@@ -1,0 +1,163 @@
+---
+title: DeepEval.ts
+---
+
+import { Callout } from "nextra/components";
+
+# Using Datasets
+
+Pulling a dataset from Confident AI to run LLM evals on is as easy as pulling a repo from GitHub.
+
+## Code Summary
+
+```typescript showLineNumbers copy
+import { EvaluationDataset } from 'deepeval/dataset';
+import { LLMTestCase } from 'deepeval/test_case';
+import { evaluate } from 'deepeval';
+
+const dataset = new EvaluationDataset();
+// Replace with your actual dataset alias
+await dataset.pull({ alias: "My Evals Dataset" });
+
+// Convert goldens to test cases
+for (const golden of dataset.testCases) {
+  // Replace yourLlmApp() with your actual LLM application function
+  const actualOutput = await yourLlmApp(golden.input);
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput,
+  });
+  dataset.addTestCase(testCase);
+}
+
+// Run an evaluation
+await evaluate(dataset.testCases, [...]);
+```
+
+## Pull a Dataset
+
+Pull your dataset from Confident AI by providing the `alias` you've defined:
+
+```typescript showLineNumbers copy {5}
+import { EvaluationDataset } from 'deepeval/dataset';
+
+const dataset = new EvaluationDataset();
+// Replace with your actual alias
+await dataset.pull({ alias: "My Evals Dataset" });
+```
+
+When you `pull()` a dataset, you are pulling goldens by default, **NOT** test cases.
+
+<Callout type="warning">
+  If you're unsure what is the difference between a golden and a test case,
+  [click here.](/concepts/datasets#goldens-vs-test-cases)
+</Callout>
+
+If you have a pre-computed dataset, aka. your `actualOutput`s are already populated (which is highly **NOT** recommended), you can also convert the goldens you pull to test cases automatically:
+
+```typescript showLineNumbers copy {5}
+...
+
+await dataset.pull({ alias: "My Evals Dataset", autoConvertGoldensToTestCases: true });
+```
+
+The second parameter `autoConvertGoldensToTestCases` is defaulted to `false`, and the preferred way is to convert goldens to test cases **manually** before evaluation.
+
+## Convert Golden(s) to Test Case(s)
+
+To convert goldens to test cases, all you have to do is dynamically generate the `actualOutput`, and optionally the `retrievalContext` (for RAG piplines) and/or `toolsCalled` (for agents) based on the given `input`.
+
+```typescript {7}
+...
+
+// Convert goldens to test cases
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  dataset.addTestCase(testCase);
+}
+
+console.log(dataset.testCases);
+```
+
+If you need to get the `retrievalContext` and `toolsCalled` as well, `yourLlmApp()` in this example should also return these parameters:
+
+```typescript {5}
+...
+
+for (const golden of dataset.testCases) {
+  const input = golden.input;
+  const { actualOutput, retrievalContext, toolsCalled } = await yourLlmApp(input);
+
+  const testCase = new LLMTestCase({
+    input,
+    actualOutput,
+    retrievalContext,
+    toolsCalled
+  });
+  dataset.addTestCase(testCase);
+}
+
+console.log(dataset.testCases);
+```
+
+Whether or not you need to supply the `retrievalContext` and/or the `toolsCalled` parameter when creating test cases is **entirely dependent on whether your chosen metrics requires them for evaluation**.
+
+> [!NOTE]
+>
+> If no metrics require these parameters for evaluation (which is rare in our experience), you can still include these parameters for visualization on Confident AI, but you will not run into errors even if you don't supply them for evaluation.
+
+Finally, you can use the test cases within your dataset for evaluation, which will create a test run on Confident AI:
+
+```typescript
+import { confidentEvaluate } from 'deepeval/evaluate';
+...
+
+await confidentEvaluate({ testCases: dataset.testCases, metricCollection: "..."});
+```
+
+## Avoid This Common Mistake
+
+The most common mistake is to append test cases to a random list of test cases **outside of your dataset**. Don't do this:
+
+```typescript showLineNumbers copy {5, 11}
+import { EvaluationDataset } from 'deepeval/dataset';
+import { LLMTestCase } from 'deepeval/test_case';
+import { evaluate } from 'deepeval';
+
+const testCases = [];
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  testCases.push(testCase);
+}
+
+await evaluate({ testCases, metricCollection: "..."});
+```
+
+Instead, add it back to the test cases in your dataset:
+
+```typescript {8}
+...
+
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  dataset.addTestCase(testCase);
+}
+```
+
+By appending test cases back to the original dataset instead of a separate list:
+
+1. The ordering of goldens is preserved, which is critical when running evaluations asynchronously
+2. You can accurately compare results between different evaluation runs
+3. Regression testing and A/B experiments work correctly since test cases maintain their relationship to the original goldens
+4. The dataset is properly synchronized with Confident AI for all evaluations
+
+In short, keeping test cases in their original dataset maintains data integrity and enables proper analysis of your evaluation results.
