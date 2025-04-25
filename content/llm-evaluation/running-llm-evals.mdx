@@ -233,6 +233,36 @@ for goldens in dataset.goldens:
 confident_evaluate(metric_collection="your-collection-name", test_cases=dataset.test_cases)
 ```
 
+Similarly, here's how to trigger evaluations on the cloud in TypeScript or JavaScript via `deepeval-ts`:
+
+```typescript showLineNumbers copy {22}
+import { EvaluationDataset, LLMTestCase } from 'deepeval-ts';
+import { confidentEvaluate } from 'deepeval';
+
+// Initialize and pull your dataset from Confident AI
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "your-dataset-alias" });
+
+// Process each golden in your dataset
+const testCases = [];
+for (const golden of dataset.goldens) {
+  const input = golden.input;
+  // Replace yourLlmApp() with your actual LLM application
+  const actualOutput = await yourLlmApp(input);
+  const testCase = new LLMTestCase({
+    input: input,
+    actualOutput: actualOutput
+  });
+  testCases.push(testCase);
+}
+
+// Run evals on Confident AI
+await confidentEvaluate({
+  metricCollection: "your-collection-name", 
+  testCases: testCases
+});
+```
+
 ### Trigger evals without code
 
 1. [Setup an LLM connection](/project-settings/setup-llm-connection) endpoint

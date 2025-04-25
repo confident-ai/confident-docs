@@ -1,0 +1,147 @@
+---
+title: DeepEval.ts
+---
+
+import { Callout } from "nextra/components";
+
+# Using Datasets
+
+You can also pull datasets from Confident AI to run LLM evals in typescript or javascript through `Deepeval.ts`.
+
+## Code Summary
+
+```typescript showLineNumbers copy
+import { EvaluationDataset } from 'deepeval/dataset';
+import { LLMTestCase } from 'deepeval/test_case';
+import { evaluate } from 'deepeval';
+
+const dataset = new EvaluationDataset();
+// Replace with your actual dataset alias
+await dataset.pull({ alias: "My Evals Dataset" });
+
+// Convert goldens to test cases
+for (const golden of dataset.testCases) {
+  // Replace yourLlmApp() with your actual LLM application function
+  const actualOutput = await yourLlmApp(golden.input);
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput,
+  });
+  dataset.addTestCase(testCase);
+}
+
+// Run an evaluation
+await evaluate(dataset.testCases, [...]);
+```
+
+## Pull a Dataset
+
+As with `DeepEval`, pulling your dataset in `Deepeval.ts` is as easy as providing the dataset `alias` you've defined:
+
+```typescript showLineNumbers copy {5}
+import { EvaluationDataset } from 'deepeval/dataset';
+
+const dataset = new EvaluationDataset();
+// Replace with your actual alias
+await dataset.pull({ alias: "My Evals Dataset" });
+```
+
+If your dataset is already populated with `actualOutput`s ([this is not recommended](/dataset-editor/using-datasets/using-datasets#pull-a-dataset)), you can convert the goldens you pull to test cases by setting the second parameter `autoConvertGoldensToTestCases` to `true`:
+
+```typescript showLineNumbers copy {5}
+...
+
+await dataset.pull({ alias: "My Evals Dataset", autoConvertGoldensToTestCases: true });
+```
+
+By default, `autoConvertGoldensToTestCases` is set to `false`.
+
+## Convert Golden(s) to Test Case(s)
+
+To convert goldens to test cases, you need to dynamically generate the `actualOutput` (and optionally the `retrievalContext` and/or `toolsCalled`), at evaluation time. 
+
+```typescript {7}
+...
+
+// Convert goldens to test cases
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  dataset.addTestCase(testCase);
+}
+
+console.log(dataset.testCases);
+```
+
+If you need the `retrievalContext` and `toolsCalled` for evaluation, `yourLlmApp()` should also return these parameters. Here is an example:
+
+```typescript {5}
+...
+
+for (const golden of dataset.testCases) {
+  const input = golden.input;
+  const { actualOutput, retrievalContext, toolsCalled } = await yourLlmApp(input);
+
+  const testCase = new LLMTestCase({
+    input,
+    actualOutput,
+    retrievalContext,
+    toolsCalled
+  });
+  dataset.addTestCase(testCase);
+}
+
+console.log(dataset.testCases);
+```
+
+Finally, to run an evaluation, you can use the `confidentEvaluate` function and simply pass the test cases you've created along with the metric collection name:
+
+```typescript
+import { confidentEvaluate } from 'deepeval/evaluate';
+...
+
+await confidentEvaluate({ testCases: dataset.testCases, metricCollection: "..."});
+```
+
+<Callout type="warning">
+`DeepEval.ts` currently does not support running evaluations locally, so you will need to run evaluations on the cloud using `confidentEvaluate`.
+</Callout>
+
+## Avoid This Common Mistake
+
+A common mistake is to append newly generated test cases to a list of test cases **outside of your dataset**:
+
+```typescript showLineNumbers copy {5, 11}
+import { EvaluationDataset } from 'deepeval/dataset';
+import { LLMTestCase } from 'deepeval/test_case';
+import { evaluate } from 'deepeval';
+
+const testCases = [];
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  testCases.push(testCase);
+}
+
+await evaluate({ testCases, metricCollection: "..."});
+```
+
+Instead, add it back to the test cases in your dataset.
+
+```typescript {8}
+...
+
+for (const golden of dataset.testCases) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: await yourLlmApp(golden.input)
+  });
+  dataset.addTestCase(testCase);
+}
+```
+
+To learn more about the benefits of keeping test cases in their original dataset, [read this section](/dataset-editor/using-datasets/using-datasets#avoid-this-common-mistake).
