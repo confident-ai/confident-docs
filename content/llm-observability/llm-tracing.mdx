@@ -314,7 +314,7 @@ def generate_response(prompt: str) -> str:
 
 There are **TWO** mandatory and **TWO** optional parameters for `LLMAttributes`:
 
-- `input`: The prompt or text of type `str` sent to the language model.
+- `input`: The prompt or text of type `str` or `List[Dict[str, str]]` sent to the language model.
 - `output`: The response generated of type `str` by the language model.
 - [Optional] `input_token_count`: The number of tokens of type `int` in the input.
 - [Optional] `output_token_count`: The number of tokens of type `int` in the generated response.
