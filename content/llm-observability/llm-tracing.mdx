@@ -316,6 +316,8 @@ There are **TWO** mandatory and **TWO** optional parameters for `LLMAttributes`:
 
 - `input`: The prompt or text of type `str` or `List[Dict[str, str]]` sent to the language model.
 - `output`: The response generated of type `str` by the language model.
+- `tools`: List of dictionaries containing tool definitions that are passed to the LLM of type `List[Dict]`
+- `tool_calls`: List of dictionaries containing output tool calls by LLM of type `List[Dict]`
 - [Optional] `input_token_count`: The number of tokens of type `int` in the input.
 - [Optional] `output_token_count`: The number of tokens of type `int` in the generated response.
 
