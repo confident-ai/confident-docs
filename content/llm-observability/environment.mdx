@@ -1,0 +1,33 @@
+---
+title: Environment
+---
+
+# Environment
+
+The environment feature allows you to specify which environment your traces are coming from. This is useful for separating traces from different environments such as development, staging, or production.
+
+## Setting the Environment
+
+You can set the environment by setting the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
+
+```bash
+export CONFIDENT_TRACE_ENVIRONMENT="staging"
+```
+
+Alternatively, you can set the environment directly in your Python code:
+
+```python
+from deepeval.tracing import trace_manager
+
+trace_manager.configure(environment="production")
+```
+
+The environment value can be any string that helps you identify where your traces are coming from.
+
+## Using Environments in Confident AI
+
+Environments allow you to separate traces without needing different projects. This is useful for:
+
+- Comparing performance between development and production environments
+- Isolating test traces from real user traces
+- Monitoring different deployment stages within the same project

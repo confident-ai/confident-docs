@@ -1,0 +1,51 @@
+---
+title: Tags
+---
+
+# Tags
+
+Tags provide a simple way to categorize and filter your traces in Confident's observatory. Unlike metadata, which can contain complex structured data, tags are simple string labels that make it easy to group related traces together.
+
+## Adding Tags to Traces
+
+You can add tags to a trace using the `update_current_trace` function:
+
+```python
+from deepeval.tracing import update_current_trace
+
+# Inside any observed function
+update_current_trace(
+    tags=["production", "user-query", "high-priority"]
+)
+```
+
+Tags are applied at the trace level, making them visible for all spans within that trace.
+
+## Example Usage
+
+Here's a simple example showing how to tag traces inside a traced component:
+
+```python
+from deepeval.tracing import observe, update_current_trace
+
+@observe(type="agent")
+def process_user_query(query, user_id):
+    tags = []
+    
+    # Add tags based on query characteristics
+    if "payment" in query.lower():
+        tags.append("payment-related")
+    elif "account" in query.lower():
+        tags.append("account-related")
+    
+    # Add tags based on user tier
+    if is_premium_user(user_id):
+        tags.append("premium-user")
+    
+    ...
+
+    # Update the trace with all relevant tags
+    update_current_trace(tags=tags)
+
+    return "Response to query"
+```

@@ -1,0 +1,114 @@
+---
+title: Masking
+---
+
+# Masking
+
+When working with LLMs, your application may process sensitive information such as personal data, financial details, or proprietary content. Confident's masking feature allows you to automatically redact or transform this sensitive data before it's sent to the observatory, ensuring privacy and compliance while still maintaining valuable observability.
+
+## Why Use Masking?
+
+Masking is essential for several reasons:
+
+- **Privacy Protection**: Keep user personal information private
+- **Regulatory Compliance**: Meet requirements like GDPR, HIPAA, or CCPA
+- **Security**: Prevent exposure of credentials or sensitive business data
+- **Risk Reduction**: Minimize the impact of potential data breaches
+
+## Configuring Masking
+
+To implement masking, you need to define a masking function and configure the trace manager with it.
+
+```python
+from deepeval.tracing import trace_manager
+import re
+
+def mask_data(data):
+    if isinstance(data, str):
+        data = re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
+        return data
+    return data
+
+trace_manager.configure(mask=mask_data)
+```
+
+The masking function is automatically applied to:
+
+1. **Span attributes**: Any attributes passed to span decorators or wrappers
+2. **Observed function I/O**: all input parameters and return values of functions with `@observe` decorator.
+
+
+## Creating an Effective Masking Function
+
+A good masking function should:
+
+### 1. Handle Different Data Types
+
+Your function needs to process various data types that might contain sensitive information. What data types you need to handle depends on your functions' input and output types as well as the attributes you are using.
+
+```python
+def mask_function(data):
+    if isinstance(data, str):
+        ...
+    elif isinstance(data, dict):
+        ...
+    elif isinstance(data, list):
+        ...
+    return data
+```
+
+### 2. Identify Sensitive Information
+
+Common types of sensitive data to mask include:
+
+- **Personal Identifiers**: Names, addresses, phone numbers
+- **Financial Information**: Credit card numbers, account details
+- **Credentials**: API keys, passwords, tokens
+- **Medical Information**: Health records, diagnoses
+- **Business Data**: Proprietary algorithms, internal metrics
+
+## Complete Example: Payment Information Masking
+
+Here's a complete example that uses a recursive masking function to mask payment information.
+
+```python
+from deepeval.tracing import observe, trace_manager
+import re
+
+def mask_payment_info(data):
+    if data is None:
+        return None
+    if isinstance(data, str):
+        return re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
+    elif isinstance(data, dict):
+        return {k: mask_payment_info(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [mask_payment_info(item) for item in data]
+    return data
+
+trace_manager.configure(mask=mask_payment_info)
+```
+
+The following example shows a retriever function that handles both string and list data types containing sensitive information. This demonstrates how the masking function automatically protects credit card numbers in both function parameters and span attributes:
+
+```python
+@observe(type="retriever", embedder="text-embedding-ada-002")
+def retrieve_payment_docs(query: str) -> list:
+    ...
+    fetched_documents = [
+        "Document 1: We accept Visa 4111-1111-1111-1111 and Mastercard.",
+        "Document 2: For premium accounts, please use the card on file.",
+        "Document 3: Payment history shows transaction with card 4111-2222-3333-4444."
+    ]
+    
+    update_current_span(
+        attributes={
+            "embedding_input": query,
+            "retrieval_context": fetched_documents,
+            "retrieval_source": "payment_db"
+        }
+    )
+    return fetched_documents
+```
+
+All instances of credit card numbers will appear as `[REDACTED CARD]` in the observatory.

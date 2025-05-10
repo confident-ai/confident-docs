@@ -1,0 +1,90 @@
+---
+title: Metadata
+---
+
+# Metadata
+
+With Confident AI, you can attach additional metadata to both traces and spans. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+
+## Adding Metadata
+
+You can add metadata at two levels:
+
+1. **Span Level**: Metadata attached to individual spans
+2. **Trace Level**: Metadata attached to the entire trace
+
+### Span-Level Metadata
+
+To add metadata to the current span, use the `update_current_span` function and pass in your `metadata`, which accepts a dictionary where keys are strings and values can be any serializable type. You can record a span's metadata in any span type.
+
+```python
+from deepeval.tracing import update_current_span
+
+# Inside a decorated function
+update_current_span(
+    metadata={
+        "source": "knowledge_base_1",
+        "confidence_score": 0.92,
+        "retrieved_documents": 3,
+        "is_cached": True
+    }
+)
+```
+
+### Trace-Level Metadata
+
+To add metadata to the entire trace, use the `update_current_trace` function.
+
+```python
+from deepeval.tracing import update_current_trace
+
+# Inside any decorated function
+update_current_trace(
+    metadata={
+        "user_id": "user-456",
+        "session_id": "abc123",
+    }
+)
+```
+
+## Complete Example
+
+Here's a simple example showing how to record metadata at both span and trace levels within the same LLM component function:
+
+```python
+from deepeval.tracing import observe, update_current_span, update_current_trace
+
+@observe(type="agent")
+async def my_agent(query: str):
+    # Agent logic here...
+    
+    # Add span-level metadata
+    update_current_span(
+        metadata={
+            "source": "knowledge_base_1",
+            "confidence_score": 0.92,
+            "retrieved_documents": 3
+        }
+    )
+    
+    # Add trace-level metadata
+    update_current_trace(
+        metadata={
+            "user_id": "user-456",
+            "session_id": "session-123",
+            "app_version": "1.2.3",
+        }
+    )
+
+    return "Agent response"
+```
+
+## Using Metadata in the Observatory
+
+In Confident's observatory, you can:
+
+- View metadata for any span or trace in the trace viewer
+- Filter traces by metadata
+- Analyze trace performance by metadata values
+
+This makes metadata essential for debugging, monitoring, and analyzing your LLM application performance.
