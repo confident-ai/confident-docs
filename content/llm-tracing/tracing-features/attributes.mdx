@@ -6,12 +6,12 @@ import { Callout } from "nextra/components";
 
 # Attributes
 
-Attributes are like [`metadata`](/llm-observability/functionalities/metadata) but specific for different span `type`s, with the only difference being attributes are stricter in type. For example, you are expected to provide an input of type string when setting attribute for the `retriever` span type to represent the text to be embedded.
+Attributes are like [`metadata`](/llm-observability/functionalities/metadata) but specific for different span `type`s, with the only difference being attributes are stricter in type. 
 
-Setting attributes will make the tracing UI easier to navigate on Confident AI, but is by no means required.
+For example, you are expected to provide an `input` of type string when setting attribute for the `retriever` span type to represent the text to be embedded, which is also why you should avoid [setting `input`/`output`s manually](/llm-tracing/tracing-features/input-output#set-span-io-at-runtime) for default span types to avoid running into typing errors.
 
 <Callout type="warning">
-You cannot set attributes for custom [span `type`s](/llm-observability/functionalities/span-types).
+Setting attributes will make the tracing UI easier to navigate on Confident AI, but is by no means required. You also cannot set attributes for custom [span `type`s](/llm-observability/functionalities/span-types).
 </Callout>
 
 ## Set Attributes At Runtime

@@ -1,7 +1,6 @@
 export default {
-  overview: "",
-  "llm-tracing": "",
-  "functionalities": "",
+  introduction: "",
+  "tracing-features": "",
   "integrations": "",
   "latency-and-cost-tracking": "",
   "filters-and-searches": "",

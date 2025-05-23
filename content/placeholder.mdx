@@ -1,26 +1,32 @@
 ---
-title: Overview
+title: Placeholder
 ---
 
 import { Callout, Cards } from "nextra/components";
 
-# LLM Observability Overview
+# LLM Tracing on Confident AI
 
-Confident AI offers an **Observatory** for teams to trace and monitor LLM applications. Think Datadog for LLM apps. The observatory allows you to:
 
-- Detect and debug issues in your LLM applications in real-time
-- Search and analyze historical generation data with powerful filters
-- Collect human feedback on model responses
-- Run evaluations to measure and improve performance
-- Track costs and latency to optimize resource usage
+Confident AI offers an **Observatory** for teams to do tracing and evals in one place. Think Datadog with evals for LLM apps.
 
-## Features Summary
+<Callout>
+When you use tracing on Confident AI, all traces, spans, and threads **automatically have access to all the evaluation DeepEval offers.**
+</Callout>
+
+Tracing is designed to be completely non-intrusive to your application. It:
+
+- Requires no rewrite of your existing code - just add the `@observe` decorator
+- Runs asynchronously in the background with zero impact on latency
+- Fails silently if there are any issues, ensuring your app keeps running
+- Works with any function signature - you can set input/output at runtime
+
+## Feature Highlights
 
 <Cards>
-  <Cards.Card arrow title="LLM Tracing" href="/llm-observability/llm-tracing" />
+  <Cards.Card arrow title="Extensive LLM Tracing" href="/llm-observability/llm-tracing" />
   <Cards.Card
     arrow
-    title="Online Metrics"
+    title="Online Evaluation"
     href="/llm-observability/functionalities/online-metrics"
   />
   <Cards.Card
@@ -40,7 +46,13 @@ Confident AI offers an **Observatory** for teams to trace and monitor LLM applic
   />
 </Cards>
 
-## Simple Walkthrough
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/observability:llm-tracing.mp4"
+  width="100%"
+  title="LLM Tracing for an Agentic RAG App"
+/>
+
+## Quick Walkthrough
 
 This walkthrough will show how to trace LLM applications on Confident AI. Not all features will be covered, but if you follow all the steps you'll have LLM tracing setup.
 
@@ -108,22 +120,3 @@ Once you have everything setup, all you have to do is run the `generate_response
 
 generate_response("Hi!")
 ```
-
-### View Traces
-
-Here's a quick overview of the **Observatory** page on Confident AI:
-
-<VideoDisplayer
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/observability:llm-tracing.mp4"
-  width="100%"
-  title="LLM Tracing for an Agentic RAG App"
-/>
-
-## Future Roadmap
-
-- [x] Span level metrics defining
-- [ ] Hyperparameter logging
-- [ ] Custom properties logging
-- [ ] Latency and cost tracking display
-- [ ] Self-served alerting notification configurations
-- [ ] More integrations

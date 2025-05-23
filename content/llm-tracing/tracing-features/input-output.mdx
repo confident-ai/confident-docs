@@ -1,0 +1,72 @@
+---
+title: Input/Output
+---
+
+import { Callout } from "nextra/components";
+
+# Input/Output
+
+Both traces and spans have inputs and outputs, which you can set dynamically within your application using the `update_current_span` and `update_current_trace` function respectively.
+
+## Set Trace I/O At Runtime
+
+You can set the `input` and `output` of a trace using the `update_current_trace` function:
+
+```python showLineNumbers {12}
+from deepeval.tracing import observe, update_current_trace
+ 
+@observe()
+def llm_app(query: str):
+    res = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message["content"]
+
+    update_current_trace(input=query, output=res)
+    return res
+ 
+ 
+llm_app("Write me a poem.")
+```
+
+The `input` and `output` can be **ANY TYPE**, and is useful for visualization on the UI (even more so if you're using [conversation threads](/llm-tracing/tracing-features/threads)).
+
+<Callout>
+The trace I/O defaults to the `input` and `output` of the root span **if not set.**
+</Callout>
+
+## Set Span I/O At Runtime
+
+
+You can set the `input` and `output` on spans using the `update_current_span` function.
+
+One thing to note however, is we recommend [setting attributes](/llm-tracing/tracing-features/attributes) instead of `input` and `output` directly on spans that are one of the **DEFAULT span types**, since DeepEval handles the `input` and `output` setting automatically for default span `type`s. 
+
+<Callout type="warning">
+For example, the `"retriever"` span `type` expects a string as the `input` and list of strings as the `output`, which you might violate if setting I/O yourself. This will decrease the chances that you run into an error.
+</Callout>
+
+```python showLineNumbers {12}
+from deepeval.tracing import observe, update_current_span
+ 
+@observe()
+def llm_app(query: str):
+    res = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message["content"]
+
+    update_current_span(input=query, output=res)
+    return res
+ 
+ 
+llm_app("Write me a poem.")
+```
+
+This example is the same as the one for tracing except for the `update_current_trace`, and that's not a mistake. You can set `input` and `output`s the same way as you do for traces, and if a trace's I/O is not set it defaults to the I/O of the root span.
+
+The `input` and `output` can be **ANY TYPE** for custom span `type`s, and is useful for visualization on the UI.

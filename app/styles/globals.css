@@ -124,3 +124,46 @@ h4, h5, h6 {
     display: none;
   }
 }
+
+
+/* Hide the folder buttons for multiple folders */
+button[data-href="/llm-evaluation"],
+button[data-href="/llm-tracing"],
+button[data-href="/dataset-editor"],
+button[data-href="/prompt-management"],
+button[data-href="/human-in-the-loop"],
+button[data-href="/project-settings"] {
+  display: none !important;
+}
+
+/* Remove indentation ONLY from direct children (first level) */
+button[data-href="/llm-evaluation"] + div > ul,
+button[data-href="/llm-tracing"] + div > ul,
+button[data-href="/dataset-editor"] + div > ul,
+button[data-href="/prompt-management"] + div > ul,
+button[data-href="/human-in-the-loop"] + div > ul,
+button[data-href="/project-settings"] + div > ul {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Remove the left border/line ONLY from direct children */
+button[data-href="/llm-evaluation"] + div > ul::before,
+button[data-href="/llm-tracing"] + div > ul::before,
+button[data-href="/dataset-editor"] + div > ul::before,
+button[data-href="/prompt-management"] + div > ul::before,
+button[data-href="/human-in-the-loop"] + div > ul::before,
+button[data-href="/project-settings"] + div > ul::before {
+  display: none !important;
+}
+
+/* Ensure the container divs don't add extra spacing */
+li:has(button[data-href="/llm-evaluation"]) > div,
+li:has(button[data-href="/llm-tracing"]) > div,
+li:has(button[data-href="/dataset-editor"]) > div,
+li:has(button[data-href="/prompt-management"]) > div,
+li:has(button[data-href="/human-in-the-loop"]) > div,
+li:has(button[data-href="/project-settings"]) > div {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}

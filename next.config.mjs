@@ -22,6 +22,4 @@ export default withNextra({
     }
     return config
   },
-  // // Enable CSS modules
-  // cssModules: true
 })

@@ -1,11 +1,12 @@
 ---
 title: Span Types
 ---
+
 import { Callout } from "nextra/components";
 
 # Span Types
 
-Span types are optional and allow you to classify the most common types of components in LLM applications, which includes:
+Span types are **hugely optional** but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
 
 - `"llm"`
 - `"retriever"`
@@ -15,8 +16,27 @@ Span types are optional and allow you to classify the most common types of compo
 This is set via the `type` argument in the `@observe` decorator. By classifying span types you can create more tailored UIs on Confident AI, and set more specific [`attribtues`](/llm-observability/functionalities/attributes) instead of using generalized [`metadata`](/llm-observability/functionalities/metadata).
 
 <Callout type="info">
-Anything that is not one of the four pre-defined span types are automatically custom spans.
+Anything that is **NOT** one of these four default span types are **automatically custom spans.**
 </Callout>
+
+
+## Custom Span
+
+The most flexible `type` out of all (and the default type if `type` is not provided), custom spans are essential for creating hierarchical structures or grouping related spans together. They provide flexibility in organizing your tracing data.
+
+```python
+@observe(name="RAG Pipeline")
+def rag_pipeline(query: str) -> str:
+    pass
+```
+
+There is **ONE** mandatory and **TWO** optional parameters when decorating a function of the Custom span type:
+
+- `type`: The type of span. Anything other than `"llm"`, `"retriever"`, `"tool"`, and `"agent"` is a custom span type. Defaulted to the `name`.
+- [Optional] `name`: A string specifying how this custom span is displayed on Confident AI. Defaulted to the name of the decorated function.
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/llm-observability/online-metrics)
+
+The `input` and `output`s of a custom span is defaulted to the function input arguments and the output, however you can also [set it dynamically yourself.](/llm-tracing/tracing-features/input-output#set-span-io-at-runtime)
 
 ## LLM Span
 
@@ -108,19 +128,3 @@ There are **ONE** mandatory and **FOUR** optional parameters when decorating a f
 - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/llm-observability/online-metrics)
 
 Agents can be nested within other agents, which is useful for implementing hierarchical agent architectures. For instance, a "supervisor" agent might coordinate communication between specialized agents.
-
-## Custom Span
-
-Custom spans are essential for creating hierarchical structures or grouping related spans together. They provide flexibility in organizing your tracing data.
-
-```python
-@observe(name="RAG Pipeline")
-def rag_pipeline(query: str) -> str:
-    pass
-```
-
-There is **ONE** mandatory and **TWO** optional parameters when decorating a function of the Custom span type:
-
-- `type`: The type of span. Anything other than `"llm"`, `"retriever"`, `"tool"`, and `"agent"` is a custom span type. Defaulted to the `name`.
-- [Optional] `name`: A string specifying how this custom span is displayed on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/llm-observability/online-metrics)

@@ -1,0 +1,41 @@
+---
+title: Threads (Chats, Conversations, etc.)
+---
+
+import { Callout } from "nextra/components";
+
+# Threads
+
+A "thread" on Confident AI is a group of one or more traces. This is useful for those building AI chatrooms, conversational agents, etc., where you wish to view entire conversations on Confident AI.
+
+<Callout type="warning">
+It is traces that are grouped together, not spans.
+</Callout>
+
+## Set Threads At Runtime
+
+You can use the `update_current_trace` function to set the `thread_id` within traces, which Confident AI will use to group traces together:
+
+```python showLineNumbers {12}
+from deepeval.tracing import observe, update_current_trace
+ 
+@observe()
+def llm_app(query: str):
+    res = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message["content"]
+
+    update_current_trace(thread_id="your-thread-id", input=query, output=query)
+    return res
+ 
+llm_app("Write me a poem.")
+```
+
+The `thread_id` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI. 
+
+<Callout>
+If the I/O is not provided, it will be set to the [default I/O values of the trace.](/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) 
+</Callout>

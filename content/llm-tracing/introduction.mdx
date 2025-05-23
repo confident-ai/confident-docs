@@ -1,8 +1,133 @@
 ---
-title: LLM Tracing
+title: Introduction
 ---
 
-import { Callout } from "nextra/components";
+import { Callout, Cards } from "nextra/components";
+
+# Introduction to LLM Tracing on Confident AI 
+
+Confident AI offers an **Observatory** for teams to trace and monitor LLM applications. Think Datadog for LLM apps. The observatory allows you to:
+
+- Detect and debug issues in your LLM applications in real-time
+- Search and analyze historical generation data with powerful filters
+- Collect human feedback on model responses
+- Run evaluations to measure and improve performance
+- Track costs and latency to optimize resource usage
+
+## Feature Highlights
+
+<Cards>
+  <Cards.Card arrow title="LLM Tracing" href="/llm-observability/llm-tracing" />
+  <Cards.Card
+    arrow
+    title="Online Metrics"
+    href="/llm-observability/functionalities/online-metrics"
+  />
+  <Cards.Card
+    arrow
+    title="Latency and Cost Tracking"
+    href="/llm-observability/latency-and-cost-tracking"
+  />
+  <Cards.Card
+    arrow
+    title="Filters and Searches"
+    href="/llm-observability/filters-and-searches"
+  />
+  <Cards.Card
+    arrow
+    title="Performance Alerting"
+    href="/llm-observability/performance-alerting"
+  />
+</Cards>
+
+## Simple Walkthrough
+
+This walkthrough will show how to trace LLM applications on Confident AI. Not all features will be covered, but if you follow all the steps you'll have LLM tracing setup.
+
+### Setup Tracing
+
+Here's a simple tracing implementation that monitors an OpenAI generation using the `@observe` decorator:
+
+```python showLineNumbers
+from deepeval.tracing import observe, update_current_span
+
+
+@observe(type="llm", model="gpt-4")
+def generate_response(prompt: str) -> str:
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    output = response.choices[0].message.content
+
+    update_current_span(
+      attributes=LlmAttributes(input=prompt, output=output)
+    )
+    return output
+```
+
+### Enable Online Metrics (recommended)
+
+This step is optional but, you can enable online metrics to evaluate all traces logged on Confident AI. First, enable online metrics on Confident AI by goin got **Metrics** > **Collections**, and create a new metric collection. Then add the "Answer Relevancy" metric to this newly created collection, and make sure it is activated. Finally, select the metric collection, and click **Enable for monitoring**.
+
+Now in your code, add these lines to automatically run online evals in production:
+
+```python showLineNumbers {10, 19}
+from openai import OpenAI
+from deepeval.test_case import LLMTestCase
+from deepeval.tracing import (
+    observe,
+    update_current_span,
+    LlmAttributes,
+)
+
+@observe(type="llm", model="gpt-4", metrics="Answer Relevancy")
+def generate_response(prompt: str) -> str:
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4", messages=[{"role": "user", "content": prompt}]
+    )
+    output = response.choices[0].message.content
+
+    update_current_span(
+      attributes=LlmAttributes(input=prompt, output=output)
+      test_case=LLMTestCase(input=prompt, actual_output=output)
+    )
+    return output
+```
+
+Now whenever you run your `generate_response()` function, all traces will be logged and evaluated on Confident AI.
+
+### Trace a Generation
+
+Once you have everything setup, all you have to do is run the `generate_response()` function:
+
+```python
+...
+
+generate_response("Hi!")
+```
+
+### View Traces
+
+Here's a quick overview of the **Observatory** page on Confident AI:
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/observability:llm-tracing.mp4"
+  width="100%"
+  title="LLM Tracing for an Agentic RAG App"
+/>
+
+## Future Roadmap
+
+- [x] Span level metrics defining
+- [ ] Hyperparameter logging
+- [ ] Custom properties logging
+- [ ] Latency and cost tracking display
+- [ ] Self-served alerting notification configurations
+- [ ] More integrations
+
 
 # LLM Tracing
 
