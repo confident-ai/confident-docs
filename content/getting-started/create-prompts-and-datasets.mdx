@@ -4,17 +4,17 @@ title: Create Prompts and Datasets
 
 import { Callout } from "nextra/components";
 
-# Setup Prompts and Datasets
+**Prompts** are either text or a list of text templates that guide LLM behavior by providing instructions, context, and structure for generating responses. Refer to the [concepts page](/concepts/hyperparameters#prompts) for more information.
 
-Creating a prompt and dataset is extremely important to running evaluations on Confident AI. This is because by editing prompts on Confident AI we'll be able to tell you which version performs best, while annotating datasets on Confident AI allows you to use them for evaluation much more effectively.
+**Datasets** in Confident AI is a collection of [test cases](/concepts/test-cases) and/or [goldens](/concepts/datasets#goldens) that you use to evaluate your LLM application. Refer to the [datasets concept page](/concepts/datasets) for more information.
 
-<Callout type="warning">
-  If in doubt, read the concepts explanation on what a
-  [prompt](/concepts/hyperparameters#prompts) and [dataset](/concepts/datasets)
-  is.
-</Callout>
 
-This page will walk you through how to quickly create one of each before moving onto running an evaluation.
+# Getting Started with Prompts and Datasets
+
+A prompt and dataset are how you run evaluations on Confident AI.
+Prompts will be used to provide the input to your LLM application, and datasets will be used to store the inputs and expected outputs for evaluation.
+
+By [prompt versioning](/concepts/hyperparameters#prompt-versioning), we track which prompt template performs best, while annotating datasets enables effective evaluations.
 
 ## Prompts
 
@@ -30,21 +30,17 @@ This page will walk you through how to quickly create one of each before moving 
 
 ### Create a Prompt
 
-Navigate to your project, and go to the **Prompt Studio** tab on the left navigation drawer. Click on **Create a Prompt**, and provide your prompt with an alias. For example, the alias of your first prompt can be something like `"System Prompt"`, which is where you'll be storing your system prompt, instead of using something like CSV files or GitHub `.txt` files.
+Navigate to your project, and go to the **Prompt Studio** tab on the left navigation drawer. Click on **Create a Prompt**, and provide your prompt with an alias. For example, the alias of your first prompt can be called `System Prompt`, which is where you can centrally store your [system prompt](https://promptengineering.org/system-prompts-in-large-language-models/), instead of using CSV files, or `.txt` files without any [versioning](/concepts/hyperparameters#prompt-versioning).
+
+{/* Add an example system prompt */}
 
 ### Create a Prompt Version
 
 Now that you have a prompt, create a first version of your prompt. You should paste in the prompt that you are currently using in your LLM application. For example, you can paste in your entire system prompt and click **Save**.
 
-<Callout type="info">
-  If this is a bit too much information, don't worry. You'll have the
-  opportunity to dig deeper into all the prompt management features Confident AI
-  offers in later sections.
-</Callout>
-
 ### Using Variables in Prompts
 
-When your prompt needs to include dynamic content, you can use variables by wrapping them in double curly braces. Here's how to format them correctly:
+When your prompt needs to include dynamic content, you can use variables to create a [prompt template](/concepts/hyperparameters#prompt-templates). Variables can be added by wrapping them in spaced out double curly braces. Variables must have no spaces in variable name. Here's how to format them correctly:
 
 ```text showLineNumbers
 # ✅ Correct usage:
@@ -56,11 +52,6 @@ When your prompt needs to include dynamic content, you can use variables by wrap
 "Hi, my name is {{ variable name }}."  # Spaces in variable name
 "Hi, my name is {{  variable_name }}." # Extra spaces around variable name
 ```
-
-<Callout type="warning">
-  Variables must follow these rules: 1. No spaces in the variable name 2.
-  Exactly one space between the braces and the variable name
-</Callout>
 
 You can also create **a list of prompt messages**, or which is a list of prompts with the `"role"` and `"content"` field present. If you decide to create a prompt message instead, you can supply it directly to your LLM provider once pulled from Confident AI (more info on this later). More on prompt messages can be [found here.](/prompt-studio/prompt-versioning#commit-a-prompt-message-list)
 
@@ -81,22 +72,21 @@ Let's create a dataset next.
 
 ### Create a Dataset
 
-Navigate to your project, and go to the **Datasets** tab on the left navigation drawer. Click on **Create a dataset**, and provide your dataset with an alias. For example, the alias of your first dataset can be something like `"My Evals Dataset"`, which is where you'll be storing the dataset you'll be using for evaluation.
+Navigate to your project, and go to the **Datasets** tab on the left navigation drawer. Click on **Create a dataset**, and provide your dataset with an alias.
 
 ### Create or Upload Golden(s)
 
 Once you've created a dataset, you'll be directed to the **Dataset Editor** page for your newly created dataset. Depending on whether you already have [goldens](/concepts/datasets#goldens), you should either:
 
-1. Upload a CSV file of your goldens to your dataset, **only if you already have a dataset prepared**
-2. Create a golden, with the input as the text you typically prompt your LLM application with for testing
+1. Upload a CSV file of your goldens to your dataset, if you already have a dataset prepared.
+2. Create a golden, with the input as the text you typically prompt your LLM application with for testing.
 
-If you fall into category 2 where you don't already have a dataset, simply creating a golden very quickly with the input text you usually test your LLM application with is the best approach to get LLM evaluation setup.
+If you don't already have a dataset, create a golden with a text input text you usually use to test your LLM application. You can add more goldens later to the dataset. 
 
-<Callout>
-  You can always add more goldens later on, but that can be done at a later time
-  once you've gone through this quickstart guide.
-</Callout>
+{/* Add a sample golden for users Getting Strated */}
 
-## What's Next?
+## Conclusion: What's next?
+
+In this section, we learned what prompts, prompt versioning and datasets are. We created a prompt to guide our LLM application's behaviors. We added a dataset on Confident AI with goldens to evaluate our LLM application against. 
 
 In the next section, we'll use the prompt and dataset we've setup to run our first LLM evaluation.
