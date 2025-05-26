@@ -46,27 +46,13 @@ When a hyperparameter is not a prompt, there won't be any versioning. For exampl
 
 ## Prompts
 
-### Why prompt versioning?
+Prompts are either text **OR** a list of text templates that guide LLM behavior by providing instructions, context, and structure for generating responses. 
 
-Prompt versioning is a critical feature for optimizing your LLM applications. By running evaluations with different prompt versions, you can:
+### Prompt Templates
 
-1. **Quantify improvements**: Measure how each version performs against your evaluation metrics
-2. **Identify optimal versions**: Determine which prompt version produces the best results for your specific use case
-3. **Track evolution**: Document how your prompts have evolved and what changes led to improvements
-4. **Compare trade-offs**: Understand the balance between different aspects of performance (e.g., accuracy vs. conciseness)
+Prompt templates are variables that are dynamically filled at runtime, allowing for flexible and context-aware interactions with the LLM.
 
-Confident AI automatically tracks which prompt version was used for each test run, allowing you to correlate prompt changes with performance metrics. This data-driven approach to prompt engineering helps you make informed decisions about which prompt version to use in production.
-
-Confident AI provides a [Prompt Studio](/prompt-studio/overview) for managing your prompt templates:
-
-- **Versioning**: Track changes to your prompts over time
-- **A/B Testing**: Compare different prompt versions to see which performs better
-- **Centralized Storage**: Keep all your prompts in one place
-- **Collaboration**: Share prompts with team members
-
-Prompts are either text **OR** a list of text templates that guide LLM behavior by providing instructions, context, and structure for generating responses. A prompt template contains variables that are interpolated at runtime with dynamic values to create the final prompt sent to the LLM.
-
-For example, a simple prompt template might look like:
+Example 1:  A simple prompt template looks like this:
 
 ```
 You are a helpful AI assistant. Answer the following question based on the provided context:
@@ -78,12 +64,9 @@ Question: {question}
 Answer:
 ```
 
-<Callout type="info">
-  When this template is used, the variables `{context}` and `{question}` are
-  replaced with actual values to create the final prompt.
-</Callout>
+When this template is used, the variables `{context}` and `{question}` are replaced with actual values to create the final prompt.
 
-On the contrary, a list of prompt template messages looks like this:
+Example 2: A list of prompt template messages looks like this:
 
 ```python
 [
@@ -92,7 +75,26 @@ On the contrary, a list of prompt template messages looks like this:
 ]
 ```
 
-Which you can provide to your LLM provider such as OpenAI directly.
+These could be LLM specific providing system and user prompts to your LLM provider such as OpenAI directly.
+
+
+### Prompt Versioning
+
+Prompts can be versioned to track changes and improvements over time with **prompt versioning**. This is particularly useful for optimizing LLM performance, as different prompt versions can yield varying results based on how they are structured and the information they provide.
+
+1. **Quantify improvements**: Measure how each version performs against your evaluation metrics.
+2. **Identify optimal versions**: Determine which prompt version produces the best results for your specific use case.
+3. **Track evolution**: Document how your prompts have evolved and what changes led to improvements.
+4. **Compare trade-offs**: Understand the balance between different aspects of performance (e.g., accuracy vs. conciseness).
+
+Confident AI automatically tracks which prompt version was used for each test run, allowing you to correlate prompt changes with performance metrics. This data-driven approach to prompt engineering helps you make informed decisions about which prompt version to use in production.
+
+To manage your prompt templates, checkout [Prompt Studio](/prompt-studio/overview):
+
+- **Versioning**: Track changes to your prompts over time
+- **A/B Testing**: Compare different prompt versions to see which performs better
+- **Centralized Storage**: Keep all your prompts in one place
+- **Collaboration**: Share prompts with team members
 
 ### Prompt Versioning vs Prompts
 
