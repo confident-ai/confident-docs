@@ -24,7 +24,7 @@ If you wish to run evaluations on individual components in your LLM app, you sho
 ## Code Summary
 
 
-<Tabs items={['Evals In CI/CD', 'Evals In Python Script']}>
+<Tabs items={['Evals In CI/CD', 'Evals In Python Script', 'Evals with OpenAI']}>
   <Tabs.Tab>
 
 ```python showLineNumbers copy {10, 16, 20}
@@ -73,6 +73,39 @@ for goldens in dataset.goldens:
 evaluate(
     test_cases=dataset.test_cases,
     metrics=[AnswerRelevancyMetric()], # Replace with your metrics
+)
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```python showLineNumbers copy {2, 14, 26}
+from deepeval.tracing import observe
+from deepeval.openai import OpenAI
+
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import evaluate
+
+
+dataset = EvaluationDataset()
+dataset.pull(alias="your-dataset-alias") # Pull dataset from Confident AI
+
+# Decorate your LLM app
+@observe(metrics=[AnswerRelevancyMetric()])
+def your_llm_app(input: str):
+    client = OpenAI()
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input}
+        ]
+    )
+
+# Run an evaluation
+evaluate(
+    goldens=dataset.goldens,
+    observed_callback=your_llm_app,
 )
 ```
   </Tabs.Tab>

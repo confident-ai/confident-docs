@@ -23,7 +23,7 @@ If you would rather treat your LLM app as a black-box, you can run [end-to-end e
 
 ## Code Summary
 
-<Tabs items={['Evals In CI/CD', 'Evals In Python Script']}>
+<Tabs items={['Evals In CI/CD', 'Evals In Python Script', 'Evals with OpenAI']}>
   <Tabs.Tab>
 
 ```python filename="test_llm_app.py" showLineNumbers {9, 18, 22, 26}
@@ -89,6 +89,33 @@ dataset.pull(alias="your-dataset-alias")
 evaluate(goldens=[dataset.goldens], observed_callback=llm_app)
 ```
     </Tabs.Tab>
+    <Tabs.Tab>
+```python showLineNumbers {1, 9, 23}
+from deepeval.openai import OpenAI
+import pytest
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.tracing import observe
+from deepeval import evaluate
+
+
+@observe(metrics=[AnswerRelevancyMetric()])
+def llm_app(query: str) -> str:
+    client = OpenAI()
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message["content"]
+    return res
+
+dataset = EvaluationDataset()
+dataset.pull(alias="your-dataset-alias")
+
+evaluate(goldens=[dataset.goldens], observed_callback=llm_app)
+```
+    </Tabs.Tab>
 </Tabs>
 
 ## Define Metrics
@@ -105,7 +132,9 @@ metric = AnswerRelevancyMetric()
 
 Setup tracing for your LLM application with the `@observe` decorator - which will allow you to create test cases at runtime for each individual component.
 
-```python {5, 15}
+<Tabs items={['Python', 'OpenAI']}>
+  <Tabs.Tab>
+```python showLineNumbers {5, 15}
 from deepeval.tracing import observe, update_current_span
 ...
 
@@ -122,7 +151,30 @@ def llm_app(query: str) -> str:
     # This creates test cases for your component at evaluation time
     update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
     return res
-```
+``` 
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+```python showLineNumbers {1, 6}
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, update_current_span
+...
+
+# Decorate your LLM app and provide metrics
+@observe(metrics=[metric])
+def llm_app(query: str) -> str:
+    client = OpenAI()
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message["content"]
+    return res
+``` 
+
+  </Tabs.Tab>
+</Tabs>
 
 Tracing will also allow you to visualize and debug the latencies, model cost, etc. of each individual component in your testing report. You can read more about all of Confident AI's tracing features and capabilities in the [tracing section.](/llm-tracing/introduction)
 
