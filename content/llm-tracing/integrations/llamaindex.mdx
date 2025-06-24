@@ -11,7 +11,7 @@ import { Callout } from "nextra/components";
 
 ## Quickstart
 
-Confident AI provides a `LlamaIndexSpanHandler` that can be used to trace LlamaIndex **spans.**
+Confident AI provides a instruments LlamaIndex to trace LlamaIndex **spans** and **events**.
 
 Install the following packages:
 
@@ -23,18 +23,17 @@ Login with your API key and configure DeepEval as an span handler for LlamaIndex
 
 ```python filename="main.py" showLineNumbers {6, 9, 10}
 import llama_index.core.instrumentation as instrument
-from deepeval.integrations import LlamaIndexEventHandler, LlamaIndexSpanHandler
+from deepeval.integrations import instrument_llama_index
 import deepeval
 
 # Login
 deepeval.login_with_confident_api_key("<your-confident-api-key>")
 
 # Let DeepEval collect traces
-instrument.get_dispatcher().add_event_handler(LlamaIndexEventHandler())
-instrument.get_dispatcher().add_span_handler(LlamaIndexSpanHandler())
+instrument_llama_index(instrument.get_dispatcher())
 ```
 
-Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as traces and publish them to Confident AI.
+Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans and events as traces and publish them to Confident AI.
 
 <Callout type="info">
 [Spans & Events](https://docs.llamaindex.ai/en/stable/module_guides/observability/instrumentation/) in LlamaIndex are units of work that can be used to trace the execution flow of the application.
@@ -44,7 +43,7 @@ Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as trace
 
 The example agent will be able to perform calculations using the `multiply` tool.
 
-```python showLineNumbers filename="main.py" {12, 13, 14, 23}
+```python showLineNumbers filename="main.py" {12, 13, 21}
 import os
 import asyncio
 import time
@@ -52,14 +51,12 @@ from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.openai import OpenAI
 import llama_index.core.instrumentation as instrument
 
-from deepeval.integrations import LlamaIndexSpanHandler, LlamaIndexEventHandler
+from deepeval.integrations import instrument_llama_index
 import deepeval
 
 # Don't forget to setup tracing
 deepeval.login_with_confident_api_key("<your-confident-api-key>")
-instrument.get_dispatcher().add_span_handler(LlamaIndexSpanHandler())
-instrument.get_dispatcher().add_event_handler(LlamaIndexEventHandler())
-
+instrument_llama_index(instrument.get_dispatcher())
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 
@@ -95,5 +92,5 @@ python main.py
 You can directly view the traces in the **Observatory** by clicking on the link in the output printed in the console.
 
 <Callout>
-As the agent is running, it will export **spans** and **events** to the `dispatcher`. The `dispatcher` will send the spans to the `LlamaIndexSpanHandler` and the events to the `LlamaIndexEventHandler`, which will collect them to create a Confident AI **trace** and send it to the [Observatory](https://documentation.confident-ai.com/llm-tracing/introduction).
+As the agent is running, it will export **spans** and **events** to the `dispatcher`. The `dispatcher` will send them to DeepEval's LlamaIndex handlers, which will collect them to create a Confident AI **trace** and send it to the [Observatory](https://documentation.confident-ai.com/llm-tracing/introduction).
 </Callout>
