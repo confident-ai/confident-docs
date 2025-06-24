@@ -23,7 +23,7 @@ Login with your API key and configure DeepEval as an span handler for LlamaIndex
 
 ```python filename="main.py" showLineNumbers {6, 9, 10}
 import llama_index.core.instrumentation as instrument
-from deepeval.integrations import instrument_llama_index
+from deepeval.integrations.llama_index.handler import instrument_llama_index
 import deepeval
 
 # Login
