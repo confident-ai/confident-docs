@@ -51,7 +51,7 @@ from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.openai import OpenAI
 import llama_index.core.instrumentation as instrument
 
-from deepeval.integrations import instrument_llama_index
+from deepeval.integrations.llama_index.handler import instrument_llama_index
 import deepeval
 
 # Don't forget to setup tracing
