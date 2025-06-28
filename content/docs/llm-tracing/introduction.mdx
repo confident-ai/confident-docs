@@ -127,18 +127,20 @@ export CONFIDENT_API_KEY=YOUR_API_KEY
 
 The `@observe` decorator is the primary way to instrument your LLM application for tracing.
 
-```python filename="main.py" showLineNumbers {4, 15}
+```python filename="main.py" showLineNumbers {6, 17}
 from openai import OpenAI
 from deepeval.tracing import observe
 
+client = OpenAI()
+
 @observe()
 def llm_app(query: str) -> str:
-    return openai.ChatCompletion.create(
+    return client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
 
 # Call app to send trace to Confident AI
@@ -196,18 +198,20 @@ First, enable online evals on Confident AI by [creating a metric collection](/do
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
 
-```python filename="main.py" showLineNumbers {4, 13}
+```python filename="main.py" showLineNumbers {6, 15}
 from openai import OpenAI
 from deepeval.tracing import observe, update_current_span
 
+client = OpenAI()
+
 @observe(metricCollection=["My Metrics"])
 def llm_app(query: str) -> str:
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
     update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
     return res

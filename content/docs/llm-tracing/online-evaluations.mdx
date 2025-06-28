@@ -35,18 +35,21 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {4, 13}
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing import observe, update_current_span
+from openai import OpenAI
+
+client = OpenAI()
 
 @observe(metricCollection="My Collection")
 def llm_app(query: str) -> str:
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
     update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
   
@@ -97,20 +100,23 @@ You can run online evals on both traces and spans at the same time.
 Similar to evals for spans, you would also provide a `metricCollection` name, but this time call the `update_current_trace()` function instead:
 
 
-<Tabs items={['Python', 'TypeScript']}>
+<Tabs items={['Python', 'TypeScript'}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {4, 13}
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing import observe, update_current_trace
+from openai import OpenAI
+
+client = OpenAI()
 
 @observe(metricCollection="My Collection")
 def llm_app(query: str) -> str:
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
     update_current_trace(test_case=LLMTestCase(input=query, actual_output=res))
   
@@ -146,20 +152,21 @@ Similar to traces and spans, Confident AI will only run online evals on threads 
 
 However, since it is impossible for Confident AI to automatically know whether a multi-turn conversation has completed or not, you'll have to trigger an online evaluation using the `evaluate_thread()` method **ONLY AFTER** once you're certain a conversation has completed:
 
-```python filename="main.py" showLineNumbers copy {15, 23}
-import openai
+```python filename="main.py" showLineNumbers copy {16, 24}
+from openai import OpenAI
 from deepeval.tracing import observe, update_current_trace, evaluate_thread
 
+client = OpenAI()
 your_thread_id = "your-thread-id"
 
 @observe()
 def llm_app(query: str):
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
     update_current_trace(thread_id=your_thread_id, input=query, output=res)
     return res

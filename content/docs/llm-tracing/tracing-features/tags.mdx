@@ -19,20 +19,22 @@ Tags are applied at the trace level, making them visible for all spans within th
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {6}
+    ```python filename="main.py" showLineNumbers {8}
     from deepeval.tracing import observe, update_current_trace
-    import openai
+    from openai import OpenAI
+    
+    client = OpenAI()
     
     @observe(type="agent")
     def llm_app(query: str):
         update_current_trace(tags=["Causal Chit-Chat"])
     
-        return openai.ChatCompletion.create(
+        return client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
     
     llm_app("Write me a poem.")
     ```

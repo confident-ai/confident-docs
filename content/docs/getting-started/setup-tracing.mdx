@@ -27,18 +27,20 @@ Confident AI is also feature complete for tracing, [click here](/docs/llm-tracin
 
 Assuming this is `your_llm_app`, you will trace it using the `@observe` decorator:
 
-```python showLineNumbers {4, 13, 18}
+```python showLineNumbers {6, 15, 20}
 from openai import OpenAI
 from deepeval.tracing import observe
 
+client = OpenAI()
+
 @observe()
 def your_llm_app(query: str) -> str:
-    return openai.ChatCompletion.create(
+    return client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
 # Call app to send trace to Confident AI
 your_llm_app("Write me a poem.")
@@ -68,20 +70,22 @@ Technically, you can also think of end-to-end evaluations as running evals on a 
 
 The last step is to define your metrics and create test cases at runtime. These metrics and test cases work exactly the same way as it does in end-to-end evaluation:
 
-```python showLineNumbers {6, 15}
+```python showLineNumbers {8, 17}
 from openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing import observe, update_current_span
+
+client = OpenAI()
  
 @observe(metrics=[AnswerRelevancyMetric()])
 def your_llm_app(query: str) -> str:
-    res = openai.ChatCompletion.create(
+    res = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 
     update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
     return res

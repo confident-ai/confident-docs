@@ -14,18 +14,20 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {13}
-    import openai
+    ```python filename="main.py" showLineNumbers {15}
+    from openai import OpenAI
     from deepeval.tracing import observe, update_current_trace
+
+    client = OpenAI()
      
     @observe()
     def llm_app(query: str):
-        res = openai.ChatCompletion.create(
+        res = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
     
         update_current_trace(input=query, output=res)
         return res
@@ -81,18 +83,20 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {13}
-    import openai
+    ```python filename="main.py" showLineNumbers {15}
+    from openai import OpenAI
     from deepeval.tracing import observe, update_current_span
+
+    client = OpenAI()
      
     @observe()
     def llm_app(query: str):
-        res = openai.ChatCompletion.create(
+        res = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
     
         update_current_span(input=query, output=res)
         return res

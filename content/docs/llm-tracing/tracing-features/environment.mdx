@@ -25,19 +25,20 @@ Alternatively, you can set the environment directly in code:
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
     ```python filename="main.py" showLineNumbers {4}
-    import openai
+    from openai import OpenAI 
     from deepeval.tracing import observe, trace_manager
     
     trace_manager.configure(environment="production")
+    client = OpenAI()
     
     @observe()
     def llm_app(query: str):
-        return openai.ChatCompletion.create(
+        return client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
     
     
     llm_app("Write me a poem.")
@@ -49,7 +50,6 @@ Alternatively, you can set the environment directly in code:
     import { observe, traceManager } from '@deepeval-ts/tracing';
     
     traceManager.configure({ environment: "production" });
-    
     const openai = new OpenAI();
     
     const llmApp = (query: string): string => {

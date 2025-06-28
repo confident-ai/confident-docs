@@ -23,21 +23,22 @@ Alternatively, you can set the sampling rate directly in code:
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {5}
+    ```python filename="main.py" showLineNumbers {6}
     import os
     from deepeval.tracing import observe, trace_manager
-    import openai
-    
+    from openai import OpenAI
+
+    client = OpenAI()
     trace_manager.configure(sample_rate=0.5)
     
     @observe()
     def llm_app(query: str):
-        return openai.ChatCompletion.create(
+        return client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
     
     for _ in range(10):
         llm_app("Write me a poem.")  # roughly half of these traces will be sent

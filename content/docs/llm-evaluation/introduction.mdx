@@ -104,18 +104,20 @@ metric = GEval(
 
 Decorate your LLM app (replace with your own):
 
-```python filename="main.py" showLineNumbers {4}
+```python filename="main.py" showLineNumbers {6}
 from openai import OpenAI
 from deepeval.tracing import observe
 
+client = OpenAI()
+
 @observe()
 def your_llm_app(query: str) -> str:
-    return openai.ChatCompletion.create(
+    return client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "user", "content": query}
         ]
-    ).choices[0].message["content"]
+    ).choices[0].message.content
 ```
 
 Pull the dataset you've created (full guide [here](/docs/dataset-editor/introduction)):
@@ -132,18 +134,20 @@ dataset.pull(alias="your-dataset-alias")
 
 Putting everything together, run your first LLM evaluation:
 
-```python filename="main.py" showLineNumbers {19, 24} copy
+```python filename="main.py" showLineNumbers {21, 26} copy
 from openai import OpenAI
 from deepeval.tracing import observe
 from deepeval.dataset import EvaluationDataset
 from deepeval.test_case import LLMTestCase
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval import evaluate
+
+client = OpenAI()
  
 @observe()
 def your_llm_app(query: str) -> str:
-    return openai.ChatCompletion.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
-    ).choices[0].message["content"]
+    return client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
 
 dataset = EvaluationDataset()
 dataset.pull(alias="your-dataset-alias")

@@ -14,18 +14,20 @@ You can use the `update_current_trace` function to set the `user_id` within trac
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {13}
+    ```python filename="main.py" showLineNumbers {15}
     from deepeval.tracing import observe, update_current_trace
-    import openai
+    from openai import OpenAI
+    
+    client = OpenAI()
     
     @observe()
     def llm_app(query: str):
-        res = openai.ChatCompletion.create(
+        res = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "user", "content": query}
             ]
-        ).choices[0].message["content"]
+        ).choices[0].message.content
 
         update_current_trace(user_id="your-user-id")
         return res

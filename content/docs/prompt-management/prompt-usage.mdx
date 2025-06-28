@@ -102,10 +102,11 @@ print(messages_to_llm)
 
 To be clear, here is an example of how you can use it for OpenAI's APIs:
 
-```python showLineNumbers copy {8, 16}
-import openai
+```python showLineNumbers copy {9, 17}
+from openai import OpenAI
 from deepeval.prompt import Prompt
 
+client = OpenAI()
 prompt = Prompt(alias="your-alias-here")
 prompt.pull()
 
@@ -116,11 +117,11 @@ def your_llm_app(user_input: str):
     # Combine dynamically with user input
     messages = messages_to_llm + [{"role": "user", "content": user_input}]
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=messages
     )
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
 
 # Print the response
 print(your_llm_app("Hi!"))
