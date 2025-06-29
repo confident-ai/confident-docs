@@ -1,0 +1,47 @@
+---
+title: PaydanticAI
+---
+
+im
+# PaydanticAI
+
+[Paydantic AI](https://ai.pydantic.dev/) is a platform for building and deploying AI agents. It provides a set of tools and libraries for building and deploying AI agents.
+
+## Quickstart
+Confident AI instruments PydanticAI to trace your agent's execution and achieve observability. 
+
+```bash
+pip install pydantic-ai sdk -U deepeval
+```
+
+With your Confident API key, setup the instrumentaion in your agent:
+```python filename="main.py" showLineNumbers {6, 10}
+import os
+import time
+from pydantic_ai.agent import Agent
+from deepeval.integrations.pydantic_ai import setup_instrumentation
+
+setup_instrumentation(api_key="<your-confident-api-key>")
+
+os.environ['OPENAI_API_KEY'] = '<your-openai-api-key>'
+
+Agent.instrument_all()
+
+agent = Agent(  
+    'openai:gpt-4o-mini',
+    system_prompt='Be concise, reply with one sentence.',  
+)
+
+result = agent.run_sync('Where does "hello world" come from?')  
+print(result.output)
+
+time.sleep(10)
+```
+
+Run your agent:
+
+```bash
+python main.py
+```
+
+After execution, you can see the traces on Confident AI's **Observability**.
