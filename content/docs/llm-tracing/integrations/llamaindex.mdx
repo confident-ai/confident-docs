@@ -10,7 +10,7 @@ import { Callout } from "nextra/components";
 
 ## Quickstart
 
-Confident AI provides a `LlamaIndexSpanHandler` that can be used to trace LlamaIndex **spans.**
+Confident AI provides a `instrumentator` that can be used to trace LlamaIndex **spans.**
 
 Install the following packages:
 
@@ -18,18 +18,11 @@ Install the following packages:
 pip install -U deepeval llama-index
 ```
 
-Login with your API key and configure DeepEval as an span handler for LlamaIndex:
+With your Confident API key, initialize DeepEval’s `instrumentator` in your agent’s `main.py` script:
 
-```python filename="main.py" showLineNumbers {6, 9}
-import llama_index.core.instrumentation as instrument
-from deepeval.integrations.llama_index import instrument_llama_index
-import deepeval
-
-# Login
-deepeval.login_with_confident_api_key("<your-confident-api-key>")
-
-# Let DeepEval collect traces
-instrument_llama_index(instrument.get_dispatcher())
+```python
+from deepeval.integrations.llama_index import instrumentator
+instrumentator(api_key="<your-confident-api-key>")
 ```
 
 Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as traces and publish them to Confident AI.
@@ -42,20 +35,16 @@ Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as trace
 
 The example agent will be able to perform calculations using the `multiply` tool.
 
-```python showLineNumbers filename="main.py" {10, 11, 19}
+```python showLineNumbers filename="main.py" {6, 9}
 import os
+import asyncio
+import time
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.openai import OpenAI
-import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrumentator
 
-from deepeval.integrations.llama_index import instrument_llama_index
-import deepeval
-
-# Don't forget to setup tracing
-deepeval.login_with_confident_api_key("<your-confident-api-key>")
-instrument_llama_index(instrument.get_dispatcher())
-
-os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+os.environ["OPENAI_API_KEY"] = "<your_openai_api_key>"
+instrumentator(api_key="<your_deepeval_api_key>")
 
 def multiply(a: float, b: float) -> float:
     """Useful for multiplying two numbers."""
@@ -64,25 +53,20 @@ def multiply(a: float, b: float) -> float:
 agent = FunctionAgent(
     tools=[multiply],
     llm=OpenAI(model="gpt-4o-mini"),
-    system_prompt="You are a helpful assistant that can perform calculations.",
+    system_prompt="""You are a helpful assistant that can perform calculations
+    and search through documents to answer questions.""",
 )
-```
 
-Finally, try calling your agent to see your traces on Confident AI:
-
-```python filename="main.py"
-import asyncio
-import time
-...
-
-async def main():   
+async def main():
     response = await agent.run("What's 7 * 8?")
     print(response)
 
 if __name__ == "__main__":
     asyncio.run(main())
-    time.sleep(12)
+    time.sleep(8)
 ```
+
+Finally, run your agent to see your traces on Confident AI:
 
 ```bash
 python main.py
