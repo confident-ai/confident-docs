@@ -3,13 +3,10 @@ import {  Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 import '@/app/styles/globals.css'
-import CustomFooter from '@/components/CustomFooter/CustomFooter'
-import CustomBanner from '@/components/CustomBanner/CustomBanner'
-import CustomNavbar from '@/components/CustomNavbar/CustomNavbar'
+import NewHeader from '@/components/Home/NewHeader'
+import Footer from '@/components/Home/Footer/Footer'
+import styles from './styles.module.scss'
 
-const banner = <CustomBanner />
-const navbar = <CustomNavbar />
-const footer = <CustomFooter />
 
 export default async function RootLayout({ children }) {
   return (
@@ -39,20 +36,10 @@ export default async function RootLayout({ children }) {
         ></script>
         {/* Don't set title or description here as they're handled by Nextra via useNextSeoProps */}
       </Head>
-      <body suppressHydrationWarning>
-        <Layout
-          darkMode={false}
-          nextThemes={{
-            defaultTheme: "light",
-          }}
-          banner={banner}
-          navbar={navbar}
-          pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/confident-ai/confident-docs/tree/main"
-          footer={footer}
-        >
-          {children}
-        </Layout>
+      <body className={styles.body2} suppressHydrationWarning>
+      <NewHeader/>
+        {children}
+      <Footer/>
       </body>
     </html>
   )

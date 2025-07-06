@@ -1,0 +1,119 @@
+@keyframes scrollMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.marqueeContainer {
+  background: #0e0e12;
+  border-top: 1px solid #363636;
+  border-bottom: 1px solid #363636;
+  overflow: hidden;
+  padding: 40px 0;
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 6px;
+
+    .trustedBy {
+      color: #f0f3f8;
+      font-size: 12px;
+      font-weight: 300;
+      font-family: 'Inter', sans-serif;
+      margin: 0 auto;
+    }
+
+    .marquee {
+      display: flex;
+      overflow: hidden;
+      width: 100%;
+      padding: 17.5px 0;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 30px;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-image: linear-gradient(90deg, #0e0e13, #fff0);
+        height: 100%;
+        z-index: 2;
+        width: 10%;
+      }
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-image: linear-gradient(270deg, #0e0e13, #fff0);
+        height: 100%;
+        z-index: 2;
+        width: 10%;
+      }
+
+      .MarqueeBar1,
+      .MarqueeBar2 {
+        display: flex;
+        flex-shrink: 0;
+        white-space: nowrap;
+        animation: scrollMarquee 20s linear infinite reverse;
+        transform: translateX(-100%);
+
+        img {
+          width: 45px;
+          height: 45px;
+          object-fit: contain;
+          margin: 0 64px;
+        }
+      }
+    }
+
+    .socialProofsContainer {
+      margin: 0 auto;
+      display: flex;
+      gap: 150px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 50px;
+      }
+
+      .socialProof {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 150px;
+        text-align: center;
+        padding: 10px;
+
+        span {
+          font-family: "IBM Plex Mono", monospace;
+          font-size: 32px;
+          width: 100%;
+
+          @media (max-width: 768px) {
+            font-size: 24px;
+          }
+        }
+
+        ;
+
+        .proofsTitle {
+          color: #a9afba;
+          font-size: 12px;
+          font-family: 'Inter', sans-serif;
+        }
+      }
+    }
+  }
+}

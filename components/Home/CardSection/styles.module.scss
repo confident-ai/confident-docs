@@ -1,0 +1,216 @@
+.CardSection {
+    background-color: #0e0e13;
+    padding: 70px 0;
+    border-bottom: 1px solid #363636;
+
+    .inner {
+        display: flex;
+        max-width: 1440px;
+        gap: 50px;
+        padding: 0 6px;
+        margin: 30px auto 20px;
+
+        .textWrap {
+            width: 100%;
+
+            @media (max-width: 991px) {
+                text-align: center;
+            }
+
+            .subHeading {
+                color: #c9ced6;
+                font-size: 13px;
+                font-weight: 400;
+                font-family: 'Inter', sans-serif;
+                margin-bottom: 20px;
+                display: block;
+                text-transform: uppercase;
+            }
+
+            .heading {
+                margin-bottom: 80px;
+                font-size: 70px;
+                font-weight: 400;
+                color: white;
+                line-height: 1.3em;
+                max-width: 80%;
+                font-family: 'Inter', sans-serif;
+
+                @media (max-width: 991px) {
+                    font-size: 36px;
+                    max-width: unset;
+                    margin-bottom: 40px;
+                }
+
+                @media (max-width: 767px) {
+                    font-size: 32px;
+                }
+            }
+
+            .cards {
+                background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
+                background-size: 20px 20px;
+                display: flex;
+                border: 1px solid #363636;
+                border-radius: 12px;
+                width: 100%;
+                flex-wrap: wrap;
+                margin-bottom: 40px;
+
+                &.centeredCards {
+                    @media (max-width: 991px) {
+                        justify-content: center;
+
+                        .card {
+                            &:last-of-type {
+                                border-left: none;
+                            }
+                        }
+                    }
+                }
+
+                .card {
+                    border-right: 1px solid #555;
+                    padding: 35px 20px 35px 25px;
+
+                    &:last-of-type {
+                        border: none;
+                    }
+
+                    @media (max-width: 991px) {
+                        width: 50% !important;
+                        border-bottom: 1px solid #555;
+                        border-right: none;
+                        padding: 25px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+                        &:first-child {
+                            border-right: 1px solid #555;
+                        }
+
+                        &:last-of-type {
+                            border-left: 1px solid #555;
+                        }
+                    }
+
+                    @media (max-width: 575px) {
+                        width: 100% !important;
+
+                        &:first-child {
+                            border-right: none;
+                        }
+
+                        &:last-of-type {
+                            border-left: none;
+                        }
+                    }
+
+
+
+                    .cardStep {
+                        border: 1px solid #fff;
+                        color: #fff;
+                        border-radius: 13px;
+                        padding: 5px 10px;
+                        font-size: 14px;
+                        width: fit-content;
+                        margin-bottom: 20px;
+
+                        span {
+                            line-height: 1.75em;
+                            display: block;
+                        }
+                    }
+
+                    .cardIcon {
+                        margin-bottom: 20px;
+
+                    }
+
+                    .cardHeading {
+                        font-size: 24px;
+                        font-weight: 300;
+                        font-family: 'Inter', sans-serif;
+                        color: #fff;
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    .cardDescription {
+                        color: #a9afba;
+                        font-size: 14px;
+                        font-weight: 300;
+                        line-height: 1.8em;
+                        font-family: 'Inter', sans-serif;
+
+                        @media (max-width: 767px) {
+                            font-size: 12px;
+                        }
+                    }
+                }
+            }
+
+            .buttonWrap {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                @media (max-width: 991px) {
+                    justify-content: center;
+                }
+                .btn {
+                    font-family: 'Inter', sans-serif;
+                    border-radius: 40px;
+                    padding: 12px 30px;
+                    font-weight: 500;
+                    font-family: 'Inter', sans-serif;
+                    color: white;
+                    font-size: 14px;
+                    display: block;
+
+                    @media (max-width: 991px) {
+                        font-size: 14px;
+                        padding: 14px 22px;
+                    }
+
+                    @media (max-width: 767px) {
+                        font-size: 12px;
+                        padding: 10px 16px;
+                        text-align: center;
+                    }
+
+                    &.outlined {
+                        border: 2px solid #fff;
+                        color: #fff;
+                        font-weight: 500;
+                        background-color: #000;
+                        transition: background-color 0.475s, color 0.4s;
+
+                        &:hover {
+                            color: #000;
+                            background-color: #fff;
+                        }
+                    }
+
+                    &.contained {
+                        border: 2px solid #000;
+                        color: #000;
+                        font-weight: 600;
+                        background-color: #fff;
+                        transition: box-shadow 0.4s ease-in-out, background-color 0.4s, color 0.4s, border-color 0.4s ease;
+                        box-shadow: 0 0 5px #fff;
+
+                        &:hover {
+                            color: white;
+                            box-shadow: unset;
+                            border-color: #fff;
+                            background-color: #0b101b;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
