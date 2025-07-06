@@ -1,7 +1,6 @@
 import Banner from '@/components/Home/Banner/Banner'
 import TextSection from '@/components/Home/TextSection/TextSection'
 import TwoColumn from '@/components/Home/TwoColumn/TwoColumn'
-import ShowCase from '@/components/Home/ShowCase/ShowCase'
 import CardSection from '@/components/Home/CardSection/CardSection'
 import SecurityInsurance from '@/components/Home/SecurityInsurance/SecurityInsurance'
 import TextOnlySection from '@/components/Home/TextOnlySection/TextOnlySection'

@@ -6,6 +6,7 @@
     "nextra-theme-docs": "^4.2.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-intersection-observer": "^9.16.0",
     "sass": "^1.86.3"
   },
   "scripts": {
