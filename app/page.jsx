@@ -17,7 +17,6 @@ export default function HomePage() {
       {twoColumns.map((item, index) => (
         <TwoColumn key={index} data={item} />
       ))}
-      <ShowCase data={showCaseData} />
       <CardSection data={cardSectionData} />
       <SecurityInsurance data={securityInsuranceData} />
       <CardSection data={socialsCard} />
