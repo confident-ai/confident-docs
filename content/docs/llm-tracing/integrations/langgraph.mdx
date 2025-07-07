@@ -20,7 +20,7 @@ pip install -U deepeval langgraph langchain langchain-openai
 
 Login with your API key and configure DeepEval's `CallbackHandler` as a callback for LangGraph:
 
-```python filename="main.py" showLineNumbers {9, 21}
+```python filename="main.py" showLineNumbers {9, 23}
 import os
 import time
 from langgraph.prebuilt import create_react_agent
@@ -31,8 +31,10 @@ import deepeval
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 deepeval.login_with_confident_api_key("<your-confident-api-key>")
 
-def get_weather(city: str) -> str:  
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
     return f"It's always sunny in {city}!"
+
 agent = create_react_agent(
     model="openai:gpt-4o-mini",  
     tools=[get_weather],  
