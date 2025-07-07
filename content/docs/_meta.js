@@ -2,7 +2,7 @@ import { CircleHelp, MessageSquareText, PenLine, Settings, FlaskConical, User, L
 import NavIconTabItem from '@/components/NavIconTabItem'
 
 export default {
-  index: "",
+  page: "",
   "how-it-works": "",
   "getting-started": {
     title: "Getting Started",
