@@ -4,6 +4,7 @@ import VideoDisplayer from './components/VideoDisplayer'
 import ImageDisplayer from './components/ImageDisplayer'
 import SignUpButton from './components/SignUpButton'
 import NavIconTabItem from './components/NavIconTabItem'
+import H1WithCopy from './components/H1WithCopy'
  
 // Get the default MDX components
 const themeComponents = getThemeComponents()
@@ -12,6 +13,7 @@ const themeComponents = getThemeComponents()
 export function useMDXComponents(components) {
   return {
     ...themeComponents,
+    h1: H1WithCopy,
     ComparisonTable,
     VideoDisplayer,
     ImageDisplayer,
