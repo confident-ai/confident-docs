@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 
 Running metrics on the cloud produces exactly the same results as running metrics [locally](/docs/llm-evaluation/metrics/locally). However, you might want to run metrics on cloud when:
 
-- You need to run [online evaluations](/docs/llm-tracing/online-evaluations) in production
+- You need to run [online evaluations](/docs/llm-tracing/evaluations) in production
 - You want to enable non-technical team members to run evals directly from the UI
 - You are not using Python, in this case you can delegate the evals to Confident AI's hosted DeepEval servers instead
 
@@ -33,7 +33,7 @@ Creating a collection of metrics on Confident AI allows you to specify which gro
 To create a metric collection, in your project space go to **Metrics** > **Collections**, click on the **Create Collection** button, and enter a collection name. Your collection name must not already be taken in your project.
 
 <Callout>
-Metric collections can be either **single or multi-turn** collections. If you're looking to run [online metrics on threads](/docs/llm-tracing/online-evaluations#online-evals-for-threads) for example, you should create a multi-turn collection instead.
+Metric collections can be either **single or multi-turn** collections. If you're looking to run [online metrics on threads](/docs/llm-tracing/evaluations#online-evals-for-threads) for example, you should create a multi-turn collection instead.
 </Callout>
 
 ## Add a Default Metric
@@ -67,4 +67,4 @@ Click on the respective links to learn how.
 
 ### In production
 
-The only way to run _online evaluations_ in production is by providing the name of your created metric collection to the observe functions you've defined, which you can [learn how here.](/docs/llm-tracing/online-evaluations)
+The only way to run _online evaluations_ in production is by providing the name of your created metric collection to the observe functions you've defined, which you can [learn how here.](/docs/llm-tracing/evaluations)

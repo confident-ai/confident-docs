@@ -3,6 +3,6 @@ export default {
         "display": "hidden"
     },
     "data-models": "",
-     "collections": "",
-    "create-metrics": "",
+    ingestion: "",
+    "evaluations": ""
 }

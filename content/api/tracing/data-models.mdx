@@ -1,10 +1,10 @@
 ---
-title: Data Model
+title: Data Models
 ---
 
 import { Callout } from "nextra/components";
 
-# Data Models for Traces
+# Data Models for Tracing
 
 A trace represents the overall process of tracking and visualizing the execution flow of your LLM application. Each observed function creates a span, and many spans together make up a trace.
 
@@ -49,6 +49,7 @@ A trace contains multiple spans, and at the same time can belong to an end user 
 ```typescript filename="trace.d.ts"
 type Trace = {
     uuid: string;
+    name?: string;
     input?: any;
     output?: any;
     startTime: string; // ISO datetime
@@ -58,11 +59,11 @@ type Trace = {
     tags?: string[];
 
     // Span collections
-    baseSpans: BaseSpan[];
-    llmSpans: LlmSpan[];
-    retrieverSpans: RetrieverSpan[];
-    toolSpans: ToolSpan[];
-    agentSpans: AgentSpan[];
+    baseSpans?: BaseSpan[];
+    llmSpans?: LlmSpan[];
+    retrieverSpans?: RetrieverSpan[];
+    toolSpans?: ToolSpan[];
+    agentSpans?: AgentSpan[];
 
     // Relationships
     threadId?: string;
@@ -70,19 +71,11 @@ type Trace = {
 
     // Evals
     metricCollection?: string;
-    traceTestCase?: {
-      input: string,
-      actualOutput: string,
-      expectedOutput?: string,
-      context?: string[],
-      retrievalContext?: string[],
-      toolsCalled?: ToolCallData[],
-      expectedTools?: ToolCallData[],
-    };
+    llmTestCase?: LLMTestCase;
 }
 ```
 
-You can run [online evals](/docs/llm-tracing/online-evaluations) by providing **BOTH** the name of the `metricCollection` you've created on Confident AI and `traceTestCase`.
+You can run [online evals](/docs/llm-tracing/evaluations) by providing **BOTH** the name of the `metricCollection` you've created on Confident AI and `llmTestCase`.
 
 ## Span
 
@@ -98,25 +91,16 @@ type BaseSpan = {
     status: 'COMPLETED' | 'ERRORED';
     startTime: string; // ISO datetime
     endTime: string; // ISO datetime
-    traceUuid: string;
     parentUuid?: string;
     metadata?: Record<string, any>;
 
     // Evals
     metricCollection?: string;
-    spanTestCase?: {
-      input: string,
-      actualOutput: string,
-      expectedOutput?: string,
-      context?: string[],
-      retrievalContext?: string[],
-      toolsCalled?: ToolCallData[],
-      expectedTools?: ToolCallData[],
-    };
+    llmTestCase?: LLMTestCase;
 }
 ```
 
-You can run [online evals](/docs/llm-tracing/online-evaluations) by providing **BOTH** the name of the `metricCollection` you've created on Confident AI and `spanTestCase`.
+You can run [online evals](/docs/llm-tracing/evaluations) by providing **BOTH** the name of the `metricCollection` you've created on Confident AI and `llmTestCase`.
 
 <Callout type="warning">
 Note that `parentUuid` **MUST NOT BE** provided for root spans in a `Trace`.
@@ -129,6 +113,8 @@ If you provide spans through the `llmSpans` of a `Trace`, your span will be crea
 ```typescript filename="llm-span.d.ts"
 type LlmSpan = BaseSpan & {
   model: string;
+  input: Record<string, string> | string;
+  output: Record<string, string> | string;
   costPerInputToken?: number;
   costPerOutputToken?: number;
   inputTokenCount?: number;
@@ -145,6 +131,8 @@ If you provide spans through the `retrieverSpans` of a `Trace`, your span will b
 ```typescript filename="retriever-span.d.ts"
 type RetrieverSpan = BaseSpan & {
   embedder: string;
+  input: string;
+  output: string[];
   topK?: number;
   chunkSize?: number;
 }
@@ -174,3 +162,4 @@ type AgentSpan = BaseSpan & {
 ```
 
 A agent span is similar to the tool span where the it automatically takes the `input` and `output` of the `BaseSpan` as I/O if not set explicitly.
+

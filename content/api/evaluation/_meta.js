@@ -2,6 +2,5 @@ export default {
     introduction: {
         "display": "hidden"
     },
-    "data-model": "",
-    ingestion: ""
+    "data-models": "",
 }

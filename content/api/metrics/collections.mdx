@@ -1,0 +1,148 @@
+---
+title: Metric Collections
+---
+
+import { Callout } from "nextra/components";
+
+# Metric Collections
+
+Metric collections determine the set of metrics that should be ran for test runs, spans, traces, and threads.
+
+## Create Metric Collection
+
+Your metric collection `name` and `multiTurn` combination **MUST BE UNIQUE** within a project.
+
+### Single-turn
+
+The request body should be **strictly** the [`MetricCollection` data model](/api/metrics/data-models#metric-collection), with `multiturn` set to `false`:
+
+```bash filename="POST - /v1/metrics-collections" showLineNumbers {6}
+curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "name": "Collection Name",
+            "multiTurn": false
+         }`
+```
+
+```json filename="response" showLineNumbers
+{
+  "success": true,
+  "data": {"id": "METRIC-COLLECTION-ID"}
+}
+```
+
+Single-turn collections are used to evaluate `LLMTestCase`s in a single-turn test run, or individual traces and spans during LLM tracing.
+
+### Multi-turn
+
+Creating a multi-turn collection is exactly the same as the single-turn example above, with the only difference being you should set the `multiTurn` value to `true`:
+
+```bash filename="POST - /v1/metrics-collections" showLineNumbers {6}
+curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "name": "Collection Name",
+            "multiTurn": true
+         }`
+```
+
+```json filename="response" showLineNumbers
+{
+  "success": true,
+  "data": {"id": "METRIC-COLLECTION-ID"}
+}
+```
+
+Multi-turn collections are used to evaluate `ConversationalTestCase`s in a multi-turn test run, or a thread of traces during LLM tracing.
+
+### With metric settings
+
+If you already have metrics in mind, you can also include a list of  `"metricSettings"` that has the type of a [`MetricSetting` data model](/api/metrics/data-models#metric-settings):
+
+```bash filename="POST - /v1/metrics-collections" showLineNumbers {6}
+curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "name": "Collection Name",
+            "metricSettings": [
+                {
+                    "metric": {"name": "Answer Relevancy"},
+                    "threshold": 0.8
+                }
+            ],
+            "multiTurn": false
+         }`
+```
+
+```json filename="response" showLineNumbers
+{"success": true}
+```
+
+Note that whatever `"metric"` you include in your `"metricSettings"`, it **must**: 
+- Already exist in your project, and
+- Match the collection in the `multiTurn` value
+
+For example, you cannot [create a custom metric](/api/metrics/create-metrics) in the process of adding `"metricSettings"` to your collection, nor can you add a metric that does not yet exist as either a default or custom metric. You also cannot add a single-turn metric to a multi-turn collection, and vice versa.
+
+## Update Metric Collection
+
+The request body should be **strictly** the [`MetricCollection` data model](/api/metrics/data-models#metric-collection), except you cannot provide an updated `multiTurn` value:
+
+```bash filename="PUT - /v1/metrics-collections/:id" showLineNumbers {6}
+curl -X POST "https://api.confident-ai.com/v1/metric-collections/:id" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "name": "New Collection Name",
+            "metricSettings": [
+                {
+                    "metric": {"name": "Faithfulness"},
+                    "threshold": 0.5
+                }
+            ],
+         }`
+```
+
+```json filename="response" showLineNumbers
+{"success": true}
+```
+
+Before updating any `"metricSettings"`, it is highly recommended that you first [fetch the existing settings in your collection](#get-metric-collections), before figuring out which settings you should keep/delete/update.
+
+<Callout type="info">
+Whatever fields you provide will overwrite the existing values. In this example, the `"Faithfulness"` metric will overwrite the previous `"Answer Relevancy"` metric.
+</Callout>
+
+## Get Metric Collection(s)
+
+You can list all metric collections (both multi and single-turn ones) in your project as follows:
+
+```bash filename="GET - /v1/metric-collections" showLineNumbers
+curl -X GET "https://api.confident-ai.com/v1/metric-collections" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>"
+```
+```json filename="response" showLineNumbers
+{
+    "success": true,
+    "data": {
+        "metricCollections": [{
+            "id": "COLLECTION-ID",
+            "name": "New Collection Name",
+            "multiTurn": false,
+            "metricSettings": [
+                {
+                    "metric": {"name": "Faithfulness"},
+                    "activated": true,
+                    "threshold": 0.5,
+                    "includeReason": true,
+                    "strictMode": false
+                }
+            ]
+        }]
+    }
+}
+```

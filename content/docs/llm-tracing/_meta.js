@@ -1,6 +1,7 @@
 export default {
   introduction: "",
-  "online-evaluations": "",
+  "quickstart": "",
+  "evaluations": "",
   "tracing-features": "",
   "integrations": "",
   "latency-and-cost-tracking": "",
