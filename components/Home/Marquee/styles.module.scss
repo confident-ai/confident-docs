@@ -1,3 +1,5 @@
+@import '../../../app/styles/vars';
+
 @keyframes scrollMarquee {
   0% {
     transform: translateX(0%);
@@ -20,7 +22,7 @@
     flex-direction: column;
     max-width: 1240px;
     margin: 0 auto;
-    padding: 0 6px;
+    padding: 0 20px;
 
     .trustedBy {
       color: #f0f3f8;
@@ -28,6 +30,7 @@
       font-weight: 300;
       font-family: 'Inter', sans-serif;
       margin: 0 auto;
+      text-align: center;
     }
 
     .marquee {
@@ -81,25 +84,31 @@
     .socialProofsContainer {
       margin: 0 auto;
       display: flex;
-      gap: 150px;
+      justify-content: space-between  ;
+      width: 745px;
 
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 50px;
+        align-items: center;
+        width: fit-content;
       }
 
       .socialProof {
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-width: 150px;
         text-align: center;
         padding: 10px;
+
 
         span {
           font-family: "IBM Plex Mono", monospace;
           font-size: 32px;
           width: 100%;
+          min-width: 153px;
+
+          display: block;
 
           @media (max-width: 768px) {
             font-size: 24px;

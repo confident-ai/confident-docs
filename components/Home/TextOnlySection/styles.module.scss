@@ -1,9 +1,15 @@
+@import '../../../app/styles/vars';
+
 .TextOnlySection {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 2px);
     background-color: #0a0b14;
+    background-size: 20px 20px;
     padding: 100px 0 140px;
     border-bottom: 1px solid #363636;
+
+    @include responsive(md)  {
+        padding: 70px 0;
+    }
 
     .inner {
         display: flex;
@@ -13,7 +19,12 @@
         margin: 30px auto 20px;
         flex-direction: column;
         align-items: center;
-
+        @include responsive(lg)  {
+            padding: 0 16px;
+        }
+        @include responsive(md)  {
+            padding: 0 32px;
+        }
         .heading {
             font-size: 120px;
             font-weight: 400;
@@ -21,7 +32,9 @@
             line-height: 1.3em;
             font-family: 'Inter', sans-serif;
             width: fit-content;
-            @media (max-width: 991px) {
+            letter-spacing: 3px;
+
+            @include responsive(md)  {
                 font-size: 72px;
                 max-width: unset;
             }
@@ -29,6 +42,7 @@
             @media (max-width: 767px) {
                 font-size: 48px;
             }
+
             @media (max-width: 575px) {
                 font-size: 32px;
             }

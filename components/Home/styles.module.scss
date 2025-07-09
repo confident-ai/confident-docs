@@ -1,4 +1,5 @@
 @import '@/app/styles/colors.scss';
+@import '../../app/styles/vars';
 
 .NewHeader {
     position: fixed;
@@ -6,7 +7,6 @@
     width: 100%;
     border-bottom: 1px solid #363636;
     background-color: #0a0b14d1;
-    padding: 0 8px;
     z-index: 99;
 
     &.active {
@@ -15,10 +15,9 @@
 
     .inner {
         display: flex;
-        max-width: 1680px;
         width: 100%;
         margin: 0 auto;
-        padding: 12px 0;
+        padding: 12px 5%;
         justify-content: space-between;
 
         .logoWrap {
@@ -27,12 +26,12 @@
             width: 100%;
             max-width: 20%;
 
-            @media (max-width: 991px) {
+            @include responsive(md) {
                 max-width: unset;
             }
 
             .span {
-                font-family: Lexend Deca, sans-serif;
+                font-family: "Lexend Deca", sans-serif;
                 font-size: 19px;
                 font-weight: 300;
                 letter-spacing: 1px;
@@ -51,9 +50,8 @@
             justify-content: center;
             width: 100%;
             max-width: 60%;
-            z-index: -1;
 
-            @media (max-width: 991px) {
+            @include responsive(md) {
                 position: absolute;
                 max-width: unset;
                 width: 100%;
@@ -68,7 +66,6 @@
                 visibility: none;
                 pointer-events: none;
                 transition: top ease 0.5s, opacity ease 0.5s;
-                z-index: -1;
 
                 &.active {
                     top: 57px;
@@ -84,9 +81,9 @@
                 gap: 32px;
                 height: 100%;
 
-                @media (max-width: 991px) {
+                @include responsive(md) {
                     flex-direction: column;
-                    gap: 8px;
+                    gap: 20px;
                     align-items: flex-start;
                     width: 100%;
                     height: auto;
@@ -96,13 +93,15 @@
                     color: #fff;
                     font-family: "Inter", sans-serif;
                     font-size: 14px;
-                    font-weight: 400;
+                    font-weight: 500;
                     line-height: 1.125em;
                     height: 100%;
                     display: flex;
                     align-items: center;
                     cursor: pointer;
-
+                    @include responsive(md) {
+                        font-size: 18px;
+                    }
                     &:hover {
                         text-decoration: underline;
                     }
@@ -114,7 +113,7 @@
                     align-items: center;
                     position: relative;
 
-                    @media (max-width: 991px) {
+                    @include responsive(md) {
                         display: none;
                     }
 
@@ -155,7 +154,7 @@
                         .popoverLink {
                             color: #fff;
                             font-size: 15px;
-                            font-family: Lexend Deca, sans-serif;
+                            font-family: "Lexend Deca", sans-serif;
                             border-radius: 6px;
                             text-decoration: none;
                             transition: all ease 0.18s;
@@ -187,7 +186,7 @@
 
         .buttonWrap {
             display: flex;
-            gap: 10px;
+            gap: 26px;
             align-items: center;
             width: 100%;
             max-width: 20%;
@@ -201,7 +200,7 @@
                 padding: 4px 8px;
                 border: 1px solid #737b89;
 
-                @media (max-width: 991px) {
+                @include responsive(md) {
                     display: none;
                 }
 
@@ -226,15 +225,15 @@
 
             .loginButton {
                 height: 100%;
-                margin-left: 24px;
 
-                @media (max-width: 991px) {
+               @include responsive(md) {
                     display: none;
                 }
 
                 a {
                     height: 100%;
                     padding: 4px 30px;
+                    background-color: #10002a;
                     border: 1px solid #6e00ff;
                     border-radius: 20px;
                     color: white;
@@ -250,7 +249,7 @@
                 height: 25px;
                 display: none;
 
-                @media (max-width: 991px) {
+                @include responsive(md) {
                     display: block;
                 }
 

@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import styles from "./styles.module.scss";
-
+import Marquee from '@/components/Home/Marquee/Marquee';
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-export default function Banner({ data }) {
+export default function Banner( ) {
   const [hasAnimated, setHasAnimated] = useState(false);
 
   const { ref, inView } = useInView({
@@ -46,37 +46,37 @@ export default function Banner({ data }) {
 
         <div className={styles.textWrap} ref={ref}>
           <h1
-            className={`${styles.bannerHeading} ${
-              hasAnimated ? styles.popUpText : ""
-            }`}
+            className={`${styles.bannerHeading} ${hasAnimated ? styles.popUpText : ""
+              }`}
           >
-            {data?.heading}
+            The LLM <span className="underline" style={{ color: '#6e00ff', textDecoration: 'underline' }}>Evaluation</span> & Observability Platform for DeepEval
           </h1>
           <p
-            className={`${styles.bannerDescription} ${
-              hasAnimated ? styles.fadeUp : ""
-            }`}
+            className={`${styles.bannerDescription} ${hasAnimated ? styles.fadeUp : ""
+              }`}
           >
-            {data?.description}
+            Built by the creators of DeepEval, engineering teams use Confident AI to benchmark, safeguard, and improve LLM applications, with best-in-class metrics and tracing.
           </p>
           <div
             className={`${styles.btnWrap} ${hasAnimated ? styles.fadeUp2 : ""}`}
           >
-            {data?.buttons?.map((btn, i) => (
-              <div key={i}>
-                <a
-                  href={btn?.link}
-                  className={`${styles.btn} ${styles[btn?.variant]}`}
-                >
-                  {btn?.txt}
-                </a>
-              </div>
-            ))}
+            <a
+              href='https://www.confident-ai.com/book-a-demo'
+              className={`${styles.btn} ${styles.outlined}`}
+            >
+              Request a Demo
+            </a>
+            <a
+              href='https://app.confident-ai.com/auth/signup?redirect_url=%2F'
+              className={`${styles.btn} ${styles.contained}`}
+            >
+              Try Now For Free
+            </a>
           </div>
         </div>
 
         <div className={styles.imageWrap}>
-          <img src={data?.image?.url} alt={data?.image?.alt} />
+          <img src='img/banner/bannerImage.png' alt='Illustration showing productivity and teamwork' />
         </div>
       </div>
 
@@ -85,6 +85,7 @@ export default function Banner({ data }) {
       ))}
 
       <div className={styles.absoluteBackground}></div>
+      <Marquee />
     </div>
   );
 }

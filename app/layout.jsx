@@ -1,12 +1,9 @@
-import {  Layout } from 'nextra-theme-docs'
-import {  Head } from 'nextra/components'
+import { Layout } from 'nextra-theme-docs'
+import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 import '@/app/styles/globals.css'
-import NewHeader from '@/components/Home/NewHeader'
-import Footer from '@/components/Home/Footer/Footer'
-import styles from './styles.module.scss'
-
+import Script from 'next/script'
 
 export default async function RootLayout({ children }) {
   return (
@@ -34,12 +31,21 @@ export default async function RootLayout({ children }) {
           data-domain="confident-ai.com"
           src="https://plausible.io/js/script.js"
         ></script>
+        <Script id="gtm-init" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-PJ6SMMP5');
+          `}
+        </Script>
         {/* Don't set title or description here as they're handled by Nextra via useNextSeoProps */}
       </Head>
-      <body className={styles.body2} suppressHydrationWarning>
-      <NewHeader/>
+      <body suppressHydrationWarning>
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PJ6SMMP5"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         {children}
-      <Footer/>
       </body>
     </html>
   )

@@ -1,3 +1,5 @@
+@import '../../../app/styles/vars';
+
 .SecurityInsurance {
     background-color: #0e0e13;
     padding: 70px 0;
@@ -11,11 +13,17 @@
         gap: 50px;
         padding: 0 6px;
         margin: 30px auto 20px;
+        @include responsive(lg)  {
+            padding: 0 16px;
+        }
+        @include responsive(md)  {
+            padding: 0 32px;
+        }
 
         .textWrap {
             width: 100%;
 
-            @media (max-width: 991px) {
+            @include responsive(md)  {
                 text-align: center;
             }
 
@@ -37,7 +45,7 @@
                 line-height: 1.3em;
                 font-family: 'Inter', sans-serif;
 
-                @media (max-width: 991px) {
+                @include responsive(md)  {
                     font-size: 36px;
                     max-width: unset;
                     margin-bottom: 40px;
@@ -57,7 +65,7 @@
                 flex-wrap: wrap;
                 margin-bottom: 35px;
 
-                @media (max-width: 991px) {
+                @include responsive(md)  {
                     flex-direction: row;
                     justify-content: center;
                 }
@@ -69,7 +77,7 @@
                     display: flex;
                     gap: 20px;
 
-                    @media (max-width: 991px) {
+                    @include responsive(md)  {
                         flex-direction: column;
                         max-width: 50%;
                         border: 1px solid #555;
@@ -89,7 +97,7 @@
                         gap: 20px;
                         align-items: center;
 
-                        @media (max-width: 991px) {
+                        @include responsive(md)  {
                             max-width: unset;
                             width: 100%;
                             margin: 0;
@@ -123,7 +131,7 @@
                             font-family: 'Inter', sans-serif;
                             color: #fff;
 
-                            @media (max-width: 991px) {
+                            @include responsive(md)  {
                                 font-size: 18px;
 
                             }
@@ -144,7 +152,7 @@
                         display: flex;
                         align-items: center;
 
-                        @media (max-width: 991px) {
+                        @include responsive(md)  {
                             width: 100%;
                             max-width: 100%;
                             text-align: center;

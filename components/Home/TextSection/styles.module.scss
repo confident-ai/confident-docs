@@ -1,3 +1,5 @@
+@import '../../../app/styles/vars';
+
 .textSection {
     background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
     background-size: 20px 20px;
@@ -11,10 +13,20 @@
         padding: 0 6px;
         margin: 30px auto 20px;
 
+        @include responsive(lg)  {
+            padding: 0 16px;
+        }
+
+        @include responsive(md)  {
+            padding: 0 32px;
+        }
+
         .textWrap {
-            @media (max-width: 991px) {
+            @include responsive(md)  {
                 text-align: center;
+                width: 100%;
             }
+
             .subHeading {
                 color: #c9ced6;
                 margin-bottom: 20px;
@@ -24,6 +36,9 @@
                 margin-bottom: 20px;
                 display: block;
                 text-transform: uppercase;
+                @include responsive(sm){
+                    font-size: 12px;
+                }
             }
 
             .heading {
@@ -35,15 +50,18 @@
                 max-width: 80%;
                 font-family: 'Inter', sans-serif;
 
-                @media (min-width: 1920px){
+                @include responsive(xxl)  {
                     font-size: 70px;
                 }
-                @media (max-width: 991px) {
+
+                @include responsive(md)  {
                     font-size: 36px;
                     max-width: unset;
+                    margin-bottom: 20px;
                 }
-                @media (max-width: 767px) {
-                    font-size: 32px;
+
+                @include responsive(sm){
+                    font-size: 28px;
                 }
             }
 
@@ -55,13 +73,13 @@
                 font-family: 'Inter', sans-serif;
                 margin-bottom: 36px;
 
-                @media (max-width: 991px) {
+                @include responsive(md)  {
                     font-size: 16px;
                     max-width: unset;
                 }
 
-                @media (max-width: 767px) {
-                    font-size: 14px;
+                @include responsive(sm){
+                    font-size: 12px;
                 }
 
                 b {
@@ -75,6 +93,10 @@
                 display: flex;
                 align-items: center;
                 gap: 20px;
+
+                @include responsive(md)  {
+                    justify-content: center;
+                }
 
                 .btn {
                     font-family: 'Inter', sans-serif;
@@ -94,7 +116,7 @@
                     @media (max-width: 768px) {
                         font-size: 12px;
                         padding: 10px 16px;
-                        width: 100%;
+                        width: fit-content;
                         text-align: center;
                     }
 

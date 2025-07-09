@@ -1,3 +1,5 @@
+@import '../../../app/styles/vars';
+
 .TwoColumn {
     padding: 90px 0;
     border-bottom: 1px solid #363636;
@@ -10,15 +12,20 @@
         gap: 80px;
         padding: 0 6px;
 
-        @media (max-width: 768px) {
+        @include responsive(lg)  {
+            padding: 0 16px;
+        }
+
+        @include responsive(md)  {
             flex-direction: column;
+            padding: 0 32px;
         }
 
         .textWrap {
             width: 100%;
             max-width: calc(50% - 25px);
 
-            @media (max-width: 768px) {
+            @include responsive(md)  {
                 max-width: 100%;
             }
 
@@ -29,7 +36,7 @@
                 font-weight: 400;
                 font-family: 'Inter', sans-serif;
 
-                @media (max-width: 768px) {
+                @include responsive(md)  {
                     font-size: 12px;
                 }
             }
@@ -41,8 +48,8 @@
                 margin-bottom: 16px;
                 font-family: 'Inter', sans-serif;
 
-                @media (max-width: 768px) {
-                    font-size: 28px;
+                @include responsive(md)  {
+                    font-size: 24px;
                 }
 
             }
@@ -54,7 +61,7 @@
                 line-height: 1.8em;
                 font-family: 'Inter', sans-serif;
 
-                @media (max-width: 768px) {
+                @include responsive(md)  {
                     font-size: 14px;
                 }
             }
@@ -68,7 +75,7 @@
             overflow: hidden;
             position: relative;
 
-            @media (max-width: 768px) {
+            @include responsive(md)  {
                 max-width: 100%;
             }
 

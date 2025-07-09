@@ -1,17 +1,43 @@
 import styles from './styles.module.scss'
-export default function CardSection({ data }) {
+export default function CardSection( ) {
+    const cards = [
+        {
+            cardHeading: "Install DeepEval.",
+            cardDescription:
+                "Whatever framework you're using, just install DeepEval.",
+        },
+        {
+            cardHeading: "Choose metrics.",
+            cardDescription:
+                "30+ LLM-as-a-judge metrics based on your use case.",
+        },
+        {
+            cardHeading: "Plug it in.",
+            cardDescription:
+                "Decorate your LLM app to apply your metrics in code.",
+        },
+        {
+            cardHeading: "Run an evaluation.",
+            cardDescription:
+                "Generate test reports to catch regressions and debug with traces.",
+        },
+    ];
+
     return (
         <div className={styles.CardSection}>
             <div className={styles.inner}>
                 <div className={styles.textWrap}>
-                    <span className={styles.subHeading} style={{ color: `${data?.text?.subHeadingColor}` }}>{data?.text?.subHeading}</span>
-                    <h2 className={styles.heading}>{data?.text?.heading}</h2>
+                    <span className={styles.subHeading} style={{ color: '#fff86c' }}>How It Works</span>
+                    <h2 className={styles.heading}>
+                        Four steps to setup.<br />
+                        No credit card required.
+                    </h2>
                     <div
-                        className={`${styles.cards} ${data?.cards?.length % 2 !== 0 ? styles.centeredCards : ""
+                        className={`${styles.cards} ${cards?.length % 2 !== 0 ? styles.centeredCards : ""
                             }`}
                     >
-                        {data?.cards?.map((card, idx) => (
-                            <div key={idx} className={styles.card} style={{ width: `calc(100% / ${data.cards.length} )` }}>
+                        {cards.map((card, idx) => (
+                            <div key={idx} className={styles.card} style={{ width: `calc(100% / ${cards.length} )` }}>
                                 {!card.icon && (
                                     <div className={styles.cardStep}>
                                         <span>{idx + 1}</span>
@@ -47,11 +73,9 @@ export default function CardSection({ data }) {
                         ))}
                     </div>
                     <div className={styles.buttonWrap}>
-                        {data?.buttons?.map((btn, i) => (
-                            <a key={i} href={btn?.link} className={`${styles.btn} ${styles[btn?.variant]}`}>
-                                {btn?.txt}
-                            </a>
-                        ))}
+                        <a href='https://documentation.confident-ai.com/getting-started/create-account' className={`${styles.btn} ${styles.contained}`}>
+                            GO TO QUICK START
+                        </a>
                     </div>
                 </div>
             </div>

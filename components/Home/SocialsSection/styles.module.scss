@@ -35,7 +35,6 @@
                 margin-bottom: 20px;
                 display: block;
                 text-transform: uppercase;
-
                 @include responsive(sm) {
                     font-size: 12px;
                 }
@@ -49,11 +48,9 @@
                 line-height: 1.3em;
                 max-width: 80%;
                 font-family: 'Inter', sans-serif;
-
-                @include responsive(xl) {
+                @include responsive(xl){
                     font-size: 60px;
                 }
-
                 @include responsive(md) {
                     font-size: 36px;
                     max-width: unset;

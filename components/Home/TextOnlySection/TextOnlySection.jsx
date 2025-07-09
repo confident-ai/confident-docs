@@ -1,15 +1,22 @@
 import styles from './styles.module.scss'
-export default function TextOnlySection({ data }) {
+export default function TextOnlySection() {
     return (
         <div className={styles.TextOnlySection}>
             <div className={styles.inner}>
-                <h2 className={styles.heading}>{data?.text?.heading}</h2>
+                <h2 className={styles.heading}>Get started today.</h2>
                 <div className={styles.buttonWrap}>
-                    {data?.buttons?.map((btn, i) => (
-                        <a key={i} href={btn?.link} className={`${styles.btn} ${styles[btn?.variant]}`}>
-                            {btn?.txt}
-                        </a>
-                    ))}
+                    <a
+                        href='https://www.confident-ai.com/book-a-demo'
+                        className={`${styles.btn} ${styles.outlined}`}
+                    >
+                        Request a Demo
+                    </a>
+                    <a
+                        href='https://app.confident-ai.com/auth/signup?redirect_url=%2F'
+                        className={`${styles.btn} ${styles.contained}`}
+                    >
+                        Try Now For Free
+                    </a>
                 </div>
             </div>
         </div>
