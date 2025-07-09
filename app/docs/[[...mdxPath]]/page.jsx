@@ -53,7 +53,7 @@ export default async function Page({ params }) {
   if (mdxPathArray.length === 0) {
 
     // For the root `/docs` route, import the `page.mdx` explicitly:
-    const result = await importPage(['docs', 'page']);
+    const result = await importPage(['docs']);
     const { default: MDXContent, toc, metadata } = result
     const Wrapper = getMDXComponents().wrapper
     return (
