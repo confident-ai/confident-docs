@@ -15,11 +15,12 @@ body::before {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.131) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px);
   background-size: 20px 20px;
   mask-image: radial-gradient(circle, transparent 40%, black 100%);
   -webkit-mask-image: radial-gradient(circle, transparent 40%, black 100%);
 }
+
 /* Dark mode background */
 .dark body {
   background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);

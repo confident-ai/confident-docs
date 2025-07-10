@@ -220,41 +220,8 @@ curl -X PUT "https://api.confident-ai.com/v1/traces/:uuid" \
 {"success": true}
 ```
 
+You shouldn't use the update method to trigger evaluations on traces. Instead, you can trigger [offline evaluations instead](/api/tracing/evaluations#traces-1) to update metric scores of traces and spans retrospectively.
+
 <Callout>
-Individual spans cannot be updated.
+Existing spans cannot be updated.
 </Callout>
-
-## Batch Ingestion
-
-You can also send batch ingest traces to Confident AI, accepting the the same [`Trace` data model](/api/tracing/data-models) via the `"traces"` key:
-
-```bash filename="POST - /v1/batch-traces" showLineNumbers {5}
-curl -X POST "https://api.confident-ai.com/v1/batch-traces" \
-     -H "Content-Type: application/json" \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -d '{
-            "traces": [{
-                "uuid": <TRACE-UUID>,
-                "startTime": "2024-01-15T10:30:00Z",
-                "endTime": "2024-01-15T10:30:05Z",
-                "baseSpans": [
-                    {
-                        "uuid": <SPAN-UUID>,
-                        "name": "LLM Call",
-                        "input": "What is the capital of France?",
-                        "output": "The capital of France is Paris.",
-                        "startTime": "2024-01-15T10:30:00Z",
-                        "endTime": "2024-01-15T10:30:05Z"
-                    }
-                ]
-            }]
-         }`
-```
-```json filename="response"
-{
-    "success": true,
-    "ids": ["TRACE-UUID"]
-}
-```
-
-[Online evaluations](/api/tracing/evaluations) work exactly the same way as before via the batch ingestion API.
