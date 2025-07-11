@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 
 All metrics you create and update are by definition **custom metrics**. Default metrics, which are all DeepEval metrics, are available to be added to any metric collection anytime, and doesn't require to be created.
 
-## Create Metric(s)
+## Create Metric
 
 Similar to metric collections, your metric `name` and `multiTurn` combination **MUST BE UNIQUE** within a project.
 
@@ -24,22 +24,18 @@ The request body should be **strictly** the an object of `"metrics"` to a list o
 curl -X POST "https://api.confident-ai.com/v1/metrics" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -d '{
-            "metrics": [
-                {            
-                    "name": "Correctness",
-                    "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
-                    "evaluationParams": ["actualOutput", "expectedOutput"],
-                    "multiTurn": false
-                }
-            ]
-         }`
+     -d '{          
+            "name": "Correctness",
+            "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
+            "evaluationParams": ["actualOutput", "expectedOutput"],
+            "multiTurn": false
+        }'
 ```
 
 ```json filename="response" showLineNumbers
 {
   "success": true,
-  "data": {"ids": ["METRIC-ID"]}
+  "data": {"id": "METRIC-ID"}
 }
 ```
 
@@ -61,7 +57,7 @@ curl -X POST "https://api.confident-ai.com/v1/metrics" \
                     "multiTurn": true
                 }
             ]
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
@@ -84,7 +80,7 @@ curl -X PUT "https://api.confident-ai.com/v1/metrics/:id" \
      -d '{
             "criteria": "Determine if the 'actual output' is correct based on the 'input'.",
             "evaluationParams": ["input", "actualOutput"]
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
@@ -122,3 +118,28 @@ curl -X GET "https://api.confident-ai.com/v1/metrics" \
     }
 }
 ```
+
+## Batch Create Metrics
+
+You can also batch create metrics by providing the [Metric data model]() through the `"metrics"` key:
+
+```bash filename="POST - /v1/batch-metrics" showLineNumbers {5}
+curl -X POST "https://api.confident-ai.com/v1/batch-metrics" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metrics": [
+                {            
+                    "name": "Correctness",
+                    "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
+                    "evaluationParams": ["actualOutput", "expectedOutput"],
+                    "multiTurn": false
+                }
+            ]
+         }'
+```
+```json filename="response" showLineNumbers
+{
+  "success": true,
+  "data": {"ids": ["METRIC-ID"]}
+}

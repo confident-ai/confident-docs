@@ -33,7 +33,7 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                     }
                 }
             ]
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}
@@ -77,7 +77,7 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                     }
                 ]
             }]
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}
@@ -106,7 +106,7 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate/threads/:id" \
      -d '{
             "metricCollections": "Collection Name",
             "chatbotRole": "You are a rich, powerful..."
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}
@@ -128,7 +128,7 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate/traces/:uuid" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
             "metricCollections": "Collection Name"
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}
@@ -146,7 +146,7 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate/spans/:uuid" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
             "metricCollections": "Collection Name"
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}

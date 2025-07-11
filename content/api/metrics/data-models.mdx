@@ -51,12 +51,27 @@ type Metric = {
     name: string;
     criteria?: string;
     evaluationSteps?: string;
-    requiredParameters?: LLMTestCaseParams[] | TurnParams[];
+    evaluationParams?: LLMTestCaseParams[]; // only for single-turn metrics
     multiTurn?: boolean; // defaults to false
 }
 ```
 
 As you'll learn in the next section, although the `criteria` and `evaluationSteps` fields are option in reality you will be required to provide either field when creating a metric. This is because all metrics you create are by definition custom metrics (powered by [DeepEval's G-Eval](https://deepeval.com/docs/metrics-llm-evals)), and therefore will always require a `criteria`/`evaluationSteps`.
+
+For a single-turn metric, you must provide at least one of `LLMTestCaseParams` in `evaluationParams`:
+
+```typescript
+export enum LLMTestCaseParams {
+  INPUT = "input",
+  ACTUAL_OUTPUT = "actualOutput",
+  EXPECTED_OUTPUT = "expectedOutput",
+  CONTEXT = "context",
+  EXPECTED_TOOLS = "expectedTools",
+}
+```
+
+For a multi-turn metric, there's no need to provide `evaluationParams`.
+
 
 ## Metric Settings
 

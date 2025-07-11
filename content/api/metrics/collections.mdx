@@ -23,7 +23,7 @@ curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
      -d '{
             "name": "Collection Name",
             "multiTurn": false
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
@@ -46,7 +46,7 @@ curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
      -d '{
             "name": "Collection Name",
             "multiTurn": true
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
@@ -75,7 +75,7 @@ curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
                 }
             ],
             "multiTurn": false
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
@@ -93,7 +93,7 @@ For example, you cannot [create a custom metric](/api/metrics/create-metrics) in
 The request body should be **strictly** the [`MetricCollection` data model](/api/metrics/data-models#metric-collection), except you cannot provide an updated `multiTurn` value:
 
 ```bash filename="PUT - /v1/metrics-collections/:id" showLineNumbers {6}
-curl -X POST "https://api.confident-ai.com/v1/metric-collections/:id" \
+curl -X PUT "https://api.confident-ai.com/v1/metric-collections/:id" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
@@ -103,8 +103,8 @@ curl -X POST "https://api.confident-ai.com/v1/metric-collections/:id" \
                     "metric": {"name": "Faithfulness"},
                     "threshold": 0.5
                 }
-            ],
-         }`
+            ]
+         }'
 ```
 
 ```json filename="response" showLineNumbers

@@ -20,19 +20,19 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
             "uuid": <TRACE-UUID>,
             "input": "What is the capital of France?",
             "output": "The capital of France is Paris.",
-            "startTime": "2024-01-15T10:30:00Z",
-            "endTime": "2024-01-15T10:30:05Z",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
             "baseSpans": [
                 {
                     "uuid": <SPAN-UUID>,
                     "name": "LLM Call",
                     "input": "What is the capital of France?",
                     "output": "The capital of France is Paris.",
-                    "startTime": "2024-01-15T10:30:00Z",
-                    "endTime": "2024-01-15T10:30:05Z"
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
                 }
             ]
-        }`
+        }'
 ```
 
 ```json filename="response"
@@ -66,28 +66,29 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                 "uuid": <TRACE-UUID>,
                 "input": "What is the capital of France?",
                 "output": "The capital of France is Paris.",
-                "startTime": "2024-01-15T10:30:00Z",
-                "endTime": "2024-01-15T10:30:05Z",
+                "startTime": "2025-01-15T10:30:00Z",
+                "endTime": "2025-01-15T10:30:05Z",
                 "baseSpans": [
                     {
                         "uuid": <ROOT-SPAN-UUID>,
                         "name": "Agent",
                         "input": "What is the capital of France?",
                         "output": "Let me look that up for you.",
-                        "startTime": "2024-01-15T10:30:00Z",
-                        "endTime": "2024-01-15T10:30:02Z"
+                        "startTime": "2025-01-15T10:30:00Z",
+                        "endTime": "2025-01-15T10:30:02Z"
                     }],
                 "llmSpans": [
                     {
                         "uuid": <NESTED-SPAN-UUID>,
                         "name": "OpenAI Call",
+                        "model": "gpt-4.1",
                         "input": [{"role": "user", "content": "What is the capital of France?"}],
-                        "output": [{"role": "assistant", content:"The capital of France is Paris."}],
-                        "startTime": "2024-01-15T10:30:02Z",
-                        "endTime": "2024-01-15T10:30:05Z",
+                        "output": [{"role": "assistant", "content":"The capital of France is Paris."}],
+                        "startTime": "2025-01-15T10:30:02Z",
+                        "endTime": "2025-01-15T10:30:05Z",
                         "parentUuid": <ROOT-SPAN-UUID>
                     }]
-        }`
+        }'
 ```
 
 ### Span types
@@ -102,20 +103,20 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
             "uuid": <TRACE-UUID>,
             "input": "What is the capital of France?",
             "output": "The capital of France is Paris.",
-            "startTime": "2024-01-15T10:30:00Z",
-            "endTime": "2024-01-15T10:30:05Z",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
             "llmSpans": [
                 {
                     "uuid": <SPAN-UUID>,
                     "name": "OpenAI Call",
+                    "model": "gpt-4o",
                     "input": [{"role": "user", "content": "What is the capital of France?"}],
-                    "output": [{"role": "assistant", content:"The capital of France is Paris."}],
-                    "startTime": "2024-01-15T10:30:00Z",
-                    "endTime": "2024-01-15T10:30:05Z",
-                    "model": "gpt-4o"
+                    "output": [{"role": "assistant", "content": "The capital of France is Paris."}],
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
                 }
             ]
-         }`
+         }'
 ```
 
 Span types allow you to classify different components in your LLM app. Instead of treating everything as a generic `"baseSpan"`, different span types offer different component-specific UIs on Confident AI.
@@ -136,8 +137,8 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
             "uuid": <TRACE-UUID>,
             "input": "What is the capital of France?",
             "output": "The capital of France is Paris.",
-            "startTime": "2024-01-15T10:30:00Z",
-            "endTime": "2024-01-15T10:30:05Z",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
             "threadId": <THREAD-ID>,
             "baseSpans": [
                 {
@@ -145,11 +146,11 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                     "name": "LLM Call",
                     "input": "What is the capital of France?",
                     "output": "The capital of France is Paris.",
-                    "startTime": "2024-01-15T10:30:00Z",
-                    "endTime": "2024-01-15T10:30:05Z"
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
                 }
             ]
-        }`
+        }'
 ```
 
 You can also run online evaluations on threads.
@@ -168,8 +169,8 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
             "uuid": <TRACE-UUID>,
             "input": "What is the capital of France?",
             "output": "The capital of France is Paris.",
-            "startTime": "2024-01-15T10:30:00Z",
-            "endTime": "2024-01-15T10:30:05Z",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
             "userId": <USER-ID>,
             "baseSpans": [
                 {
@@ -177,11 +178,11 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                     "name": "Agent",
                     "input": "What is the capital of France?",
                     "output": "The capital of France is Paris.",
-                    "startTime": "2024-01-15T10:30:00Z",
-                    "endTime": "2024-01-15T10:30:05Z"
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
                 }
             ]
-        }`
+        }'
 ```
 
 
@@ -211,10 +212,10 @@ curl -X PUT "https://api.confident-ai.com/v1/traces/:uuid" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
             "output": "The capital of France is Rome.",
-            "endTime": "2024-01-16T10:30:05Z",
+            "endTime": "2025-01-16T10:30:05Z",
             "metadata": {"ip_address": "127.0.0.1"},
             "tags": ["General QA"]
-         }`
+         }'
 ```
 ```json filename="response"
 {"success": true}

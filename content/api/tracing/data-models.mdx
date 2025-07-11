@@ -88,7 +88,7 @@ type BaseSpan = {
     input?: string | Record<string, any> | any[];
     output?: string | Record<string, any> | any[];
     error?: string;
-    status: 'COMPLETED' | 'ERRORED';
+    status?: 'SUCCESS' | 'ERRORED'; // defaults to 'SUCCESS'
     startTime: string; // ISO datetime
     endTime: string; // ISO datetime
     parentUuid?: string;
