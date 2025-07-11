@@ -17,8 +17,8 @@ body::before {
   pointer-events: none;
   background-image: radial-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px);
   background-size: 20px 20px;
-  mask-image: radial-gradient(circle, transparent 40%, black 100%);
-  -webkit-mask-image: radial-gradient(circle, transparent 40%, black 100%);
+  mask-image: radial-gradient(circle, transparent 70%, black 100%);
+  -webkit-mask-image: radial-gradient(circle, transparent 70%, black 100%);
 }
 
 /* Dark mode background */
