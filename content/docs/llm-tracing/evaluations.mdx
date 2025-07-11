@@ -191,7 +191,7 @@ if __name__ == "__main__":
     response = llm_app(user_query, true)
     print(f"\n🤖 Response:\n{response}")
 
- evaluate_thread(thread_id=your_thread_id, metricCollection="Collection Name")
+evaluate_thread(thread_id=your_thread_id, metricCollection="Collection Name")
 ```
 
 You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`:
@@ -205,6 +205,38 @@ a_evaluate_thread(thread_id=your_thread_id, metricCollection="Collection Name")
 You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input-output) of individual traces in a thread for multi-turn evaluation to work online. To recap, DeepEval uses the `input` of a trace as the `"user"` role content and the `output` of a trace as the `"assistant"` role content as turns in your thread.
 
 If you don't set the `input` and/or `output`, Confident AI will have nothing in your thread to evaluate.
+
+### Trace
+
+Although less common since you can run online evals on traces, you can also run **single-turn**, offline evals on trace retrospectively:
+
+```python filename="main.py" showLineNumbers copy
+from deepeval.tracing import evaluate_trace
+
+evaluate_thread(trace_uuid=<your-trace-uuid>, metricCollection="Collection Name")
+```
+
+<Callout>
+The asynchronous version, `a_evaluate_trace` is also available for traces.
+</Callout>
+
+Note that your trace **must already contain** the necessary test case parameters as you cannot update the test case parameters using the `evaluate_trace` function.
+
+### Span
+
+The same offline evals can also be ran in the same say for spans:
+
+```python filename="main.py" showLineNumbers copy
+from deepeval.tracing import evaluate_span
+
+evaluate_span(span_uuid=<your-span-uuid>, metricCollection="Collection Name")
+```
+
+<Callout>
+The asynchronous version, `a_evaluate_span` is also available for spans.
+</Callout>
+
+Remember, the metric collection you provide must be a **single-turn** one. 
 
 ## Examples
 
