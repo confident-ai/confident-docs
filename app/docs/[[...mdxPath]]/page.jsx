@@ -4,20 +4,6 @@
 
 // export const generateStaticParams = generateStaticParamsFor("mdxPath");
 
-// export async function generateMetadata(props) {
-//   const params = await props.params;
-//   // If no mdxPath, this is the root route - use custom metadata
-//   if (!params.mdxPath || params.mdxPath.length === 0) {
-//     return {
-//       title: "The LLM Evaluation Platform",
-//       description:
-//         "By the authors of DeepEval, Confident AI is the open-source platform for evaluating and improving LLM applications.",
-//     };
-//   }
-//   const { metadata } = await importPage(params.mdxPath);
-//   return metadata;
-// }
-
 // export default async function Page(props) {
 //   const params = await props.params;
 
@@ -44,6 +30,21 @@
 
 import { importPage } from 'nextra/pages'
 import { useMDXComponents as getMDXComponents } from '../../../mdx-components'
+
+
+export async function generateMetadata(props) {
+  const params = await props.params;
+  // If no mdxPath, this is the root route - use custom metadata
+  if (!params.mdxPath || params.mdxPath.length === 0) {
+    return {
+      title: "The LLM Evaluation Platform",
+      description:
+        "By the authors of DeepEval, Confident AI is the open-source platform for evaluating and improving LLM applications.",
+    };
+  }
+  const { metadata } = await importPage(params.mdxPath);
+  return metadata;
+}
 
 export default async function Page({ params }) {
   const mdxPath = await params;

@@ -37,7 +37,7 @@ export default function Marquee() {
                         <span className={styles.proofsTitle}>Daily evaluations</span>
                     </div>
                     <div className={styles.socialProof}>
-                        <Counter target={6700} />
+                        <Counter target={8000} />
                         <span className={styles.proofsTitle}>Github stars</span>
                     </div>
                     <div className={styles.socialProof}>

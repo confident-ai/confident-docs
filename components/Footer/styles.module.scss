@@ -3,7 +3,7 @@
 .footer {
     padding: 50px 0 135px;
     &.light{
-        background-color: #f3f4f6;
+        background-color: $lightModeBG;
         .inner{
             .logoWrap{
                 .first{
@@ -11,21 +11,21 @@
                         svg{
                             g{
                                 path{
-                                    fill: #000;
+                                    fill: $black;
                                 }
                             }
                         }
                         span{
-                            color: #000;
+                            color: $black;
                             font-weight: 400;
                         }
                     }
                     .copyright{
-                        color: #000;
+                        color: $black;
 
                     }
                     .codeEmbedded{
-                        background-color: #0a0b14;
+                        background-color: $darkBlue;
                         width: fit-content;
                         border-radius: 8px;
                         display: flex;
@@ -36,11 +36,11 @@
             .linkWrap{
                 .column{
                     .title{
-                        color: #4a5565;
+                        color: $grayBlue;
                     }
                     .list{
                         .link{
-                            color: #868e99;
+                            color: $lightGray-200;
                             &:hover{
                                 text-decoration: underline;
                                 color: inherit;
@@ -52,7 +52,7 @@
         }
     }
     &.dark{
-        background-color: #0a0b14;
+        background-color: $darkBlue;
     }
     .inner {
         max-width: 1200px;
@@ -94,11 +94,10 @@
                     }
 
                     .span {
-                        font-family: "Lexend Deca", sans-serif;
+                        font-family: $Lexend;
                         font-size: 19px;
                         font-weight: 300;
-                        letter-spacing: 1px;
-                        color: white;
+                        color: $white;
                         line-height: 100%;
                         display: flex;
                         align-items: center;
@@ -125,11 +124,11 @@
                 .copyright {
                     margin-bottom: 0;
                     font-size: 13px;
-                    color: white;
-                    font-family: 'Inter', sans-serif;
+                    color: $white;
+                    font-family: $inter;
                     margin: 5px 0 25px;
 
-                    @media (max-width: 767px) {
+                    @include responsive(sm) {
                         font-size: 10px;
                     }
                 }
@@ -142,7 +141,7 @@
                 display: flex;
                 gap: 20px;
 
-                @media (max-width: 767px) {
+                @include responsive(sm) {
                     flex-direction: column;
                 }
 
@@ -165,18 +164,18 @@
                 max-width: 100%;
             }
 
-            @media (max-width: 767px) {
+            @include responsive(sm) {
                 flex-wrap: wrap;
                 gap: 20px 0;
             }
 
             .column {
-                @media (max-width: 767px) {
+                @include responsive(sm) {
                     width: 50%;
                 }
 
                 .title {
-                    color: white;
+                    color: $white;
                     font-size: 16px;
                     font-weight: 600;
 
@@ -187,7 +186,7 @@
                     flex-direction: column;
 
                     .link {
-                        color: #a9afba;
+                        color: $lightGray-100;
                         display: block;
                         margin-top: 12px;
                         margin-bottom: 6px;
@@ -197,7 +196,7 @@
                         transition: color 0.3s ease;
 
                         &:hover {
-                            color: #fff;
+                            color: $white;
                         }
                     }
                 }

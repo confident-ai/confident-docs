@@ -1,13 +1,13 @@
 @import '../../../app/styles/vars';
 
 .CardSection {
-    background-color: #0e0e13;
+    background-color: $confident-dark;
     padding: 70px 0;
-    border-bottom: 1px solid #363636;
+    border-bottom: 1px solid $darkBorder-100;
 
     .inner {
         display: flex;
-        max-width: 1440px;
+        max-width: $container_xl;
         gap: 50px;
         padding: 0 6px;
         margin: 30px auto 20px;
@@ -28,13 +28,14 @@
             }
 
             .subHeading {
-                color: #c9ced6;
+                color: $lightGray;
                 font-size: 13px;
-                font-weight: 400;
-                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                font-family: $inter;
                 margin-bottom: 20px;
                 display: block;
                 text-transform: uppercase;
+                line-height: 2em;
 
                 @include responsive(sm) {
                     font-size: 12px;
@@ -45,10 +46,10 @@
                 margin-bottom: 80px;
                 font-size: 70px;
                 font-weight: 400;
-                color: white;
+                color: $white;
                 line-height: 1.3em;
-                max-width: 80%;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
+                letter-spacing: 3px;
 
                 @include responsive(xl) {
                     font-size: 60px;
@@ -69,7 +70,7 @@
                 background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
                 background-size: 20px 20px;
                 display: flex;
-                border: 1px solid #363636;
+                border: 1px solid $darkBorder-100;
                 border-radius: 12px;
                 width: 100%;
                 flex-wrap: wrap;
@@ -88,7 +89,7 @@
                 }
 
                 .card {
-                    border-right: 1px solid #555;
+                    border-right: 1px solid $lightGray-500;
                     padding: 35px 20px 35px 25px;
 
                     &:last-of-type {
@@ -97,7 +98,7 @@
 
                     @include responsive(md) {
                         width: 50% !important;
-                        border-bottom: 1px solid #555;
+                        border-bottom: 1px solid $lightGray-500;
                         border-right: none;
                         padding: 25px;
                         display: flex;
@@ -105,15 +106,15 @@
                         align-items: center;
 
                         &:first-child {
-                            border-right: 1px solid #555;
+                            border-right: 1px solid $lightGray-500;
                         }
 
                         &:last-of-type {
-                            border-left: 1px solid #555;
+                            border-left: 1px solid $lightGray-500;
                         }
                     }
 
-                    @media (max-width: 575px) {
+                    @include responsive(xs) {
                         width: 100% !important;
 
                         &:first-child {
@@ -128,13 +129,14 @@
 
 
                     .cardStep {
-                        border: 1px solid #fff;
-                        color: #fff;
+                        border: 1px solid $white;
+                        color: $white;
                         border-radius: 13px;
-                        padding: 5px 10px;
+                        font-family: $inter;
+                        padding: 7px 10px;
                         font-size: 14px;
                         width: fit-content;
-                        margin-bottom: 20px;
+                        margin-bottom: 15px;
 
                         span {
                             line-height: 1.75em;
@@ -149,22 +151,24 @@
 
                     .cardHeading {
                         font-size: 24px;
-                        font-weight: 300;
-                        font-family: 'Inter', sans-serif;
-                        color: #fff;
+                        font-weight: 400;
+                        font-family: $inter;
+                        color: $white;
                         margin-bottom: 14px;
                         display: flex;
                         gap: 10px;
+                        letter-spacing: 0.5px;
                     }
 
                     .cardDescription {
-                        color: #a9afba;
+                        color: $lightGray-100;
                         font-size: 14px;
                         font-weight: 300;
-                        line-height: 1.8em;
-                        font-family: 'Inter', sans-serif;
+                        line-height: 2em;
+                        font-family: $inter;
+                        margin-bottom: 16px;
 
-                        @media (max-width: 767px) {
+                        @include responsive(sm) {
                             font-size: 12px;
                         }
                     }
@@ -180,56 +184,6 @@
                     justify-content: center;
                 }
 
-                .btn {
-                    font-family: 'Inter', sans-serif;
-                    border-radius: 40px;
-                    padding: 12px 30px;
-                    font-weight: 500;
-                    font-family: 'Inter', sans-serif;
-                    color: white;
-                    font-size: 14px;
-                    display: block;
-
-                    @include responsive(md) {
-                        font-size: 14px;
-                        padding: 14px 22px;
-                    }
-
-                    @media (max-width: 767px) {
-                        font-size: 12px;
-                        padding: 10px 16px;
-                        text-align: center;
-                    }
-
-                    &.outlined {
-                        border: 2px solid #fff;
-                        color: #fff;
-                        font-weight: 500;
-                        background-color: #000;
-                        transition: background-color 0.475s, color 0.4s;
-
-                        &:hover {
-                            color: #000;
-                            background-color: #fff;
-                        }
-                    }
-
-                    &.contained {
-                        border: 2px solid #000;
-                        color: #000;
-                        font-weight: 600;
-                        background-color: #fff;
-                        transition: box-shadow 0.4s ease-in-out, background-color 0.4s, color 0.4s, border-color 0.4s ease;
-                        box-shadow: 0 0 5px #fff;
-
-                        &:hover {
-                            color: white;
-                            box-shadow: unset;
-                            border-color: #fff;
-                            background-color: #0b101b;
-                        }
-                    }
-                }
             }
         }
     }

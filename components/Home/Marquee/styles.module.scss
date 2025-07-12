@@ -11,26 +11,26 @@
 }
 
 .marqueeContainer {
-  background: #0e0e12;
-  border-top: 1px solid #363636;
-  border-bottom: 1px solid #363636;
+  background: $confident-dark;
+  border-top: 1px solid $darkBorder-100;
+  border-bottom: 1px solid $darkBorder-100;
   overflow: hidden;
-  padding: 40px 0;
+  padding: 40px 16px;
 
   .inner {
     display: flex;
     flex-direction: column;
     max-width: 1240px;
     margin: 0 auto;
-    padding: 0 20px;
 
     .trustedBy {
-      color: #f0f3f8;
+      color: $lightGray-10;
       font-size: 12px;
-      font-weight: 300;
-      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-family: $inter;
       margin: 0 auto;
       text-align: center;
+      line-height: 1.143em;
     }
 
     .marquee {
@@ -47,7 +47,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-image: linear-gradient(90deg, #0e0e13, #fff0);
+        background-image: linear-gradient(90deg, $confident-dark, #fff0);
         height: 100%;
         z-index: 2;
         width: 10%;
@@ -58,7 +58,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        background-image: linear-gradient(270deg, #0e0e13, #fff0);
+        background-image: linear-gradient(270deg, $confident-dark, #fff0);
         height: 100%;
         z-index: 2;
         width: 10%;
@@ -84,10 +84,10 @@
     .socialProofsContainer {
       margin: 0 auto;
       display: flex;
-      justify-content: space-between  ;
+      justify-content: space-between;
       width: 745px;
 
-      @media (max-width: 768px) {
+      @include responsive(sm) {
         flex-direction: column;
         gap: 50px;
         align-items: center;
@@ -99,28 +99,28 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding: 10px;
-
+        justify-content: center;
+        min-height: 78px;
 
         span {
           font-family: "IBM Plex Mono", monospace;
-          font-size: 32px;
+          font-size: 34px;
           width: 100%;
           min-width: 153px;
-
+          line-height: 100%;
           display: block;
+          margin-bottom: 5px;
 
-          @media (max-width: 768px) {
+          @include responsive(sm) {
             font-size: 24px;
           }
         }
 
-        ;
-
         .proofsTitle {
-          color: #a9afba;
+          color: $lightGray-100;
           font-size: 12px;
-          font-family: 'Inter', sans-serif;
+          font-family: $inter;
+          line-height: 1.75em;
         }
       }
     }

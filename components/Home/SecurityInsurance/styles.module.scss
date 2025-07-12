@@ -1,15 +1,15 @@
 @import '../../../app/styles/vars';
 
 .SecurityInsurance {
-    background-color: #0e0e13;
+    background-color: $confident-dark;
     padding: 70px 0;
-    border-bottom: 1px solid #363636;
+    border-bottom: 1px solid $darkBorder-100;
     background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
     background-size: 20px 20px;
 
     .inner {
         display: flex;
-        max-width: 1440px;
+        max-width: $container_xl;
         gap: 50px;
         padding: 0 6px;
         margin: 30px auto 20px;
@@ -28,22 +28,24 @@
             }
 
             .subHeading {
-                color: #c9ced6;
+                color: $lightGray;
                 font-size: 13px;
                 font-weight: 400;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
                 margin-bottom: 20px;
                 display: block;
                 text-transform: uppercase;
+                line-height: 2em;
             }
 
             .heading {
                 margin-bottom: 40px;
                 font-size: 70px;
                 font-weight: 400;
-                color: white;
+                color: $white;
                 line-height: 1.3em;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
+                letter-spacing: 3px;
 
                 @include responsive(md)  {
                     font-size: 36px;
@@ -51,7 +53,7 @@
                     margin-bottom: 40px;
                 }
 
-                @media (max-width: 767px) {
+                @include responsive(sm) {
                     font-size: 32px;
                 }
             }
@@ -71,31 +73,32 @@
                 }
 
                 .security {
-                    border-top: 1px solid #555;
+                    border-top: 1px solid $lightGray-500;
                     padding: 40px 0;
                     width: 100%;
                     display: flex;
-                    gap: 20px;
+                    gap: 80px;
 
                     @include responsive(md)  {
                         flex-direction: column;
                         max-width: 50%;
-                        border: 1px solid #555;
+                        border: 1px solid $lightGray-500;
                         padding: 20px;
+                        gap: 20px;
                         min-height: 200px;
 
                     }
 
-                    @media (max-width: 575px) {
+                    @include responsive(xs) {
                         max-width: 100%;
                     }
 
                     .wrap {
-                        margin-right: 20px;
-                        width: 40%;
                         display: flex;
                         gap: 20px;
                         align-items: center;
+                        max-width: 400px;
+                        width: 100%;
 
                         @include responsive(md)  {
                             max-width: unset;
@@ -105,7 +108,7 @@
                         }
 
                         .iconOuter {
-                            border: 1px solid #fff;
+                            border: 1px solid $white;
                             width: fit-content;
                             padding: 2px;
                             border-radius: 24px;
@@ -113,9 +116,9 @@
                             width: 84px;
 
                             .securityIcon {
-                                background-color: #ffe485;
+                                background-color: $lightYellow;
                                 border-radius: 24px;
-                                border: 1px solid #000;
+                                border: 1px solid $black;
                                 justify-content: center;
                                 align-items: center;
                                 width: 100%;
@@ -127,9 +130,9 @@
 
                         .securityHeading {
                             font-size: 21px;
-                            font-weight: 300;
-                            font-family: 'Inter', sans-serif;
-                            color: #fff;
+                            font-weight: 500;
+                            font-family: $inter;
+                            color: $white;
 
                             @include responsive(md)  {
                                 font-size: 18px;
@@ -141,14 +144,13 @@
 
 
                     .securityDescription {
-                        color: #c9ced6;
+                        color: $lightGray;
                         font-size: 16px;
-                        font-weight: 300;
+                        font-weight: 400;
                         line-height: 1.8em;
-                        font-family: 'Inter', sans-serif;
+                        font-family: $inter;
                         max-width: 87%;
                         text-align: left;
-                        width: 60%;
                         display: flex;
                         align-items: center;
 
@@ -158,7 +160,7 @@
                             text-align: center;
                         }
 
-                        @media (max-width: 767px) {
+                        @include responsive(sm) {
                             font-size: 12px;
                         }
                     }

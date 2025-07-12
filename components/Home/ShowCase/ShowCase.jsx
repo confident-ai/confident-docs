@@ -12,6 +12,7 @@ export default function ShowCase() {
   const [typedHtml, setTypedHtml] = useState("");
   const [charIndex, setCharIndex] = useState(0);
   const [flatChars, setFlatChars] = useState([]);
+  const [isClient, setIsClient] = useState(false);
   const typingTimeoutRef = useRef(null);
 
   const { ref, inView } = useInView({ triggerOnce: false });
@@ -78,10 +79,12 @@ print(res)`
   ];
 
   const highlightedMap = useMemo(() => {
+    // Only highlight on client to prevent hydration mismatch
+    if (!isClient) return rawCode.map(() => "");
     return rawCode.map(code =>
       Prism.highlight(code, Prism.languages.python, "python")
     );
-  }, []);
+  }, [isClient]);
 
   // Precompute full lines for current tab's full code (for line numbers)
   const fullLines = useMemo(() => {
@@ -92,7 +95,15 @@ print(res)`
   // typedLines derived from typedHtml for rendering typed content
   const typedLines = typedHtml.split("\n");
 
+  // Set isClient to true after mount
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // Only run effects on client
+    if (!isClient) return;
+
     const code = highlightedMap[tab];
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -122,20 +133,23 @@ print(res)`
       setCharIndex(0);
       setFlatChars(chars);
     }
-  }, [tab, inView, hasAnimatedTab, highlightedMap]);
+  }, [tab, inView, hasAnimatedTab, highlightedMap, isClient]);
 
   useEffect(() => {
+    // Only run effects on client
+    if (!isClient) return;
+
     if (charIndex < flatChars.length) {
       typingTimeoutRef.current = setTimeout(() => {
         setTypedHtml(prev => prev + flatChars[charIndex]);
         setCharIndex(prev => prev + 1);
-      }, 10);
+      }, 0);
     } else if (flatChars.length && charIndex === flatChars.length) {
       setHasAnimatedTab(prev => ({ ...prev, [tab]: true }));
     }
 
     return () => clearTimeout(typingTimeoutRef.current);
-  }, [charIndex, flatChars, tab]);
+  }, [charIndex, flatChars, tab, isClient]);
 
   const titles = ["evaluate.py", "observability.py", "dataset.py", "prompt.py"];
   const videos = [
@@ -180,16 +194,26 @@ print(res)`
             <div className={styles.codeFrame}>
               <div className={styles.heading}>{titles[tab]}</div>
               <div className={styles.codeBlock}>
-                {fullLines.map((_, i) => (
-                  <div key={i} className={styles.codeLine}>
-                    <span className={styles.lineNumber}>{i + 1}</span>
-                    <code
-                      dangerouslySetInnerHTML={{
-                        __html: typedLines[i] || "&nbsp;",
-                      }}
-                    />
-                  </div>
-                ))}
+                {isClient ? (
+                  fullLines.map((_, i) => (
+                    <div key={i} className={styles.codeLine}>
+                      <span className={styles.lineNumber}>{i + 1}</span>
+                      <code
+                        dangerouslySetInnerHTML={{
+                          __html: typedLines[i] || "&nbsp;",
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  // Server-side fallback - show raw code without highlighting
+                  rawCode[tab].split("\n").map((line, i) => (
+                    <div key={i} className={styles.codeLine}>
+                      <span className={styles.lineNumber}>{i + 1}</span>
+                      <code>{line}</code>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

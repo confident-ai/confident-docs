@@ -30,7 +30,6 @@ export const metadata = {
     creator: '@ConfidentAI', 
   },
 };
-
 export default function HomePage() {
   return (
     <>

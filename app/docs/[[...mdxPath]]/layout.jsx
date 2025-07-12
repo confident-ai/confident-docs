@@ -8,15 +8,13 @@ import footerLinks from '../footerLinks'
 export default async function DocsLayout({ children }) {
   const pageMap = await getPageMap()
 
-  const filteredPageMap = pageMap.filter(page => page.name !== 'index')
-
-  console.log(filteredPageMap)
+  const filteredPageMap = pageMap.filter(page => page.name !== 'index');
   return (
     <Layout
       darkMode={false}
       nextThemes={{ defaultTheme: 'light' }}
       banner={<CustomBanner />}
-      navbar={<CustomNavbar />}
+      navbar={<CustomNavbar isDocsPage={true} />}
       pageMap={filteredPageMap}
       docsRepositoryBase="https://github.com/confident-ai/confident-docs/tree/main"
       footer={<Footer variant='light' links={footerLinks} />}

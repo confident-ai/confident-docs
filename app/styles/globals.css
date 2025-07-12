@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
 /* Add subtle dot pattern to the background */
 body {
   background-image: radial-gradient(rgba(0, 0, 0, 0.131) 1px, transparent 1px);
@@ -34,18 +33,18 @@ body {
 }
 
 h1, h2 {
-  font-family: 'Fira Code', monospace ;
-  font-weight: 600;
+  font-family: 'Fira Code', monospace !important;
+  font-weight: 600 !important;
 }
 
 h3 {
-  font-family: 'Fira Code', monospace;
-  font-weight: 600;
+  font-family: 'Fira Code', monospace !important;
+  font-weight: 600 !important;
 }
 
 h4, h5, h6 {
-  font-family: 'Fira Code', monospace;
-  font-weight: 500;
+  font-family: 'Fira Code', monospace !important;
+  font-weight: 500 !important;
 }
 
 /* Add right border to the left navigation drawer */
@@ -202,3 +201,4 @@ details > summary + div {
   padding: 0.5rem 1rem 1rem 1rem;
   font-size: 15px;
 }
+

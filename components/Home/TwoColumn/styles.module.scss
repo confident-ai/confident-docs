@@ -2,12 +2,12 @@
 
 .TwoColumn {
     padding: 90px 0;
-    border-bottom: 1px solid #363636;
-    background: #0e0e13;
+    border-bottom: 1px solid $darkBorder-100;
+    background: $confident-dark;
 
     .inner {
         display: flex;
-        max-width: 1440px;
+        max-width: $container_xl;
         margin: 0 auto;
         gap: 80px;
         padding: 0 6px;
@@ -22,20 +22,15 @@
         }
 
         .textWrap {
-            width: 100%;
-            max-width: calc(50% - 25px);
 
-            @include responsive(md)  {
-                max-width: 100%;
-            }
 
             .subHeading {
-                color: #c9ced6;
-                margin-bottom: 20px;
+                color: $lightGray;
+                margin-bottom: 10px;
                 font-size: 13px;
                 font-weight: 400;
-                font-family: 'Inter', sans-serif;
-
+                font-family: $inter;
+                display: block;
                 @include responsive(md)  {
                     font-size: 12px;
                 }
@@ -43,10 +38,12 @@
 
             .heading {
                 font-size: 40px;
-                color: #fff;
+                color: $white;
                 font-weight: 400;
                 margin-bottom: 16px;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
+                line-height: 1.316em;
+                letter-spacing: 2px;
 
                 @include responsive(md)  {
                     font-size: 24px;
@@ -55,22 +52,24 @@
             }
 
             .description {
-                color: #a9afba;
+                color: $lightGray-100;
                 font-size: 18px;
-                font-weight: 300;
+                font-weight: 400;
                 line-height: 1.8em;
-                font-family: 'Inter', sans-serif;
-
+                max-width: 95%;
+                font-family: $inter;
+                
                 @include responsive(md)  {
                     font-size: 14px;
+                    max-width: 100%;
                 }
             }
         }
 
         .imageWrap {
             width: 100%;
-            max-width: calc(50% - 25px);
-            box-shadow: 0 2px 20px #000;
+            max-width: 50%;
+            box-shadow: 0 2px 20px $black;
             border-radius: 8px;
             overflow: hidden;
             position: relative;
@@ -87,7 +86,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                border: 1px solid #363636;
+                border: 1px solid $darkBorder-100;
                 border-radius: 8px;
 
 

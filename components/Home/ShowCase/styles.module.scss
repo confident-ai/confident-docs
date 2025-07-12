@@ -4,13 +4,13 @@
     background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
     background-size: 20px 20px;
     padding: 70px 0;
-    border-bottom: 1px solid #363636;
+    border-bottom: 1px solid $darkBorder-100;
 
     .inner {
         display: flex;
         flex-direction: column;
-        max-width: 1440px;
-        gap: 50px;
+        max-width: $container_xl;
+        gap: 38px;
         padding: 0 6px;
         margin: 0 auto;
         align-items: center;
@@ -36,14 +36,15 @@
             }
 
             .subHeading {
-                color: #c9ced6;
+                color: $lightGray;
                 margin-bottom: 20px;
                 font-size: 13px;
                 font-weight: 400;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
                 margin-bottom: 20px;
                 display: block;
                 text-transform: uppercase;
+                line-height: 2em;
 
                 @include responsive(sm) {
                     font-size: 12px;
@@ -52,12 +53,13 @@
 
 
             .heading {
-                margin-bottom: 40px;
+                margin-bottom: 16px;
                 font-size: 64px;
                 font-weight: 400;
-                color: white;
+                color: $white;
                 line-height: 1.3em;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
+                letter-spacing: 3px;
 
                 @include responsive(md) {
                     font-size: 36px;
@@ -69,31 +71,31 @@
             }
 
             .description {
-                color: #a9afba;
+                color: $lightGray-100;
                 font-size: 18px;
-                font-weight: 300;
+                font-weight: 500;
                 line-height: 1.8em;
-                font-family: 'Inter', sans-serif;
-                margin-bottom: 36px;
+                font-family: $inter;
+                margin-bottom: 16px;
 
                 @include responsive(md) {
                     font-size: 16px;
                 }
 
-                @media (max-width: 767px) {
+                @include responsive(sm) {
                     font-size: 14px;
                 }
 
                 span {
                     font-weight: bold;
-                    color: #fff;
+                    color: $white;
                 }
             }
         }
 
         .tabs {
             display: flex;
-            background-color: #000;
+            background-color: $black;
             border-radius: 29px;
             justify-content: space-between;
             align-items: center;
@@ -102,9 +104,9 @@
             width: fit-content;
             gap: 11px;
             margin: 0 auto 40px;
-            border: 1px solid #363636;
+            border: 1px solid $darkBorder-100;
 
-            @media (max-width: 767px) {
+            @include responsive(sm) {
                 flex-direction: column;
                 width: fit-content;
                 padding: 15px 10px;
@@ -112,13 +114,13 @@
             }
 
             .tab {
-                color: #737b89;
-                background-color: #8585b600;
+                color: $lightGray-300;
+                background-color: $translucentDarkBlue-300;
                 border-radius: 20px;
                 padding: 8.5px 15px;
                 font-size: 14px;
                 font-weight: 500;
-                font-family: "Inter", sans-serif;
+                font-family: $inter;
                 cursor: pointer;
                 transition: background-color .2s, color .3s;
                 text-align: center;
@@ -128,13 +130,13 @@
                 }
 
                 &:hover {
-                    background-color: #fff;
-                    color: #000;
+                    background-color: $white;
+                    color: $black;
                 }
 
                 &.activeTab {
-                    background-color: #fff;
-                    color: #000;
+                    background-color: $white;
+                    color: $black;
                 }
             }
         }
@@ -153,44 +155,44 @@
             .frame {
                 width: 100%;
                 padding: 10px;
-                background-color: #000;
-                border: 1px solid #a9afba;
+                background-color: $black;
+                border: 1px solid $lightGray-100;
                 border-radius: 15px;
 
                 .codeFrame {
-                    background-image: linear-gradient(325deg, #0e0e13 81%, #ffffff14 80%, #fff0), linear-gradient(to bottom, #0e0e13, #0e0e13);
-                    border: 1px solid #a9afba;
+                    background-image: linear-gradient(325deg, $confident-dark 81%, #ffffff14 80%, #fff0), linear-gradient(to bottom, $confident-dark, $confident-dark);
+                    border: 1px solid $lightGray-100;
                     border-radius: 12px 12px 0 0;
 
                     .heading {
                         width: 100%;
-                        background-color: #070a0e26;
+                        background-color: $translucentDarkBlue-400;
                         white-space: nowrap;
                         font-family: "IBM Plex Mono", monospace;
                         font-size: 12px;
                         line-height: 1.4em;
                         padding: 10px 16px;
-                        border-bottom: 1px solid #363636;
-                        color: white;
+                        border-bottom: 1px solid $darkBorder-100;
+                        color: $white;
 
                     }
 
                     .codeBlock {
-                        color: #ffffff;
+                        color: $white;
                         font-family: "IBM Plex Mono", monospace;
                         font-size: 12px;
                         padding: 20px;
                         border-radius: 10px;
                         white-space: pre-wrap;
                         max-width: 100%;
-                        overflow: scroll;
+                        overflow: auto;
 
                         .codeLine {
                             display: flex;
                             min-width: 991px;
 
                             .lineNumber {
-                                color: #737b89;
+                                color: $lightGray-300;
                                 width: 3%;
                                 user-select: none;
 
@@ -206,7 +208,7 @@
             }
 
             .video {
-                border: 1px solid #a9afba;
+                border: 1px solid $lightGray-100;
                 border-radius: 0 0 12px 12px;
                 overflow: hidden;
                 margin-top: 5px;
@@ -231,44 +233,3 @@
     }
 }
 
-// Code coloring classes
-.keyword {
-    color: #00a3d0;
-}
-
-.className {
-    color: #fff;
-}
-
-.decorator {
-    color: #fca7ff;
-}
-
-.quotes {
-    color: #78fffe;
-}
-
-.string {
-    color: #fff;
-}
-
-.declaration {
-    color: #ff724c;
-}
-
-.inputOutputs {
-    color: #ffa842;
-}
-
-.numbers {
-    color: #ffe418;
-}
-
-.controlFlow {
-    color: #00fbff;
-}
-
-.comment {
-    color: #737b89;
-    font-style: italic;
-}
