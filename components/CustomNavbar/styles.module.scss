@@ -150,7 +150,11 @@
             opacity: 0;
             top: 200%;
             transition: all ease 0.18s;
-
+            .inner{
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
             .popoverLink {
               color: $white;
               font-size: 15px;

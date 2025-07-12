@@ -73,7 +73,7 @@ const CustomNavbar = ({ isDocsPage }) => {
                     <Image src='/icons/arrow-down.svg' width={10} height={10} alt='downwards facing arrow'/>
                   </div>
                   <div className={styles.popover}>
-                    <div className="inner">
+                    <div className={styles.inner}>
                       {link.children.map(child => (
                         <Link href={child.href} key={child.label}>
                           <div className={styles.popoverLink}>
