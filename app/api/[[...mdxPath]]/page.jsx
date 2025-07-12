@@ -24,7 +24,7 @@ export default async function Page({ params }) {
   if (mdxPathArray.length === 0) {
 
     // For the root `/docs` route, import the `page.mdx` explicitly:
-    const result = await importPage(['docs']);
+    const result = await importPage(['api']);
     const { default: MDXContent, toc, metadata } = result
     const Wrapper = getMDXComponents().wrapper
     return (
@@ -35,7 +35,7 @@ export default async function Page({ params }) {
   }
 
   // For nested docs paths
-  const result = await importPage(['docs', ...mdxPathArray]);
+  const result = await importPage(['api', ...mdxPathArray]);
   const { default: MDXContent, toc, metadata } = result
   const Wrapper = getMDXComponents().wrapper
   return (

@@ -7,9 +7,7 @@ export default function ConditionalHead() {
   const pathname = usePathname();
 
   // Check if we're on a docs page (path starts with /docs)
-  const isDocsPage = pathname?.startsWith("/docs");
-
- 
+  const isDocsPage = pathname?.startsWith("/docs") || pathname?.startsWith("/api");
 
   return (
     <Head
