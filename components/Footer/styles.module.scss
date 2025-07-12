@@ -1,0 +1,206 @@
+@import '../../app/styles/vars';
+
+.footer {
+    padding: 50px 0 135px;
+    &.light{
+        background-color: $lightModeBG;
+        .inner{
+            .logoWrap{
+                .first{
+                    .logo{
+                        svg{
+                            g{
+                                path{
+                                    fill: $black;
+                                }
+                            }
+                        }
+                        span{
+                            color: $black;
+                            font-weight: 400;
+                        }
+                    }
+                    .copyright{
+                        color: $black;
+
+                    }
+                    .codeEmbedded{
+                        background-color: $darkBlue;
+                        width: fit-content;
+                        border-radius: 8px;
+                        display: flex;
+                        justify-content: center;
+                    }
+                }
+            }
+            .linkWrap{
+                .column{
+                    .title{
+                        color: $grayBlue;
+                    }
+                    .list{
+                        .link{
+                            color: $lightGray-200;
+                            &:hover{
+                                text-decoration: underline;
+                                color: inherit;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    &.dark{
+        background-color: $darkBlue;
+    }
+    .inner {
+        max-width: 1200px;
+        padding: 0 6px;
+        margin: 0 auto;
+        display: flex;
+        gap: 50px;
+        @include responsive(lg)  {
+            padding: 0 16px;
+        }
+        @include responsive(md)  {
+            flex-direction: column;
+            padding: 0 32px;
+        }
+
+        .logoWrap {
+            display: flex;
+            flex-direction: column;
+            max-width: calc(30% - 25px);
+            width: 100%;
+
+            @include responsive(md)  {
+                flex-direction: row;
+                justify-content: space-between;
+                max-width: unset;
+            }
+
+            .first {
+                display: flex;
+                flex-direction: column;
+
+                .logo {
+                    display: flex;
+                    gap: 10px;
+                    width: 100%;
+
+                    @include responsive(md)  {
+                        max-width: unset;
+                    }
+
+                    .span {
+                        font-family: $Lexend;
+                        font-size: 19px;
+                        font-weight: 300;
+                        color: $white;
+                        line-height: 100%;
+                        display: flex;
+                        align-items: center;
+                    }
+                }
+
+                .socials {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 20px;
+
+                    .social {
+                        img {
+                            width: 25px;
+                            height: 25px;
+                        }
+                    }
+                }
+
+                .codeEmbedded {
+                    margin-bottom: 20px;
+                }
+
+                .copyright {
+                    margin-bottom: 0;
+                    font-size: 13px;
+                    color: $white;
+                    font-family: $inter;
+                    margin: 5px 0 25px;
+
+                    @include responsive(sm) {
+                        font-size: 10px;
+                    }
+                }
+
+
+            }
+
+
+            .compliances {
+                display: flex;
+                gap: 20px;
+
+                @include responsive(sm) {
+                    flex-direction: column;
+                }
+
+                @include responsive(md)  {
+                    img {
+                        width: 100px;
+                        height: 100px;
+                    }
+                }
+            }
+        }
+
+        .linkWrap {
+            max-width: calc(70% - 25px);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+            @include responsive(md)  {
+                max-width: 100%;
+            }
+
+            @include responsive(sm) {
+                flex-wrap: wrap;
+                gap: 20px 0;
+            }
+
+            .column {
+                @include responsive(sm) {
+                    width: 50%;
+                }
+
+                .title {
+                    color: $white;
+                    font-size: 16px;
+                    font-weight: 600;
+
+                }
+
+                .list {
+                    display: flex;
+                    flex-direction: column;
+
+                    .link {
+                        color: $lightGray-100;
+                        display: block;
+                        margin-top: 12px;
+                        margin-bottom: 6px;
+                        font-size: 14px;
+                        line-height: 16px;
+                        text-decoration: none;
+                        transition: color 0.3s ease;
+
+                        &:hover {
+                            color: $white;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

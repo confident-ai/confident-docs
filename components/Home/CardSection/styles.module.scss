@@ -1,0 +1,190 @@
+@import '../../../app/styles/vars';
+
+.CardSection {
+    background-color: $confident-dark;
+    padding: 70px 0;
+    border-bottom: 1px solid $darkBorder-100;
+
+    .inner {
+        display: flex;
+        max-width: $container_xl;
+        gap: 50px;
+        padding: 0 6px;
+        margin: 30px auto 20px;
+
+        @include responsive(lg) {
+            padding: 0 16px;
+        }
+
+        @include responsive(md) {
+            padding: 0 32px;
+        }
+
+        .textWrap {
+            width: 100%;
+
+            @include responsive(md) {
+                text-align: center;
+            }
+
+            .subHeading {
+                color: $lightGray;
+                font-size: 13px;
+                font-weight: 500;
+                font-family: $inter;
+                margin-bottom: 20px;
+                display: block;
+                text-transform: uppercase;
+                line-height: 2em;
+
+                @include responsive(sm) {
+                    font-size: 12px;
+                }
+            }
+
+            .heading {
+                margin-bottom: 80px;
+                font-size: 70px;
+                font-weight: 400;
+                color: $white;
+                line-height: 1.3em;
+                font-family: $inter;
+                letter-spacing: 3px;
+
+                @include responsive(xl) {
+                    font-size: 60px;
+                }
+
+                @include responsive(md) {
+                    font-size: 36px;
+                    max-width: unset;
+                    margin-bottom: 40px;
+                }
+
+                @include responsive(sm) {
+                    font-size: 28px;
+                }
+            }
+
+            .cards {
+                background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
+                background-size: 20px 20px;
+                display: flex;
+                border: 1px solid $darkBorder-100;
+                border-radius: 12px;
+                width: 100%;
+                flex-wrap: wrap;
+                margin-bottom: 40px;
+
+                &.centeredCards {
+                    @include responsive(md) {
+                        justify-content: center;
+
+                        .card {
+                            &:last-of-type {
+                                border-left: none;
+                            }
+                        }
+                    }
+                }
+
+                .card {
+                    border-right: 1px solid $lightGray-500;
+                    padding: 35px 20px 35px 25px;
+
+                    &:last-of-type {
+                        border: none;
+                    }
+
+                    @include responsive(md) {
+                        width: 50% !important;
+                        border-bottom: 1px solid $lightGray-500;
+                        border-right: none;
+                        padding: 25px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+                        &:first-child {
+                            border-right: 1px solid $lightGray-500;
+                        }
+
+                        &:last-of-type {
+                            border-left: 1px solid $lightGray-500;
+                        }
+                    }
+
+                    @include responsive(xs) {
+                        width: 100% !important;
+
+                        &:first-child {
+                            border-right: none;
+                        }
+
+                        &:last-of-type {
+                            border-left: none;
+                        }
+                    }
+
+
+
+                    .cardStep {
+                        border: 1px solid $white;
+                        color: $white;
+                        border-radius: 13px;
+                        font-family: $inter;
+                        padding: 7px 10px;
+                        font-size: 14px;
+                        width: fit-content;
+                        margin-bottom: 15px;
+
+                        span {
+                            line-height: 1.75em;
+                            display: block;
+                        }
+                    }
+
+                    .cardIcon {
+                        margin-bottom: 14px;
+
+                    }
+
+                    .cardHeading {
+                        font-size: 24px;
+                        font-weight: 400;
+                        font-family: $inter;
+                        color: $white;
+                        margin-bottom: 14px;
+                        display: flex;
+                        gap: 10px;
+                        letter-spacing: 0.5px;
+                    }
+
+                    .cardDescription {
+                        color: $lightGray-100;
+                        font-size: 14px;
+                        font-weight: 300;
+                        line-height: 2em;
+                        font-family: $inter;
+                        margin-bottom: 16px;
+
+                        @include responsive(sm) {
+                            font-size: 12px;
+                        }
+                    }
+                }
+            }
+
+            .buttonWrap {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+
+                @include responsive(md) {
+                    justify-content: center;
+                }
+
+            }
+        }
+    }
+}

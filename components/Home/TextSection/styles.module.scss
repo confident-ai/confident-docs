@@ -1,0 +1,101 @@
+@import '../../../app/styles/vars';
+
+.textSection {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
+    background-size: 20px 20px;
+    padding: 70px 0;
+    border-bottom: 1px solid $darkBorder-100;
+
+    .inner {
+        display: flex;
+        max-width: $container_xl;
+        gap: 50px;
+        padding: 0 6px;
+        margin: 30px auto 20px;
+
+        @include responsive(lg) {
+            padding: 0 16px;
+        }
+
+        @include responsive(md) {
+            padding: 0 32px;
+        }
+
+        .textWrap {
+            @include responsive(md) {
+                text-align: center;
+                width: 100%;
+            }
+
+            .subHeading {
+                color: $lightGray;
+                margin-bottom: 20px;
+                font-size: 13px;
+                font-weight: 400;
+                font-family: $inter;
+                margin-bottom: 20px;
+                display: block;
+                text-transform: uppercase;
+                line-height: 2em;
+                @include responsive(sm) {
+                    font-size: 12px;
+                }
+            }
+
+            .heading {
+                margin-bottom: 40px;
+                font-size: 60px;
+                font-weight: 400;
+                color: $white;
+                line-height: 1.316em;
+                max-width: 80%;
+                letter-spacing: 3px;
+                font-family: $inter;
+                @include responsive(xxl) {
+                    font-size: 70px;
+                }
+                @include responsive(md) {
+                    font-size: 36px;
+                    max-width: unset;
+                    margin-bottom: 20px;
+                }
+                @include responsive(sm) {
+                    font-size: 28px;
+                }
+            }
+
+            .description {
+                color: $lightGray-100;
+                font-size: 18px;
+                font-weight: 500;
+                line-height: 1.8em;
+                font-family: $inter;
+                margin-bottom: 36px;
+
+                @include responsive(md) {
+                    font-size: 16px;
+                    max-width: unset;
+                }
+
+                @include responsive(sm) {
+                    font-size: 12px;
+                }
+
+                b {
+                    font-weight: bold;
+                    color: $white;
+                }
+            }
+
+
+            .buttonWrap {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                @include responsive(md) {
+                    justify-content: center;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,125 @@
+@import "../../../app/styles/vars";
+
+.btn {
+  font-weight: 500;
+  font-family: $inter;
+  color: $white;
+  font-size: 16px;
+  display: block;
+  padding: 15px 25px;
+
+  &.curved {
+    border-radius: 40px;
+  }
+  &.bordered {
+    border: 2px solid $white;
+  }
+
+  // Sizes
+  &.xs {
+    padding: 6px 32px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  &.sm {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  &.md {
+    padding: 15px 25px;
+    font-size: 16px;
+    line-height: 1.75em;
+
+    @include responsive(sm) {
+      font-size: 12px;
+      padding: 10px 16px;
+      width: fit-content;
+      text-align: center;
+    }
+  }
+
+  &.lg {
+    padding: 12px 30px;
+    font-size: 14px;
+    line-height: 2em;
+    @include responsive(md) {
+      font-size: 14px;
+      padding: 12px 24px;
+    }
+
+    @include responsive(sm) {
+      font-size: 12px;
+      padding: 10px 16px;
+      width: fit-content;
+      text-align: center;
+    }
+  }
+
+  &.xl {
+    padding: 22px 36px;
+    font-size: 18px;
+
+    @include responsive(md) {
+      font-size: 14px;
+      padding: 14px 22px;
+    }
+
+    @include responsive(sm) {
+      font-size: 12px;
+      padding: 10px 16px;
+      width: fit-content;
+      text-align: center;
+    }
+  }
+
+  // Colors
+  &.primary {
+    background: $white;
+    color: $black;
+    border-color: $black;
+    &:hover {
+      background-color: $black;
+      color: $white;
+      border-color: $white;
+    }
+  }
+  &.secondary {
+    background: $black;
+    color: $white;
+    border-color: $white;
+    &:hover {
+      background-color: $white;
+      color: $black;
+      border-color: $black;
+    }
+  }
+  &.purple {
+    background-color: $darkPurple-600;
+    color: $white;
+    border-color: $purple;
+    &:hover {
+      background-color: $white;
+      color: $black;
+    }
+  }
+
+  //Variants
+  &.outlined {
+    font-weight: 500;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.4s, color 0.4s,
+      border-color 0.3s;
+  }
+  &.contained {
+    font-weight: 500;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.4s, color 0.4s,
+      border-color 0.3s;
+    box-shadow: 0 0 13px $white;
+    &:hover {
+      background-color: $white;
+      border-color: $black;
+      color: $black;
+      box-shadow: 0 0 19px $white;
+    }
+  }
+}
