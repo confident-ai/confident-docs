@@ -1,10 +1,14 @@
 ---
-title: Welcome
+title: Welcome to Evals API
 ---
 
 import { Cards, Callout } from "nextra/components";
 
 # Confident AI RESTFUL Evals API
+
+<Callout>
+Evals API is under **BETA** at the moment. 
+</Callout>
 
 Confident AI enables organizations to offload evaluations, tracing, dataset management, and prompt versioning via a comprehensive **RESTFUL Evals API**.
 
@@ -12,7 +16,7 @@ Whether you're evaluating LLM outputs in production or integrating directly with
 
 <details>
 
-<summary>How is this different from DeepEval?</summary>
+<summary>How the Evals API different from DeepEval?</summary>
 
 The Evals API provides more low-level control over the DeepEval client and provide benefits that DeepEval alone doesn't offer:
 
@@ -94,7 +98,7 @@ flowchart TD
     D --> E[Uses Project API Key to Run Evals, Ingest Traces, etc.]
 ```
 
-Note that if you're purely using the platform, this will be your authentication flow instead:
+Note that if you're purely [using the platform](/docs/getting-started/setup), this will be your authentication flow instead:
 
 ```mermaid
 flowchart TD

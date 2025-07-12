@@ -1,41 +1,41 @@
 ---
-title: Create Metrics
+title: Custom Metrics
 ---
 
 import { Callout } from "nextra/components";
 
 # Creating Custom Metrics via Evals API
 
-All metrics you create a by definition **custom metrics**. Default metrics, which are all DeepEval metrics, are available to be added to any metric collection anytime.
+All metrics you create and update are by definition **custom metrics**. Default metrics, which are all DeepEval metrics, are available to be added to any metric collection anytime, and doesn't require to be created.
 
-## Create Metric(s)
+## Create Metric
 
-Your metric `name` and `multiturn` combination **MUST BE UNIQUE** within a project.
+Similar to metric collections, your metric `name` and `multiTurn` combination **MUST BE UNIQUE** within a project.
 
 ### Single-turn
 
-Also know as a "G-Eval" metric (a custom single-turn metric offered by DeepEval), the request body should be **strictly** the an object of `"metrics"` to a list of [`Metric` data models](/api/metrics/data-model#metric), but additionally requiring either the `criteria` and/or `evaluationSteps`, and `evaluationParams`:
+<Callout>
+A single-turn custom metric on Confident AI uses DeepEval's "G-Eval" metric under-the-hood, 
+</Callout>
+
+The request body should be **strictly** the an object of `"metrics"` to a list of [`Metric` data models](/api/metrics/data-models#metric), but additionally requiring either the `criteria` and/or `evaluationSteps`, and `evaluationParams`:
 
 ```bash filename="POST - /v1/metrics" showLineNumbers {10}
 curl -X POST "https://api.confident-ai.com/v1/metrics" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -d '{
-            "metrics": [
-                {            
-                    "name": "Correctness",
-                    "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
-                    "evaluationParams": ["actualOutput", "expectedOutput"],
-                    "multiturn": false
-                }
-            ]
-         }`
+     -d '{          
+            "name": "Correctness",
+            "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
+            "evaluationParams": ["actualOutput", "expectedOutput"],
+            "multiTurn": false
+        }'
 ```
 
 ```json filename="response" showLineNumbers
 {
   "success": true,
-  "data": {"metricIds": ["TODO"]}
+  "data": {"id": "METRIC-ID"}
 }
 ```
 
@@ -43,7 +43,7 @@ curl -X POST "https://api.confident-ai.com/v1/metrics" \
 
 ### Multi-turn
 
-Also known as a "Conversational G-Eval" metric (a multi-turn custom metric offered by DeepEval), the request body should be **strictly** the an object of `"metrics"` to a list of [`Metric` data models](/api/metrics/data-model#metric), but additionally requiring either the `criteria` and/or `evaluationSteps`:
+Also known as a "Conversational G-Eval" metric (a multi-turn custom metric offered by DeepEval), the request body should be **strictly** the an object of `"metrics"` to a list of [`Metric` data models](/api/metrics/data-models#metric), but additionally requiring either the `criteria` and/or `evaluationSteps`:
 
 ```bash filename="POST - /v1/metrics" showLineNumbers {9}
 curl -X POST "https://api.confident-ai.com/v1/metrics" \
@@ -54,16 +54,16 @@ curl -X POST "https://api.confident-ai.com/v1/metrics" \
                 {            
                     "name": "Relevancy",
                     "criteria": "Determine if the assistant answers are relevant to what the user is asking.",
-                    "multiturn": true
+                    "multiTurn": true
                 }
             ]
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
 {
   "success": true,
-  "data": {"metricIds": ["TODO"]}
+  "data": {"ids": ["METRIC-ID"]}
 }
 ```
 
@@ -71,24 +71,23 @@ You **don't** have to provide `evaluationParams` when creating a multi-turn, con
 
 ## Update Metric
 
-The request body should be **strictly** the [`Metric` data model](/api/metrics/data-model#metric), but additionally it is required that after updating either the `criteria` and/or `evaluationSteps`, and `evaluationParams` still has to be populated:
+The request body should be **strictly** the [`Metric` data model](/api/metrics/data-models#metric), but additionally it is required that after updating either the `criteria` and/or `evaluationSteps`, and `evaluationParams` still has to be populated:
 
 ```bash filename="PUT - /v1/metrics/:id" showLineNumbers
 curl -X PUT "https://api.confident-ai.com/v1/metrics/:id" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
-            "metricId": "TODO",
             "criteria": "Determine if the 'actual output' is correct based on the 'input'.",
             "evaluationParams": ["input", "actualOutput"]
-         }`
+         }'
 ```
 
 ```json filename="response" showLineNumbers
 {"success": true}
 ```
 
-You **CANNOT** change the `multiturn` value of a metric once it has been created.
+You **CANNOT** change the `multiTurn` value of a metric once it has been created.
 
 ## Get Metric(s)
 
@@ -104,18 +103,43 @@ curl -X GET "https://api.confident-ai.com/v1/metrics" \
     "success": true,
     "data": {
         "metrics": [{
-            "metricId": "TODO",
+            "id": "METRIC-ID-1",
             "name": "Correctness",
             "criteria": "Determine if the 'actual output' is correct based on the 'input'.",
             "evaluationParams": ["input", "actualOutput"],
-            "multiturn": false,
+            "multiTurn": false,
         },
         {
-            "metricId": "TODO",
+            "id": "METRIC-ID-2",
             "name": "Relevancy",
             "criteria": "Determine if the assistant answers are relevant to what the user is asking.",
-            "multiturn": true
+            "multiTurn": true
         }]
     }
 }
 ```
+
+## Batch Create Metrics
+
+You can also batch create metrics by providing the [Metric data model]() through the `"metrics"` key:
+
+```bash filename="POST - /v1/batch-metrics" showLineNumbers {5}
+curl -X POST "https://api.confident-ai.com/v1/batch-metrics" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metrics": [
+                {            
+                    "name": "Correctness",
+                    "criteria": "Determine if the 'actual output' is correct based on the 'expected output'.",
+                    "evaluationParams": ["actualOutput", "expectedOutput"],
+                    "multiTurn": false
+                }
+            ]
+         }'
+```
+```json filename="response" showLineNumbers
+{
+  "success": true,
+  "data": {"ids": ["METRIC-ID"]}
+}

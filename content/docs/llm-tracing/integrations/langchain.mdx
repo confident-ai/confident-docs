@@ -20,7 +20,7 @@ pip install -U deepeval langchain langchain-openai
 
 Login with your API key and configure DeepEval's `CallbackHandler` as a callback for LangChain:
 
-```python filename="main.py" showLineNumbers {9, 18}
+```python filename="main.py" showLineNumbers {9, 20}
 import os
 import time
 from langchain.chat_models import init_chat_model
@@ -32,7 +32,9 @@ os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 login_with_confident_api_key("<your-confident-api-key>")
 
 def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
     return a * b
+
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 llm_with_tools = llm.bind_tools([multiply])
 

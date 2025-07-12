@@ -24,15 +24,18 @@ After creating your account, you'll be guided through the onboarding process. Yo
 Create a metric collection by providing a custom name for it. Note that this name must not already be taken in your project for an existing metric collection.
 
 ```bash showLineNumbers filename="POST request"
-curl -X POST "https://api.confident-ai.com/v1/metric-collections" \
+curl -X POST "https://api.confident-ai.com/v1/metrics" \
      -H "Content-Type: application/json" \
-     -H "CONFIDENT_API_KEY: your-project-api-key-goes-here" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
             "name": "Collection Name",
-            "metrics": [
-                {"name": "Answer Relevancy"},
+            "metricSettings": [
+                {
+                    "metric": {"name": "Answer Relevancy"},
+                    "threshold": 0.8
+                }
             ],
-            "multi-turn": false
+            "multiturn": false
          }`
 ```
 ```json filename="response"
@@ -65,7 +68,7 @@ This example shows a single-turn evaluation.
 ```bash showLineNumbers filename="POST request"
 curl -X POST "https://api.confident-ai.com/v1/evaluate" \
      -H "Content-Type: application/json" \
-     -H "CONFIDENT_API_KEY: your-project-api-key-goes-here" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
             "metricCollection": "Collection Name",
             "testCases": [
@@ -81,10 +84,10 @@ The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-run
 
 ```json showLineNumbers filename="response"
 {
-    "status": 200,
-    "res": [
+    "success": true,
+    "data": [
         {
-            "testRunId": "clasdjfkafkjasfdafbkd",
+            "testRunId": <TEST-RUN-ID>,
             "metrics": [
                 {
                     "name": "Answer Relevancy",
@@ -102,9 +105,9 @@ The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-run
 For one-off evaluations, it is recommended that you use the `POST /v1/metric` endpoint instead, which avoids polluting your dashboard with necessary test runs.
 </Callout>
 
-## Using The Platform
+## Verifying Evals on the Platform
 
-Everytime when you do something using the Evals API, changes will be reflected on the platform as well. This is especially helpful for those that need more visibility intow what a customers' evals look like.
+Everytime when you do something using the Evals API, changes will be reflected on the platform as well. This is especially helpful for those that need more visibility into what a customers' evals look like.
 
 For example, here is the [testing report](/docs/llm-evaluation/evaluation-features/testing-reports) you'll get on the platform whenever you call the `/v1/evaluate` endpoint:
 

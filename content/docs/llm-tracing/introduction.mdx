@@ -3,48 +3,28 @@ title: Introduction
 ---
 
 import { Callout, Cards, Tabs } from "nextra/components";
+import { Globe, Percent, Braces, Tag, MessageSquare, EyeOff, User, Settings } from 'lucide-react';
 
 # Introduction to LLM Tracing on Confident AI 
 
-Confident AI offers an **Observatory** for teams to trace and monitor LLM applications. Think Datadog for LLM apps.
+Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps.
 
-<Callout>
-Tracing on Confident AI contains [all the features](/docs/llm-tracing/tracing-features/attributes) you would expect but also enables DeepEval metrics to run on individual components.
-</Callout>
+<details>
 
-Confident AI tracing is designed to be completely non-intrusive to your application. It:
+<summary>Why Use LLM Tracing & Observability on Confident AI?</summary>
 
-- Requires no rewrite of your existing code - just add the `@observe` decorator
-- Runs asynchronously in the background with zero impact on latency
-- Fails silently if there are any issues, ensuring your app keeps running
-- Works with any function signature - you can set input/output at runtime
-- Allows you to [run online evaluations](/docs/llm-tracing/online-evaluations) for spans and traces.
+- Native to DeepEval, the most widely used LLM evaluation framework in the world.
+- Tracing is evals-first, you can trace and evaluate literally any component (retrievers, LLMs, tools, agents).
+- Only platform where you can:
+  - Leverage DeepEval's 50+ metrics.
+  - Run evaluations on:
+    - Individual spans (component-level)
+    - Traces (end-to-end)
+    - Threads (conversation evals)
+  - Access unlimited evaluation use cases for chatbots, text-to-SQL, RAG pipelines, agentic workflows, document Q&A, summarization, code generation, translation, content moderation, and more.
 
-## Feature Highlights
+</details>
 
-<Cards>
-  <Cards.Card arrow title="LLM Tracing Features" href="/docs/llm-tracing/introduction" />
-  <Cards.Card
-    arrow
-    title="Online Evaluations"
-    href="/docs/llm-tracing/online-evaluations"
-  />
-  <Cards.Card
-    arrow
-    title="Conversation Monitoring"
-    href="/docs/llm-tracing/tracing-features/threads"
-  />
-  <Cards.Card
-    arrow
-    title="Latency and Cost Tracking"
-    href="/docs/llm-tracing/latency-and-cost-tracking"
-  />
-  <Cards.Card
-    arrow
-    title="Performance Alerting"
-    href="/docs/llm-tracing/performance-alerting"
-  />
-</Cards>
 
 <VideoDisplayer
   src="https://confident-docs.s3.us-east-1.amazonaws.com/observability:llm-tracing.mp4"
@@ -52,228 +32,105 @@ Confident AI tracing is designed to be completely non-intrusive to your applicat
   title="LLM Tracing for an Agentic RAG App"
 />
 
-## Quickstart
+## Get Started
 
-Two important terminologies to be aware of:
+Get LLM tracing for your LLM app with best in-class-evals.
 
-- **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application
-- **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)
+<Cards>
+  <Cards.Card arrow title="5 Min Quickstart" href="/docs/llm-tracing/quickstart" />
+  <Cards.Card
+    arrow
+    title="Online & Offline Evals"
+    href="/docs/llm-tracing/evaluations"
+  />
+  <Cards.Card
+    arrow
+    title="Latency and Cost Tracking"
+    href="/docs/llm-tracing/latency-and-cost-tracking"
+  />
+</Cards>
 
-Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. When you have tracing setup, you can run evaluations on both the trace and span level.
+## Advanced Features
 
-### Installation
+You can configure tracing on Confident AI in virtually any way you wish:
 
-Install DeepEval and setup your tracing enviornment:
+<Cards>
+  <Cards.Card
+    icon={<Globe />}
+    arrow
+    title="Trace Environments"
+    description="Set different trace environments for your app."
+    href="/docs/llm-tracing/tracing-features/environment"
+  />
+  <Cards.Card
+    icon={<Percent />}
+    arrow
+    title="Sampling Rate"
+    description="Configure the trace sampling rate."
+    href="/docs/llm-tracing/tracing-features/sampling"
+  />
+  <Cards.Card
+    icon={<Braces />}
+    arrow
+    title="Any Metadata"
+    description="Log any custom metadata with your traces."
+    href="/docs/llm-tracing/tracing-features/metadata"
+  />
+  <Cards.Card
+    icon={<Tag />}
+    arrow
+    title="Tags"
+    description="Log any tags for better trace organization."
+    href="/docs/llm-tracing/tracing-features/tags"
+  />
+  <Cards.Card
+    icon={<MessageSquare />}
+    arrow
+    title="Threads/Conversations"
+    description="Log entire conversations (threads) for multi-turn tracing."
+    href="/docs/llm-tracing/tracing-features/threads"
+  />
+  <Cards.Card
+    icon={<EyeOff />}
+    arrow
+    title="Mask PII"
+    description="Mask PII for traces to protect sensitive data."
+    href="/docs/llm-tracing/tracing-features/masking"
+  />
+  <Cards.Card
+    icon={<User />}
+    arrow
+    title="User Tracking"
+    description="Mask PII for traces to protect sensitive data."
+    href="/docs/llm-tracing/tracing-features/users"
+  />
+  <Cards.Card
+    icon={<Settings />}
+    arrow
+    title="Custom Span Types"
+    description="Set span and component types for detailed tracing."
+    href="/docs/llm-tracing/tracing-features/attributes"
+  />
+</Cards>
 
-<Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-```bash
-pip install deepeval
-```
+## FAQs
 
-Don't forget to login using your API key on Confident AI in the CLI:
+### What evals are offered by Confident AI LLM tracing?
 
-```bash
-deepeval login --confident-api-key YOUR_API_KEY
-```
+You can run evaluations using metrics for **RAG**, **agents**, **chatbots**, on:
 
-> [!NOTE]
->
-> You can also login by using the `login_with_confident_api_key` method without going through the CLI if you're in a notebook environment:
->
-> ```python
-> import deepeval
->
-> deepeval.login_with_confident_api_key("YOUR_API_KEY")
-> ```
+1. Traces (end-to-end)
+2. Spans (individual components)
+3. Threads (multi-turn conversations)
 
-  </Tabs.Tab>
-  <Tabs.Tab>
+And these are be either done in an **online** fashion (run evals as they are being ingested in the platform), or **offline** (run evals retrospectively).
 
-Using `npm`:
-```bash
-npm install deepeval-ts
-```
+### How will tracing affect my app?
 
-Using `yarn`:
-```bash
-yarn add deepeval-ts
-```
+Confident AI tracing is designed to be completely non-intrusive to your application. It:
 
-Don't forget to login with your API key:
-
-```bash
-export CONFIDENT_API_KEY=YOUR_API_KEY
-```
-
-> [!NOTE]
-> 
-> You can also do it directly in code:
-> ```typescript
-> import { traceManager } from '@deepeval-ts/tracing';
->
-> traceManager.configure({
->	  confidentApiKey: "YOUR_API_KEY"
-> })
-> ```
-
-  </Tabs.Tab>
-</Tabs>
-
-### Setup tracing
-
-<Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-
-The `@observe` decorator is the primary way to instrument your LLM application for tracing.
-
-```python filename="main.py" showLineNumbers {6, 17}
-from openai import OpenAI
-from deepeval.tracing import observe
-
-client = OpenAI()
-
-@observe()
-def llm_app(query: str) -> str:
-    return client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": query}
-        ]
-    ).choices[0].message.content
-
-
-# Call app to send trace to Confident AI
-llm_app("Write me a poem.")
-```
-
-If your `llm_app` has more than one function, simply decorate those functions with `@observe` too.
-
-  </Tabs.Tab>
-<Tabs.Tab>
-
-The `observe` wrapper is the primary way to instrument your LLM application for tracing.
-
-```typescript filename="index.ts" showLineNumbers {14, 20}
-import OpenAI from 'openai';
-import { observe } from '@deepeval-ts/tracing';
- 
-const openai = new OpenAI();
-const llmApp = (query: string) => {
-  return openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "user", content: query }
-    ]
-  }).choices[0].message.content;
-};
- 
-const observedLlmApp = observe({
-  fn: llmApp
-});
-
-
-// Call app to send trace to Confident AI
-observedLlmApp("Write me a poem.")
-```
-
-If your `llmApp` has more than one function, simply wrap those functions in `observe` too and call the wrapped functions in `llmApp` instead.
-
-  </Tabs.Tab>
-</Tabs>
-
-
-✅ You can now go to the **Observatory** to see your traces there.
-
-<Callout>
-In a later section, you'll learn how to create [spans that are LLM specific](/docs/llm-tracing/tracing-features/span-types#llm-span), which would allow you to log things such as token cost and model name automatically.
-</Callout>
-
-### Enable Online Evals 
-
-You can enable online evaluation to run both [end-to-end](/docs/llm-evaluation/run-evals/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/run-evals/component-level-evals) (metrics on the span) evaluations on Confident AI. 
-
-First, enable online evals on Confident AI by [creating a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and adding at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
-
-<Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-
-```python filename="main.py" showLineNumbers {6, 15}
-from openai import OpenAI
-from deepeval.tracing import observe, update_current_span
-
-client = OpenAI()
-
-@observe(metric_collection=["My Metrics"])
-def llm_app(query: str) -> str:
-    res = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": query}
-        ]
-    ).choices[0].message.content
-
-    update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
-    return res
-
-
-# Call app to send trace to Confident AI
-llm_app("Write me a poem.")
-```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
-The `observe` wrapper is the primary way to instrument your LLM application for tracing.
-
-```typescript filename="index.ts" showLineNumbers {14, 20}
-import OpenAI from 'openai';
-import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
- 
-const openai = new OpenAI();
-const llmApp = (query: string) => {
-  const res = openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "user", content: query }
-    ]
-  }).choices[0].message.content;
-  
-  updateCurrentSpan(
-    testCase=new LLMTestCase({input=query, actualOutput=res})
-  )
-  return res
-};
- 
-const observedLlmApp = observe({
-  metricCollection=["My Metrics"],
-  fn: llmApp
-});
-
-
-// Call app to send trace to Confident AI
-observedLlmApp("Write me a poem.")
-```
-
-  </Tabs.Tab>
-</Tabs>
-
-Congratulations 🎉! Now whenever you run your LLM app, all traces will be logged **AND** evaluated on Confident AI.
-
-<Callout type="info">
-More information on online evaluations can be found [here.](/docs/llm-tracing/online-evaluations)
-</Callout>
-
-## Why Tracing On Confident AI?
-
-Confident AI is the only platform where you can leverage DeepEval's evaluations on traces. Confident AI is also feature complete for your LLM tracing expectations, with features including:
-
-- [Environments](/docs/llm-tracing/tracing-features/environment)
-- [Conversation logging](/docs/llm-tracing/tracing-features/threads)
-- [PII masking](/docs/llm-tracing/tracing-features/masking)
-- [Setting custom metadata](/docs/llm-tracing/tracing-features/metadata)
-- [Rate sampling](/docs/llm-tracing/tracing-features/sampling)
-- [Tags](/docs/llm-tracing/tracing-features/tags)
-- etc.
-
-You can run evaluations on individual spans (component-level), traces (end-to-end), or threads (conversation evals), with access to an unlimited eval use cases through DeepEval. Whatever you're using for evals in development, bring it to prod.
+- Can be disabled/enabled anytime through the `ENABLE_CONFIDENT_TRACING="YES"/"NO"` enviornment variable.
+- Requires no rewrite of your existing code - just add the `@observe` decorator.
+- Runs asynchronously in the background with zero impact on latency.
+- Fails silently if there are any issues, ensuring your app keeps running.
+- Works with any function signature - you can set input/output at runtime.

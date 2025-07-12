@@ -1,0 +1,155 @@
+---
+title: Online & Offline Evaluations
+---
+
+import { Callout } from "nextra/components";
+
+# Run Online and Offline Evaluations
+
+This page shows you how to run online evaluations using the Evals API. For a deeper understanding of how online evals work, you should also read [this guide.](/docs/llm-tracing/evaluations)
+
+## Online Evaluations
+
+### Traces
+
+You can run online evaluations on traces during **ingestion or update** by providing a test case argument **AND** valid [metric collection name](/api/metrics/collections):
+
+```bash filename="POST - /v1/traces" showLineNumbers {12, 13}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "traces": [
+                {
+                    "uuid": <TRACE-UUID>,
+                    "input": "What is the capital of France?",
+                    "output": "The capital of France is Paris.",
+                    "startTime": "2024-01-15T10:30:00Z",
+                    "endTime": "2024-01-15T10:30:05Z",
+                    "metricCollection": "Your Metric Collection",
+                    "llmTestCase": {
+                        "input": "What is the capital of France?",
+                        "actualOutput": "The capital of France is Paris."
+                    }
+                }
+            ]
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+<Callout type="info">
+The metric collection you provide must be a **single-turn** one.
+</Callout>
+
+You may notice that the `input` and `output`/`actualOutput` fields are duplicated between the trace and the "llmTestCase". This is intentional. 
+
+Confident AI does not assume that the `input`s and `output`s of a trace are automatically the same as those of a test case. In fact, the `input` and `output` fields in a trace have no impact on evaluations at all.
+
+
+### Spans
+
+You can run online evaluations on spans during trace **ingestion or update** by providing a test case argument **AND** valid [metric collection name](/api/metrics/collections), but this time on a span instead:
+
+```bash filename="POST - /v1/traces" showLineNumbers {17, 18}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "traces": [{
+                "uuid": <TRACE-UUID>,
+                "startTime": "2024-01-15T10:30:00Z",
+                "endTime": "2024-01-15T10:30:05Z",
+                "baseSpans": [
+                    {
+                        "uuid": <SPAN-UUID>,
+                        "name": "LLM Call",
+                        "input": "What is the capital of France?",
+                        "output": "The capital of France is Paris.",
+                        "startTime": "2024-01-15T10:30:00Z",
+                        "endTime": "2024-01-15T10:30:05Z",
+                        "metricCollection": "Your Metric Collection",
+                        "llmTestCase": {
+                            "input": "What is the capital of France?",
+                            "actualOutput": "The capital of France is Paris."
+                        }
+                    }
+                ]
+            }]
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+Your metric collection must also be a **single-turn** one, and everything about duplicated inputs/outputs, etc. that was discussed above for traces applies to spans as well.
+
+## Offline Evaluations
+
+Offline evals works a bit different since it is has to be manually triggered whenever a trace/span/thread completes. Take a thread for example, we must run offline evaluations because we shouldn't run metrics on a thread that is still ongoing.
+
+
+### Threads
+
+Evals for threads work a bit differently because it is:
+
+- Multi-turn, and
+- Has to be manually triggered whenever a converesation completes
+
+It is only available for offline evals as you have to manually call the `/evaluate/threads/:id` endpoint because there is no way for Confident AI to know whether your conversation has completed or not. You should only run an evaluation when you're certain the conversation has been completed.
+
+```bash filename="POST - /v1/evaluate/threads/:id" showLineNumbers {17, 18}
+curl -X POST "https://api.confident-ai.com/v1/evaluate/threads/:id" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollections": "Collection Name",
+            "chatbotRole": "You are a rich, powerful..."
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+<Callout>
+The `"chatbotRole"` argument is optional and only required if you wish to use the [`RoleAdherenceMetric`](https://deepeval.com/docs/metrics-role-adherence) in your metric collection.
+</Callout>
+
+Note that for evaluations to be ran on a thread, the metric collection you provide must be a multi-turn one, and the **traces inside your thread must have their `input`s and/or `output`s set**, as [explained here.](/docs/llm-tracing/tracing-features/input-output#big-disclaimer-for-threads)
+
+### Traces
+
+Evaluations on traces are usually ran through online evals - but you can also retrospectively trigger evals on traces you've ingested into Confident AI:
+
+```bash filename="POST - /v1/evaluate/traces/:uuid" showLineNumbers {17, 18}
+curl -X POST "https://api.confident-ai.com/v1/evaluate/traces/:uuid" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollections": "Collection Name"
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+Confident AI assumes that your trace will already have all the test case data required during ingestion, hence you cannot supply an updated, or new test case through this endpoint.
+
+### Spans
+
+Online evals for spans is identical to that for traces:
+
+```bash filename="POST - /v1/evaluate/spans/:uuid" showLineNumbers {17, 18}
+curl -X POST "https://api.confident-ai.com/v1/evaluate/spans/:uuid" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollections": "Collection Name"
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+Remember to supply a metric collection that is **single-turn**.

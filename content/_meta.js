@@ -6,6 +6,5 @@ export default {
   "api": {
     type: "page",
     title: "Evals API",
-    // display: "hidden",
   },
 } 

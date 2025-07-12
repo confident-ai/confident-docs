@@ -1,0 +1,228 @@
+---
+title: Trace Ingestion
+---
+
+import { Callout } from "nextra/components";
+
+# Ingesting Traces via Evals API
+
+You can ingest traces via the Evals API by calling the `POST - /v1/traces` endpoint.
+
+## Create Trace
+
+The request body should be **strictly** the [`Trace` data model](/api/tracing/data-models):
+
+```bash filename="POST - /v1/traces" showLineNumbers
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "uuid": <TRACE-UUID>,
+            "input": "What is the capital of France?",
+            "output": "The capital of France is Paris.",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
+            "baseSpans": [
+                {
+                    "uuid": <SPAN-UUID>,
+                    "name": "LLM Call",
+                    "input": "What is the capital of France?",
+                    "output": "The capital of France is Paris.",
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
+                }
+            ]
+        }'
+```
+
+```json filename="response"
+{
+    "success": true, 
+    "data": {"id": "TRACE-UUID"}
+}
+```
+
+### Span hierarchy
+
+The hierarchy of spans is determined by the:
+
+- `parentUuid`, and
+- `startTime`
+
+When you provide a list of `"baseSpans"`, `"llmSpans"`, etc., you need to make sure that each span correctly references its parent **span** via the `parentUuid` field, and that the `startTime` values accurately reflect the order and nesting of operations within the trace.
+
+Root spans **should not** contain `parentUuid`s. 
+
+<Callout>
+The `parentUuid` should never be the trace UUID, but instead the UUIDs of spans.
+</Callout>
+
+
+```bash filename="POST - /v1/traces" showLineNumbers {12,21,27}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+                "uuid": <TRACE-UUID>,
+                "input": "What is the capital of France?",
+                "output": "The capital of France is Paris.",
+                "startTime": "2025-01-15T10:30:00Z",
+                "endTime": "2025-01-15T10:30:05Z",
+                "baseSpans": [
+                    {
+                        "uuid": <ROOT-SPAN-UUID>,
+                        "name": "Agent",
+                        "input": "What is the capital of France?",
+                        "output": "Let me look that up for you.",
+                        "startTime": "2025-01-15T10:30:00Z",
+                        "endTime": "2025-01-15T10:30:02Z"
+                    }],
+                "llmSpans": [
+                    {
+                        "uuid": <NESTED-SPAN-UUID>,
+                        "name": "OpenAI Call",
+                        "model": "gpt-4.1",
+                        "input": [{"role": "user", "content": "What is the capital of France?"}],
+                        "output": [{"role": "assistant", "content":"The capital of France is Paris."}],
+                        "startTime": "2025-01-15T10:30:02Z",
+                        "endTime": "2025-01-15T10:30:05Z",
+                        "parentUuid": <ROOT-SPAN-UUID>
+                    }]
+        }'
+```
+
+### Span types
+
+You can ingest traces containing different span types for more tailored functionalities. Below shows an example for an [LLM span](/api/tracing/data-models#llm-span):
+
+```bash filename="POST resquest" showLineNumbers {10, 18}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "uuid": <TRACE-UUID>,
+            "input": "What is the capital of France?",
+            "output": "The capital of France is Paris.",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
+            "llmSpans": [
+                {
+                    "uuid": <SPAN-UUID>,
+                    "name": "OpenAI Call",
+                    "model": "gpt-4o",
+                    "input": [{"role": "user", "content": "What is the capital of France?"}],
+                    "output": [{"role": "assistant", "content": "The capital of France is Paris."}],
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
+                }
+            ]
+         }'
+```
+
+Span types allow you to classify different components in your LLM app. Instead of treating everything as a generic `"baseSpan"`, different span types offer different component-specific UIs on Confident AI.
+
+For example, when you create `"llmSpans"`, the model string you provide are automatically used to [calculate token cost and usage](/docs/llm-tracing/latency-and-cost-tracking). You can learn about all the [span types here.](/docs/llm-tracing/tracing-features/span-types)
+
+### Threads
+
+Threads are a way to group together traces. For example, a conversation that involves a series of exchanges between users and your LLM app would be considered the same thread.
+
+Simply have to provide a `"threadId"`:
+
+```bash filename="POST - /v1/traces" showLineNumbers {10}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "uuid": <TRACE-UUID>,
+            "input": "What is the capital of France?",
+            "output": "The capital of France is Paris.",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
+            "threadId": <THREAD-ID>,
+            "baseSpans": [
+                {
+                    "uuid": <SPAN-UUID>,
+                    "name": "LLM Call",
+                    "input": "What is the capital of France?",
+                    "output": "The capital of France is Paris.",
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
+                }
+            ]
+        }'
+```
+
+You can also run online evaluations on threads.
+
+### Users
+
+Users are extremely similar to threads, but determines which user has interacted with which trace for your LLM app instead. This allows you to track engagement, eval results for each user, model consumption, etc.
+
+Simply provide the `"userId"`:
+
+```bash filename="POST - /v1/traces" showLineNumbers {10}
+curl -X POST "https://api.confident-ai.com/v1/traces" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "uuid": <TRACE-UUID>,
+            "input": "What is the capital of France?",
+            "output": "The capital of France is Paris.",
+            "startTime": "2025-01-15T10:30:00Z",
+            "endTime": "2025-01-15T10:30:05Z",
+            "userId": <USER-ID>,
+            "baseSpans": [
+                {
+                    "uuid": <SPAN-UUID>,
+                    "name": "Agent",
+                    "input": "What is the capital of France?",
+                    "output": "The capital of France is Paris.",
+                    "startTime": "2025-01-15T10:30:00Z",
+                    "endTime": "2025-01-15T10:30:05Z"
+                }
+            ]
+        }'
+```
+
+
+## Update Trace
+
+Traces in Confident AI are loosely immutable, meaning that once a trace is created, most of its data cannot be modified — only certain fields can be appended to. You can overwrite the following in a [`Trace` data model](/api/tracing/data-models#trace):
+
+- `"output"`
+- `"endTime"`
+- `"environment"`
+
+And append to:
+
+- `"metadata"`
+- `"tags"`
+- `"baseSpans"`
+- `"llmSpans"`
+- `"retrieverSpans"`
+- `"agentSpans"`
+- `"toolSpans"`
+
+For example, if you previously ingested some `llmSpans` for an existing trace, updating the trace with mode `llmSpans` will not overwrite the existing ones. The same goes for individual records in `metadata`, or strings in `tags`.
+
+```bash filename="PUT - /v1/traces/:uuid" showLineNumbers
+curl -X PUT "https://api.confident-ai.com/v1/traces/:uuid" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "output": "The capital of France is Rome.",
+            "endTime": "2025-01-16T10:30:05Z",
+            "metadata": {"ip_address": "127.0.0.1"},
+            "tags": ["General QA"]
+         }'
+```
+```json filename="response"
+{"success": true}
+```
+
+You shouldn't use the update method to trigger evaluations on traces. Instead, you can trigger [offline evaluations instead](/api/tracing/evaluations#traces-1) to update metric scores of traces and spans retrospectively.
+
+<Callout>
+Existing spans cannot be updated.
+</Callout>

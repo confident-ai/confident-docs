@@ -11,23 +11,24 @@ export default {
     "metrics":  <NavIconTabItem icon={Gauge} label="Metrics" />,
     "---2": {
         type: "separator",
-        title: <NavIconTabItem icon={FlaskConical} label="Evaluations" />
+        title: <NavIconTabItem icon={FlaskConical} label="Evaluation" />
     },
+    "evaluation":  <NavIconTabItem icon={FlaskConical} label="Evaluation" />,
     "---3": {
         type: "separator",
-        title: <NavIconTabItem icon={GitBranch} label="Traces" />
+        title: <NavIconTabItem icon={GitBranch} label="Tracing" />
     },
-    "traces":  <NavIconTabItem icon={GitBranch} label="Traces" />,
-    "---4": {   
-        type: "separator",
-        title: <NavIconTabItem icon={BookOpen} label="Datasets" />
-    },
-    "---5": {
-        type: "separator",
-        title: <NavIconTabItem icon={MessageSquareText} label="Prompts" />
-    },
-    "---6": {
-        type: "separator",
-        title: <NavIconTabItem icon={UserCog} label="User & Project Management" />
-    },
+    "tracing":  <NavIconTabItem icon={GitBranch} label="Tracing" />,
+    // "---4": {   
+    //     type: "separator",
+    //     title: <NavIconTabItem icon={BookOpen} label="Datasets" />
+    // },
+    // "---5": {
+    //     type: "separator",
+    //     title: <NavIconTabItem icon={MessageSquareText} label="Prompts" />
+    // },
+    // "---6": {
+    //     type: "separator",
+    //     title: <NavIconTabItem icon={UserCog} label="User & Project Management" />
+    // },
 }

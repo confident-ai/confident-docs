@@ -1,0 +1,224 @@
+---
+title: Quickstart
+---
+
+import { Callout, Cards, Tabs } from "nextra/components";
+
+# Getting Started with LLM Tracing
+
+5 minute quickstart to setup LLM tracing on Confident AI.
+
+## Installation
+
+Install DeepEval and setup your tracing enviornment:
+
+<Tabs items={['Python', 'JS/TypeScript']}>
+  <Tabs.Tab>
+```bash
+pip install deepeval
+```
+
+Don't forget to login using your API key on Confident AI in the CLI:
+
+```bash
+deepeval login --confident-api-key YOUR_API_KEY
+```
+
+Or in code:
+
+```python filename="main.py"
+import deepeval
+
+deepeval.login_with_confident_api_key("YOUR_API_KEY")
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Using `npm`:
+```bash
+npm install deepeval-ts
+```
+
+Using `yarn`:
+```bash
+yarn add deepeval-ts
+```
+
+Don't forget to login with your API key:
+
+```bash
+export CONFIDENT_API_KEY=YOUR_API_KEY
+```
+
+> [!NOTE]
+> 
+> You can also do it directly in code:
+> ```typescript
+> import { traceManager } from '@deepeval-ts/tracing';
+>
+> traceManager.configure({
+>	  confidentApiKey: "YOUR_API_KEY"
+> })
+> ```
+
+  </Tabs.Tab>
+</Tabs>
+
+If you don't have an API key, first [create an account.](/docs/getting-started/setup#create-an-account)
+
+## Setup tracing
+
+<Tabs items={['Python', 'JS/TypeScript']}>
+  <Tabs.Tab>
+
+The `@observe` decorator is the primary way to instrument your LLM application for tracing.
+
+```python filename="main.py" showLineNumbers {6, 18}
+from openai import OpenAI
+from deepeval.tracing import observe
+
+client = OpenAI()
+
+@observe()
+def llm_app(query: str) -> str:
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+    return
+
+
+# Call app to send trace to Confident AI
+llm_app("Write me a poem.")
+```
+
+If your `llm_app` has more than one function, simply decorate those functions with `@observe` too.
+
+  </Tabs.Tab>
+<Tabs.Tab>
+
+The `observe` wrapper is the primary way to instrument your LLM application for tracing.
+
+```typescript filename="index.ts" showLineNumbers {14, 20}
+import OpenAI from 'openai';
+import { observe } from '@deepeval-ts/tracing';
+ 
+const openai = new OpenAI();
+const llmApp = (query: string) => {
+  return openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "user", content: query }
+    ]
+  }).choices[0].message.content;
+};
+ 
+const observedLlmApp = observe({
+  fn: llmApp
+});
+
+
+// Call app to send trace to Confident AI
+observedLlmApp("Write me a poem.")
+```
+
+If your `llmApp` has more than one function, simply wrap those functions in `observe` too and call the wrapped functions in `llmApp` instead.
+
+  </Tabs.Tab>
+</Tabs>
+
+
+✅ You just created a trace with a span inside it. Go to the **Observatory** to see your traces there.
+
+<details>
+
+<summary>What is a Trace and Span?</summary>
+
+
+- **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application
+- **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)
+
+Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. When you have tracing setup, you can run evaluations on both the trace and span level.
+
+</details>
+
+In a later section, you'll learn how to create [spans that are LLM specific](/docs/llm-tracing/tracing-features/span-types#llm-span), which would allow you to log things such as token cost and model name automatically.
+
+## Run an Online Evaluation
+
+You can run online evaluation on both [end-to-end](/docs/llm-evaluation/run-evals/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/run-evals/component-level-evals) (metrics on the span) evaluations on Confident AI. 
+
+First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
+
+<Tabs items={['Python', 'JS/TypeScript']}>
+  <Tabs.Tab>
+
+```python filename="main.py" showLineNumbers {6, 15}
+from openai import OpenAI
+from deepeval.tracing import observe, update_current_span
+
+client = OpenAI()
+
+@observe(metric_collection=["My Metrics"])
+def llm_app(query: str) -> str:
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+
+    update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
+    return res
+
+
+# Call app to send trace to Confident AI
+llm_app("Write me a poem.")
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+The `observe` wrapper is the primary way to instrument your LLM application for tracing.
+
+```typescript filename="index.ts" showLineNumbers {14, 20}
+import OpenAI from 'openai';
+import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+ 
+const openai = new OpenAI();
+const llmApp = (query: string) => {
+  const res = openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "user", content: query }
+    ]
+  }).choices[0].message.content;
+  
+  updateCurrentSpan(
+    testCase=new LLMTestCase({input=query, actualOutput=res})
+  )
+  return res
+};
+ 
+const observedLlmApp = observe({
+  metricCollection=["My Metrics"],
+  fn: llmApp
+});
+
+
+// Call app to send trace to Confident AI
+observedLlmApp("Write me a poem.")
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+Congratulations 🎉! Now whenever you run your LLM app, all traces will be logged **AND** evaluated on Confident AI. To the the **Observatory** to check it out.
+
+
+In the next section, we will dive deep into [online and offline evaluations for tracing.](/docs/llm-tracing/evaluations)
+
+

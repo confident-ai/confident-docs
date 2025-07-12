@@ -1,5 +1,5 @@
 ---
-title: Data Model
+title: Data Models
 ---
 
 import { Callout } from "nextra/components";
@@ -44,19 +44,34 @@ The reason why a metric collection does not relate directly to metrics is becaus
 
 ## Metric
 
-A metric is uniquely identified within a project via its `name` and `multiturn` value. For example, you can have two metrics with the same name only if they are not both single/multi-turn. You also cannot use any of the default names that are already reserved by Confident AI.
+A metric is uniquely identified within a project via its `name` and `multiTurn` value. For example, you can have two metrics with the same name only if they are not both single/multi-turn. You also cannot use any of the default names that are already reserved by Confident AI.
 
 ```typescript filename="metric.d.ts"
 type Metric = {
     name: string;
     criteria?: string;
     evaluationSteps?: string;
-    requiredParameters?: LLMTestCaseParams
-    multiturn?: boolean; // defaults to false
+    evaluationParams?: LLMTestCaseParams[]; // only for single-turn metrics
+    multiTurn?: boolean; // defaults to false
 }
 ```
 
-As you'll learn in the next section, although the `criteria` and `evaluationSteps` fields are option in reality you will be required to provide either field when creating a metric. This is because all metrics you create are by definition custom metrics (powered by [G-Eval](https://deepeval.com/docs/metrics-llm-evals)), and therefore will always require a `criteria`/`evaluationSteps`.
+As you'll learn in the next section, although the `criteria` and `evaluationSteps` fields are option in reality you will be required to provide either field when creating a metric. This is because all metrics you create are by definition custom metrics (powered by [DeepEval's G-Eval](https://deepeval.com/docs/metrics-llm-evals)), and therefore will always require a `criteria`/`evaluationSteps`.
+
+For a single-turn metric, you must provide at least one of `LLMTestCaseParams` in `evaluationParams`:
+
+```typescript
+export enum LLMTestCaseParams {
+  INPUT = "input",
+  ACTUAL_OUTPUT = "actualOutput",
+  EXPECTED_OUTPUT = "expectedOutput",
+  CONTEXT = "context",
+  EXPECTED_TOOLS = "expectedTools",
+}
+```
+
+For a multi-turn metric, there's no need to provide `evaluationParams`.
+
 
 ## Metric Settings
 
@@ -83,9 +98,9 @@ A metric collection groups related metric (along with their settings) together f
 ```typescript filename="metric-collection.d.ts"
 type MetricCollection = {
     name: string;
-    metricSettings: MetricSetting[];
-    multiturn?: boolean; // defaults to false
+    metricSettings?: MetricSetting[];
+    multiTurn?: boolean; // defaults to false
 }
 ```
 
-Note that you can only add metric settings whose metrics has the same `multiturn` value as the metric collection you're creating.
+Note that you can only add metric settings whose metrics has the same `multiTurn` value as the metric collection you're creating.
