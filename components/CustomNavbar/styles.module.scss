@@ -1,30 +1,33 @@
 @import "@/app/styles/colors.scss";
-@import "../../app/styles/vars";
+@import "@/app/styles/vars.scss";
 
 .NewHeader {
   position: fixed;
   top: 0;
   width: 100%;
+  height: 64px;
   background-color: $translucentDarkBlue-200;
   z-index: 99;
   border-bottom: 1px solid $darkBorder-100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &.active {
     background-color: $darkBlue;
   }
 
-  .inner {
+  .container {
     display: flex;
     width: 100%;
+    max-width: 1440px;
+    padding: 0 24px;
     margin: 0 auto;
-    padding: 11px 5%;
     justify-content: space-between;
 
     .logoWrap {
       display: flex;
       gap: 10px;
-      width: 100%;
-      max-width: 20%;
 
       @include responsive(md) {
         max-width: unset;
@@ -33,7 +36,6 @@
       .span {
         font-family: $Lexend;
         font-size: 19px;
-        font-weight: 300;
         color: $white;
         line-height: 100%;
         display: flex;
@@ -41,11 +43,11 @@
       }
     }
 
+
     .linkWrap {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
       max-width: 60%;
 
       @include responsive(md) {
@@ -192,44 +194,7 @@
       display: flex;
       gap: 28px;
       align-items: center;
-      width: 100%;
-      max-width: 20%;
       justify-content: flex-end;
-      .githubButton {
-        display: flex;
-        align-items: center;
-        display: flex;
-        padding: 3px 10px 3px 4px;
-        border: 1px solid #ffffff00;
-        outline: 1px solid $lightGray-300;
-        transition: border-color 0.4s ease;
-        border-radius: 2px;
-        &:hover {
-          border-color: $lightGray-300;
-        }
-        @include responsive(lg) {
-            display: none;
-        }
-
-        .githubIconContainer {
-          width: fit-content;
-          border-radius: 100%;
-          padding: 2px 0;
-          margin-right: 2px;
-
-          svg {
-            fill: $white;
-          }
-        }
-
-        span {
-          color: $white;
-          font-family: $inter;
-          font-size: 12px;
-          line-height: 100%;
-          margin-left: 4px;
-        }
-      }
 
       .dropDownBtn {
         width: 25px;
@@ -264,11 +229,6 @@
           .bar3 {
             transform: rotate(45deg) translate(-5px, -6px);
           }
-        }
-      }
-      .loginBtn{
-         @include responsive(md) {
-            display: none;
         }
       }
     }

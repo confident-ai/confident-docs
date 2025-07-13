@@ -9,13 +9,26 @@
   border: 1px solid black;
   border-radius: 10px;
   transition: all 0.2s ease-in-out;
-  box-shadow: -5px 5px 0 #6912ff;
+  box-shadow: 5px 5px 0 #6912ff;
   transform: translateY(-5px) translateX(5px);
+  background-color: white;
+
+  &.darkMode {
+    color: white;
+    border: 1px solid $purple;
+    transform: translateY(0px) translateX(0px);
+    box-shadow: none;
+    background-color: $darkPurple-600;
+  }
 }
 
 .signUpButton:hover {
   box-shadow: 0px 0px 0 #ffffff;
   transform: translateY(0px) translateX(10px);
+
+  &.darkMode {
+    transform: translateY(0px) translateX(0px);
+  }
 }
 
 

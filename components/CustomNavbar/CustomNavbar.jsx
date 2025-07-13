@@ -31,7 +31,7 @@ const CustomNavbar = ({ isDocsPage }) => {
       ],
     },
     { label: "Blog", href: "/blog" },
-    { label: "Documentation", href: "/docs" },
+    { label: "Docs", href: "/docs" },
     { label: "Pricing", href: "/pricing" },
     { label: "Careers", href: "/careers" },
   ];
@@ -52,7 +52,7 @@ const CustomNavbar = ({ isDocsPage }) => {
 
   return (
     <div className={`${styles.NewHeader} ${active ? styles.active : ""}`}>
-      <div className={styles.inner}>
+      <div className={styles.container}>
         <div className={styles.logoWrap}>
           <Image
             src="/icons/logo-without-border.svg"
@@ -98,34 +98,8 @@ const CustomNavbar = ({ isDocsPage }) => {
           </div>
         </div>
         <div className={styles.buttonWrap}>
-          <Link
-            href="https://github.com/confident-ai/deepeval"
-            className={styles.githubButton}
-          >
-            <div className={styles.githubIconContainer}>
-              <Image src='/icons/github-inverted.svg' width={18} height={18} alt='github logo'/>
-            </div>
-            <span>8.0k+</span>
-            <Star size={20} fill="#ffc107" />
-            <span>DeepEval</span>
-          </Link>
-          <div className={styles.loginBtn}>
-
-            <Button
-              to="https://app.confident-ai.com/auth/signup?redirect_url=%2F"
-              variant="outlined"
-              color="purple"
-              label="Login"
-              sizes="xs"
-              curved
-              bordered
-              style={{
-                borderWidth: '1px',
-                fontWeight: '500',
-                fontSize: '13px,'
-              }}
-            />
-          </div>
+          <GitHubButton darkMode={true} />
+          <SignUpButton darkMode={true} />
           <div
             className={`${styles.dropDownBtn} ${active ? styles.active : ""}`}
             onClick={() => setActive(!active)}

@@ -21,7 +21,6 @@ export default function TextSection() {
                             cost by 80%</b>, and convince stakeholders that their AI is always better than the week before.
                     </p>
                     <div className={styles.buttonWrap}>
-
                         <Button
                             to='https://confident-ai.com/case-study/supernormal'
                             variant='outlined'
