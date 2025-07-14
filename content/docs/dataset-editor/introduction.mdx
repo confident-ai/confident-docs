@@ -82,7 +82,7 @@ for golden in dataset.goldens:
         input=golden.input,
         actual_output=your_llm_app(golden.input) # Replace your_llm_app()
     )
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Run an evaluation
 evaluate(test_cases=dataset.test_cases, metrics=[...])

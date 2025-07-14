@@ -151,7 +151,7 @@ for golden in dataset.goldens:
         # the output your LLM app generated for this `golden.input`
         actual_output="..."
     )
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Define metric
 metric = AnswerRelevancyMetric()

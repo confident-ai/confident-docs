@@ -77,7 +77,7 @@ for goldens in dataset.goldens:
         input=input,
         actual_output=your_llm_app(input) # Replace your_llm_app()
     )
-    dataset.test_cases.append(test_case) # Add the test case back to your dataset
+    dataset.add_test_case(test_case) # Add the test case back to your dataset
 ```
 
 All that's left after this is to use `dataset.test_cases` for evaluation.
@@ -143,7 +143,7 @@ dataset.pull(alias="your-dataset-alias")
 for goldens in dataset.goldens:
     input = golden.input
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Define metric(s)
 metric = AnswerRelevancyMetric()
@@ -213,7 +213,7 @@ for goldens in dataset.goldens:
         input=golden.input,
         actual_output=your_llm_app(golden.input) # Hopefully you've made changes to your LLM app!
     )
-    dataset.test_cases.append(test_case) # Add the test case back to your dataset
+    dataset.add_test_case(test_case) # Add the test case back to your dataset
 
 evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
 ```

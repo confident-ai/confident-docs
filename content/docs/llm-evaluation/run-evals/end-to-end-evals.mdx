@@ -67,7 +67,7 @@ for goldens in dataset.goldens:
     input = golden.input
     # Replace your_llm_app() with your actual LLM application
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Run an evaluation
 evaluate(
@@ -107,7 +107,7 @@ for golden in dataset.goldens:
     input = golden.input
     # Replace your_llm_app() with your actual LLM app
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(golden.input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 print(dataset.test_cases) # Sanity check yourself
 ```
@@ -272,7 +272,7 @@ for goldens in dataset.goldens:
     input = golden.input
     # Replace your_llm_app() with your actual LLM application
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(input, prompt))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 
 # Run evals on Confident AI

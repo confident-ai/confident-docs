@@ -22,7 +22,7 @@ dataset.pull(alias="your-dataset-alias")
 for golden in dataset.goldens:
     # Replace your_llm_app()
     test_case = LLMTestCase(input=golden.input, actual_output=your_llm_app(golden.input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Run an evaluation
 evaluate(test_cases=dataset.test_cases, metrics=[...])
@@ -80,7 +80,7 @@ for golden in dataset.goldens:
         input=golden.input,
         actual_output=your_llm_app(golden.input) # Replace your_llm_app()
     )
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 print(dataset.test_cases)
 ```
@@ -100,7 +100,7 @@ for golden in dataset.goldens:
         retrieval_context=retrieval_context,
         tools_called=tools_called
     )
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 print(dataset.test_cases)
 ```
@@ -135,7 +135,7 @@ dataset.pull(...)
 test_cases = []
 for goldens in dataset.goldens:
     test_cases = LLMTestCase(input=golden.input, ...)
-    test_cases.append(test_case)
+    add_test_case(test_case)
 
 evaluate(test_cases=test_cases, metrics=[])
 ```
@@ -147,7 +147,7 @@ Instead, add it back to the test cases in your dataset:
 
 for goldens in dataset.goldens:
     test_cases = LLMTestCase(input=golden.input, ...)
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 ```
 
 By appending test cases back to the original dataset instead of a separate list:

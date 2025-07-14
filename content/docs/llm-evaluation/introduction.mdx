@@ -170,7 +170,7 @@ dataset.pull(alias="your-dataset-alias")
 for goldens in dataset.goldens:
     input = golden.input
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 
 # Run an evaluation
