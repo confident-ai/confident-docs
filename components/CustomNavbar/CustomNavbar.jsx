@@ -12,6 +12,7 @@ import Link from "next/link";
 
 const CustomNavbar = ({ isDocsPage }) => {
   const [active, setActive] = useState();
+  const [activatePopOver, setActivatePopOver] = useState(false);
   const navLinks = [
     {
       label: "Products",
@@ -67,12 +68,12 @@ const CustomNavbar = ({ isDocsPage }) => {
           <div className={styles.nav}>
             {navLinks.map(link =>
               link.children ? (
-                <div className={styles.navItemWithPopover} key={link.label}>
+                <div className={styles.navItemWithPopover} key={link.label} onClick={() => setActivatePopOver(!activatePopOver)}>
                   <span className={styles.navLink}>{link.label}</span>
-                  <div className={styles.arrow}>
+                  <div className={`${styles.arrow} ${activatePopOver ?  styles.active : ''}`}>
                     <Image src='/icons/arrow-down.svg' width={10} height={10} alt='downwards facing arrow'/>
                   </div>
-                  <div className={styles.popover}>
+                  <div className={`${styles.popover} ${activatePopOver ? styles.active : ''}`} >
                     <div className={styles.inner}>
                       {link.children.map(child => (
                         <Link href={child.href} key={child.label}>

@@ -29,12 +29,14 @@ from deepeval.dataset import Golden, LLMTestCase
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval import evaluate
 
-@observe(metrics=[AnswerRelevancyMetric()])
+@observe(metrics=[AnswerRelevancyMetric()]) # Define metrics
 def llm_app(input: str):
     res = openai.ChatCompletion.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": input}]
     ).choices[0].message["content"]
+    
+    # Set test case at runtime
     update_current_span(test_case=LLMTestCase(input=input, actual_output=res))
     return res
 
@@ -74,7 +76,7 @@ messages_to_llm = prompt.interpolate(variable="value")
 res = openai.ChatCompletion.create(
     model="gpt-4o", messages=messages_to_llm
 ).choices[0].message["content"]
-print(res)`
+print(res)`,
   ];
 
   const highlightedMap = useMemo(() => {
@@ -149,16 +151,17 @@ print(res)`
     <div className={styles.showCaseSection} ref={ref}>
       <div className={styles.inner}>
         <div className={styles.textWrap}>
-          <span
-            className={styles.subHeading}
-            style={{ color: '#02e2ff' }}
-          >
+          <span className={styles.subHeading} style={{ color: "#02e2ff" }}>
             DEEPEVAL AND PLATFORM
           </span>
           <h2 className={styles.heading}>
-             Built for developers.<br /> Used by everyone to drive product decisions.
+            Built for developers.
+            <br /> Used by everyone to drive product decisions.
           </h2>
-          <p className={styles.description}>Easily integrate evals using DeepEval, with intuitive product analytic dashboards for non-technical team members.</p>
+          <p className={styles.description}>
+            Easily integrate evals using DeepEval, with intuitive product
+            analytic dashboards for non-technical team members.
+          </p>
         </div>
 
         <div className={styles.imageWrap}>
@@ -194,10 +197,24 @@ print(res)`
             </div>
 
             <div className={styles.video}>
-              <video autoPlay loop muted playsInline preload="auto">
-                <source src={videos[tab]} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              {videos.map((videoSrc, index) => (
+                <video
+                  key={index}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  style={{
+                    display: tab === index ? "block" : "none",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <source src={videoSrc} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ))}
             </div>
           </div>
         </div>

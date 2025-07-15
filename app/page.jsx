@@ -1,12 +1,13 @@
-import Banner from '@/components/Home/Banner/Banner'
-import TextSection from '@/components/Home/TextSection/TextSection'
-import TwoColumn from '@/components/Home/TwoColumn/TwoColumn'
-import ShowCase from '@/components/Home/ShowCase/ShowCase'
-import CardSection from '@/components/Home/CardSection/CardSection'
-import SecurityInsurance from '@/components/Home/SecurityInsurance/SecurityInsurance'
-import TextOnlySection from '@/components/Home/TextOnlySection/TextOnlySection'
-import SocialsSection from '@/components/Home/SocialsSection/SocialsSection'
-import GlobalLayout from './global-layout'
+import Head from 'next/head';
+import Banner from '@/components/Home/Banner/Banner';
+import TextSection from '@/components/Home/TextSection/TextSection';
+import TwoColumn from '@/components/Home/TwoColumn/TwoColumn';
+import ShowCase from '@/components/Home/ShowCase/ShowCase';
+import CardSection from '@/components/Home/CardSection/CardSection';
+import SecurityInsurance from '@/components/Home/SecurityInsurance/SecurityInsurance';
+import TextOnlySection from '@/components/Home/TextOnlySection/TextOnlySection';
+import SocialsSection from '@/components/Home/SocialsSection/SocialsSection';
+import GlobalLayout from './global-layout';
 
 export const metadata = {
   title: 'Confident AI - The DeepEval LLM Evaluation Platform',
@@ -47,7 +48,7 @@ export default function HomePage() {
         <TextOnlySection />
       </GlobalLayout>
     </>
-  )
+  );
 }
 
 const twoColumns = [
@@ -57,10 +58,11 @@ const twoColumns = [
       subHeading: 'END-TO-END EVALUATION',
       subHeadingColor: '#25a4ff',
       heading: 'Build in a weekend, validate in minutes.',
-      description: "Measure which prompts and models give the best end-to-end performance using Confident AI's evaluation suite.",
+      description:
+        "Measure which prompts and models give the best end-to-end performance using Confident AI's evaluation suite.",
     },
     imageUrl: 'img/twoColumn-1.png',
-    imageAlt: 'Support Illustration'
+    imageAlt: 'Support Illustration',
   },
   {
     flexDirection: 'row',
@@ -68,10 +70,11 @@ const twoColumns = [
       subHeading: 'REGRESSION TESTING',
       subHeadingColor: '#ff4aad',
       heading: 'Make forward progress. Always.',
-      description: 'Mitigate LLM regressions by running unit tests in CI/CD pipelines. Go ahead and deploy on Fridays.'
+      description:
+        'Mitigate LLM regressions by running unit tests in CI/CD pipelines. Go ahead and deploy on Fridays.',
     },
     imageUrl: 'img/twoColumn-2.png',
-    imageAlt: 'Support Illustration'
+    imageAlt: 'Support Illustration',
   },
   {
     flexDirection: 'rowReverse',
@@ -79,10 +82,10 @@ const twoColumns = [
       subHeading: 'COMPONENT-LEVEL EVALUATION',
       subHeadingColor: '#ffd900',
       heading: 'Dissect, debug, and iterate with tracing.',
-      description: 'Evaluate and apply tailored metrics to individual components, to pinpoint weaknesses in your LLM pipeline.'
+      description:
+        'Evaluate and apply tailored metrics to individual components, to pinpoint weaknesses in your LLM pipeline.',
     },
     imageUrl: 'img/twoColumn-3.png',
-    imageAlt: 'Support Illustration'
+    imageAlt: 'Support Illustration',
   },
 ];
-

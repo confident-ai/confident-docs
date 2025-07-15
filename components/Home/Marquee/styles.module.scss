@@ -15,7 +15,7 @@
   border-top: 1px solid $darkBorder-100;
   border-bottom: 1px solid $darkBorder-100;
   overflow: hidden;
-  padding: 40px 16px;
+  padding: 40px 24px;
 
   .inner {
     display: flex;
@@ -31,6 +31,9 @@
       margin: 0 auto;
       text-align: center;
       line-height: 1.143em;
+      @include responsive(xl){
+        margin-bottom: 20px;
+      }
     }
 
     .marquee {
@@ -86,10 +89,20 @@
       display: flex;
       justify-content: space-between;
       width: 745px;
-
+      gap: 50px;
+      @include responsive(lg) {
+        width: 728px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      @include responsive(md) {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+      }
       @include responsive(sm) {
         flex-direction: column;
-        gap: 50px;
+        gap: 28px;
         align-items: center;
         width: fit-content;
       }
@@ -101,7 +114,9 @@
         text-align: center;
         justify-content: center;
         min-height: 78px;
-
+        @include responsive(sm){
+          min-height: unset;
+        }
         span {
           font-family: "IBM Plex Mono", monospace;
           font-size: 34px;
@@ -111,8 +126,12 @@
           display: block;
           margin-bottom: 5px;
 
-          @include responsive(sm) {
-            font-size: 24px;
+          @include responsive(md) {
+            font-size: 26px;
+            min-width: unset;
+          }
+          @include responsive(xs) {
+            font-size: 22px;
           }
         }
 

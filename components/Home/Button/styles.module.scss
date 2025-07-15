@@ -1,4 +1,4 @@
-@import "../../../app/styles/vars";
+@import "@/app/styles/vars";
 
 .btn {
   font-weight: 500;
@@ -16,61 +16,18 @@
   }
 
   // Sizes
-  &.xs {
-    padding: 6px 32px;
-    font-size: 13px;
-    font-weight: 700;
-  }
-  &.sm {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
 
   &.md {
     padding: 15px 25px;
     font-size: 16px;
     line-height: 1.75em;
-
-    @include responsive(sm) {
-      font-size: 12px;
-      padding: 10px 16px;
-      width: fit-content;
-      text-align: center;
-    }
   }
 
   &.lg {
     padding: 12px 30px;
     font-size: 14px;
     line-height: 2em;
-    @include responsive(md) {
-      font-size: 14px;
-      padding: 12px 24px;
-    }
 
-    @include responsive(sm) {
-      font-size: 12px;
-      padding: 10px 16px;
-      width: fit-content;
-      text-align: center;
-    }
-  }
-
-  &.xl {
-    padding: 22px 36px;
-    font-size: 18px;
-
-    @include responsive(md) {
-      font-size: 14px;
-      padding: 14px 22px;
-    }
-
-    @include responsive(sm) {
-      font-size: 12px;
-      padding: 10px 16px;
-      width: fit-content;
-      text-align: center;
-    }
   }
 
   // Colors

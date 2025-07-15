@@ -32,7 +32,6 @@ export default function SocialsSection() {
           </span>
           <h2 className={styles.heading}>
             100,000+ devs already do evals the
-            <br />
             Confident way.
           </h2>
           <div
@@ -55,8 +54,8 @@ export default function SocialsSection() {
                   {card.cardHeading}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="18"
+                    height="18"
                     viewBox="0 0 512 512"
                   >
                     <g>

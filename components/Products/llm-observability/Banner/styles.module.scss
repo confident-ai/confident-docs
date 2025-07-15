@@ -1,0 +1,126 @@
+.Banner {
+    padding: 140px 0;
+    background-image: radial-gradient(circle farthest-corner at 4% -20%, #9764ff, #6e00ff 23%);
+    height: 800px;
+    overflow: hidden;
+    position: relative;
+
+    .inner {
+        max-width: 1280px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+
+        .textWrap {
+            width: 95%;
+            margin: 0 auto;
+
+            .heading {
+                font-family: 'Inter', sans-serif;
+                font-size: 70px;
+                font-weight: 400;
+                color: white;
+                line-height: 1.222em;
+                margin-bottom: 16px;
+                letter-spacing: 1px;
+            }
+
+            .description {
+                font-size: 25px;
+                color: white;
+                font-family: 'Inter', sans-serif;
+                width: 800px;
+                margin-bottom: 40px;
+                line-height: 1.5em;
+            }
+
+            .btnWrap {
+                display: flex;
+                gap: 18px;
+
+                .btn {
+                    padding: 15px 20px;
+                    display: block;
+                    font-family: "Inter", sans-serif;
+                    font-size: 16px;
+                    transition: background-color 0.4s ease, color 0.4s ease;
+
+                    &.contained {
+                        background-color: #fff;
+                        border: 2px solid #000;
+                        border-radius: 4px;
+                        font-weight: 500;
+                        color: #000;
+
+                        &:hover {
+                            background-color: #000;
+                            color: #fff;
+                        }
+                    }
+
+                    &.containedInverted {
+                        background-color: #10002a;
+                        border: 1px solid #fff;
+                        font-weight: 500;
+                        color: #fff;
+
+                        &:hover {
+                            background-color: #fff;
+                            color: #000;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    .backgroundImage {
+        width: 1516px;
+        min-width: 1600px;
+        transition: opacity 0.2s;
+        position: absolute;
+        bottom: -21%;
+        border-radius: 20px;
+        right: -745px;
+        transform: rotateX(-48deg) rotateY(-4deg) rotate(-28deg);
+        box-shadow: -80px 138px rgba(0, 0, 0, 0.3019607843);
+
+        img {
+            border-radius: 20px;
+        }
+    }
+}
+
+.BannerBottom {
+    padding: 40px 0 0;
+    background-color: #0b101b;
+
+    .inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        border: 1px solid #000;
+        border-bottom-color: #27272a;
+        padding: 0 20px 20px;
+        text-align: center;
+
+        .heading {
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.222em;
+            color: white;
+            margin-bottom: 13px;
+            font-family: 'Inter', sans-serif;
+
+        }
+
+        .description {
+            font-family: 'Inter', sans-serif;
+            color: #f0f3f8;
+            text-align: center;
+            width: 95%;
+            font-size: 15px;
+            line-height: 1.75em;
+        }
+    }
+}

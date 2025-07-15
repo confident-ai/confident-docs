@@ -9,7 +9,10 @@
   position: relative;
 
   @include responsive(md) {
-    padding: 35px 0;
+    padding: 86px 0 0;
+  }
+  @include responsive(sm) {
+    padding: 36px 0 0;
   }
 
   .inner {
@@ -18,7 +21,6 @@
     max-width: $container_xl;
     margin: 0 auto;
     z-index: 2;
-    padding: 0 6px;
 
     @include responsive(xxl) {
       max-width: $container_xxl;
@@ -26,12 +28,12 @@
       padding: 0;
     }
     @include responsive(xl) {
-      padding: 0 16px;
-      width: 100%;
-      max-width: $container_xl;
+      max-width: $container_xxl;
+      width: 80%;
+      padding: 0;
     }
     @include responsive(md) {
-      padding: 0 32px;
+      width: 90%;
     }
 
     .backedBy {
@@ -45,9 +47,11 @@
       margin-top: 36px;
       background-color: $confident-dark;
       margin-bottom: 20px;
-
       @include responsive(md) {
         margin-top: 0;
+      }
+      @include responsive(xs) {
+        padding: 9px 13px;
       }
 
       .BackedByText {
@@ -58,24 +62,37 @@
           color: $lightGray-100;
           font-size: 12px;
           margin-bottom: 2px;
-          font-weight: 300;
+          font-weight: 500;
+          @include responsive(xs) {
+            font-size: 10px;
+          }
         }
 
         color: $white;
         line-height: 100%;
         font-size: 15px;
         font-weight: 600;
+        @include responsive(xs) {
+          font-size: 13px;
+        }
       }
 
-      svg {
+      img {
         border-radius: 4px;
+        @include responsive(xs) {
+          width: 24px;
+          height: 24px;
+        }
       }
     }
 
     .textWrap {
       margin-bottom: 38px;
-      padding: 0 16px;
+      padding: 0;
       @include responsive(md) {
+        padding: 0 32px;
+      }
+      @include responsive(sm) {
         padding: 0;
       }
       .bannerHeading {
@@ -93,27 +110,27 @@
 
         @include responsive(xxl) {
           font-size: 70px;
-          max-width: 90%;
         }
         @include responsive(xl) {
           font-size: 62px;
-          max-width: unset;
-          letter-spacing: unset;
+          max-width: 100%;
           margin-bottom: 16px;
         }
         @include responsive(lg) {
-          font-size: 52px;
-          max-width: unset;
+          font-size: 55px;
+        }
+        @include responsive(md) {
+          font-size: 50px;
         }
         @include responsive(sm) {
-          font-size: 32px;
-          max-width: unset;
-          letter-spacing: unset;
+          font-size: 42px;
+          letter-spacing: 2px;
+          margin-bottom: 20px;
         }
         @include responsive(xs) {
-          font-size: 28px;
-          max-width: unset;
-          letter-spacing: unset;
+          font-size: 30px;
+          letter-spacing: 2px;
+          margin-bottom: 10px;
         }
 
         .underline {
@@ -128,7 +145,7 @@
         text-align: center;
         width: 100%;
         max-width: 70%;
-        font-size: 16px;
+        font-size: 20px;
         font-weight: 400;
         line-height: 1.8em;
         margin: 0 auto 40px auto;
@@ -136,22 +153,22 @@
         opacity: 0;
         transform: translate(-100%);
 
-        @include responsive(xxl) {
-          font-size: 20px;
-        }
-
         @include responsive(xl) {
           font-size: 16px;
-          max-width: 72%;
+        }
+
+        @include responsive(md) {
+          font-size: 15px;
+          max-width: 100%;
         }
 
         @include responsive(sm) {
           font-size: 14px;
-          max-width: unset;
-          line-height: 1.6em;
+                                                                             margin-bottom: 20px;
         }
         @include responsive(xs) {
-          font-size: 12px;
+          font-size: 13px;
+          line-height: 1.6em;
         }
       }
 
@@ -166,6 +183,11 @@
 
         @include responsive(sm) {
           gap: 14px;
+          a {
+            &:first-child {
+              display: none;
+            }
+          }
         }
       }
     }
@@ -188,6 +210,13 @@
           padding-left: 15px;
           height: 20px;
         }
+        @include responsive(sm) {
+          background-color: #ffffffbf;
+          border-radius: 5px 5px 0 0;
+          height: 8px;
+          padding: 0 8px;
+        }
+
         .tabIcons {
           width: 16px;
           height: 16px;
@@ -196,6 +225,9 @@
           @include responsive(md) {
             width: 12px;
             height: 12px;
+          }
+          @include responsive(sm) {
+            display: none;
           }
           &:after {
             content: "";
@@ -250,7 +282,9 @@
     left: 20%;
     transform: translateY(400px);
     border-radius: 100%;
-
+    @include responsive(sm) {
+      display: none;
+    }
     &:first-of-type {
       left: 50%;
       transform: translateY(768px);
@@ -297,6 +331,9 @@
     z-index: -1;
     opacity: 0.5;
     left: 0;
+    @include responsive(sm) {
+      display: none;
+    }
   }
 }
 

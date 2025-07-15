@@ -55,7 +55,7 @@ export default function SecurityInsurance( ) {
                                 <div className={styles.wrap}>
                                     <div className={styles.iconOuter}>
                                         <div className={styles.securityIcon} style={{ backgroundColor: `${security?.iconColor}` }}>
-                                            <Image src={security.icon} alt={security.heading} width={25} height={25} />
+                                            <Image src={security.icon} alt={security.heading} width={30} height={30} />
                                         </div>
                                     </div>
                                     <h3 className={styles.securityHeading}>

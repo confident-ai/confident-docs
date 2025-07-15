@@ -12,11 +12,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &.active {
-    background-color: $darkBlue;
-  }
-
   .container {
     display: flex;
     width: 100%;
@@ -43,7 +38,6 @@
       }
     }
 
-
     .linkWrap {
       display: flex;
       align-items: center;
@@ -54,23 +48,29 @@
         position: absolute;
         max-width: unset;
         width: 100%;
-        height: 100vh;
         justify-content: flex-start;
         align-items: flex-start;
-        top: -100%;
-        padding: 25px;
         background: $darkBlue-200;
         left: 0;
-        opacity: 0;
-        visibility: none;
+        z-index: -1;
+        top: 64px;
         pointer-events: none;
-        transition: top ease 0.5s, opacity ease 0.5s;
-
+        height: 0;
+        overflow: hidden;
+        transition: height 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+        transform: translateY(-10px);
+        opacity: 0;
         &.active {
-          top: 57px;
-          opacity: 1;
-          visibility: visible;
           pointer-events: all;
+          height: 100vh; /* Adjust based on your content size */
+          transform: translateY(0);
+          opacity: 1;
+          .nav {
+            .navLink {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
         }
       }
 
@@ -79,12 +79,13 @@
         align-items: center;
         gap: 32px;
         height: 100%;
-
+        transition: height 0.3s ease;
         @include responsive(md) {
           flex-direction: column;
           gap: 20px;
           align-items: flex-start;
           width: 100%;
+          padding: 25px;
           height: auto;
         }
 
@@ -101,6 +102,9 @@
           position: relative;
           @include responsive(md) {
             font-size: 18px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
           }
           &:hover {
             text-decoration: underline;
@@ -112,30 +116,13 @@
           display: flex;
           align-items: center;
           position: relative;
-
-          @include responsive(md) {
-            display: none;
-          }
-
+          flex-wrap: wrap;
           .arrow {
             margin-left: 8px;
-            transition: all ease 0.18s;
-          }
-
-          &:hover {
-            &::after {
-            }
-            .arrow {
+            transition: rotate ease 0.18s;
+            &.active {
               rotate: 180deg;
             }
-          }
-
-          &:hover .popover,
-          &:focus-within .popover {
-            transition: all ease 0.18s;
-            opacity: 1;
-            pointer-events: auto;
-            top: 100%;
           }
 
           .popover {
@@ -151,11 +138,32 @@
             left: 0;
             opacity: 0;
             top: 200%;
-            transition: all ease 0.18s;
-            .inner{
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
+            transition: opacity 0.3s ease, top 0.3s ease;
+            @include responsive(md) {
+              position: static;
+              width: 100%;
+              opacity: 0;
+              padding: 0;
+              transform: scale(0);
+              height: 0;
+              transform-origin: top left;
+              transition: transform 0.4s ease, opacity 0.3s ease;
+            }
+            &.active {
+              opacity: 1;
+              pointer-events: auto;
+              top: 100%;
+              @include responsive(md) {
+                transform: scale(1);
+                padding: 1.5rem 2rem;
+                height: 100%;
+                margin-top: 10px;
+              }
+            }
+            .inner {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
             }
             .popoverLink {
               color: $white;
