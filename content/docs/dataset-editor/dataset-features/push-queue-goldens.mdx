@@ -2,7 +2,7 @@
 title: Push and Queue Goldens
 ---
 
-import { Callout } from "nextra/components";
+import { Callout, Tabs } from "nextra/components";
 
 # Push and Queue Goldens
 
@@ -16,23 +16,43 @@ You can push goldens to Confident AI through DeepEval that are **finalized** by 
 You will need to already have a dataset on Confident AI for this to work.
 </Callout>
 
-```python {4}
+<Tabs items={['Single-Turn', 'Multi-Turn']} storageKey="single-multi-turn">
+  <Tabs.Tab>
+
+```python filename="main.py" showLineNumbers {4}
 from deepeval.dataset import EvaluationDataset, Golden
 
 dataset = EvaluationDataset(goldens=[Golden(input="Input of my first golden!")])
 dataset.push(alias="your-dataset-alias")
 ```
 
+  </Tabs.Tab>
+    <Tabs.Tab>
+
+```python filename="main.py" showLineNumbers {10}
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+
+dataset = EvaluationDataset(
+  goldens=[
+    ConversationalGolden(
+      scenario="Angry user asking for a refund.",
+      expected_output="User gets redirected to human agent"
+    )]
+)
+dataset.push(alias="your-dataset-alias")
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+
 There are **TWO** mandatory and **ONE** optional parameters when using the `queue` method:
 
 - `alias`: A string specifying the alias of the dataset.
-- [Optional] `overwrite`: A boolean specifying whether to overwrite existing goldens in your dataset. DeepEval will prompt you to enter a [y/N] value if no value is provided. Defaulted to `None`.
+- [Optional] `overwrite`: A boolean specifying whether to overwrite existing goldens in your dataset. Defaulted to `False`.
 
-<Callout>
-By default, the `push` method marks goldens as **finalized**. Goldens that are finalized will be pulled by default via the [`.pull()` method](/docs/dataset-editor/using-datasets#pull-a-dataset). To upload goldens as **unfinalized**, use the [queue method](#queue) instead.
-</Callout>
 
-You can also choose to overwrite or append to an existing dataset if an existing dataset with the same alias already exist.
+By default, the `push` method marks goldens as **finalized**. Goldens that are finalized will be pulled by default via the [`.pull()` method](/docs/dataset-editor/using-datasets#pull-a-dataset). To upload goldens as **unfinalized**, use the [queue method](#queue) instead. You can also choose to overwrite an existing dataset if an existing dataset with the same alias already exist.
 
 ```python
 ...
@@ -40,11 +60,6 @@ You can also choose to overwrite or append to an existing dataset if an existing
 # Overwrite existing goldens
 dataset.push(alias="QA Dataset", overwrite=True)
 ```
-
-<Callout type="info">
-  `deepeval` will prompt you in the terminal if no value for `overwrite` is
-  provided.
-</Callout>
 
 You can also **load a dataset from CSV or JSON locally** before uploading it to Confident AI through `deepeval`. For more information on `deepeval`'s `EvaluationDataset`, visit the [official DeepEval documentation.](https://deepeval.com/docs/evaluation-datasets#load-an-existing-dataset)
 
@@ -56,12 +71,33 @@ If your goldens are not ready for evaluation, need human annotation, as is the c
 Queued goldens are automatically marked as **unfinalized**.
 </Callout>
 
-```python {4}
+<Tabs items={['Single-Turn', 'Multi-Turn']} storageKey="single-multi-turn">
+
+    <Tabs.Tab>
+```python filename="main.py" showLineNumbers {4}
 from deepeval.dataset import EvaluationDataset, Golden
 
 dataset = EvaluationDataset()
 dataset.queue(alias="your-dataset-alias", goldens=[Golden(input="Input of my first golden!")])
 ```
+  </Tabs.Tab>
+    <Tabs.Tab>
+```python filename="main.py" showLineNumbers {4}
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+
+dataset = EvaluationDataset()
+dataset.queue(
+  alias="your-dataset-alias", 
+  goldens=[
+    ConversationalGolden(
+      scenario="Angry user asking for a refund.",
+      expected_output="User gets redirected to human agent"
+  )]
+)
+```
+</Tabs.Tab>
+
+</Tabs>
 
 There are **TWO** mandatory and **ONE** optional parameters when using the `queue` method:
 
