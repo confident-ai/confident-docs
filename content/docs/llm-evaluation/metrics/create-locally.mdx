@@ -19,7 +19,7 @@ from deepeval.metrics import GEval, AnswerRelevancyMetric
 relevancy_metric = AnswerRelevancyMetric()
 custom_metric = GEval(
     name="Custom Relevancy",
-    criteria="How relevant is the `input` compared to `actual_output`?"
+    criteria="How relevant is the `input` compared to `actual_output`?",
     evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT]
 )
 ```
@@ -171,13 +171,13 @@ from deepeval import DAGMetric, GEval
 
 geval_relevancy = GEval(
     name="Custom Relevancy",
-    criteria="How relevant is the `input` compared to `actual_output`?"
+    criteria="How relevant is the `input` compared to `actual_output`?",
     evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT]
 )
 
 less_than_3_sentences = BinaryJudgementNode(
     criteria="Does the `actual_output` have less than 3 sentences?",
-    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT]
+    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
     children=[
         VerdictNode(verdict=False, score=0),
         VerdictNode(verdict=True, child=geval_relevancy),
