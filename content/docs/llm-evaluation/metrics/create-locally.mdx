@@ -19,7 +19,7 @@ from deepeval.metrics import GEval, AnswerRelevancyMetric
 relevancy_metric = AnswerRelevancyMetric()
 custom_metric = GEval(
     name="Custom Relevancy",
-    criteria="How relevant is the `input` compared to `actual_output`?"
+    criteria="How relevant is the `input` compared to `actual_output`?",
     evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT]
 )
 ```
