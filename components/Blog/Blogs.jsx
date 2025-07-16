@@ -137,7 +137,7 @@ export default function Blogs() {
 
 const blogs = [
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -173,7 +173,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -209,7 +209,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -245,7 +245,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -281,7 +281,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -317,7 +317,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -353,7 +353,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -389,7 +389,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
@@ -425,7 +425,7 @@ const blogs = [
     tag: "safety",
   },
   {
-    heading: <>LLM Guardrails for Data Leakage, Prompt Injection, and More</>,
+    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
     description:
       "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
     author: "Jeffrey Ip",
