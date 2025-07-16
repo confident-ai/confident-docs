@@ -12,7 +12,7 @@ export async function generateMetadata(props) {
         "By the authors of DeepEval, Confident AI is the open-source platform for evaluating and improving LLM applications.",
     };
   }
-  const { metadata } = await importPage(params.mdxPath);
+  const { metadata } = await importPage(['api', ...params.mdxPath]);
   return metadata;
 }
 

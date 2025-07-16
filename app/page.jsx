@@ -34,6 +34,33 @@ export const metadata = {
 export default function HomePage() {
   return (
     <>
+      {/* Preload videos for ShowCase tab transitions */}
+      <Head>
+        <link
+          rel="preload"
+          as="video"
+          href="https://confident-landing.s3.us-east-1.amazonaws.com/evaluation-4k.mp4"
+          type="video/mp4"
+        />
+        <link
+          rel="preload"
+          as="video"
+          href="https://confident-landing.s3.us-east-1.amazonaws.com/monitoring-4k.mp4"
+          type="video/mp4"
+        />
+        <link
+          rel="preload"
+          as="video"
+          href="https://confident-landing.s3.us-east-1.amazonaws.com/dataset-editor-4k.mp4"
+          type="video/mp4"
+        />
+        <link
+          rel="preload"
+          as="video"
+          href="https://confident-landing.s3.us-east-1.amazonaws.com/prompt-editor-4k.mp4"
+          type="video/mp4"
+        />
+      </Head>
 
       <GlobalLayout>
         <Banner />

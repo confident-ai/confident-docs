@@ -12,7 +12,7 @@ export default function TextSection() {
                 <div className={styles.textWrap}>
                     <span className={styles.subHeading} style={{ color: '#ffb62e' }}>USE CASES</span>
                     <h2 className={styles.heading}>
-                        Build your AI moat. <br />
+                        Build your AI moat.<br />
                         Do evals the right way.
                     </h2>
                     <p className={styles.description}>

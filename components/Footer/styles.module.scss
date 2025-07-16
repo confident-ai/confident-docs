@@ -8,13 +8,6 @@
       .logoWrap {
         .first {
           .logo {
-            svg {
-              g {
-                path {
-                  fill: $black;
-                }
-              }
-            }
             span {
               color: $black;
               font-weight: 400;
@@ -42,7 +35,7 @@
               color: $lightGray-200;
               &:hover {
                 text-decoration: underline;
-                color: inherit;
+                color: $lightGray-200;
               }
             }
           }
@@ -52,6 +45,44 @@
   }
   &.dark {
     background-color: $darkBlue;
+        .inner {
+      .logoWrap {
+        .first {
+          .logo {
+            span {
+              color: $white;
+              font-weight: 400;
+            }
+          }
+          .copyright {
+            color: $white;
+          }
+          .codeEmbedded {
+            background-color: $darkBlue;
+            width: fit-content;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+          }
+        }
+      }
+      .linkWrap {
+        .column {
+          .title {
+            color: $white;
+          }
+          .list {
+            .link {
+              color: $lightGray-200;
+              &:hover {
+                text-decoration: underline;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+    }
   }
   .layout {
     max-width: $container_lg;
@@ -126,7 +157,6 @@
               font-family: $Lexend;
               font-size: 19px;
               font-weight: 300;
-              color: $white;
               line-height: 100%;
               display: flex;
               align-items: center;
@@ -158,7 +188,6 @@
           .copyright {
             margin-bottom: 0;
             font-size: 13px;
-            color: $white;
             font-family: $inter;
             margin: 3px 0 20px;
             line-height: 1.75em;
@@ -218,7 +247,6 @@
           }
 
           .title {
-            color: $white;
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
@@ -231,7 +259,6 @@
             flex-direction: column;
 
             .link {
-              color: $lightGray-100;
               display: block;
               margin-top: 12px;
               margin-bottom: 6px;
@@ -240,10 +267,6 @@
               text-decoration: none;
               font-family: $inter;
               transition: color 0.3s ease;
-
-              &:hover {
-                color: $white;
-              }
             }
           }
         }

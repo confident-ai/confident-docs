@@ -1,5 +1,5 @@
 import { importPage } from 'nextra/pages'
-import { useMDXComponents as getMDXComponents } from '../../../mdx-components'
+import { useMDXComponents as getMDXComponents } from '@/mdx-components'
 
 
 export async function generateMetadata(props) {
@@ -12,8 +12,10 @@ export async function generateMetadata(props) {
         "By the authors of DeepEval, Confident AI is the open-source platform for evaluating and improving LLM applications.",
     };
   }
-  const { metadata } = await importPage(params.mdxPath);
+  
+  const { metadata } = await importPage(['docs', ...params.mdxPath]);
   return metadata;
+ 
 }
 
 export default async function Page({ params }) {
