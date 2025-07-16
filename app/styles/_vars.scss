@@ -1,0 +1,50 @@
+// Breakpoints Structure
+@import './colors.scss';
+
+$custom-breakpoints: (
+  xs: (minSize: 0px,
+    maxSize: 479px,
+    name: 'XS'
+  ),
+  sm: (minSize: 480px,
+    maxSize: 767px,
+    name: 'SM'
+  ),
+  md: (minSize: 768px,
+    maxSize: 991px,
+    name: 'MD'
+  ),
+  lg: (minSize: 992px,
+    maxSize: 1439px,
+    name: 'LG'
+  ),
+  xl: (minSize: 1440px,
+    maxSize: 1919px,
+    name: 'XL'
+  ),
+  xxl: (minSize: 1920px,
+    maxSize: 99999px, // No upper bound
+    name: 'XXL'
+  )
+);
+
+@mixin responsive($breakpoint) {
+  @if map-has-key($custom-breakpoints, $breakpoint) {
+    @media (max-width: #{map-get(map-get($custom-breakpoints, $breakpoint), maxSize)}) {
+      @content;
+    }
+  }
+
+  @else {
+    @warn "Breakpoint `#{$breakpoint}` does not exist. Check case sensitivity.";
+  }
+}
+
+$container_xxl: 1800px;
+$container_xl: 1440px;
+$container_lg: 1280px;
+$container_md: 1200px;
+
+$inter: "Inter", sans-serif;
+$Lexend: "Lexend Deca", sans-serif;
+$PTSans: "PT Sans", sans-serif;

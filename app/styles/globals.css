@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap');
 
 /* Add subtle dot pattern to the background */
-body {
+.docs-layout {
   position: relative;
   margin: 0;
   padding: 0;
@@ -10,7 +10,7 @@ body {
   overflow-x: hidden;
 }
 
-body::before {
+.docs-layout::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -22,7 +22,7 @@ body::before {
 }
 
 /* Dark mode background */
-.dark body {
+.dark .docs-layout {
   background-image: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
   background-size: 20px 20px;
 }
@@ -33,7 +33,7 @@ body::before {
   50% { opacity: 0; }
 }
 
-.cursor-blink {
+.docs-layout .cursor-blink {
   display: inline-block;
   color: rgba(0, 0, 0, 0.891);
   animation: blink 1.5s step-end infinite;
@@ -42,70 +42,70 @@ body::before {
 }
 
 /* Dark mode cursor */
-.dark .cursor-blink {
+.dark .docs-layout .cursor-blink {
   color: rgba(200, 200, 200, 0.7);
 }
 
-h1 {
+.docs-layout h1 {
   font-family: 'Fira Code', monospace !important;
   font-weight: 600 !important;
 }
 
-h2 {
+.docs-layout h2 {
   margin-top: 4rem !important;
 }
 
-h3, h2 {
+.docs-layout h3, .docs-layout h2 {
   font-family: 'Inter', sans-serif !important;
   font-weight: 600 !important;
 }
 
-h4, h5, h6 {
+.docs-layout h4, .docs-layout h5, .docs-layout h6 {
   font-family: 'Inter', sans-serif !important;
   font-weight: 500 !important;
 }
 
-div[role="tabpanel"] {
+.docs-layout div[role="tabpanel"] {
   margin-top: 1rem !important;
   padding: 0rem 1rem 1rem 1rem;
   border: 1px solid rgb(209, 209, 210) !important;
 }
 
 /* Add right border to the left navigation drawer */
-.nextra-sidebar {
+.docs-layout .nextra-sidebar {
   border-right: 1px solid rgba(0, 0, 0, 0.081);
   font-weight: 500;
 }
 
-.nextra-sidebar li a {
+.docs-layout .nextra-sidebar li a {
   color: rgba(0, 0, 23, 0.688);
 }
 
-.nextra-sidebar li button {
+.docs-layout .nextra-sidebar li button {
   color: rgba(0, 0, 23, 0.688);
 }
 
-.custom-icon-tab-item {
+.docs-layout .custom-icon-tab-item {
   padding: 4px;
   border: 1px solid rgb(213, 213, 216);
   background: white;
   border-radius: 4px;
 }
 
-.nextra-sidebar li.active .custom-icon-tab-item {
+.docs-layout .nextra-sidebar li.active .custom-icon-tab-item {
   color: #5800d3 !important;
   background-color: white !important;
   border: 1px solid #983eff !important;
 }
 
 /* Active/selected item in sidebar */
-.nextra-sidebar li.active a,
-.nextra-sidebar li.active a.active,
-.nextra-sidebar li.active button[aria-expanded="true"] {
+.docs-layout .nextra-sidebar li.active a,
+.docs-layout .nextra-sidebar li.active a.active,
+.docs-layout .nextra-sidebar li.active button[aria-expanded="true"] {
   color: #5800d3 !important;
 }
 
-details {
+.docs-layout details {
   border: 1px solid rgb(209, 209, 210) !important;
   background-color: white !important;
 
@@ -115,7 +115,7 @@ details {
 }
 
 /* Card background customization */
-.nextra-card {
+.docs-layout .nextra-card {
   background-color: white !important;
   backdrop-filter: blur(10px);
   border: 1px solid rgb(163, 159, 167) !important;
@@ -129,108 +129,108 @@ details {
   }
 }
   
-.nextra-card:hover {
+.docs-layout .nextra-card:hover {
   background-color: rgb(255, 255, 255) !important;
   transform: translateY(4px);
   box-shadow: none;
 }
 
 /* Dark mode card customization */
-.dark .nextra-card {
+.dark .docs-layout .nextra-card {
   background-color: rgba(17, 17, 17, 0.7) !important;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dark .nextra-card:hover {
+.dark .docs-layout .nextra-card:hover {
   background-color: rgba(17, 17, 17, 0.9) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Card content customization */
-.nextra-card h3 {
+.docs-layout .nextra-card h3 {
   color: #111;
   margin-bottom: 0.5rem;
 }
 
-.dark .nextra-card h3 {
+.dark .docs-layout .nextra-card h3 {
   color: #fff;
 }
 
-.nextra-card p {
+.docs-layout .nextra-card p {
   color: #666;
   margin-bottom: 0;
 }
 
-.dark .nextra-card p {
+.dark .docs-layout .nextra-card p {
   color: #999;
 }
 
 @media (max-width: 1080px) {
-  nav .nextra-scrollbar {
+  .docs-layout nav .nextra-scrollbar {
     display: none;
   }
 }
 
 
 /* Hide the folder buttons for multiple folders */
-button[data-href="/docs/llm-evaluation"],
-button[data-href="/docs/llm-tracing"],
-button[data-href="/docs/dataset-editor"],
-button[data-href="/docs/prompt-management"],
-button[data-href="/docs/human-in-the-loop"],
-button[data-href="/docs/project-settings"],
-button[data-href="/api/tracing"],
-button[data-href="/api/evaluation"],
-button[data-href="/api/metrics"] {
+.docs-layout button[data-href="/docs/llm-evaluation"],
+.docs-layout button[data-href="/docs/llm-tracing"],
+.docs-layout button[data-href="/docs/dataset-editor"],
+.docs-layout button[data-href="/docs/prompt-management"],
+.docs-layout button[data-href="/docs/human-in-the-loop"],
+.docs-layout button[data-href="/docs/project-settings"],
+.docs-layout button[data-href="/api/tracing"],
+.docs-layout button[data-href="/api/evaluation"],
+.docs-layout button[data-href="/api/metrics"] {
   display: none !important;
 }
 
 /* Remove indentation ONLY from direct children (first level) */
-button[data-href="/docs/llm-evaluation"] + div > ul,
-button[data-href="/docs/llm-tracing"] + div > ul,
-button[data-href="/docs/dataset-editor"] + div > ul,
-button[data-href="/docs/prompt-management"] + div > ul,
-button[data-href="/docs/human-in-the-loop"] + div > ul,
-button[data-href="/docs/project-settings"] + div > ul,
-button[data-href="/api/tracing"] + div > ul,
-button[data-href="/api/evaluation"] + div > ul,
-button[data-href="/api/metrics"] + div > ul {
+.docs-layout button[data-href="/docs/llm-evaluation"] + div > ul,
+.docs-layout button[data-href="/docs/llm-tracing"] + div > ul,
+.docs-layout button[data-href="/docs/dataset-editor"] + div > ul,
+.docs-layout button[data-href="/docs/prompt-management"] + div > ul,
+.docs-layout button[data-href="/docs/human-in-the-loop"] + div > ul,
+.docs-layout button[data-href="/docs/project-settings"] + div > ul,
+.docs-layout button[data-href="/api/tracing"] + div > ul,
+.docs-layout button[data-href="/api/evaluation"] + div > ul,
+.docs-layout button[data-href="/api/metrics"] + div > ul {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
 
 /* Remove the left border/line ONLY from direct children */
-button[data-href="/docs/llm-evaluation"] + div > ul::before,
-button[data-href="/docs/llm-tracing"] + div > ul::before,
-button[data-href="/docs/dataset-editor"] + div > ul::before,
-button[data-href="/docs/prompt-management"] + div > ul::before,
-button[data-href="/docs/human-in-the-loop"] + div > ul::before,
-button[data-href="/docs/project-settings"] + div > ul::before,
-button[data-href="/api/tracing"] + div > ul::before,
-button[data-href="/api/evaluation"] + div > ul::before,
-button[data-href="/api/metrics"] + div > ul::before {
+.docs-layout button[data-href="/docs/llm-evaluation"] + div > ul::before,
+.docs-layout button[data-href="/docs/llm-tracing"] + div > ul::before,
+.docs-layout button[data-href="/docs/dataset-editor"] + div > ul::before,
+.docs-layout button[data-href="/docs/prompt-management"] + div > ul::before,
+.docs-layout button[data-href="/docs/human-in-the-loop"] + div > ul::before,
+.docs-layout button[data-href="/docs/project-settings"] + div > ul::before,
+.docs-layout button[data-href="/api/tracing"] + div > ul::before,
+.docs-layout button[data-href="/api/evaluation"] + div > ul::before,
+.docs-layout button[data-href="/api/metrics"] + div > ul::before {
   display: none !important;
 }
 
 /* Ensure the container divs don't add extra spacing */
-li:has(button[data-href="/docs/llm-evaluation"]) > div,
-li:has(button[data-href="/docs/llm-tracing"]) > div,
-li:has(button[data-href="/docs/dataset-editor"]) > div,
-li:has(button[data-href="/docs/prompt-management"]) > div,
-li:has(button[data-href="/docs/human-in-the-loop"]) > div,
-li:has(button[data-href="/docs/project-settings"]) > div,
-li:has(button[data-href="/api/tracing"]) > div,
-li:has(button[data-href="/api/evaluation"]) > div,
-li:has(button[data-href="/api/metrics"]) > div {
+.docs-layout li:has(button[data-href="/docs/llm-evaluation"]) > div,
+.docs-layout li:has(button[data-href="/docs/llm-tracing"]) > div,
+.docs-layout li:has(button[data-href="/docs/dataset-editor"]) > div,
+.docs-layout li:has(button[data-href="/docs/prompt-management"]) > div,
+.docs-layout li:has(button[data-href="/docs/human-in-the-loop"]) > div,
+.docs-layout li:has(button[data-href="/docs/project-settings"]) > div,
+.docs-layout li:has(button[data-href="/api/tracing"]) > div,
+.docs-layout li:has(button[data-href="/api/evaluation"]) > div,
+.docs-layout li:has(button[data-href="/api/metrics"]) > div {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
 
-.nextra-scrollbar {
+.docs-layout .nextra-scrollbar {
   /* margin-bottom: -1.5rem !important; */
 }
 
-details > summary + div {
+.docs-layout details > summary + div {
   padding: 0.5rem 1rem 1rem 1rem;
   font-size: 15px;
 }

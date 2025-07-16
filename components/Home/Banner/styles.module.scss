@@ -1,0 +1,385 @@
+@import "@/app/styles/vars.scss";
+
+.Banner {
+  width: 100%;
+  padding: 50px 0 0;
+  z-index: 1;
+  background-color: $confident-dark;
+  position: relative;
+
+  @include responsive(md) {
+    padding: 86px 0 0;
+  }
+  @include responsive(sm) {
+    padding: 36px 0 0;
+  }
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    max-width: $container_xl;
+    margin: 0 auto;
+    z-index: 2;
+
+    @include responsive(xxl) {
+      max-width: $container_xxl;
+      width: 75%;
+      padding: 0;
+    }
+    @include responsive(xl) {
+      max-width: $container_xxl;
+      width: 80%;
+      padding: 0;
+    }
+    @include responsive(md) {
+      width: 90%;
+    }
+
+    .backedBy {
+      display: flex;
+      align-items: center;
+      margin: 0 auto;
+      padding: 9px 20px;
+      border: 1px solid $darkBorder;
+      border-radius: 11px;
+      gap: 16px;
+      margin-top: 36px;
+      background-color: $confident-dark;
+      margin-bottom: 20px;
+      @include responsive(md) {
+        margin-top: 0;
+      }
+      @include responsive(xs) {
+        padding: 9px 13px;
+      }
+
+      .BackedByText {
+        font-family: $inter;
+
+        span {
+          display: block;
+          color: $lightGray-100;
+          font-size: 12px;
+          margin-bottom: 2px;
+          font-weight: 500;
+          @include responsive(xs) {
+            font-size: 10px;
+          }
+        }
+
+        color: $white;
+        line-height: 100%;
+        font-size: 15px;
+        font-weight: 600;
+        @include responsive(xs) {
+          font-size: 13px;
+        }
+      }
+
+      img {
+        border-radius: 4px;
+        @include responsive(xs) {
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+
+    .textWrap {
+      margin-bottom: 38px;
+      padding: 0;
+      @include responsive(md) {
+        padding: 0 32px;
+      }
+      @include responsive(sm) {
+        padding: 0;
+      }
+      .bannerHeading {
+        color: $white;
+        text-align: center;
+        width: 100%;
+        font-family: $inter;
+        font-size: 62px;
+        font-weight: 400;
+        line-height: 1.3em;
+        margin: 0 auto 36px auto;
+        transform-origin: center;
+        opacity: 0;
+        letter-spacing: 3px;
+
+        @include responsive(xxl) {
+          font-size: 70px;
+        }
+        @include responsive(xl) {
+          font-size: 62px;
+          max-width: 100%;
+          margin-bottom: 16px;
+        }
+        @include responsive(lg) {
+          font-size: 55px;
+        }
+        @include responsive(md) {
+          font-size: 50px;
+        }
+        @include responsive(sm) {
+          font-size: 42px;
+          letter-spacing: 2px;
+          margin-bottom: 20px;
+        }
+        @include responsive(xs) {
+          font-size: 30px;
+          letter-spacing: 2px;
+          margin-bottom: 10px;
+        }
+
+        .underline {
+          color: $purple;
+          text-decoration: underline;
+          font-family: inherit;
+        }
+      }
+
+      .bannerDescription {
+        color: $lightGray;
+        text-align: center;
+        width: 100%;
+        max-width: 70%;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.8em;
+        margin: 0 auto 40px auto;
+        font-family: $inter;
+        opacity: 0;
+        transform: translate(-100%);
+
+        @include responsive(xl) {
+          font-size: 16px;
+        }
+
+        @include responsive(md) {
+          font-size: 15px;
+          max-width: 100%;
+        }
+
+        @include responsive(sm) {
+          font-size: 14px;
+                                                                             margin-bottom: 20px;
+        }
+        @include responsive(xs) {
+          font-size: 13px;
+          line-height: 1.6em;
+        }
+      }
+
+      .btnWrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transform: translate(-100%);
+
+        @include responsive(sm) {
+          gap: 14px;
+          a {
+            &:first-child {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+    .imageWrap {
+      width: 100%;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 13px -8px $translucentWhite;
+      border-radius: 10px;
+
+      .topNav {
+        height: 28px;
+        background-color: #ffffff;
+        border-radius: 6px 6px 0 0;
+        padding: 0px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        @include responsive(md) {
+          padding-left: 15px;
+          height: 20px;
+        }
+        @include responsive(sm) {
+          background-color: #ffffffbf;
+          border-radius: 5px 5px 0 0;
+          height: 8px;
+          padding: 0 8px;
+        }
+
+        .tabIcons {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          position: relative;
+          @include responsive(md) {
+            width: 12px;
+            height: 12px;
+          }
+          @include responsive(sm) {
+            display: none;
+          }
+          &:after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            top: 50%;
+            border-radius: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #00000066;
+            @include responsive(md) {
+              width: 6px;
+              height: 6px;
+            }
+          }
+          &.red {
+            background-color: #ff006a;
+          }
+          &.yellow {
+            background-color: #ffbf00;
+          }
+          &.green {
+            background-color: #00ff99;
+          }
+        }
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .meteors {
+    position: absolute;
+    width: 1px;
+    height: 30px;
+    background: $white;
+    border-radius: 50%;
+    opacity: 0.5;
+    top: 200px;
+    left: 100px;
+    z-index: -1;
+    animation-name: meteor;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-duration: 4.5s; // uniform duration
+    pointer-events: none;
+    left: 20%;
+    transform: translateY(400px);
+    border-radius: 100%;
+    @include responsive(sm) {
+      display: none;
+    }
+    &:first-of-type {
+      left: 50%;
+      transform: translateY(768px);
+    }
+
+    &:last-of-type {
+      left: 80%;
+      transform: translateY(700px);
+    }
+  }
+
+  @keyframes meteor {
+    0% {
+      opacity: 0.14;
+    }
+
+    20% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+  }
+
+  .absoluteBackground {
+    position: absolute;
+    background-image: radial-gradient(
+        circle closest-side at 50% 42%,
+        $translucentDarkBlue 90%,
+        $confident-dark
+      ),
+      url(../../../public/img/grid-bg.svg);
+    background-repeat: repeat, repeat;
+    background-size: auto, auto;
+    background-position: 0 0, 50%;
+    background-attachment: scroll, scroll;
+    top: -31px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.5;
+    left: 0;
+    @include responsive(sm) {
+      display: none;
+    }
+  }
+}
+
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: translateY(200px) scale(0);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  60% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popUpText {
+  animation: popUp 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fadeUp {
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.6s;
+}
+
+.fadeUp2 {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.8s;
+}

@@ -1,0 +1,290 @@
+@import "@/app/styles/vars";
+
+.blogSection {
+  background-color: $confident-dark;
+  padding: 64px 20px 190px;
+  @include responsive(sm){
+    padding: 64px 24px 178px;
+  }
+  @include responsive(xs){
+    padding: 64px 20px 155px;
+  }
+  .inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    @include responsive(lg) {
+      max-width: 1100px;
+      overflow-x: auto;
+    }
+    @include responsive(md) {
+      max-width: 600px;
+    }
+    .tabs {
+      width: 100%;
+      display: flex;
+      border-bottom: 1px solid $darkBorder-50;
+      gap: 40px;
+      margin-bottom: 40px;
+      @include responsive(xs){
+        gap: 20px;
+      }
+      .tab {
+        transition: border-color 0.3s ease;
+        border-bottom: 2px solid #ffffff00;
+        padding-bottom: 10px;
+        line-height: 1.75em;
+        cursor: pointer;
+        @include responsive(xl) {
+          padding: 10px 0;
+          line-height: 1.7em;
+        }
+        @include responsive(xs){
+            padding-bottom: 6px;
+        }
+        &:first-child {
+          span {
+            font-weight: 400;
+          }
+        }
+        span {
+          font-family: $PTSans;
+          color: $white;
+          font-weight: 700;
+          font-size: 22px;
+          @include responsive(md) {
+            font-weight: 400;
+          }
+          @include responsive(sm) {
+            font-size: 16px;
+          }
+        }
+        &.active {
+          border-color: $purple;
+        }
+      }
+    }
+    .blogs {
+      display: flex;
+      flex-direction: row;
+      gap: 34px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+      @include responsive(lg) {
+        min-width: 1100px;
+        overflow-x: auto;
+      }
+      @include responsive(md) {
+        min-width: unset;
+        width: 100%;
+        flex-direction: column;
+      }
+      .blogItem {
+        width: calc(50% - 17px);
+        min-height: 254px;
+        max-height: 254px;
+        display: flex;
+        flex-direction: row;
+        transition: opacity 0.3s ease;
+        border: 1px solid $white;
+        @include responsive(md) {
+          width: 100%;
+          flex-direction: column;
+          min-height: unset;
+          max-height: unset;
+        }
+        &:hover {
+          opacity: 0.8;
+        }
+        .imageWrap {
+          width: 100%;
+          background-color: $lightGray-100;
+          min-width: 220px;
+          max-width: 220px;
+          @include responsive(lg) {
+            min-width: 200px;
+            max-width: 200px;
+          }
+          @include responsive(md) {
+            min-width: unset;
+            max-width: unset;
+            min-height: 264px;
+            max-height: 264px;
+          }
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        .textWrap {
+          max-width: 100%;
+          width: 100%;
+          padding: 20px 40px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          @include responsive(md) {
+            padding: 20px 38px 13px;
+          }
+          @include responsive(sm) {
+            padding: 20px 20px 10px;
+            gap: 3.55px;
+          }
+          .heading {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: $white;
+            margin-bottom: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            font-family: $PTSans;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-height: 1.27em;
+            @include responsive(md) {
+              margin-bottom: 10px;
+              line-height: 1.27;
+            }
+            @include responsive(sm) {
+              -webkit-line-clamp: 1;
+            }
+            @include responsive(xs) {
+                font-size: 1.2em;
+            }
+          }
+          .description {
+            color: $lightGray-100;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-family: $PTSans;
+            font-size: 15px;
+            font-weight: 400;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.866666em;
+            @include responsive(xs) {
+                font-size: 14px;
+            }
+          }
+          .author {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            min-height: 48px;
+            @include responsive(md) {
+              margin: 0;
+            }
+            .profilePicture {
+              width: 38px;
+              height: 38px;
+              margin-right: 14px;
+              border: 1px solid $purple;
+              border-radius: 50%;
+              background-color: $white;
+              overflow: hidden;
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            .user {
+              .username {
+                color: $white;
+                font-family: $inter;
+                font-size: 13px;
+                font-weight: 500;
+                line-height: 1.75em;
+                margin-bottom: -7px;
+                @include responsive(md) {
+                  margin-bottom: -10px;
+                }
+              }
+              .infoWrap {
+                display: flex;
+                align-items: center;
+
+                .createdAt {
+                  color: $lightGray-100;
+                  font-family: $PTSans;
+                  font-size: 13px;
+                  font-weight: 300;
+                  line-height: 1.125em;
+                  display: block;
+                  margin: 7px 0 0;
+                  @include responsive(md) {
+                    font-size: 14px;
+                    font-family: $inter;
+                  }
+                  @include responsive(xs) {
+                    font-size: 12px;
+                    font-family: $inter;
+                  }
+                }
+                .lineBreaker {
+                  color: $lightGray-100;
+                  font-family: $inter;
+                  margin: 7.5px 10px;
+                  font-weight: 300;
+                  @include responsive(md) {
+                    margin: 7.5px 8px;
+                  }
+                  strong {
+                    display: block;
+                    height: fit-content;
+                    line-height: 100%;
+                    font-size: 13px;
+                    font-weight: 300;
+                    @include responsive(md) {
+                      font-size: 16px;
+                    }
+                  }
+                }
+                .readingTime {
+                  color: $lightGray-100;
+                  font-family: $PTSans;
+                  font-size: 13px;
+                  font-weight: 300;
+                  line-height: 1.125em;
+                  display: block;
+                  margin: 7px 0 0;
+                  @include responsive(md) {
+                    font-size: 14px;
+                    font-family: $inter;
+                  }
+                  @include responsive(xs) {
+                    font-size: 12px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .pagination{
+        display: flex;
+        justify-content: center;
+        .btn{
+            cursor: pointer;
+            padding: 15px 20px;
+            display: block;
+            font-size: 14px;
+            margin: 0 10px;
+            font-family: $inter;
+            background-color: $darkPurple-600;
+            border: 2px solid $purple;
+            color: $white;
+            line-height: 1.75em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    }
+  }
+}

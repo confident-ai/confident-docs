@@ -1,0 +1,161 @@
+@import "@/app/styles/vars";
+
+.SecurityInsurance {
+  background-color: $confident-dark;
+  padding: 70px 0;
+  border-bottom: 1px solid $darkBorder-100;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.105) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+    @include responsive(sm){
+        padding: 60px 0;
+    }
+  .inner {
+    display: flex;
+    gap: 50px;
+    margin: 30px auto 20px;
+    width: 75%;
+    @include responsive(xl) {
+      width: 75%;
+    }
+    @include responsive(lg) {
+      width: 80%;
+    }
+
+    @include responsive(md) {
+      width: 90%;
+    }
+    @include responsive(sm){
+        margin: 10px auto;
+    }
+    .textWrap {
+      width: 100%;
+
+      .subHeading {
+        color: $lightGray;
+        font-size: 13px;
+        font-weight: 400;
+        font-family: $inter;
+        margin-bottom: 20px;
+        display: block;
+        text-transform: uppercase;
+        line-height: 2em;
+      }
+
+      .heading {
+        margin-bottom: 40px;
+        font-size: 70px;
+        font-weight: 400;
+        color: $white;
+        line-height: 1.3em;
+        font-family: $inter;
+        max-width: 80%;
+        letter-spacing: 3px;
+
+        @include responsive(xl) {
+          font-size: 60px;
+          max-width: 90%;
+          margin-bottom: 40px;
+          letter-spacing: 3px;
+        }
+
+        @include responsive(md) {
+          font-size: 55px;
+          max-width: unset;
+          margin-bottom: 10px;
+          letter-spacing: 3px;
+        }
+                @include responsive(sm) {
+          font-size: 50px;
+          letter-spacing: 2px;
+        }
+        @include responsive(xs) {
+          font-size: 38px;
+        }
+      }
+
+      .securities {
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        width: 100%;
+
+
+
+        .security {
+          border-top: 1px solid $darkBorder-100;
+          padding: 40px 0;
+          width: 100%;
+          display: flex;
+          gap: 80px;
+
+          @include responsive(md) {
+            gap: 28px;
+          }
+          @include responsive(sm) {
+            flex-direction: column;
+          }
+
+          .wrap {
+            display: flex;
+            gap: 25px;
+            max-width: 400px;
+            width: 100%;
+            align-items: center;
+
+            .iconOuter {
+              border: 1px solid $white;
+              width: fit-content;
+              padding: 2px;
+              border-radius: 24px;
+              height: 50px;
+              width: 84px;
+
+              .securityIcon {
+                background-color: $lightYellow;
+                border-radius: 24px;
+                border: 0px solid $black;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                display: flex;
+              }
+            }
+
+            .securityHeading {
+              font-size: 21px;
+              font-weight: 400;
+              font-family: $inter;
+              color: $white;
+
+              @include responsive(md) {
+                font-size: 19px;
+              }
+            }
+          }
+
+          .securityDescription {
+            color: $lightGray;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.8em;
+            font-family: $inter;
+            max-width: 87%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+
+            @include responsive(md) {
+              width: 100%;
+              max-width: 100%;
+              font-size: 15px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
