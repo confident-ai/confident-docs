@@ -82,3 +82,36 @@ This will evaluate agent's parent span with the metric collection.
 To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
 </Callout>
 
+## Offline Evaluation
+
+To run offline evaluation, you need use `dataset` generator function with `goldens`.
+
+```python filename="main.py" showLineNumbers {2, 21}
+from deepeval.metrics import TaskCompletionMetric
+from deepeval.evaluate import dataset
+from deepeval.dataset import Golden
+
+...
+
+# Create a metric
+task_completion = TaskCompletionMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+
+# Create goldens
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+# Run evaluation for each golden
+for golden in dataset(goldens=goldens):
+    agent.invoke(
+        input={"messages": [{"role": "user", "content": golden.input}]},
+        config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
+    )
+```
+
+This will create a test run and evaluate [task completion metric](https://deepeval.com/docs/metrics-task-completion) for each golden.
