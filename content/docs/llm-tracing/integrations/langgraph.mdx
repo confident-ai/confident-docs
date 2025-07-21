@@ -61,27 +61,6 @@ You can directly view the traces in the **Observatory** by clicking on the link 
 DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
 </Callout>
 
-## Online Evaluation in Production
-
-Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
-
-```python filename="main.py" showLineNumbers {7}
-from deepeval.integrations.langchain.callback import CallbackHandler
-...
-
-# Invoke your agent with the metric collection name
-agent.invoke(
-    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config = {"callbacks": [CallbackHandler(metric_collection="<your-metric-collection-name>")]}
-)
-```
-
-This will evaluate agent's parent span with the metric collection.
-
-<Callout>
-To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
-</Callout>
-
 ## End-to-End Evaluation
 
 To run end-to-end evaluation locally, you need use `dataset` generator function with `goldens`.
@@ -152,3 +131,24 @@ for golden in dataset(goldens=goldens):
 ```
 
 This will create a test run and evaluate [task completion metric](https://deepeval.com/docs/metrics-task-completion) for each golden.
+
+## Online Evaluation in Production
+
+Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
+
+```python filename="main.py" showLineNumbers {7}
+from deepeval.integrations.langchain.callback import CallbackHandler
+...
+
+# Invoke your agent with the metric collection name
+agent.invoke(
+    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config = {"callbacks": [CallbackHandler(metric_collection="<your-metric-collection-name>")]}
+)
+```
+
+This will evaluate agent's parent span with the metric collection.
+
+<Callout>
+To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
+</Callout>
