@@ -3,6 +3,7 @@ title: LangGraph
 ---
 
 import { Callout } from "nextra/components";
+import { Tabs } from "nextra/components";
 
 # LangGraph
 
@@ -65,7 +66,8 @@ DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackH
 
 To run end-to-end evaluation locally, you need use `dataset` generator function with `goldens`.
 
-### Sync
+<Tabs items={['Sync', 'Async']}>
+  <Tabs.Tab>
 
 ```python filename="main.py" showLineNumbers {2, 21}
 from deepeval.metrics import TaskCompletionMetric
@@ -95,7 +97,8 @@ for golden in dataset(goldens=goldens):
     )
 ```
 
-### Async
+  </Tabs.Tab>
+  <Tabs.Tab>
 
 ```python filename="main.py" showLineNumbers {4, 23}
 from deepeval.metrics import TaskCompletionMetric
@@ -129,6 +132,9 @@ for golden in dataset(goldens=goldens):
     test_run.append(task)
 
 ```
+
+  </Tabs.Tab>
+</Tabs>
 
 This will create a test run and evaluate [task completion metric](https://deepeval.com/docs/metrics-task-completion) for each golden.
 
