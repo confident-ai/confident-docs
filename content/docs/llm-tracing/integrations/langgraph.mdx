@@ -61,7 +61,7 @@ You can directly view the traces in the **Observatory** by clicking on the link 
 DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
 </Callout>
 
-## Online Evaluation
+## Online Evaluation in Production
 
 Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
 
@@ -82,9 +82,11 @@ This will evaluate agent's parent span with the metric collection.
 To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
 </Callout>
 
-## Offline Evaluation
+## End-to-End Evaluation
 
-To run offline evaluation, you need use `dataset` generator function with `goldens`.
+To run end-to-end evaluation locally, you need use `dataset` generator function with `goldens`.
+
+### Sync
 
 ```python filename="main.py" showLineNumbers {2, 21}
 from deepeval.metrics import TaskCompletionMetric
@@ -112,6 +114,41 @@ for golden in dataset(goldens=goldens):
         input={"messages": [{"role": "user", "content": golden.input}]},
         config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
     )
+```
+
+### Async
+
+```python filename="main.py" showLineNumbers {2, 21}
+from deepeval.metrics import TaskCompletionMetric
+from deepeval.evaluate import dataset
+from deepeval.dataset import Golden
+from deepeval.evaluate.types import global_test_run_tasks as test_run
+
+...
+ 
+# Create a metric
+task_completion = TaskCompletionMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+ 
+# Create goldens
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+# Run evaluation for each golden
+for golden in dataset(goldens=goldens):
+    task = asyncio.create_task(
+        agent.ainvoke(
+            input={"messages": [{"role": "user", "content": golden.input}]},
+            config={"callbacks": [CallbackHandler(metrics=[task_completion], metric_collection="task_completion")]}
+        )
+    )
+    test_run.append(task)
+
 ```
 
 This will create a test run and evaluate [task completion metric](https://deepeval.com/docs/metrics-task-completion) for each golden.
