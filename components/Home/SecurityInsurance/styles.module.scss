@@ -1,5 +1,6 @@
 @import "@/app/styles/vars";
 
+
 .SecurityInsurance {
   background-color: $confident-dark;
   padding: 70px 0;
@@ -52,24 +53,20 @@
         line-height: 1.3em;
         font-family: $inter;
         max-width: 80%;
-        letter-spacing: 3px;
 
         @include responsive(xl) {
           font-size: 60px;
           max-width: 90%;
           margin-bottom: 40px;
-          letter-spacing: 3px;
         }
 
         @include responsive(md) {
           font-size: 55px;
           max-width: unset;
           margin-bottom: 10px;
-          letter-spacing: 3px;
         }
                 @include responsive(sm) {
           font-size: 50px;
-          letter-spacing: 2px;
         }
         @include responsive(xs) {
           font-size: 38px;

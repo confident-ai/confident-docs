@@ -1,0 +1,32 @@
+@import '@/app/styles/vars';
+.Article{
+    background-color: $white;
+    padding: 40px 0 200px;
+    
+    .inner{
+        width: 100%;
+        max-width: $container_lg;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row-reverse;
+         @include responsive(xl){
+            max-width: $container_md;
+            justify-content: center;
+            gap: 25px;
+         }
+         @media (max-width: 1200px) {
+            justify-content: unset;
+            gap: 29px;
+         }
+        .contentWrap{
+            max-width: 840px;
+            margin: 0 auto;
+            width: 100%;
+            @include responsive(xl){
+                max-width: 768px;
+                margin: 0;
+                width: 60%;
+            }
+        }
+    }
+}

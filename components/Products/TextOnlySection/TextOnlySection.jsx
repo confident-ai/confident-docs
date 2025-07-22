@@ -1,24 +1,31 @@
-import styles from './styles.module.scss'
+import styles from "./styles.module.scss";
+ import Button from '@/components/Button/Button'
+
 export default function TextOnlySection() {
-    return (
-        <div className={styles.TextOnlySection}>
-            <div className={styles.inner}>
-                <h2 className={styles.heading}>The Future of AI Depends On <span>Confident AI</span> You.</h2>
-                <div className={styles.buttonWrap}>
-                    <a
-                        href='https://www.confident-ai.com/book-a-demo'
-                        className={`${styles.btn} ${styles.contained}`}
-                    >
-                        Request a Demo
-                    </a>
-                    <a
-                        href='https://app.confident-ai.com/auth/signup?redirect_url=%2F'
-                        className={`${styles.btn} ${styles.outlined}`}
-                    >
-                        Try Now For Free
-                    </a>
-                </div>
-            </div>
+  return (
+    <div className={styles.TextOnlySection}>
+      <div className={styles.inner}>
+        <h2 className={styles.heading}>
+          The Future of AI Depends On <span>Confident AI</span> You.
+        </h2>
+        <div className={styles.buttonWrap}>
+          <Button
+            to="https://www.confident-ai.com/book-a-demo"
+            variant="contained"
+            color="primary"
+            label="Request a Demo"
+            bordered
+          />
+          <Button
+            to="https://app.confident-ai.com/auth/signup?redirect_url=%2F"
+            variant="outlined"
+            color="purple"
+            label="Try Now For Free"
+            bordered
+            style={{ borderSize: "2px" }}
+          />
         </div>
-    );
-};
+      </div>
+    </div>
+  );
+}

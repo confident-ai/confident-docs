@@ -1,5 +1,5 @@
 import styles from './styles.module.scss'
-import Button from '@/components/Home/Button/Button'
+import Button from '@/components/Button/Button'
 
 export default function TextSection() {
     const btns = [
@@ -12,7 +12,7 @@ export default function TextSection() {
                 <div className={styles.textWrap}>
                     <span className={styles.subHeading} style={{ color: '#ffb62e' }}>USE CASES</span>
                     <h2 className={styles.heading}>
-                        Build your AI moat.<br />
+                        Build your AI moat.<br/>
                         Do evals the right way.
                     </h2>
                     <p className={styles.description}>
@@ -29,7 +29,7 @@ export default function TextSection() {
                             sizes='lg'
                             curved
                             bordered
-                            style={{ boxShadow: '0 0 4px #fff', fontWeight: '700'}}
+                            style={{ boxShadow: '0 0 4px #fff'}}
                         />
                         <Button
                             to='https://documentation.confident-ai.com'

@@ -1,5 +1,5 @@
 import styles from "./styles.module.scss";
-import Button from "@/components/Home/Button/Button";
+import Button from "@/components/Button/Button";
 export default function CardSection() {
   const cards = [
     {
@@ -69,7 +69,7 @@ export default function CardSection() {
               sizes="lg"
               curved
               bordered
-              style={{ boxShadow: "0 0 4px #fff", fontWeight: '700' }}
+              style={{ boxShadow: "0 0 4px #fff" }}
             />
           </div>
         </div>

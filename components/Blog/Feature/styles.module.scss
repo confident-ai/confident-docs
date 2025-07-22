@@ -1,0 +1,80 @@
+@import "@/app/styles/vars";
+
+.feature {
+  width: 100%;
+  background-color: $lightYellow-100;
+  padding: 40px 40px 40px 20px;
+  margin: 16px 0 32px;
+  .inner {
+    display: flex;
+    .imageWrap {
+      flex-shrink: 0;
+      width: 24%;
+      margin-right: 10px;
+      img {
+        width: 150px;
+        height: 150px;
+      }
+    }
+    .textWrap {
+      width: 76%;
+      display: flex;
+      flex-direction: column;
+      @include responsive(md) {
+        width: 100%;
+      }
+      h2 {
+        font-family: $Lexend;
+        font-size: 30px;
+        line-height: 1.38em;
+        color: $darkBlue-700;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+      p {
+        font-family: $Lexend;
+        font-size: 18px;
+        line-height: 1.8em;
+        color: $darkBlue-700;
+        font-weight: 300;
+      }
+      .features {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 22px;
+        margin: 34px 0;
+        .featureItem {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          font-family: $inter;
+          font-size: 15px;
+          line-height: 1.4em;
+          color: $darkBlue-700;
+          font-weight: 700;
+          width: 100%;
+          max-width: calc(50% - 11px);
+          img {
+            min-width: 18px;
+            min-height: 18px;
+          }
+        }
+      }
+      .btnWrap {
+        display: flex;
+        gap: 20px;
+        .ctaLink {
+          display: flex;
+          color: $darkBlue-400;
+          font-family: $Lexend;
+          gap: 8px;
+          font-size: 17px;
+          align-items: center;
+          text-decoration: underline;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}

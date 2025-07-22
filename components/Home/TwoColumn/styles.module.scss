@@ -49,13 +49,11 @@
         margin-bottom: 16px;
         font-family: $inter;
         line-height: 1.316em;
-        letter-spacing: 2px;
         @include responsive(lg) {
           font-size: 38px;
         }
         @include responsive(md) {
           font-size: 30px;
-          letter-spacing: unset;
           margin-bottom: 12px;
         }
         @include responsive(sm) {
@@ -69,7 +67,7 @@
       .description {
         color: $lightGray-100;
         font-size: 18px;
-        font-weight: 400;
+        font-weight: 300;
         line-height: 1.8em;
         max-width: 95%;
         font-family: $inter;

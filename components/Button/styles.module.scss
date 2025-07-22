@@ -5,8 +5,15 @@
   font-family: $inter;
   color: $white;
   font-size: 16px;
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 15px 25px;
+  width: fit-content;
+  border-radius: 5px;
+  img,
+  svg {
+    margin-left: 10px;
+  }
 
   &.curved {
     border-radius: 40px;
@@ -17,6 +24,22 @@
 
   // Sizes
 
+  &.xs {
+    padding: 5px 20px;
+    font-size: 15px;
+    line-height: 1.75em;
+    border-radius: 100px;
+  }
+  &.sm {
+    padding: 8px 40px;
+    font-size: 15px;
+    line-height: 1.75em;
+    @include responsive(sm){
+      padding: 8px 20px;
+      font-size: 12px;
+      line-height: 2em;
+    }
+  }
   &.md {
     padding: 15px 25px;
     font-size: 16px;
@@ -27,8 +50,13 @@
     padding: 12px 30px;
     font-size: 14px;
     line-height: 2em;
-
   }
+  &.xl {
+    padding: 20px 25px;
+    font-size: 19px;
+    line-height: 1.75em;
+
+  } 
 
   // Colors
   &.primary {
@@ -52,7 +80,7 @@
     }
   }
   &.purple {
-    background-color: $darkPurple-600;
+    background-color: $darkPurple-500;
     color: $white;
     border-color: $purple;
     &:hover {
@@ -60,12 +88,26 @@
       color: $black;
     }
   }
+  &.purple200{
+    background-color: $purple;
+    color: $white;
+    &:hover{
+      background-color: $black!important;
+      color: $white!important;
+    }
+
+  }
 
   //Variants
   &.outlined {
     font-weight: 500;
     transition: box-shadow 0.2s ease-in-out, background-color 0.4s, color 0.4s,
       border-color 0.3s;
+    svg {
+      path {
+        transition: fill 0.4s ease;
+      }
+    }
   }
   &.contained {
     font-weight: 500;

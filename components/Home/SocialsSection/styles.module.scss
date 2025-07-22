@@ -46,24 +46,20 @@
         color: $white;
         line-height: 1.3em;
         font-family: $inter;
-        letter-spacing: 3px;
 
         @include responsive(xl) {
           font-size: 60px;
           max-width: 80%;
-          letter-spacing: 2px;
         }
 
         @include responsive(md) {
           font-size: 55px;
           margin-bottom: 50px;
           max-width: 94%;
-          letter-spacing: 2px;
         }
 
         @include responsive(sm) {
           font-size: 50px;
-          letter-spacing: 2px;
         }
         @include responsive(xs) {
           max-width: 100%;

@@ -48,28 +48,23 @@
         color: $white;
         line-height: 1.3em;
         font-family: $inter;
-        letter-spacing: 3px;
         max-width: 80%;
 
         @include responsive(xl) {
           font-size: 60px;
-          letter-spacing: 2px;
         }
 
         @include responsive(md) {
           font-size: 55px;
           margin-bottom: 50px;
           max-width: 94%;
-          letter-spacing: 2px;
         }
         @include responsive(sm) {
           font-size: 50px;
-          letter-spacing: 2px;
         }
         @include responsive(xs) {
           max-width: 100%;
           font-size: 38px;
-          letter-spacing: 1px;
         }
       }
 
@@ -157,7 +152,6 @@
             margin-bottom: 19px;
             display: flex;
             gap: 10px;
-            letter-spacing: 0.5px;
             line-height: 1.2em;
           }
 

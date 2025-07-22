@@ -41,7 +41,6 @@
       line-height: 1.222em;
       font-family: $inter;
       width: fit-content;
-      letter-spacing: 6px;
       margin-bottom: 10px;
 
       @include responsive(xl) {
@@ -52,13 +51,11 @@
       @include responsive(lg) {
         font-size: 100px;
         max-width: unset;
-        letter-spacing: 4px;
         text-align: center;
       }
 
       @include responsive(sm) {
         font-size: 44px;
-        letter-spacing: 2px;
       }
       @include responsive(xs) {
         font-size: 40px;

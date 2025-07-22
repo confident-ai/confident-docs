@@ -1,6 +1,8 @@
 // Breakpoints Structure
 @import './colors.scss';
+@import './fonts';
 
+// Breakpoints Structure
 $custom-breakpoints: (
   xs: (minSize: 0px,
     maxSize: 479px,
@@ -42,9 +44,13 @@ $custom-breakpoints: (
 
 $container_xxl: 1800px;
 $container_xl: 1440px;
-$container_lg: 1280px;
-$container_md: 1200px;
+$container_lg: 1340px;
+$container_md: 1280px;
+$container_sm: 1200px;
 
-$inter: "Inter", sans-serif;
+$inter: 'Inter-ui', sans-serif;
 $Lexend: "Lexend Deca", sans-serif;
 $PTSans: "PT Sans", sans-serif;
+$Lato: "Lato", sans-serif;
+$Ubuntu: "Ubuntu", sans-serif;
+$PTSerif: "PT Serif", serif;

@@ -12,6 +12,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  &.staticHeader{
+    position: static;
+  }
   .container {
     display: flex;
     width: 100%;
@@ -50,7 +53,7 @@
         width: 100%;
         justify-content: flex-start;
         align-items: flex-start;
-        background: $darkBlue-200;
+        background: $darkBlue-900;
         left: 0;
         z-index: -1;
         top: 64px;
@@ -104,7 +107,7 @@
             font-size: 18px;
             opacity: 0;
             transform: translateY(-10px);
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, height 0.3s ease;
           }
           &:hover {
             text-decoration: underline;
@@ -224,19 +227,19 @@
           margin: 6px 0;
           transition: 0.4s;
         }
+      }
 
-        &.active {
-          .bar1 {
-            transform: rotate(-45deg) translate(-5px, 6px);
-          }
+      &.active {
+        .bar1 {
+          transform: rotate(-45deg) translate(-5px, 6px);
+        }
 
-          .bar2 {
-            opacity: 0;
-          }
+        .bar2 {
+          opacity: 0;
+        }
 
-          .bar3 {
-            transform: rotate(45deg) translate(-5px, -6px);
-          }
+        .bar3 {
+          transform: rotate(45deg) translate(-5px, -6px);
         }
       }
     }

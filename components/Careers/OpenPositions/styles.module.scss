@@ -1,0 +1,171 @@
+@import "@/app/styles/vars";
+.openPositions {
+  padding-bottom: 100px;
+  @include responsive(md){
+    padding-bottom: 90px;
+  }
+  @include responsive(sm){
+    padding-bottom: 80px;
+  }
+  .inner {
+    max-width: $container_lg;
+    width: 100%;
+    margin: 0 auto;
+    @include responsive(md) {
+      width: 90%;
+      max-width: unset;
+    }
+    .heading {
+      padding: 0 100px;
+      font-size: 27px;
+      font-weight: 400;
+      font-family: $inter;
+      color: $white;
+      margin-bottom: 16px;
+      line-height: 1.316em;
+      @include responsive(md) {
+        font-size: 24px;
+        margin-bottom: 22px;
+        padding: 0;
+      }
+
+
+    }
+    .container {
+      padding: 0 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      @include responsive(md) {
+        padding: 0;
+      }
+      .jobCard {
+        background-color: $darkBlue-200;
+        padding: 30px 20px 30px 40px;
+        box-shadow: 0 0 10px $purple-50;
+        border: 3px solid $black;
+        border-radius: 8px;
+        @include responsive(md) {
+          padding: 20px 20px 20px 30px;
+        }
+        @include responsive(sm) {
+          padding: 20px;
+        }
+        .jobHeading {
+          color: $white;
+          margin-bottom: 0;
+          font-size: 32px;
+          font-weight: 300;
+          line-height: 28px;
+          font-family: $inter;
+          @include responsive(md) {
+            font-size: 27px;
+            line-height: 1em;
+          }
+          @include responsive(sm) {
+            font-size: 30px;
+            line-height: 1.6em;
+          }
+          @include responsive(xs) {
+            font-size: 24px;
+            line-height: 1.6em;
+          }
+        }
+        .infoWrap {
+          display: flex;
+          margin: 10px 0;
+          gap: 15px;
+          width: 100%;
+          align-items: center;
+          @include responsive(sm) {
+            gap: 10px;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 20px 0;
+          }
+          .workingLocation,
+          .salary,
+          .tags {
+            display: flex;
+            gap: 6px;
+            margin: 10px 0;
+            line-height: 1.75em;
+            @include responsive(sm) {
+                margin: 0;
+            }
+
+            .text {
+              font-size: 12px;
+              font-family: $inter;
+              color: $lightGray-100;
+              font-weight: 300;
+            }
+          }
+          .dot {
+            font-size: 10px;
+            font-family: $inter;
+            font-weight: 300;
+            line-height: 1.75em;
+            color: $lightGray-100;
+            @include responsive(sm) {
+              display: none;
+            }
+          }
+        }
+        .jobDescription {
+          display: flex;
+          flex-direction: column;
+          gap: 25px;
+          margin: 0 0 20px;
+          .section {
+            h4 {
+              font-size: 14px;
+              font-family: $inter;
+              font-weight: 400;
+              color: $white;
+              @include responsive(sm){
+                margin-bottom: 4px;
+              }
+            }
+            ul {
+              li {
+                position: relative;
+                padding-left: 10px;
+                color: $lightGray-100;
+                font-size: 14px;
+                font-family: $inter;
+                font-weight: 300;
+                line-height: 1.714287em;
+                @include responsive(sm){
+                    line-height: 2.4em;
+                }
+                a {
+                  color: $Blue;
+                  text-decoration: underline;
+                  transition: color 0.3s ease;
+                  font-weight: 300;
+                  &:hover {
+                    color: $darkBlue-200;
+                  }
+                }
+                &:before {
+                  content: "-";
+                  position: absolute;
+                  left: 0;
+                  font-family: $inter;
+                  font-weight: 300;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.breakLine{
+  display: none;
+  @include responsive(xs){
+    display: block;
+  }
+}

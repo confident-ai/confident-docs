@@ -21,18 +21,16 @@
             margin: 0 auto;
 
             .heading {
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
                 font-size: 70px;
                 font-weight: 400;
                 color: white;
                 line-height: 1.222em;
                 margin-bottom: 16px;
-                letter-spacing: 3px;
 
                 @include responsive(xl) {
                     font-size: 62px;
                     max-width: unset;
-                    letter-spacing: unset;
                     margin-bottom: 16px;
                 }
 
@@ -44,7 +42,6 @@
                 @include responsive(sm) {
                     font-size: 32px;
                     max-width: unset;
-                    letter-spacing: unset;
                     text-align: center;
                 }
             }
@@ -52,12 +49,11 @@
             .description {
                 font-size: 25px;
                 color: white;
-                font-family: 'Inter', sans-serif;
+                font-family: $inter;
                 max-width: 800px;
                 font-weight: 400;
                 margin-bottom: 40px;
                 line-height: 1.5em;
-                letter-spacing: 0.5px;
 
                 @include responsive(xl) {
                     font-size: 22px;
@@ -86,7 +82,7 @@
                 .btn {
                     padding: 15px 20px;
                     display: block;
-                    font-family: "Inter", sans-serif;
+                    font-family: $inter;
                     font-size: 16px;
                     transition: background-color 0.4s ease, color 0.4s ease;
                     line-height: 1.75em;
@@ -165,13 +161,12 @@
             line-height: 1.222em;
             color: white;
             margin-bottom: 10px;
-            letter-spacing: 0.2px;
-            font-family: 'Inter', sans-serif;
+            font-family: $inter;
 
         }
 
         .description {
-            font-family: 'Inter', sans-serif;
+            font-family: $inter;
             color: #f0f3f8;
             text-align: center;
             width: 95%;

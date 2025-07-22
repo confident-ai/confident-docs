@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
-import Button from "@/components/Home/Button/Button";
+import Button from "@/components/Button/Button";
 import { useInView } from "react-intersection-observer";
 export default function TextOnlySection() {
   const [hasAnimated, setHasAnimated] = useState(false);

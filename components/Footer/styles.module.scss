@@ -2,6 +2,7 @@
 
 .footer {
   padding: 50px 0 115px;
+  border-top: 1px solid $darkBorder;
   &.light {
     background-color: $lightModeBG;
     .inner {
@@ -85,7 +86,7 @@
     }
   }
   .layout {
-    max-width: $container_lg;
+    max-width: $container_md;
     margin: 0 auto;
     padding: 0 20px;
     @include responsive(md) {

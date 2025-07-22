@@ -59,7 +59,6 @@
         color: $white;
         line-height: 1.3em;
         font-family: $inter;
-        letter-spacing: 3px;
 
         @include responsive(xl) {
           font-size: 54px;
@@ -68,7 +67,6 @@
         @include responsive(md) {
           font-size: 48px;
           margin-bottom: 12px;
-          letter-spacing: 2px;
         }
         @include responsive(xs) {
           font-size: 36px;
@@ -78,7 +76,7 @@
       .description {
         color: $lightGray-100;
         font-size: 18px;
-        font-weight: 500;
+        font-weight: 300;
         line-height: 1.8em;
         font-family: $inter;
         margin-bottom: 16px;
@@ -122,7 +120,7 @@
         border-radius: 20px;
         padding: 8.5px 15px;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 400;
         font-family: $inter;
         cursor: pointer;
         transition: background-color 0.2s, color 0.3s;

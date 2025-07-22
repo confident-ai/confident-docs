@@ -1,0 +1,56 @@
+@import "@/app/styles/vars";
+.ctaWrap {
+  margin-top: 29.16%;
+  min-height: 100vh;
+  max-width: 205px;
+  width: 100%;
+  @include responsive(xl) {
+    min-height: 204px;
+  }
+  @media (max-width: 1200px) {
+    display: none;
+  }
+  .cta {
+    position: sticky;
+    top: 24px;
+    left: 0;
+    padding: 10px 20px;
+    box-shadow: -7px 8px 0 1px $purple;
+    border: 3px solid $black;
+    border-radius: 10px;
+    min-height: 233px;
+    @include responsive(xl) {
+      min-height: 234px;
+    }
+    .subHeading {
+      font-size: 16px;
+      font-family: $PTSans;
+    }
+    .headingImg {
+      margin: 20px 0 10px;
+      img {
+        width: 100%;
+      }
+    }
+    .description {
+      line-height: 1.3em;
+      font-family: $PTSans;
+    }
+    .githubBtn {
+      display: flex;
+      gap: 4px;
+      margin-top: 15px;
+      padding: 8px 0;
+      display: flex;
+      justify-content: center;
+      line-height: 1.75em;
+      border: 3px solid $black;
+      background-color: $purple;
+      color: $white;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      font-family: $inter;
+    }
+  }
+}

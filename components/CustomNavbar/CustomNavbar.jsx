@@ -4,13 +4,13 @@ import { Navbar } from "nextra-theme-docs";
 import Logo from "@/components/Logo/Logo";
 import GitHubButton from "@/components/GitHubButton/GitHubButton";
 import SignUpButton from "@/components/SignUpButton";
-import Button from "@/components/Home/Button/Button";
+import Button from "@/components/Button/Button";
 import { useState } from "react";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-const CustomNavbar = ({ isDocsPage }) => {
+const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
   const [active, setActive] = useState();
   const [activatePopOver, setActivatePopOver] = useState(false);
   const navLinks = [
@@ -52,9 +52,9 @@ const CustomNavbar = ({ isDocsPage }) => {
   }
 
   return (
-    <div className={`${styles.NewHeader} ${active ? styles.active : ""}`}>
+    <div className={`${styles.NewHeader} ${staticHeader ? styles.staticHeader : ''} ${active ? styles.active : ""}`}>
       <div className={styles.container}>
-        <div className={styles.logoWrap}>
+        <Link href='/' className={styles.logoWrap}>
           <Image
             src="/icons/logo-without-border.svg"
             alt="White bowtie with confident AI written on the right side"
@@ -63,7 +63,7 @@ const CustomNavbar = ({ isDocsPage }) => {
             priority
           />
           <span className={styles.span}>Confident AI</span>
-        </div>
+        </Link>
         <div className={`${styles.linkWrap} ${active ? styles.active : ""}`}>
           <div className={styles.nav}>
             {navLinks.map(link =>

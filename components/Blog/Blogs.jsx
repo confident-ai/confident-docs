@@ -1,91 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
+import Skeleton from "@/components/Skeleton/Skeleton";
+import Card from "./Card/Card";
+
 export default function Blogs() {
-  const [currentfilter, setCurrentFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [tab, setTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 6;
-  const filterOptions = [
+  const [totalCount, setTotalCount] = useState(0);
+  const limit = 10;
+
+  const totalPages = Math.ceil(totalCount / limit);
+  const [blogs, setBlogs] = useState([]);
+
+  const tabOptions = [
     { title: "All Stories", value: "all" },
     { title: "Evaluation", value: "evaluation" },
     { title: "Safety", value: "safety" },
   ];
-  const tabSwitcher = value => {
-    setCurrentFilter(value);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setIsLoading(true);
+      const res = await fetch(
+        `/api/blogs?page=${currentPage}&limit=${limit}&category=${tab}`
+      );
+      const data = await res.json();
+      setBlogs(data?.items);
+      setTotalCount(data?.total);
+      setIsLoading(false);
+    };
+    fetchBlogs();
+  }, [currentPage, tab]);
+
+  const onChangeTab = value => {
+    setCurrentPage(1);
+    setTab(value);
   };
 
-  const paginatedBlogs = (
-    currentfilter === "all"
-      ? blogs
-      : blogs
-          .filter(b => b.tag === currentfilter)
-          .sort((a, b) => a.heading.localeCompare(b.heading))
-  ).slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);
-
-  const totalPages = Math.ceil(
-    (currentfilter === "all"
-      ? blogs
-      : blogs.filter(b => b.tag === currentfilter)
-    ).length / blogsPerPage
-  );
   return (
     <div className={styles.blogSection}>
       <div className={styles.inner}>
         <div className={styles.tabs}>
-          {filterOptions.map(filter => (
+          {tabOptions.map(item => (
             <div
               className={`${styles.tab} ${
-                filter.value === currentfilter ? styles.active : ""
+                item.value === tab ? styles.active : ""
               }`}
-              key={filter.value}
-              onClick={() => tabSwitcher(filter.value)}
+              key={item.value}
+              onClick={() => onChangeTab(item.value)}
             >
-              <span>{filter.title}</span>
+              <span>{item.title}</span>
             </div>
           ))}
           <span className={styles.slider} />
         </div>
         <div className={styles.blogs}>
-          {paginatedBlogs.map((blog, idx) => (
-            <div key={idx} className={styles.blogItem}>
-              <div className={styles.imageWrap}>
-                <img
-                  src={blog?.image}
-                  alt="add image here later and alt text"
-                />
-              </div>
-              <div className={styles.textWrap}>
-                <div>
-                  <h2 className={styles.heading}>{blog?.heading}</h2>
-                  <p className={styles.description}>{blog?.description}</p>
-                </div>
-                <div className={styles.author}>
-                  <div className={styles.profilePicture}>
-                    <img
-                      src={blog?.profilePicture}
-                      alt="Authors profile picture"
-                    />
-                  </div>
-                  <div className={styles.user}>
-                    <h3 className={styles.username}>{blog.author}</h3>
-                    <div className={styles.infoWrap}>
-                      <span className={styles.createdAt}>{blog.createdAt}</span>
-                      <div className={styles.lineBreaker}>
-                        <strong>.</strong>
-                      </div>
-                      <span className={styles.readingTime}>
-                        {blog.averageReadingTime} read
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          {!isLoading &&
+            blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant="dark" />)}
+
+          {isLoading &&
+            [...Array(5)].map((_, index) => (
+              <Skeleton key={index} style={{ height: "250px" }} />
+            ))}
         </div>
         <div className={styles.pagination}>
-          {currentPage !== 1 && (
+          {currentPage !== 1 && !isLoading && (
             <button
               className={styles.btn}
               onClick={() => setCurrentPage(prev => prev - 1)}
@@ -107,7 +89,7 @@ export default function Blogs() {
               Previous
             </button>
           )}
-          {currentPage !== totalPages && (
+          {currentPage !== totalPages && !isLoading && (
             <button
               className={styles.btn}
               onClick={() => setCurrentPage(prev => prev + 1)}
@@ -134,330 +116,3 @@ export default function Blogs() {
     </div>
   );
 }
-
-const blogs = [
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffrey Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-  {
-    heading: "LLM Guardrails for Data Leakage, Prompt Injection, and More",
-    description:
-      "In this article, you'll learn everything you need to know on LLM guardrails and how to use it for LLM security.",
-    author: "Jeffery Ip",
-    createdAt: "Jan 26, 2025",
-    averageReadingTime: "15 min",
-    tag: "safety",
-  },
-];

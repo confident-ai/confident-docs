@@ -1,5 +1,6 @@
 @import "@/app/styles/vars";
 
+
 @keyframes scrollMarquee {
   0% {
     transform: translateX(0%);
@@ -26,7 +27,7 @@
     .trustedBy {
       color: $lightGray-10;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 300;
       font-family: $inter;
       margin: 0 auto;
       text-align: center;
@@ -139,6 +140,7 @@
           color: $lightGray-100;
           font-size: 12px;
           font-family: $inter;
+          font-weight: 300;
           line-height: 1.75em;
         }
       }

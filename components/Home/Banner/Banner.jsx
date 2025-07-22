@@ -5,7 +5,7 @@ import styles from "./styles.module.scss";
 import Marquee from "@/components/Home/Marquee/Marquee";
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import Button from "@/components/Home/Button/Button";
+import Button from "@/components/Button/Button";
 
 export default function Banner() {
   const [hasAnimated, setHasAnimated] = useState(false);
