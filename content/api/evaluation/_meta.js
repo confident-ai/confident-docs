@@ -3,4 +3,5 @@ export default {
         "display": "hidden"
     },
     "data-models": "",
+    "simulation": "",
 }
