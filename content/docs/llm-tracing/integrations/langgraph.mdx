@@ -26,8 +26,8 @@ import os
 import time
 from langgraph.prebuilt import create_react_agent
 
-from deepeval.integrations.langchain import CallbackHandler
 import deepeval
+from deepeval.integrations.langchain import CallbackHandler
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 deepeval.login_with_confident_api_key("<your-confident-api-key>")

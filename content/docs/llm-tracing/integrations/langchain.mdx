@@ -25,11 +25,11 @@ import os
 import time
 from langchain.chat_models import init_chat_model
 
-from deepeval import login_with_confident_api_key
+from deepeval
 from deepeval.integrations.langchain import CallbackHandler
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
-login_with_confident_api_key("<your-confident-api-key>")
+deepeval.login_with_confident_api_key("<your-confident-api-key>")
 
 def multiply(a: int, b: int) -> int:
     """Returns the product of two numbers"""
@@ -78,8 +78,4 @@ llm_with_tools.invoke(
 )
 ```
 
-This will evaluate agent's **root** span with the metric collection.
-
-<Callout>
-To know more about **task completion** metric, refer to the [documentation](https://deepeval.com/docs/metrics-task-completion).
-</Callout>
+This will evaluate agent's **root** span with the metric collection containing [task completion](https://deepeval.com/docs/metrics-task-completion) metric.
