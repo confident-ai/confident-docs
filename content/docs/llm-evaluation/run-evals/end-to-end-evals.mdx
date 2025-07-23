@@ -203,7 +203,7 @@ Visit the [Evals API](/api/quickstart#run-your-first-evaluation) to learn more a
 
 <Tabs items={['TypeScript', 'curl']}>
   <Tabs.Tab>
-```typescript
+```typescript showLineNumbers filename="index.ts"
 import { evaluate, EvaluationDataset, LLMTestCase } from 'deepeval-ts';
 
 const dataset = new EvaluationDataset();
@@ -225,32 +225,30 @@ await evaluate({
 ```
   </Tabs.Tab>
   <Tabs.Tab>
-```curl
-curl -X POST "https://deepeval.confident-ai.com/evaluate" \
+
+```bash showLineNumbers filename="POST request"
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
      -d '{
-           "metricCollection": "your-metric-collection-name",
-           "testCases": [
-             {
-               "input": "What is the capital of France?",
-               "actual_output": "Paris",
-               "expected_output": "Paris",
-               "context": ["Geography question"],
-               "retrieval_context": ["Country capitals"],
-               "tools_called": [],
-               "expected_tools": []
-             }
-           ]
+            "metricCollection": "Collection Name",
+            "testCases": [
+                {
+                    "input": "How tall is mount everest?",
+                    "actualOutput: "I don't know, pretty tall I guess?"
+                },
+            ],
          }`
 ```
   </Tabs.Tab>
 </Tabs>
 
+You can find more information in the [Evals API](/api/quickstart#run-your-first-evaluation) documentation.
+
 <Callout type="info">
   Not all parameters in `"testCases"` are required. You should figure out what
   is the set of parameters required for your metric collection by reading what's
-  required for each metric on the **Metrics** > **Glossary** page.
+  required for each metric on the **Metrics** > **Library** page.
 </Callout>
 
 If you're using Python and for some reason and you still decide to run evaluations on Confident AI, here's how you can do it:

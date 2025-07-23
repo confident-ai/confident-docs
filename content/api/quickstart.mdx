@@ -36,7 +36,7 @@ curl -X POST "https://api.confident-ai.com/v1/metrics" \
                 }
             ],
             "multiturn": false
-         }`
+         }'
 ```
 ```json filename="response"
 {"status": 200}
@@ -72,10 +72,10 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate" \
             "testCases": [
                 {
                     "input": "How tall is mount everest?",
-                    "actualOutput: "I don't know, pretty tall I guess?"
-                },
-            ],
-         }`
+                    "actualOutput": "I don't know, pretty tall I guess?"
+                }
+            ]
+         }'
 ```
 </Tabs.Tab>
 <Tabs.Tab >
@@ -88,37 +88,28 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate" \
             "testCases": [
                 {
                     "turns": [
-                        {
-                            "role": "user",
-                            "content": "How tall is Mount Everest?"
-                        },
-                        {
-                            "role": "assistant",
-                            "content": "Mount Everest is approximately 8,848 meters tall."
-                        },
-                        {
-                            "role": "user",
-                            "content": "Wow, that's really high! Has that changed recently?"
-                        },
-                        {
-                            "role": "assistant",
-                            "content": "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
-                        }
+                        {"role": "user", "content": "How tall is Mount Everest?"},
+                        {"role": "assistant", "content": "Mount Everest is approximately 8,848 meters tall."},
+                        {"role": "user", "content": "Wow, that's really high! Has that changed recently?"},
+                        {"role": "assistant", "content": "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."}
                     ]
                 }
             ]
-         }`
+         }'
 ```
 </Tabs.Tab>
 </Tabs>
 
 The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-runs) on Confident AI and return a structured response containing the test run ID.
 
-```json showLineNumbers filename="response"
+```json filename="response"
 {
-    "testRunId": <TEST-RUN-ID>
+    "success": true, 
+    "data": {"id": "TEST-RUN-ID"}
 }
 ```
+
+🎉 Congratulations! You've ran your first evaluation on Confident AI via the Evals API. To learn more about the `/v1/evaluate` endpoint, visit the [evaluation section.](/api/evaluation/run-evals)
 
 <Callout>
 For one-off evaluations, it is recommended that you use the `POST /v1/metric` endpoint instead, which avoids polluting your dashboard with necessary test runs.

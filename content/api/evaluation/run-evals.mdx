@@ -1,0 +1,68 @@
+---
+title: Run LLM Evals
+---
+
+# Run LLM Evals Using Evals API
+
+You can run an evaluation by calling the `POST - /v1/evalate` endpoint.
+
+## Single-Turn Evaluation
+
+The request body should **strictly** contain a **single-turn** metric collection name, and a list of test cases with an [`LLMTestCase` data model](/api/evaluation/data-models#llm-test-case):
+
+```bash filename="POST - /v1/evaluate" showLineNumbers
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Collection Name",
+            "testCases": [
+                {
+                    "input": "How tall is mount everest?",
+                    "actualOutput": "I don't know, pretty tall I guess?"
+                }
+            ]
+         }'
+```
+
+```json filename="response"
+{
+    "success": true, 
+    "data": {"id": "TEST-RUN-ID"}
+}
+```
+
+This will create a **test run** with the corresponding metric data on Confident AI.
+
+
+## Multi-Turn Evaluation
+
+The request body should **strictly** contain a **multi-turn** metric collection name, and a list of test cases with an [`ConversationalTestCase` data model](/api/evaluation/data-models#conversational-test-case):
+
+```bash filename="POST - /v1/evaluate" showLineNumbers
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Multi-Turn Collection Name",
+            "testCases": [
+                {
+                    "turns": [
+                        {"role": "user", "content": "How tall is Mount Everest?"},
+                        {"role": "assistant", "content": "Mount Everest is approximately 8,848 meters tall."},
+                        {"role": "user", "content": "Wow, that's really high! Has that changed recently?"},
+                        {"role": "assistant", "content": "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."}
+                    ]
+                }
+            ]
+         }'
+```
+
+```json filename="response"
+{
+    "success": true, 
+    "data": {"id": "TEST-RUN-ID"}
+}
+```
+
+This will create a **test run** with the corresponding metric data on Confident AI.

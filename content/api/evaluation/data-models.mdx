@@ -78,11 +78,14 @@ type ToolCall = {
 
 ### Conversational Test Case
 
-A `ConversationalTestCase` represents a multi-turn LLM interaction, and is all you need for running multi-turn evals on Confident AI:
+A `ConversationalTestCase` represents a **multi-turn LLM interaction**, and is all you need for running multi-turn evals on Confident AI:
 
 ```typescript filename="conversational-test-case.d.ts"
 type ConversationalTestCase = {
     turns: Turn[];
+    scenario?: string;
+    expectedOutcome?: string;
+    userDescription?: string;
     chatbotRole?: string;
 }
 ```
@@ -95,5 +98,7 @@ The `Turn` data model follows the OpenAI API format for a message:
 type Turn = {
     role: "assistant" | "user";
     content: string;
+    retrievalContext?: string[];
+    toolsCalled?: ToolCall[];
 }
 ```
