@@ -3,6 +3,8 @@ title: OpenAI
 ---
 
 import { Callout } from "nextra/components";
+import { Tabs } from "nextra/components";
+import { Details, Summary } from "nextra/components";
 
 # OpenAI
 This tutorial will show you how to trace your **OpenAI API** calls on Confident AI **Observatory**.
@@ -21,45 +23,108 @@ Login using your API key on Confident AI in the CLI:
 deepeval login --confident-api-key YOUR_API_KEY
 ```
 
-Trace your OpenAI API calls:
+To begin tracing your OpenAI API calls, import `OpenAI` from `deepeval.openai` instead of `openai`.
 
-```python showLineNumbers {5, 9, 24}
+<Tabs items={['Chat Completions', 'Responses', 'Async Chat Completions', 'Async Responses']}>
+  <Tabs.Tab>
+
+```python showLineNumbers copy {3}
 import time
-from openai import OpenAI
+
+from deepeval.openai import OpenAI
 from deepeval.tracing import observe, trace_manager
 
-client = OpenAI(api_key="<your-openai-api-key>")
-
-trace_manager.configure(openai_client=client)
+client = OpenAI()
 
 @observe(type="llm")
 def generate_response(input: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",  # or your preferred model
+        model="gpt-4.1",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": input},
         ],
-        temperature=0.7,
     )
-    
     return response
 
-
-try:
-    response = generate_response("What is the weather in Tokyo?")
-    print(response)
-except Exception as e:
-    raise e
-
-time.sleep(7)
+response = generate_response("What is the weather in Tokyo?")
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {3}
+import time
+
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = OpenAI()
+
+@observe(type="llm")
+def generate_response(input: str) -> str:
+    response = client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+    )
+    return response
+
+response = generate_response("What is the weather in Tokyo?")
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {4}
+import time
+import asyncio
+
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = AsyncOpenAI()
+
+@observe(type="llm")
+async def generate_response(input: str) -> str:
+    response = await client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+    )
+    return response
+
+response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {4}
+import time
+import asyncio
+
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = AsyncOpenAI()
+
+@observe(type="llm")
+async def generate_response(input: str) -> str:
+    response = await client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+    )
+    return response
+
+response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+```
+</Tabs.Tab>
+</Tabs>
 
 The above code will automatically capture the following information and send it to Observatory (no need to set the values of `LlmAttributes`):
 
 - `model`: Name of the OpenAI model
 - `input`: Input messages
-- `output`: Output content (i.e., `response.choices[0].message.content`)
+- `output`: Output messages
+- `tool_calls`: List of tool calls by the OpenAI model
 - `input_token_count`: Input token count
 - `output_token_count`: Output token count
 
@@ -68,5 +133,277 @@ Read more about the LLM spans and its attributes [here](https://documentation.co
 </Callout>
 
 <Callout type="info">
-We use [Monkey Patching](https://www.browserstack.com/guide/monkey-patching) under the hood which dynamically wraps `chat.completions.create` and `beta.chat.completions.parse` methods of **OpenAI client** at runtime, preserving the original method signature.
+We use [Monkey Patching](https://www.browserstack.com/guide/monkey-patching) under the hood which dynamically wraps `chat.completions.create`, `beta.chat.completions.parse`, and `responses.create` methods of **OpenAI client** at runtime, preserving the original method signature.
 </Callout>
+
+## Using OpenAI in Component-level Evaluations
+
+
+You can also use DeepEval's OpenAI client to run [component-level evaluations](/docs/llm-evaluation/run-evals/component-level-evals) locally. To do this, replace your existing `OpenAI` client, pass in `metrics`, and invoke your LLM application under the `dataset` generator.
+
+<Details>
+<Summary>What metrics are supported?</Summary>
+
+DeepEval's OpenAI client populates an `LLMTestCase` for each call to `chat.completions.create` and `responses.create` with the `input`, `output` and `tools_called` parameters, so any metrics that only require these parameters will work out of the box.
+
+If you need to run metrics that require other test case parameters such as the `expected_output`, you can pass them as arguments to DeepEval's OpenAI methods.
+
+```python
+response = client.chat.completions.create(
+    ...,
+    expected_output="...",
+    retrieval_context=["...", "..."]
+)
+```
+
+</Details>
+
+<Tabs items={['Chat Completions', 'Responses', 'Async Chat Completions', 'Async Responses']}>
+  <Tabs.Tab>
+
+```python showLineNumbers copy {3, 19}
+import time
+
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import Golden
+from deepeval.evaluate import dataset
+
+client = OpenAI()
+
+@observe(type="llm")
+def generate_response(input: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+        metrics=[AnswerRelevancyMetric()]
+    )
+    return response
+
+# Create goldens
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+# Run component-level evaluation
+for golden in dataset(goldens=goldens):
+    generate_response(golden.input)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {3, 17}
+import time
+
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import Golden
+from deepeval.evaluate import dataset
+
+client = OpenAI()
+
+@observe(type="llm")
+def generate_response(input: str) -> str:
+    response = client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+        metrics=[AnswerRelevancyMetric()]
+    )
+    return response
+
+# Create goldens
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+# Run component-level evaluation
+for golden in dataset(goldens=goldens):
+    generate_response(golden.input)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {4, 20}
+import time
+import asyncio
+
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import Golden
+from deepeval.evaluate import dataset, test_run
+
+client = AsyncOpenAI()
+
+@observe(type="llm")
+async def generate_response(input: str) -> str:
+    response = await client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+        metrics=[AnswerRelevancyMetric()]
+    )
+    return response
+
+# Create goldens
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+# Run component-level evaluation
+for golden in dataset(goldens=goldens):
+    task = asyncio.create_task(generate_response(golden.input))
+    test_run.append(task)
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```python showLineNumbers copy {4, 18}
+import time
+import asyncio
+
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import Golden
+from deepeval.evaluate import dataset, test_run
+
+client = AsyncOpenAI()
+
+@observe(type="llm")
+async def generate_response(input: str) -> str:
+    response = await client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+        metrics=[AnswerRelevancyMetric()]
+    )
+    return response
+
+for golden in dataset(goldens=goldens):
+    task = asyncio.create_task(generate_response(golden.input))
+    test_run.append(task)
+
+asyncio.run(asyncio.gather(*test_run))
+```
+</Tabs.Tab>
+</Tabs>
+
+
+## End-to-End Evaluations
+
+To run end-to-end evaluations direclty on your OpenAI client, use the `dataset` generator to call OpenAI's `chat.completions.create` or `responses.create` for each golden. 
+
+
+<Tabs items={['Chat Completions', 'Responses', 'Async Chat Completions', 'Async Responses']}>
+<Tabs.Tab value="chat-completions" label="Chat Completions">
+
+```python showLineNumbers {2,18}
+from deepeval.tracing import observe
+from deepeval.openai import OpenAI
+from deepeval.evaluate import dataset
+
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import Golden
+
+client = OpenAI()
+
+for golden in dataset(alias="Your Dataset Name"):
+    # run OpenAI client
+    client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": golden.input}
+        ],
+        metrics=[AnswerRelevancyMetric(), BiasMetric()]
+    )
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```python showLineNumbers {2,16}
+from deepeval.tracing import observe
+from deepeval.openai import OpenAI
+from deepeval.evaluate import dataset
+
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import Golden
+
+client = OpenAI()
+
+for golden in dataset(alias="Your Dataset Name"):
+    # run OpenAI client
+    client.responses.create(
+        model="gpt-4o",
+        instructions="You are a helpful assistant.",
+        input=golden.input,
+        metrics=[AnswerRelevancyMetric(), BiasMetric()]
+    )
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```python showLineNumbers {2,19}
+from deepeval.tracing import observe
+from deepeval.openai import AsyncOpenAI
+from deepeval.evaluate import dataset, test_run
+
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import Golden
+
+client = AsyncOpenAI()
+
+for golden in dataset(alias="Your Dataset Name"):
+    # add OpenAI client task
+    task = asyncio.create_task(
+        client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": golden.input}
+            ],
+            metrics=[AnswerRelevancyMetric(), BiasMetric()]
+        )
+    )
+    test_run.append(task)
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```python showLineNumbers {2,17}
+from deepeval.tracing import observe
+from deepeval.openai import AsyncOpenAI
+from deepeval.evaluate import dataset, test_run
+
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import Golden
+
+client = AsyncOpenAI()
+
+for golden in dataset(alias="Your Dataset Name"):
+    # add OpenAI client task
+    task = asyncio.create_task(
+        client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=golden.input,
+            metrics=[AnswerRelevancyMetric(), BiasMetric()]
+        )
+    )
+    test_run.append(task)
+```
+
+</Tabs.Tab>
+</Tabs>
