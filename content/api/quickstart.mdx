@@ -2,7 +2,7 @@
 title: Quickstart
 ---
 
-import { Cards, Callout } from "nextra/components";
+import { Cards, Callout, Tabs } from "nextra/components";
 
 # Evals API Quickstart
 
@@ -59,12 +59,10 @@ You can learn more about the metric collection data model here.
 
 ## Run Your First Evaluation
 
-You would ran evaluation by providing the name of the metric collection you just created and the list of test cases:
+To run an evaluation, provide the name of the metric collection you just created and the list of test cases:
 
-<Callout type="warning">
-This example shows a single-turn evaluation.
-</Callout>
-
+<Tabs items={['Single-Turn', 'Multi-Turn']}>
+<Tabs.Tab>
 ```bash showLineNumbers filename="POST request"
 curl -X POST "https://api.confident-ai.com/v1/evaluate" \
      -H "Content-Type: application/json" \
@@ -79,25 +77,46 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate" \
             ],
          }`
 ```
+</Tabs.Tab>
+<Tabs.Tab >
+```bash showLineNumbers filename="POST request"
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Multi-Turn Collection Name",
+            "testCases": [
+                {
+                    "turns": [
+                        {
+                            "role": "user",
+                            "content": "How tall is Mount Everest?"
+                        },
+                        {
+                            "role": "assistant",
+                            "content": "Mount Everest is approximately 8,848 meters tall."
+                        },
+                        {
+                            "role": "user",
+                            "content": "Wow, that's really high! Has that changed recently?"
+                        },
+                        {
+                            "role": "assistant",
+                            "content": "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
+                        }
+                    ]
+                }
+            ]
+         }`
+```
+</Tabs.Tab>
+</Tabs>
 
-The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-runs) on Confident AI and return a structured response containing evaluation results for each test case. Here's what the response looks like:
+The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-runs) on Confident AI and return a structured response containing the test run ID.
 
 ```json showLineNumbers filename="response"
 {
-    "success": true,
-    "data": [
-        {
-            "testRunId": <TEST-RUN-ID>,
-            "metrics": [
-                {
-                    "name": "Answer Relevancy",
-                    "score": 1,
-                    "reason": "Although dismissive, the actual output does address the question.",
-                    "error": null
-                }
-            ]
-        }
-    ]
+    "testRunId": <TEST-RUN-ID>
 }
 ```
 
