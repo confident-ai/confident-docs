@@ -1,0 +1,177 @@
+@import '@/app/styles/vars';
+
+.Banner {
+    padding: 140px 0;
+    background-image: radial-gradient(circle farthest-corner at 4% -20%, #9764ff, #6e00ff 23%);
+    height: 800px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    @include responsive(md){
+        height: 600px;
+    }
+    .inner {
+        max-width: 1280px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+
+        .textWrap {
+            width: 95%;
+            margin: 0 auto;
+
+            .heading {
+                font-family: $inter;
+                font-size: 70px;
+                font-weight: 400;
+                color: white;
+                line-height: 1.222em;
+                margin-bottom: 16px;
+
+                @include responsive(xl) {
+                    font-size: 62px;
+                    max-width: unset;
+                    margin-bottom: 16px;
+                }
+
+                @include responsive(lg) {
+                    font-size: 52px;
+                    max-width: unset;
+                }
+
+                @include responsive(sm) {
+                    font-size: 32px;
+                    max-width: unset;
+                    text-align: center;
+                }
+            }
+
+            .description {
+                font-size: 25px;
+                color: white;
+                font-family: $inter;
+                max-width: 800px;
+                font-weight: 400;
+                margin-bottom: 40px;
+                line-height: 1.5em;
+
+                @include responsive(xl) {
+                    font-size: 22px;
+                    max-width: 55%;
+                    font-weight: 300;
+                }
+
+                @include responsive(sm) {
+                    font-size: 14px;
+                    max-width: unset;
+                    line-height: 1.6em;
+                    text-align: center;
+                }
+
+                @include responsive(xs) {
+                    font-size: 12px;
+                }
+            }
+
+            .btnWrap {
+                display: flex;
+                gap: 18px;
+                @include responsive(md){
+                    justify-content: center;
+                }
+                .btn {
+                    padding: 15px 20px;
+                    display: block;
+                    font-family: $inter;
+                    font-size: 16px;
+                    transition: background-color 0.4s ease, color 0.4s ease;
+                    line-height: 1.75em;
+                    @include responsive(md){
+                        line-height: 100%;
+                        font-size: 12px;
+                        text-align: center;
+                        
+                    }
+                    &.contained {
+                        background-color: #fff;
+                        border: 2px solid #000;
+                        border-radius: 4px;
+                        font-weight: 500;
+                        color: #000;
+
+                        &:hover {
+                            background-color: #000;
+                            color: #fff;
+                        }
+                    }
+
+                    &.containedInverted {
+                        background-color: #10002a;
+                        border: 1px solid #fff;
+                        font-weight: 600;
+                        color: #fff;
+
+                        &:hover {
+                            background-color: #fff;
+                            color: #000;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    .backgroundImage {
+        width: 1516px;
+        min-width: 1600px;
+        transition: opacity 0.2s;
+        position: absolute;
+        bottom: -21%;
+        border-radius: 20px;
+        right: -703px;
+        z-index: -1;
+        transform: rotateX(-48deg) rotateY(-4deg) rotate(-28deg);
+        box-shadow: -80px 138px rgba(0, 0, 0, 0.3019607843);
+
+        img {
+            border-radius: 20px;
+        }
+    }
+}
+
+.BannerBottom {
+    padding: 40px 20px 0;
+    background-color: #0b101b;
+
+    .inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        border: 1px solid #000;
+        border-bottom-color: #27272a;
+        padding: 0px 20px 35px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .heading {
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.222em;
+            color: white;
+            margin-bottom: 10px;
+            font-family: $inter;
+
+        }
+
+        .description {
+            font-family: $inter;
+            color: #f0f3f8;
+            text-align: center;
+            width: 95%;
+            font-size: 15px;
+            line-height: 1.75em;
+        }
+    }
+}

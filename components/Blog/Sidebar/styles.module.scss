@@ -1,0 +1,36 @@
+@import "@/app/styles/vars";
+
+.sideBarWrap {
+  max-width: 210px;
+  margin-top: 29.16%;
+  .sidebar {
+    border-left: 1px solid $lightGray;
+    border-bottom: 1px solid $lightGray;
+    position: sticky;
+    top: 24px;
+    span {
+      font-size: 16px;
+      font-weight: 700;
+      padding-left: 8px;
+      font-family: $PTSans;
+      color: $darkBlue;
+    }
+    li {
+      padding: 5.6px 0 5.6px 8px;
+      font-size: 13px;
+      font-family: $PTSans;
+      transition: 0.3s ease color;
+      &:hover {
+        color: $purple;
+      }
+      li {
+        padding-left: 4px;
+
+        margin-left: 13px;
+        &:first-of-type {
+          padding-top: 11.2px;
+        }
+      }
+    }
+  }
+}

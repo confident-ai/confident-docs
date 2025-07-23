@@ -1,0 +1,87 @@
+@import '../../../app/styles/vars';
+
+
+.TwoColumn {
+    padding: 0 20px;
+    background: #0b101b;
+    @include responsive(md){
+        padding: 30px 20px;
+    }
+    .inner {
+        display: flex;
+        max-width: 1180px;
+        margin: 0 auto;
+        justify-content: space-between;
+        border-bottom: 1px solid #363636;
+        padding: 80px 0;
+
+        @include responsive(lg) {
+            padding: 0 0 60px;
+        }
+
+        @include responsive(md) {
+            flex-direction: column;
+            padding: 0 0 60px;
+        }
+
+        .textWrap {
+            width: 100%;
+            max-width: calc(39% - 55px);
+
+            @include responsive(md) {
+                max-width: 100%;
+            }
+            .heading {
+                font-size: 30px;
+                color: #fff;
+                font-weight: 500;
+                margin-bottom: 20px;
+                line-height: 1.42em;
+                font-family: 'Inter', sans-serif;
+
+                span {
+                    color: #6e00ff;
+                }
+
+                @include responsive(md) {
+                    font-size: 24px;
+                }
+
+            }
+
+            .description {
+                color: #c9ced6;
+                font-size: 20px;
+                font-weight: 400;
+                line-height: 1.6em;
+                font-family: 'Inter', sans-serif;
+
+                @include responsive(md) {
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .videoWrap {
+            width: 100%;
+            max-width: 61%;
+
+            video {
+                border-radius: 8px;
+            }
+
+            @include responsive(md) {
+                max-width: 100%;
+            }
+        }
+    }
+
+}
+
+.row {
+    flex-direction: row;
+}
+
+.rowReverse {
+    flex-direction: row-reverse;
+}

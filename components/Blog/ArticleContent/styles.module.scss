@@ -1,0 +1,65 @@
+@import "@/app/styles/vars";
+
+.ArticleContent {
+  font-size: 1.2em;
+
+  p {
+    margin-bottom: 32px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    color: $darkBlue-800;
+    line-height: 1.458333em;
+    font-weight: 400;
+    @include responsive(xl){
+        line-height: 1.458335em;
+    }
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  ol {
+    list-style: decimal;
+    padding-left: 40px;
+    margin: 32px 0;
+
+    li {
+      padding-left: 8px;
+      margin-bottom: 8px;
+
+      p {
+        display: inline;
+        font-family: $PTSerif;
+
+        b {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+  a{
+    color: $Blue;
+    text-decoration: underline;
+    transition: 0.3s ease color;
+    &:hover{
+        color: $darkBlue-900;
+    }
+  }
+  h2 {
+    font-size: 32px;
+    color: $darkBlue-800;
+    font-family: $PTSans;
+    margin-bottom: 16px;
+    line-height: 1.316em;
+    font-weight: 700;
+  }
+  pre {
+    margin: 7px 0 39px;
+    padding: 14px;
+    border-radius: 10px;
+    line-height: 100%;
+
+    code {
+      font-size: 14px;
+    }
+  }
+}

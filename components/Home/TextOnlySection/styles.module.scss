@@ -1,0 +1,106 @@
+@import "@/app/styles/vars";
+
+.TextOnlySection {
+  background: radial-gradient(rgba(255, 255, 255, 0.105) 1px, transparent 1px);
+  background-color: $darkBlue;
+  background-size: 20px 20px;
+  padding: 100px 0 140px;
+  border-bottom: 1px solid $darkBorder-100;
+
+  @include responsive(lg) {
+    padding: 120px 0 100px;
+  }
+  @include responsive(md) {
+    padding: 140px 0 100px;
+  }
+  @include responsive(xs) {
+    padding: 100px 0;
+  }
+
+  .inner {
+    display: flex;
+    max-width: $container_xl;
+    gap: 58px;
+    margin: 0 auto;
+    flex-direction: column;
+    align-items: center;
+    @include responsive(lg) {
+      gap: 62px;
+    }
+    @include responsive(sm) {
+      gap: 45px;
+    }
+    @include responsive(md) {
+      margin: 0 auto;
+      max-width: 90%;
+    }
+    .heading {
+      font-size: 120px;
+      font-weight: 400;
+      color: $white;
+      line-height: 1.222em;
+      font-family: $inter;
+      width: fit-content;
+      margin-bottom: 10px;
+
+      @include responsive(xl) {
+        font-size: 110px;
+        
+      }
+
+      @include responsive(lg) {
+        font-size: 100px;
+        max-width: unset;
+        text-align: center;
+      }
+
+      @include responsive(sm) {
+        font-size: 44px;
+      }
+      @include responsive(xs) {
+        font-size: 40px;
+      }
+    }
+
+    .buttonWrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+
+      @include responsive(sm) {
+        gap: 14px;
+        flex-direction: column;
+        a {
+          &:first-child {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  60% {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeUp {
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.6s;
+}

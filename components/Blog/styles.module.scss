@@ -1,0 +1,105 @@
+@import "@/app/styles/vars";
+
+.blogSection {
+  background-color: $confident-dark;
+  padding: 64px 20px 190px;
+  @include responsive(sm) {
+    padding: 64px 24px 178px;
+  }
+  @include responsive(xs) {
+    padding: 64px 20px 155px;
+  }
+  .inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    @include responsive(lg) {
+      max-width: 1100px;
+      overflow-x: auto;
+    }
+    @include responsive(md) {
+      max-width: 600px;
+    }
+    .tabs {
+      width: 100%;
+      display: flex;
+      border-bottom: 1px solid $darkBorder-50;
+      gap: 40px;
+      margin-bottom: 40px;
+      @include responsive(xs) {
+        gap: 20px;
+      }
+      .tab {
+        transition: border-color 0.3s ease;
+        border-bottom: 2px solid #ffffff00;
+        padding-bottom: 10px;
+        cursor: pointer;
+        line-height: 1.75em;
+        @include responsive(xl) {
+          padding: 10px 0;
+          line-height: 1.7em;
+        }
+        @include responsive(xs) {
+          padding-bottom: 6px;
+        }
+        &:first-child {
+          span {
+            font-weight: 400;
+          }
+        }
+        span {
+          font-family: $PTSans;
+          color: $white;
+          font-weight: 700;
+          font-size: 22px;
+          @include responsive(md) {
+            font-weight: 400;
+          }
+          @include responsive(sm) {
+            font-size: 16px;
+          }
+        }
+        &.active {
+          border-color: $purple;
+        }
+      }
+    }
+    .blogs {
+      display: flex;
+      flex-direction: row;
+      gap: 34px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+      @include responsive(lg) {
+        min-width: 1100px;
+        overflow-x: auto;
+      }
+      @include responsive(md) {
+        min-width: unset;
+        width: 100%;
+        flex-direction: column;
+        overflow-x: unset;
+      }
+
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      .btn {
+        padding: 15px 20px;
+        display: block;
+        font-size: 14px;
+        margin: 0 10px;
+        font-family: $inter;
+        background-color: $darkPurple-600;
+        border: 2px solid $purple;
+        color: $white;
+        line-height: 1.75em;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+  }
+}

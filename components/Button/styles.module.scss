@@ -1,0 +1,124 @@
+@import "@/app/styles/vars";
+
+.btn {
+  font-weight: 500;
+  font-family: $inter;
+  color: $white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding: 15px 25px;
+  width: fit-content;
+  border-radius: 5px;
+  img,
+  svg {
+    margin-left: 10px;
+  }
+
+  &.curved {
+    border-radius: 40px;
+  }
+  &.bordered {
+    border: 2px solid $white;
+  }
+
+  // Sizes
+
+  &.xs {
+    padding: 5px 20px;
+    font-size: 15px;
+    line-height: 1.75em;
+    border-radius: 100px;
+  }
+  &.sm {
+    padding: 8px 40px;
+    font-size: 15px;
+    line-height: 1.75em;
+    @include responsive(sm){
+      padding: 8px 20px;
+      font-size: 12px;
+      line-height: 2em;
+    }
+  }
+  &.md {
+    padding: 15px 25px;
+    font-size: 16px;
+    line-height: 1.75em;
+  }
+
+  &.lg {
+    padding: 12px 30px;
+    font-size: 14px;
+    line-height: 2em;
+  }
+  &.xl {
+    padding: 20px 25px;
+    font-size: 19px;
+    line-height: 1.75em;
+
+  } 
+
+  // Colors
+  &.primary {
+    background: $white;
+    color: $black;
+    border-color: $black;
+    &:hover {
+      background-color: $black;
+      color: $white;
+      border-color: $white;
+    }
+  }
+  &.secondary {
+    background: $black;
+    color: $white;
+    border-color: $white;
+    &:hover {
+      background-color: $white;
+      color: $black;
+      border-color: $black;
+    }
+  }
+  &.purple {
+    background-color: $darkPurple-500;
+    color: $white;
+    border-color: $purple;
+    &:hover {
+      background-color: $white;
+      color: $black;
+    }
+  }
+  &.purple200{
+    background-color: $purple;
+    color: $white;
+    &:hover{
+      background-color: $black!important;
+      color: $white!important;
+    }
+
+  }
+
+  //Variants
+  &.outlined {
+    font-weight: 500;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.4s, color 0.4s,
+      border-color 0.3s;
+    svg {
+      path {
+        transition: fill 0.4s ease;
+      }
+    }
+  }
+  &.contained {
+    font-weight: 500;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.4s, color 0.4s,
+      border-color 0.3s;
+    box-shadow: 0 0 13px $white;
+    &:hover {
+      background-color: $white;
+      border-color: $black;
+      color: $black;
+      box-shadow: 0 0 19px $white;
+    }
+  }
+}

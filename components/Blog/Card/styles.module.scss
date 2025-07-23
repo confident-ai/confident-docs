@@ -1,0 +1,337 @@
+@import "@/app/styles/vars";
+.Card {
+  width: calc(50% - 17px);
+  height: 254px;
+  display: flex;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border: 1px solid $white;
+
+  @include responsive(md) {
+    width: 100%;
+    flex-direction: column;
+    height: 478px;
+  }
+  @include responsive(sm) {
+    height: 450px;
+  }
+  &:hover {
+    opacity: 0.8;
+  }
+  .imageWrap {
+    width: 100%;
+    background-color: $lightGray-100;
+    min-width: 220px;
+    max-width: 220px;
+    overflow: hidden;
+    @include responsive(lg) {
+      min-width: 200px;
+      max-width: 200px;
+    }
+    @include responsive(md) {
+      min-width: unset;
+      max-width: unset;
+      min-height: 264px;
+      max-height: 264px;
+    }
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .textWrap {
+    max-width: 100%;
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    @include responsive(lg) {
+      padding: 20px 38px 13px;
+    }
+    @include responsive(md) {
+      padding: 20px 38px;
+      height: 100%;
+    }
+    @include responsive(sm) {
+      padding: 20px 20px 10px;
+      gap: 3.55px;
+    }
+    .heading {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      font-family: $PTSans;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-height: 1.27em;
+      @include responsive(md) {
+        margin-bottom: 10px;
+        line-height: 1.27;
+      }
+      @include responsive(sm) {
+        -webkit-line-clamp: 1;
+      }
+      @include responsive(xs) {
+        font-size: 1.2em;
+      }
+    }
+    .description {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-family: $PTSans;
+      font-size: 15px;
+      font-weight: 400;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.866666em;
+      @include responsive(xs) {
+        font-size: 14px;
+      }
+    }
+    .author {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      @include responsive(lg) {
+        margin: 0;
+      }
+      .profilePicture {
+        width: 38px;
+        height: 38px;
+        margin-right: 14px;
+        border: 1px solid $white;
+        border-radius: 50%;
+        background-color: $white;
+        overflow: hidden;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      .user {
+        .username {
+          font-family: $inter;
+          font-size: 13px;
+          font-weight: 500;
+          line-height: 1.75em;
+          margin-bottom: -7px;
+        }
+        .infoWrap {
+          display: flex;
+          align-items: center;
+          line-height: 1.75em;
+          margin-top: 2px;
+          .createdAt,
+          .readingTime {
+            font-family: $inter;
+            font-size: 13px;
+            font-weight: 300;
+            line-height: 1.125em;
+            display: block;
+            @include responsive(md) {
+              font-size: 14px;
+            }
+            @include responsive(xs) {
+              font-size: 12px;
+            }
+          }
+          .lineBreaker {
+            font-family: $inter;
+            font-weight: 300;
+
+            strong {
+              display: block;
+              height: fit-content;
+              font-size: 13px;
+              font-weight: 700;
+              line-height: 2.154em;
+              margin: 0 8px;
+              @include responsive(lg) {
+                font-size: 16px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //Variants
+  &.dark,
+  &.Dark {
+    background-color: $confident-dark;
+    border-color: $white;
+    .textWrap {
+      .heading {
+        color: $white;
+      }
+      .description {
+        color: $lightGray-100;
+      }
+      .author {
+        .profilePicture {
+          border-color: $purple;
+        }
+        .user {
+          .username {
+            color: $white;
+          }
+          .infoWrap {
+            .createdAt,
+            .lineBreaker,
+            .readingTime {
+              color: $lightGray-100;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.light,
+  &.Light {
+    background-color: $white;
+    border-color: $lightGray;
+    .textWrap {
+      .heading {
+        color: $darkBlue;
+      }
+      .description {
+        color: $darkBorder;
+      }
+      .author {
+        .profilePicture {
+          border-color: $purple;
+        }
+        .user {
+          .username {
+            color: $darkBlue;
+          }
+          .infoWrap {
+            .createdAt,
+            .lineBreaker,
+            .readingTime {
+              color: $darkBorder;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //Directions
+  &.horizontal {
+    width: 100%;
+    max-width: calc(((100% / 3) - 14px));
+    flex-direction: column;
+    min-height: 478px;
+    height: auto;
+    @include responsive(xl) {
+      min-height: unset;
+    }
+    @include responsive(md) {
+      max-width: 100%;
+    }
+    .imageWrap {
+      min-width: unset;
+      max-width: unset;
+      min-height: 283px;
+      max-height: 283px;
+      @include responsive(xl) {
+        max-height: 230px;
+        min-height: 230px;
+      }
+      @include responsive(lg) {
+        max-height: 228px;
+        min-height: 228px;
+      }
+      @include responsive(md) {
+        max-height: fit-content;
+        min-height: fit-content;
+      }
+      
+    }
+    .textWrap {
+      padding: 14px 30px 20px;
+      @include responsive(xl) {
+        padding: 14px 14px 10px 20px;
+      }
+      .heading {
+        font-size: 1.7rem;
+        margin-bottom: 6px;
+        @include responsive(xl) {
+          font-size: 1.4rem;
+        }
+        @include responsive(sm) {
+          -webkit-line-clamp: 2;
+        }
+      }
+      .description {
+        font-size: 20px;
+        margin: 0;
+        line-height: 1.7em;
+        @include responsive(xl) {
+          font-size: 15px;
+        }
+      }
+      .author {
+        margin: 20px 0 0;
+        @include responsive(xl) {
+          margin-top: 14px;
+        }
+        .profilePicture {
+          width: 60px;
+          height: 60px;
+          @include responsive(xl) {
+            width: 40px;
+            height: 40px;
+          }
+        }
+        .user {
+          .username {
+            font-size: 20px;
+            margin: 0;
+            @include responsive(xl) {
+              font-size: 16px;
+            }
+          }
+          .infoWrap {
+            margin: 0;
+            min-height: 28px;
+            .createdAt,
+            .readingTime {
+              font-size: 16px;
+              @include responsive(xl) {
+                font-size: 13px;
+              }
+            }
+            .lineBreaker {
+              height: 28px;
+              display: flex;
+              align-items: center;
+              margin: 0 8px;
+              strong {
+                font-size: 20px;
+                line-height: 100%;
+                margin: 0;
+                @include responsive(xl) {
+                  font-size: 13px;
+                  text-align: center;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,118 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import styles from "./styles.module.scss";
+import Skeleton from "@/components/Skeleton/Skeleton";
+import Card from "./Card/Card";
+
+export default function Blogs() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [tab, setTab] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const limit = 10;
+
+  const totalPages = Math.ceil(totalCount / limit);
+  const [blogs, setBlogs] = useState([]);
+
+  const tabOptions = [
+    { title: "All Stories", value: "all" },
+    { title: "Evaluation", value: "evaluation" },
+    { title: "Safety", value: "safety" },
+  ];
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setIsLoading(true);
+      const res = await fetch(
+        `/api/blogs?page=${currentPage}&limit=${limit}&category=${tab}`
+      );
+      const data = await res.json();
+      setBlogs(data?.items);
+      setTotalCount(data?.total);
+      setIsLoading(false);
+    };
+    fetchBlogs();
+  }, [currentPage, tab]);
+
+  const onChangeTab = value => {
+    setCurrentPage(1);
+    setTab(value);
+  };
+
+  return (
+    <div className={styles.blogSection}>
+      <div className={styles.inner}>
+        <div className={styles.tabs}>
+          {tabOptions.map(item => (
+            <div
+              className={`${styles.tab} ${
+                item.value === tab ? styles.active : ""
+              }`}
+              key={item.value}
+              onClick={() => onChangeTab(item.value)}
+            >
+              <span>{item.title}</span>
+            </div>
+          ))}
+          <span className={styles.slider} />
+        </div>
+        <div className={styles.blogs}>
+          {!isLoading &&
+            blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant="dark" />)}
+
+          {isLoading &&
+            [...Array(5)].map((_, index) => (
+              <Skeleton key={index} style={{ height: "250px" }} />
+            ))}
+        </div>
+        <div className={styles.pagination}>
+          {currentPage !== 1 && !isLoading && (
+            <button
+              className={styles.btn}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+            >
+              <svg
+                className="w-pagination-previous-icon"
+                height="12px"
+                width="12px"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 12 12"
+              >
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  fillRule="evenodd"
+                  d="M8 10L4 6l4-4"
+                />
+              </svg>
+              Previous
+            </button>
+          )}
+          {currentPage !== totalPages && !isLoading && (
+            <button
+              className={styles.btn}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+            >
+              Next
+              <svg
+                className="w-pagination-next-icon"
+                height="12px"
+                width="12px"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 12 12"
+              >
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  fillRule="evenodd"
+                  d="M4 2l4 4-4 4"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
