@@ -96,8 +96,8 @@ As the agent is running, it will export **spans** to the `dispatcher`. The `disp
 
 ## Online Evaluation in Production
 Confident AI supports online evaluation on your LlamaIndex **Workflow** agents. (like `FunctionAgent`, `ReActAgent` and `CodeActAgent`)
-1. Import DeepEval's LlamaIndex **Agent** wrapper
-2. Provide `metric_collection` as an argument
+1. Replace your **Workflow** agent with DeepEval's **Agent** wrapper
+2. Provide `metric_collection` as an
 3. Run your agent
 
 ```python filename="main.py" showLineNumbers {1, 9}
