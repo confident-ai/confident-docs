@@ -26,7 +26,7 @@ import os
 import time
 from langgraph.prebuilt import create_react_agent
 
-from deepeval.integrations.langchain.callback import CallbackHandler
+from deepeval.integrations.langchain import CallbackHandler
 import deepeval
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
@@ -143,11 +143,11 @@ This will create a test run and evaluate [task completion metric](https://deepev
 Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
 
 <Callout type="info">
-Only **task completion** metric is supported in the [Metric Collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for LangGraph.
+Only **task completion** metric is supported in the [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for LangGraph.
 </Callout>
 
 ```python filename="main.py" showLineNumbers {8}
-from deepeval.integrations.langchain.callback import CallbackHandler
+from deepeval.integrations.langchain import CallbackHandler
 ...
 
 # Invoke your agent with the metric collection name
@@ -160,3 +160,7 @@ agent.invoke(
 ```
 
 This will evaluate agent's **root** span with the metric collection.
+
+<Callout>
+To know more about **task completion** metric, refer to the [documentation](https://deepeval.com/docs/metrics-task-completion).
+</Callout>
