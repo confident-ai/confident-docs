@@ -276,6 +276,7 @@ const VideoDisplayer = ({ src, type = 'video/mp4', title = "How to use Confident
             <video 
               ref={videoRef}
               playsInline
+              autoPlay
               preload={videoLoaded ? "auto" : "metadata"}
               muted={true} // Always muted
               onClick={handlePlayPause}
