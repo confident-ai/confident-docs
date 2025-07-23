@@ -155,7 +155,7 @@ for golden in dataset(goldens=goldens):
     task = asyncio.create_task(
         agent.ainvoke(
             input={"messages": [{"role": "user", "content": golden.input}]},
-            config={"callbacks": [CallbackHandler(metrics=[task_completion], metric_collection="task_completion")]}
+            config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
         )
     )
     test_run.append(task)

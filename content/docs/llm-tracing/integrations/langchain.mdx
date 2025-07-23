@@ -59,10 +59,10 @@ DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackH
 </Callout>
 
 ## Online Evaluation in Production
-Run online evaluation on your Langchain agents by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
+You can run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production on your Langchain agents by simply providing `metric_collection` as an argument to `CallbackHandler`.
 
 <Callout type="info">
-Only **task completion** metric is supported in the [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for LangChain.
+Only **task completion** metric is supported for the LangChain integration. Therefore, you should only include the task completion metric when creating the [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for your LangChain agent.
 </Callout>
 
 ```python filename="main.py" showLineNumbers {8}
@@ -78,4 +78,4 @@ llm_with_tools.invoke(
 )
 ```
 
-This will evaluate agent's **root** span with the metric collection containing [task completion](https://deepeval.com/docs/metrics-task-completion) metric.
+This will evaluate the entire traced execution flow of your LangChain agent using the metric collection containing the [task completion](https://deepeval.com/docs/metrics-task-completion) metric.
