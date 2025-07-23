@@ -62,11 +62,40 @@ You can directly view the traces in the **Observatory** by clicking on the link 
 DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
 </Callout>
 
+## Online Evaluation in Production
+
+To run online evaluation on your LangGraph agent, simply provide `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
+
+<Callout type="info">
+**Task completion** metric is the only supported metric for the LangGraph integration. Therefore, your [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) should only contain the task completion metric.
+</Callout>
+
+```python filename="main.py" showLineNumbers {8}
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+# Invoke your agent with the metric collection name
+agent.invoke(
+    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config = {"callbacks": [
+        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
+    ]}
+)
+```
+
+This will evaluate the entire trace of the agent's execution with the task completion metric in production.
+
+
 ## End-to-End Evaluation
 
-To run end-to-end evaluation locally, you need use `dataset` generator function with `goldens`.
+To configure your LangGraph agent for end-to-end evaluations, simply supply `metrics` to the `CallbackHandler`. Then, use the `dataset` generator to invoke your LangGraph agent for each golden. 
 
-<Tabs items={['Sync', 'Async']}>
+<Callout type="info">
+As with online evaluations, **Task completion** metric is the only supported metric for end-to-end evaluations.
+</Callout>
+
+
+<Tabs items={['Synchronous', 'Asynchronous']}>
   <Tabs.Tab>
 
 ```python filename="main.py" showLineNumbers {2, 21}
@@ -100,11 +129,11 @@ for golden in dataset(goldens=goldens):
   </Tabs.Tab>
   <Tabs.Tab>
 
-```python filename="main.py" showLineNumbers {4, 23}
+```python filename="main.py" showLineNumbers {4, 23, 29}
 from deepeval.metrics import TaskCompletionMetric
 from deepeval.evaluate import dataset
 from deepeval.dataset import Golden
-from deepeval.evaluate.types import global_test_run_tasks as test_run
+from deepeval.evaluate import test_run
 
 ...
  
@@ -136,27 +165,4 @@ for golden in dataset(goldens=goldens):
   </Tabs.Tab>
 </Tabs>
 
-This will create a test run and evaluate [task completion metric](https://deepeval.com/docs/metrics-task-completion) for each golden.
-
-## Online Evaluation in Production
-
-Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
-
-<Callout type="info">
-Only **task completion** metric is supported in the [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for LangGraph.
-</Callout>
-
-```python filename="main.py" showLineNumbers {8}
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-# Invoke your agent with the metric collection name
-agent.invoke(
-    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config = {"callbacks": [
-        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
-    ]}
-)
-```
-
-This will evaluate agent's **root** span with the metric collection.
+This will automatically create a generate a test run and use the [task completion metric](https://deepeval.com/docs/metrics-task-completion) to evaluate your entire LangGraph trace for each golden.
