@@ -81,7 +81,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    time.sleep(12)
 ```
 
 ```bash
@@ -95,9 +94,10 @@ As the agent is running, it will export **spans** to the `dispatcher`. The `disp
 </Callout>
 
 ## Online Evaluation in Production
-Confident AI supports online evaluation on your LlamaIndex **Workflow** agents. (like `FunctionAgent`, `ReActAgent` and `CodeActAgent`)
+Confident AI supports online evaluation on your LlamaIndex `FunctionAgent`, `ReActAgent` and `CodeActAgent`.
+
 1. Replace your **Workflow** agent with DeepEval's **Agent** wrapper
-2. Provide `metric_collection` as an
+2. Provide `metric_collection` as an argument
 3. Run your agent
 
 <Callout type="info">
@@ -122,6 +122,5 @@ async def main():
  
 if __name__ == "__main__":
     asyncio.run(main())
-    time.sleep(7)
 ```
 
