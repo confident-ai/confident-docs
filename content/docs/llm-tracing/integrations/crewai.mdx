@@ -32,13 +32,12 @@ Here's a basic example of a CrewAI agent with Confident AI's `instrumentator`:
 pip install crewai
 ```
 
-```python filename="main.py" showLineNumbers {4, 9}
-from crewai import Task, Crew
-from deepeval.integrations.crewai.agent import Agent
+```python filename="main.py" showLineNumbers {5, 8}
 import os
-from deepeval.integrations.crewai import instrumentator
 import time
+from crewai import Task, Crew, Agent
 
+from deepeval.integrations.crewai import instrumentator
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 
 instrumentator(api_key="<your-confident-api-key>")
@@ -79,9 +78,12 @@ After execution, you can see the traces on Confident AI's **Observability**.
 
 ## Online Agent Evaluation in Production
 
-Run online evaluation on your CrewAI agent by simply providing `metric_collection` as an argument of DeepEval's `Agent` wrapper. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
+To run online evaluation on your CrewAI agent:
+1. Import DeepEval's CrewAI `Agent` wrapper
+2. Provide `metric_collection` as an argument of DeepEval's `Agent` wrapper
+3. Run your agent
 
-```python filename="main.py" showLineNumbers {9}
+```python filename="main.py" showLineNumbers {1, 9}
 from deepeval.integrations.crewai.agent import Agent
 ...
 
@@ -100,10 +102,8 @@ result = crew.kickoff()
 time.sleep(7) # Wait for traces to be posted to observatory
 ```
 
-<Callout>
-To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
+This will auto-populate `input`, `actual_output`, `expected_output` and `tools_called` fields of [LLMTestCase](https://deepeval.com/docs/evaluation-test-cases) from your agent's execution. 
+
+<Callout type="info">
+Create a [metric collection](https://deepeval.com/docs/metrics-task-completion) with metrics that supports the given LLMTestCase parameters.
 </Callout>
-
-
-
-
