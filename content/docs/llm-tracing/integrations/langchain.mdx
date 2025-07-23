@@ -25,11 +25,11 @@ import os
 import time
 from langchain.chat_models import init_chat_model
 
-from deepeval import login_with_confident_api_key
-from deepeval.integrations.langchain.callback import CallbackHandler
+from deepeval
+from deepeval.integrations.langchain import CallbackHandler
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
-login_with_confident_api_key("<your-confident-api-key>")
+deepeval.login_with_confident_api_key("<your-confident-api-key>")
 
 def multiply(a: int, b: int) -> int:
     """Returns the product of two numbers"""
@@ -57,3 +57,25 @@ You can directly view the traces in the **Observatory** by clicking on the link 
 <Callout>
 DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
 </Callout>
+
+## Online Evaluation in Production
+You can run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production on your Langchain agents by simply providing `metric_collection` as an argument to `CallbackHandler`.
+
+<Callout type="info">
+Only **task completion** metric is supported for the LangChain integration. Therefore, you should only include the task completion metric when creating the [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for your LangChain agent.
+</Callout>
+
+```python filename="main.py" showLineNumbers {8}
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+# Invoke your agent with the metric collection name
+llm_with_tools.invoke(
+    "What is 3 * 12?", 
+    config = {"callbacks": [
+        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
+    ]}
+)
+```
+
+This will evaluate the entire traced execution flow of your LangChain agent using the metric collection containing the [task completion](https://deepeval.com/docs/metrics-task-completion) metric.
