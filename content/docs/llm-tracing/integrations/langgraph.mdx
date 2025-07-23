@@ -142,19 +142,21 @@ This will create a test run and evaluate [task completion metric](https://deepev
 
 Run online evaluation on your LangGraph agent by simply providing `metric_collection` as an argument in `CallbackHandler`. This will allow you run [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production.
 
-```python filename="main.py" showLineNumbers {7}
+<Callout type="info">
+Only **task completion** metric is supported in the [Metric Collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) for LangGraph.
+</Callout>
+
+```python filename="main.py" showLineNumbers {8}
 from deepeval.integrations.langchain.callback import CallbackHandler
 ...
 
 # Invoke your agent with the metric collection name
 agent.invoke(
     input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config = {"callbacks": [CallbackHandler(metric_collection="<your-metric-collection-name>")]}
+    config = {"callbacks": [
+        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
+    ]}
 )
 ```
 
-This will evaluate agent's parent span with the metric collection.
-
-<Callout>
-To know more about **metric collection**, refer to the [documentation](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud).
-</Callout>
+This will evaluate agent's **root** span with the metric collection.
