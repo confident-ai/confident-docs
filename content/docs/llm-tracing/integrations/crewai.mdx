@@ -32,12 +32,13 @@ Here's a basic example of a CrewAI agent with Confident AI's `instrumentator`:
 pip install crewai
 ```
 
-```python filename="main.py" showLineNumbers {5, 8}
+```python filename="main.py" showLineNumbers {5, 9}
 import os
 import time
 from crewai import Task, Crew, Agent
 
 from deepeval.integrations.crewai import instrumentator
+
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 
 instrumentator(api_key="<your-confident-api-key>")
@@ -78,10 +79,17 @@ After execution, you can see the traces on Confident AI's **Observability**.
 
 ## Online Agent Evaluation in Production
 
-To run online evaluation on your CrewAI agent:
-1. Import DeepEval's CrewAI `Agent` wrapper
-2. Provide `metric_collection` as an argument of DeepEval's `Agent` wrapper
+To run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your CrewAI agent:
+
+1. Replace your CrewAI `Agent` with DeepEval's CrewAI `Agent` wrapper
+2. Provide `metric_collection` as an argument to DeepEval's `Agent` wrapper
 3. Run your agent
+
+
+<Callout type="info">
+The CrewAI integration auto-populates the `input`, `actual_output`, `expected_output` and `tools_called` fields of [LLMTestCase](https://deepeval.com/docs/evaluation-test-cases) for each `Agent`. Therefore, you can't include metrics that require other parameters (e.g. `retrieval_context`) when creating your [metric collection](https://deepeval.com/docs/metrics-task-completion).
+</Callout>
+
 
 ```python filename="main.py" showLineNumbers {1, 9}
 from deepeval.integrations.crewai.agent import Agent
@@ -102,8 +110,3 @@ result = crew.kickoff()
 time.sleep(7) # Wait for traces to be posted to observatory
 ```
 
-This will auto-populate `input`, `actual_output`, `expected_output` and `tools_called` fields of [LLMTestCase](https://deepeval.com/docs/evaluation-test-cases) from your agent's execution. 
-
-<Callout type="info">
-Create a [metric collection](https://deepeval.com/docs/metrics-task-completion) with metrics that supports the given LLMTestCase parameters.
-</Callout>
