@@ -1,0 +1,25 @@
+---
+title: Pull Dataset
+---
+
+# Pull Dataset for Evals
+
+You can use datasets to run an evaluation by calling the `GET - /v1/datasets` endpoint. The workflow for single and multi-turn datasets are the same, the only difference is the `"conversationalGoldens"` field wil be populated instead by a list of [`ConversationalGolden`s](/api/datasets/data-models#multi-turn) if pulling a multi-turn dataset.
+
+```bash filename="POST - /v1/datasets" showLineNumbers
+curl -X POST "https://api.confident-ai.com/v1/datasets?alias={<DATASET-ALIAS-HERE>}" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>"
+```
+
+```json filename="response"
+{
+    "datasetId": "DATASET-ID",
+    "goldens": [{
+        "input": "How's the weather like in NYC?",
+        "expectedOutput": "No idea"
+    }]
+}
+```
+
+Lastly, you would simply use your goldens to generate actual outputs and any other parameter to create test cases, before [sending them back to Confident AI for evaluation.](/api/evaluation/run-evals)

@@ -181,7 +181,8 @@ button[data-href="/docs/human-in-the-loop"],
 button[data-href="/docs/project-settings"],
 button[data-href="/api/tracing"],
 button[data-href="/api/evaluation"],
-button[data-href="/api/metrics"] {
+button[data-href="/api/metrics"],
+button[data-href="/api/datasets"] {
   display: none !important;
 }
 
@@ -194,7 +195,8 @@ button[data-href="/docs/human-in-the-loop"] + div > ul,
 button[data-href="/docs/project-settings"] + div > ul,
 button[data-href="/api/tracing"] + div > ul,
 button[data-href="/api/evaluation"] + div > ul,
-button[data-href="/api/metrics"] + div > ul {
+button[data-href="/api/metrics"] + div > ul,
+button[data-href="/api/datasets"] + div > ul {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
@@ -208,7 +210,8 @@ button[data-href="/docs/human-in-the-loop"] + div > ul::before,
 button[data-href="/docs/project-settings"] + div > ul::before,
 button[data-href="/api/tracing"] + div > ul::before,
 button[data-href="/api/evaluation"] + div > ul::before,
-button[data-href="/api/metrics"] + div > ul::before {
+button[data-href="/api/metrics"] + div > ul::before,
+button[data-href="/api/datasets"] + div > ul::before {
   display: none !important;
 }
 
@@ -221,7 +224,8 @@ li:has(button[data-href="/docs/human-in-the-loop"]) > div,
 li:has(button[data-href="/docs/project-settings"]) > div,
 li:has(button[data-href="/api/tracing"]) > div,
 li:has(button[data-href="/api/evaluation"]) > div,
-li:has(button[data-href="/api/metrics"]) > div {
+li:has(button[data-href="/api/metrics"]) > div,
+li:has(button[data-href="/api/datasets"]) > div {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }

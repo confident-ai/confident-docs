@@ -19,10 +19,11 @@ export default {
         title: <NavIconTabItem icon={GitBranch} label="Tracing" />
     },
     "tracing":  <NavIconTabItem icon={GitBranch} label="Tracing" />,
-    // "---4": {   
-    //     type: "separator",
-    //     title: <NavIconTabItem icon={BookOpen} label="Datasets" />
-    // },
+    "---4": {   
+        type: "separator",
+        title: <NavIconTabItem icon={BookOpen} label="Datasets" />
+    },
+    "datasets":  <NavIconTabItem icon={BookOpen} label="Datasets" />,
     // "---5": {
     //     type: "separator",
     //     title: <NavIconTabItem icon={MessageSquareText} label="Prompts" />

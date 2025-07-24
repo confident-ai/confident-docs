@@ -66,3 +66,50 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate" \
 ```
 
 This will create a **test run** with the corresponding metric data on Confident AI.
+
+
+## Advanced Usage
+
+### Logging parameters 
+
+To pick the best model and prompt choices based on your evaluation results, simply supply a list of `"hyperparameters"`, which is a free-form key-value pair to associate your test run with your evaluation pipeline:
+
+
+```bash filename="POST - /v1/evaluate" showLineNumbers {12}
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Collection Name",
+            "testCases": [
+                {
+                    "input": "How tall is mount everest?",
+                    "actualOutput": "I don't know, pretty tall I guess?"
+                }
+            ],
+            "hyperparameters": {
+                "model": "gpt-4o-mini",
+                "prompt version": "ai_generation_v2"
+            }
+         }'
+```
+
+### Logging identifier
+
+You should also aim to name each evaluation run through a custom `"identifier"` argument. This would allow you to better sort and filter for test runs on Confident AI.
+
+```bash filename="POST - /v1/evaluate" showLineNumbers {12}
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Collection Name",
+            "testCases": [
+                {
+                    "input": "How tall is mount everest?",
+                    "actualOutput": "I don't know, pretty tall I guess?"
+                }
+            ],
+            "identifier": "run-399-102"
+         }'
+```
