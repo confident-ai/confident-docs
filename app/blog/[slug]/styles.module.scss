@@ -1,32 +1,71 @@
-@import '@/app/styles/vars';
-.Article{
-    background-color: $white;
-    padding: 40px 0 200px;
-    
-    .inner{
+@import "@/app/styles/vars";
+.Article {
+  background-color: $white;
+  padding: 40px 0 200px;
+  @include responsive(md) {
+    padding-top: 45px;
+    padding-bottom: 166px;
+  }
+  @include responsive(sm) {
+    padding-top: 35px;
+    padding-bottom: 138px;
+  }
+  @include responsive(xs) {
+    padding-top: 16px;
+    padding-bottom: 115px;
+  }
+  .inner {
+    width: 100%;
+    max-width: $container_md;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    position: relative;
+
+    .contentWrap {
+      max-width: 840px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      @include responsive(xl) {
+        max-width: 768px;
+        margin: 0;
+        width: 60%;
+      }
+      @include responsive(md) {
+        width: 90%;
+        max-width: 728px;
+      }
+      @include responsive(xs) {
         width: 100%;
-        max-width: $container_lg;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: row-reverse;
-         @include responsive(xl){
-            max-width: $container_md;
-            justify-content: center;
-            gap: 25px;
-         }
-         @media (max-width: 1200px) {
-            justify-content: unset;
-            gap: 29px;
-         }
-        .contentWrap{
-            max-width: 840px;
+        padding: 0 20px;
+      }
+      .mainContent {
+        position: relative;
+        @include responsive(md) {
+          position: static;
+        }
+        .featuredImage {
+          margin-bottom: 32px;
+          object-fit: cover;
+          min-height: 487px;
+          max-height: 487px;
+          width: 100%;
+          @include responsive(sm) {
+            max-width: 600px;
             margin: 0 auto;
             width: 100%;
-            @include responsive(xl){
-                max-width: 768px;
-                margin: 0;
-                width: 60%;
-            }
+            margin-bottom: 32px;
+            height: auto;
+            min-height: unset;
+            max-height: unset;
+          }
+          @include responsive(xs){
+            margin-bottom: 20px ;
+          }
         }
+      }
     }
+  }
 }

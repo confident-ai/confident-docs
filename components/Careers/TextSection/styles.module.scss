@@ -3,7 +3,7 @@
 .TextSection {
   padding: 0 100px;
   font-family: $inter;
-  max-width: $container_lg;
+  max-width: $container_md;
   width: 100%;
   margin: 0 auto 90px;
   @include responsive(md) {

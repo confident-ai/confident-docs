@@ -2,33 +2,116 @@
 
 .sideBarWrap {
   max-width: 210px;
-  margin-top: 29.16%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  right: -233px;
+  height: 100%;
+  &.mobile {
+    display: none;
+  }
+  @include responsive(xl) {
+    width: 25%;
+    right: calc(-25% - 24px);
+  }
+  @include responsive(lg) {
+    right: calc(-25% - 25px);
+  }
+  @include responsive(md) {
+    position: static;
+    width: 100%;
+    max-width: unset;
+    height: fit-content;
+    background-color: $lightGray-10;
+    display: none;
+    margin-bottom: 25px;
+    &.mobile {
+      display: block;
+    }
+  }
   .sidebar {
     border-left: 1px solid $lightGray;
     border-bottom: 1px solid $lightGray;
     position: sticky;
     top: 24px;
-    span {
+    @include responsive(md) {
+      border: none;
+    }
+    .sidebarHeading {
       font-size: 16px;
       font-weight: 700;
       padding-left: 8px;
       font-family: $PTSans;
       color: $darkBlue;
+      display: block;
+      margin-bottom: 9px;
+      line-height: 100%;
+      align-items: center;
+      justify-content: space-between;
+
+      img {
+        display: none;
+      }
+      @include responsive(md) {
+        margin-bottom: 0;
+        padding-left: 0;
+        padding: 13px 20px;
+        cursor: pointer;
+        font-weight: 300;
+        display: flex;
+        img {
+          display: block;
+        }
+        &.active {
+          img {
+            transform: rotate(-180deg);
+          }
+        }
+      }
     }
-    li {
-      padding: 5.6px 0 5.6px 8px;
-      font-size: 13px;
-      font-family: $PTSans;
-      transition: 0.3s ease color;
-      &:hover {
-        color: $purple;
+    .list {
+      @include responsive(md) {
+        transform-origin: top;
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: max-height 0.3s ease, opacity 0.3s ease,
+          border-top 0.3s ease, padding 0.3s ease;
+        &.active {
+          padding: 7.4px 0;
+          border-top: 1px solid $lightGray-300;
+          transform: scale(1);
+          max-height: 1000px;
+          opacity: 1;
+          pointer-events: all;
+        }
       }
       li {
-        padding-left: 4px;
+        padding: 5.6px 0 5.6px 8px;
+        font-size: 13px;
+        font-family: $PTSans;
+        line-height: 18px;
+        @include responsive(md) {
+          padding: 5.6px 0 5.6px 16px;
+          font-size: 16px;
+        }
+        &.childLink {
+          margin-left: 13px;
+          padding-left: 12px;
+          @include responsive(md) {
+            padding-left: 16px;
+          }
+        }
+        a {
+          transition: 0.3s ease color;
 
-        margin-left: 13px;
-        &:first-of-type {
-          padding-top: 11.2px;
+          &.active {
+            color: $purple;
+            font-weight: 600;
+          }
+          &:hover {
+            color: $purple;
+          }
         }
       }
     }

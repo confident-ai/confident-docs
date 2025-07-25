@@ -1,16 +1,36 @@
 @import "@/app/styles/vars";
 
 .feature {
-  width: 100%;
-  background-color: $lightYellow-100;
-  padding: 40px 40px 40px 20px;
-  margin: 16px 0 32px;
+  display: flex;
+
   .inner {
     display: flex;
+    gap: 16px;
+    width: 100%;
+    background-color: $lightYellow-100;
+    padding: 40px 40px 40px 20px;
+    margin: 16px 0 32px;
+    @include responsive(md) {
+      padding: 30px 40px;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    @include responsive(sm) {
+      padding: 30px 20px;
+      height: 736px;
+    }
+    @include responsive(xs) {
+      display: none;
+    }
     .imageWrap {
       flex-shrink: 0;
-      width: 24%;
+      width: 23%;
+      display: flex;
+      justify-content: center;
       margin-right: 10px;
+      @include responsive(md) {
+        display: none;
+      }
       img {
         width: 150px;
         height: 150px;
@@ -23,27 +43,66 @@
       @include responsive(md) {
         width: 100%;
       }
-      h2 {
-        font-family: $Lexend;
-        font-size: 30px;
-        line-height: 1.38em;
-        color: $darkBlue-700;
-        font-weight: 600;
+
+      .heading {
+        display: flex;
+        align-items: center;
         margin-bottom: 16px;
+        @include responsive(md) {
+          margin-bottom: 20px;
+        }
+        @include responsive(sm) {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .logo {
+          display: none;
+          @include responsive(md) {
+            display: block;
+            margin-right: 20px;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            aspect-ratio: 1;
+          }
+          @include responsive(sm) {
+            margin-bottom: 20px;
+          }
+        }
+        h2 {
+          font-family: $Lexend;
+          font-size: 1.9rem;
+          line-height: 1.38em;
+          color: $darkBlue-700;
+          font-weight: 600;
+          max-width: 80%;
+          margin-bottom: 0;
+          @include responsive(xl) {
+            max-width: 90%;
+          }
+          @include responsive(md) {
+            max-width: 67%;
+            font-size: 1.8rem;
+          }
+          @include responsive(md) {
+            max-width:75%;
+            font-size: 1.7rem;
+          }
+        }
       }
-      p {
+      .description {
         font-family: $Lexend;
         font-size: 18px;
         line-height: 1.8em;
         color: $darkBlue-700;
         font-weight: 300;
+        margin-bottom: 34px;
       }
       .features {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 22px;
-        margin: 34px 0;
+        margin: 0 0 34px;
         .featureItem {
           display: flex;
           align-items: center;
@@ -58,12 +117,26 @@
           img {
             min-width: 18px;
             min-height: 18px;
+            margin: 0;
           }
         }
       }
       .btnWrap {
         display: flex;
         gap: 20px;
+        @include responsive(sm) {
+          flex-direction: column;
+        }
+        a {
+          @include responsive(sm) {
+            width: 100%;
+            &:first-of-type {
+              display: flex;
+              justify-content: center;
+              width: calc(100% - 20px);
+            }
+          }
+        }
         .ctaLink {
           display: flex;
           color: $darkBlue-400;

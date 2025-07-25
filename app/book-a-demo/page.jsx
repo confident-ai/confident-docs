@@ -25,7 +25,7 @@ export const metadata = {
 };
 export default function HomePage() {
   return (
-      <GlobalLayout>
+      <GlobalLayout staticHeader={true}>
         <Form />
       </GlobalLayout>
   );

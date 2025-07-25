@@ -1,42 +1,38 @@
-import Banner from '@/components/Careers/Banner/Banner'
-import OpenPositions from '@/components/Careers/OpenPositions/OpenPositions'
-import TextSection from '@/components/Careers/TextSection/TextSection'
-import GlobalLayout from '../global-layout'
+import Banner from "@/components/Careers/Banner/Banner";
+import OpenPositions from "@/components/Careers/OpenPositions/OpenPositions";
+import TextSection from "@/components/Careers/TextSection/TextSection";
+import GlobalLayout from "../global-layout";
 
 export const metadata = {
-  title: 'Confident AI - The DeepEval LLM Evaluation Platform',
+  title: "Careers",
   description:
-    'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
-  metadataBase: 'https://confident-ai.com', 
+    "Build and grow the world's biggest's open-source LLM evaluation product.",
+  metadataBase: "https://confident-ai.com",
   openGraph: {
-    title: 'Confident AI - The DeepEval LLM Evaluation Platform',
+    title: "Careers",
     description:
-      'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
-    url: 'https://confident-ai.com',
-    siteName: 'Confident AI',
-    locale: 'en_US',
-    type: 'website',
+      "Build and grow the world's biggest's open-source LLM evaluation product.",
+    url: "https://confident-ai.com",
+    siteName: "Confident AI",
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Confident AI - The DeepEval LLM Evaluation Platform',
+    card: "summary_large_image",
+    title: "Careers",
     description:
-      'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
-    creator: '@confident_ai', 
+      "Build and grow the world's biggest's open-source LLM evaluation product.",
+    creator: "@confident_ai",
   },
 };
 export default function HomePage() {
   return (
     <>
-
-      <GlobalLayout>
-        <Banner/>
-        <OpenPositions/>
-        <TextSection/>
+      <GlobalLayout staticHeader={true}>
+        <Banner />
+        <OpenPositions />
+        <TextSection />
       </GlobalLayout>
     </>
-  )
+  );
 }
-
-
-

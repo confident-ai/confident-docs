@@ -2,14 +2,12 @@ import Memberships from '@/components/Pricing/Memberships/Memberships'
 import GlobalLayout from '../global-layout'
 
 export const metadata = {
-  title: 'Confident AI - The DeepEval LLM Evaluation Platform',
-  description:
-    'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
+  title: "Pricing that scales with your needs",
+  description: "Flexible pricing starting from $0/month.",  
   metadataBase: 'https://confident-ai.com', 
   openGraph: {
-    title: 'Confident AI - The DeepEval LLM Evaluation Platform',
-    description:
-      'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
+    title: "Pricing that scales with your needs",
+    description: "Flexible pricing starting from $0/month.",
     url: 'https://confident-ai.com',
     siteName: 'Confident AI',
     locale: 'en_US',
@@ -17,9 +15,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Confident AI - The DeepEval LLM Evaluation Platform',
-    description:
-      'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
+    title: "Pricing that scales with your needs",
+    description: "Flexible pricing starting from $0/month.",
     creator: '@confident_ai', 
   },
 };
@@ -27,7 +24,7 @@ export default function HomePage() {
   return (
     <>
 
-      <GlobalLayout>
+      <GlobalLayout staticHeader={true}>
         <Memberships/>
       </GlobalLayout>
     </>

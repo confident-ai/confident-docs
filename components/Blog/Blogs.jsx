@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
+import { formatDate } from "@/functions/format-date";
 import Skeleton from "@/components/Skeleton/Skeleton";
+import Link from "next/link";
 import Card from "./Card/Card";
 
 export default function Blogs() {
@@ -62,8 +64,8 @@ export default function Blogs() {
             blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant="dark" />)}
 
           {isLoading &&
-            [...Array(5)].map((_, index) => (
-              <Skeleton key={index} style={{ height: "250px" }} />
+            [...Array(10)].map((_, index) => (
+              <Skeleton key={index} className={styles.blogItem} style={{height: "250px"}} />
             ))}
         </div>
         <div className={styles.pagination}>

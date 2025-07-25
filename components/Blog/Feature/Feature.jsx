@@ -2,6 +2,7 @@ import Image from "next/image";
 import styles from "./styles.module.scss";
 import Button from "@/components/Button/Button";
 import Link from "next/link";
+import { text } from "stream/consumers";
 
 export default function Feature() {
   const features = [
@@ -16,11 +17,25 @@ export default function Feature() {
     <div className={styles.feature}>
       <div className={styles.inner}>
         <div className={styles.imageWrap}>
-          <Image src="/icons/logo.png" width={150} height={150} />
+          <Image
+            src="/icons/confident-ai-logo.svg"
+            width={150}
+            height={150}
+            alt="Confident Ai Logo"
+          />
         </div>
         <div className={styles.textWrap}>
-          <h2>Confident AI: The DeepEval LLM Evaluation Platform</h2>
-          <p>
+          <div className={styles.heading}>
+            <Image
+              src="/icons/confident-ai-logo.svg"
+              width={80}
+              height={80}
+              alt="Confident Ai Logo"
+              className={styles.logo}
+            />
+            <h2>Confident AI: The DeepEval LLM Evaluation Platform</h2>
+          </div>
+          <p className={styles.description}>
             The leading platform to evaluate and test LLM applications on the
             cloud, native to DeepEval.{" "}
           </p>
@@ -28,7 +43,12 @@ export default function Feature() {
             {features.map((feature, index) => (
               <div className={styles.featureItem} key={index}>
                 <span className={styles.check}>
-                  <Image src="/icons/checkmark.png" width={18} height={18} />
+                  <Image
+                    src="/icons/checkmark.png"
+                    width={18}
+                    height={18}
+                    alt="checkmark"
+                  />
                 </span>
                 <span className={styles.text}>{feature}</span>
               </div>
@@ -41,7 +61,12 @@ export default function Feature() {
               sizes="xl"
               color="purple200"
               label="Try Now for Free"
-              style={{ borderRadius: "8px", boxShadow: " 0 2px 5px #0000006b" }}
+              style={{
+                borderRadius: "8px",
+                boxShadow: " 0 2px 5px #0000006b",
+                textDecoration: "none",
+                lineHeight: "1.473686em",
+              }}
             />
             <Link
               className={styles.ctaLink}

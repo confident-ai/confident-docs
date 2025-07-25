@@ -1,3 +1,6 @@
+html{
+  scroll-behavior: smooth;
+}
 code[class*="language-"],
 pre[class*="language-"] {
   color: #d4d4d4;
@@ -90,3 +93,6 @@ pre[class*="language-"] {
   text-align: right;
 }
 
+.token.triple-quoted-string {
+  color: #91d076;
+}

@@ -1,8 +1,8 @@
 import styles from "./styles.module.scss";
 import { Star } from "lucide-react";
-export default function Callout() {
+export default function Callout({ theme = 'primary' }) {
   return (
-    <div className={styles.ctaWrap}>
+    <div className={`${styles.ctaWrap} ${styles[theme]}`}>
       <div className={styles.cta}>
         <span className={styles.subHeading}>Presenting...</span>
         <div className={styles.headingImg}>

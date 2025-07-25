@@ -1,31 +1,37 @@
 import styles from "./styles.module.scss";
-export default function ArticleHeader() {
+import { formatDate } from "@/functions/format-date";
+
+export default function ArticleHeader({ content }) {
+  console.log(content.author);
   return (
     <>
       <div className={styles.articleAuthor}>
         <div className={styles.profilePicture}>
-          <img src="" alt="Author Pfp" />
+          <img
+            src={content?.author?.fields?.profilePicture?.fields?.file?.url}
+            alt="Author Pfp"
+          />
         </div>
         <div className={styles.infoWrap}>
-          <span className={styles.username}>Jeffrey Ip</span>
-          <p className={styles.about}>
-            Cofounder @ Confident AI, creator of DeepEval & DeepTeam. Working
-            overtime to enforce responsible AI, with an unhealthy LLM evals
-            addiction. Ex-Googler (YouTube), Microsoft AI (Office365).
-          </p>
+          <span className={styles.username}>
+            {content?.author?.fields?.name}
+          </span>
+          <p className={styles.about}>{content?.author?.fields?.about}</p>
         </div>
       </div>
       <div className={styles.wrap}>
         <div className={styles.articleTitle}>
-          <h1>
-            LLM Arena-as-a-Judge: LLM-Evals for Comparison-Based Regression
-            Testing
-          </h1>
+          <h1>{content?.title}</h1>
         </div>
         <div className={styles.articleMeta}>
-          <span className={styles.publishDate}>July 7, 2025</span>
+          <span className={styles.publishDate}>
+            {formatDate(content.createdDate)}
+          </span>
           <span className={styles.seperator}>.</span>
-          <span className={styles.readTime}>10 min read</span>
+          <span className={styles.readTime}>{content.readTime}</span>
+        </div>
+        <div className={styles.imageWrap}>
+
         </div>
       </div>
     </>
