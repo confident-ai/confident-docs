@@ -47,8 +47,8 @@ body::before {
 }
 
 h1 {
-  font-family: 'Fira Code', monospace !important;
   font-weight: 600 !important;
+  font-size: 3rem;
 }
 
 h2 {
@@ -71,6 +71,13 @@ div[role="tabpanel"] {
   border: 1px solid rgb(209, 209, 210) !important;
 }
 
+/* Nested tabpanel styling */
+/* div[role="tabpanel"] div[role="tabpanel"] {
+  margin-top: 0rem !important;
+  border: none !important;
+  padding: 0 !important;
+} */
+
 /* Add right border to the left navigation drawer */
 .nextra-sidebar {
   border-right: 1px solid rgba(0, 0, 0, 0.081);
@@ -87,7 +94,7 @@ div[role="tabpanel"] {
 
 .custom-icon-tab-item {
   padding: 4px;
-  border: 1px solid rgb(213, 213, 216);
+  border: 1px solid rgb(147, 147, 157);
   background: white;
   border-radius: 4px;
 }

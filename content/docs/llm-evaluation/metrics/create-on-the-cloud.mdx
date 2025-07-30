@@ -14,21 +14,19 @@ Running metrics on the cloud produces exactly the same results as running metric
 
 Otherwise, we would recommend running metrics locally instead since it gives you more control in customizations.
 
-<Callout>
-We highly recommend that you only continue with this section once you are happy with your selection of metrics and their performance when ran locally.
-</Callout>
+## Create a Custom Metric
 
-## Video Demo
+This step is not strictly required, but if you wish to utilize custom metrics you can create one in the **Metrics** > **Library** page. A custom metric on Confident AI uses DeepEval's [G-Eval metric](https://deepeval.com/docs/metrics-llm-evals) under the hood, so be sure to click on the link to learn what each parameter does as you're creating one.
 
 <VideoDisplayer
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:metric-collections.mp4"
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:custom-metrics.mp4"
   width="100%"
-  title="Creating metric collections on Confident AI"
+  title="Custom Metrics on Platform"
 />
 
-## Create a Metric Collection
+The name of your custom metric must not be a reserved one on Confident AI.
 
-Creating a collection of metrics on Confident AI allows you to specify which group of metrics you wish to evaluate your LLM application on.
+## Create a Metric Collection
 
 To create a metric collection, in your project space go to **Metrics** > **Collections**, click on the **Create Collection** button, and enter a collection name. Your collection name must not already be taken in your project.
 
@@ -36,7 +34,15 @@ To create a metric collection, in your project space go to **Metrics** > **Colle
 Metric collections can be either **single or multi-turn** collections. If you're looking to run [online metrics on threads](/docs/llm-tracing/evaluations#online-evals-for-threads) for example, you should create a multi-turn collection instead.
 </Callout>
 
-## Add a Default Metric
+Creating a collection of metrics on Confident AI allows you to specify which group of metrics you wish to evaluate your LLM application on, including any custom metrics you've created.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:metric-collections.mp4"
+  width="100%"
+  title="Creating metric collections on Confident AI"
+/>
+
+### Add a metric
 
 Click on **Add metric** in your newly created collection, and select the metric you wish to add to it.
 
@@ -44,7 +50,7 @@ Click on **Add metric** in your newly created collection, and select the metric 
 The choice of metrics available to you will be different depending on whether your collection is single or multi-turn.
 </Callout>
 
-## Configure Metric Settings
+### Configure metric settings
 
 When you add a metric to a collection, you’ll have the option to configure each individual metric’s threshold, explanability, and strictness. There are three settings you can be tuning:
 
@@ -60,7 +66,7 @@ You can change them and click the **Save** button, otherwise they will be defaul
 
 There are two ways to run evals using the metric collection you've defined:
 
-    - [Through Typescript or an HTTPS `POST` request](/docs/llm-evaluation/run-evals/end-to-end-evals#run-evals-on-the-cloud) that sends over a list of test cases with the generated outputs from your LLM app, or
+    - [Through Typescript or an HTTPS `POST` request](/docs/llm-evaluation/end-to-end-evals#run-evals-on-the-cloud) that sends over a list of test cases with the generated outputs from your LLM app, or
     - [On the platform directly](/docs/llm-evaluation/running-evals#trigger-evals-without-code), which will be triggered through the click of a button without the need of code
 
 Click on the respective links to learn how.

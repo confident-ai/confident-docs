@@ -1,5 +1,5 @@
 ---
-title: End-to-End
+title: End-to-End Evals
 ---
 
 import { Callout, Tabs } from "nextra/components";
@@ -19,7 +19,7 @@ Similar to component-level evals, end-to-end evaluations generate **testing repo
 - Hyperparameter experimentation
 - Data-driven decision making
 
-If you wish to run evaluations on individual components in your LLM app, you should run [component-level evaluations](/docs/llm-evaluation/run-evals/component-level-evals) instead.
+If you wish to run evaluations on individual components in your LLM app, you should run [component-level evaluations](/docs/llm-evaluation/component-level-evals) instead.
 
 ## Code Summary
 
@@ -293,8 +293,3 @@ confident_evaluate(metric_collection="your-collection-name", test_cases=dataset.
 >
 > You should only be doing this if you have non-technical team members that wish to trigger evaluations on the platform without going through code.
 
-## Setup Notifications (recommended)
-
-You can also setup your project to receive notifications through either email, slack, discord, or teams each time an evaluation is completed, both locally or on the cloud, by configuring your project integrations in **Project Settings** > **Integrations**.
-
-To learn how, visit the [project integrations page.](/project-settings/integrations)

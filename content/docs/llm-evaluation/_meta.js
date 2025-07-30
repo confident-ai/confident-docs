@@ -1,15 +1,12 @@
 export default {
   introduction: '',
+  quickstart: '',
+  "end-to-end-evals": '',
+  "component-level-evals": '',
   "metrics": {
     title: "Metrics",
     theme: {
       collapsed: true
-    }
-  },
-  "run-evals": {
-    title: "Running Evals",
-    theme: {
-      collapsed: false
     }
   },
   "evaluation-features": {

@@ -2,7 +2,8 @@
 title: Introduction
 ---
 
-import { Callout, Cards } from "nextra/components";
+import { Callout, Cards, Tabs } from "nextra/components";
+import { Play, BarChart3, Route, Settings, FileText, GitBranch, Code, Split, MessageSquare } from 'lucide-react';
 
 # Introduction to LLM Evaluation on Confident AI
 
@@ -33,167 +34,144 @@ And offer 50+ metrics that are:
 You can also evaluations in both **CI/CD** environments, as a separate Python script, on traces in production, or through APIs.
 
 <Callout>
-You can also run evals on an individual [component-level](/docs/llm-evaluation/run-evals/component-level-evals), or [end-to-end](/docs/llm-evaluation/run-evals/end-to-end-evals) should you wish to treat your LLM app as a black-box.
+You can also run evals on an individual [component-level](/docs/llm-evaluation/component-level-evals), or [end-to-end](/docs/llm-evaluation/end-to-end-evals) should you wish to treat your LLM app as a black-box.
 </Callout>
 
 </details>
 
+<Tabs items={['Testing Reports', 'A|B Regression Testing', 'Custom Metrics', 'Find best prompts, models, etc.']}>
+  <Tabs.Tab>
+
+**Testing reports** are automatically generated each time you run an evaluation using DeepEval or on the UI.
+
+<Tabs items={['Single-turn', 'Multi-turn']}>
+  <Tabs.Tab>
+
+Single-turn evals test single, atomic LLM interactions at either an [end-to-end](/docs/llm-evaluation/end-to-end-evals), or [component-level](/docs/llm-evaluation/component-level-evals) via LLM tracing. 
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
+  width="100%"
+  title="Single-Turn Testing Reports"
+/>
+
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+
+Multi-turn evals test **multiple LLM interactions** instead of atomic interactions per test case. These are usually for a conversational chatbot use case.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:multiturn-testing-report.mp4"
+  width="100%"
+  title="Multi-Turn Testing Reports"
+/>
+
+  </Tabs.Tab>
+
+
+</Tabs>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+When you run two or more evals, you can **compare distinct testing reports** to [catch regressions](/docs/llm-evaluation/evaluation-features/ab-regression-testing) and to determine which version of your app performed better.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:ab-regression-testing.mp4"
+  width="100%"
+  title="AB Regression Testing Suite"
+/>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+You can create a utilize custom metrics **on the platform** just like how you can create custom metrics locally on DeepEval, all without having to code.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:custom-metrics.mp4"
+  width="100%"
+  title="Custom Metrics on Platform"
+/>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Using past evals you've ran, you can retrospectively figure out which combination of prompts, models, or any other parameter performed best through [parameter insights.](/docs/llm-evaluation/evaluation-features/parameter-insights)
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:parameter-insights.mp4"
+  width="100%"
+  title="Finding Best Prompts and Models"
+/>
+
+  </Tabs.Tab>
+</Tabs>
+
+
 ## Get Started
 
-Add Confident AI Evals to your LLM app.
+Get LLM evals for your LLM app, powered by DeepEval.
 
 <Cards>
-  <Cards.Card arrow title="Metrics" href="/docs/llm-evaluation/metrics/create-locally" />
+  <Cards.Card icon={<Play />} arrow title="5 Min Quickstart" href="/docs/llm-evaluation/quickstart" />
   <Cards.Card
+    icon={<Route />}
     arrow
-    title="Running Evals"
-    href="/docs/llm-evaluation/run-evals/end-to-end-evals"
+    title="End-to-end Evals"
+    href="/docs/llm-evaluation/end-to-end-evals"
   />
   <Cards.Card
+    icon={<BarChart3 />}
     arrow
-    title="Unit-Testing in CI/CD"
-    href="/docs/llm-evaluation/evaluation-features/unit-testing-in-cicd-in-cicd"
+    title="Metrics"
+    href="/docs/llm-evaluation/metrics/create-on-the-cloud"
   />
+</Cards>
+
+## Advanced Features
+
+Confident AI LLM evals goes beyond single-turn end-to-end evaluations:
+
+<Cards>
   <Cards.Card
+    icon={<Split />}
+    arrow
+    title="A|B Regression Testing"
+    href="/docs/llm-evaluation/evaluation-features/ab-regression-testing"
+  />
+<Cards.Card icon={<GitBranch />} arrow title="Component Evals" href="/docs/llm-evaluation/component-level-evals" />
+<Cards.Card icon={<MessageSquare />} arrow title="Multi-turn Evals" href="/docs/llm-evaluation/end-to-end-evals" />
+  <Cards.Card icon={<Settings />} arrow title="Parameter Comparison" href="/docs/llm-evaluation/evaluation-features/parameter-insights" />
+  <Cards.Card
+    icon={<FileText />}
     arrow
     title="Testing Reports"
     href="/docs/llm-evaluation/evaluation-features/testing-reports"
   />
   <Cards.Card
+    icon={<Code />}
     arrow
-    title="A|B Regression Testing"
-    href="/docs/llm-evaluation/evaluation-features/ab-regression-testing"
+    title="Unit-Testing in CI/CD"
+    href="/docs/llm-evaluation/evaluation-features/unit-testing-in-cicd"
   />
-  <Cards.Card arrow title="Parameter Insights" href="/docs/llm-evaluation/evaluation-features/parameter-insights" />
 </Cards>
 
-## Quickstart
 
-Get started with LLM evaluation on Confident AI by following this 5 min guide.
+## FAQs
 
-### Create Metric
+### I already use DeepEval, how long will setup take?
 
-Import metrics import DeepEval. In this example we're using `GEval` to create a custom answer relevancy metric:
+If you're already using DeepEval, setting up Confident AI will take less than one minute. All you have to do is [create an account](/docs/getting-started/setup#create-an-account) and login via the CLI using the API key available to you on the platform.
 
-```python filename="main.py"
-from deepeval.test_case import LLMTestCaseParams
-from deepeval.metrics import GEval
-
-metric = GEval(
-  name="Relevancy",
-  criteria="Determine how relevant the 'actual output' is to the 'input'",
-  evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT]
-)
+```bash
+deepeval login --confident-api-key YOUR_API_KEY
 ```
 
-<details>
-  <summary>How to customize your LLM judge?</summary>
+### What about online evals in production?
 
-  99.99% of metrics on DeepEval uses LLM-as-a-judge, which means you'll have to set your evaluation model. For most users, this will be using OpenAI, and you'll need to set your OpenAI API key:
+You can run online evals to get performance-over-time graphs by setting up LLM tracing and [enabling evaluations in code.](/docs/llm-tracing/evaluations) 
 
-  ```bash
-  export OPENAI_API_KEY="sk-..."
-  ```
+### Can I run evals on the cloud instead of locally?
 
-  You can also use other model providers that `deepeval` has integrations with, such as:
-
-  - [Ollama](https://deepeval.com/integrations/models/ollama)
-  - [Azure OpenAI](https://deepeval.com/integrations/models/azure-openai)
-  - [Anthropic](https://deepeval.com/integrations/models/anthropic)
-  - [Gemini](https://deepeval.com/integrations/models/gemini)
-  - [Vertex AI](https://deepeval.com/integrations/models/vertex-ai)
-  - [vLLM](https://deepeval.com/integrations/models/vllm)
-  - [LMStudio](https://deepeval.com/integrations/models/lmstudio)
-
-  Lastly, you can wrap your own LLM API in `deepeval`'s `DeepEvalBaseLLM` class to use **ANY** model of your choice. [Click here](https://deepeval.com/guides/guides-using-custom-llms) to learn how.
-
-  <Callout type="info">
-    This will run evaluations locally before sending results over to Confident AI.
-    You can also run evals on the cloud by [creating a metric
-    collection.](/docs/llm-evaluation/metrics/create-on-the-cloud)
-  </Callout>
-</details>
-
-### Prepare for Evaluation
-
-Decorate your LLM app (replace with your own):
-
-```python filename="main.py" showLineNumbers {6}
-from openai import OpenAI
-from deepeval.tracing import observe
-
-client = OpenAI()
-
-@observe()
-def your_llm_app(query: str) -> str:
-    return client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": query}
-        ]
-    ).choices[0].message.content
-```
-
-Pull the dataset you've created (full guide [here](/docs/dataset-editor/introduction)):
-
-```python filename="main.py" showLineNumbers {5}
-from deepeval.dataset import EvaluationDataset
-
-# Pull your dataset from Confident AI
-dataset = EvaluationDataset()
-dataset.pull(alias="your-dataset-alias")
-```
-
-### Run an LLM Eval
-
-Putting everything together, run your first LLM evaluation:
-
-```python filename="main.py" showLineNumbers {21, 26} copy
-from openai import OpenAI
-from deepeval.tracing import observe
-from deepeval.dataset import EvaluationDataset
-from deepeval.test_case import LLMTestCase
-from deepeval.metrics import AnswerRelevancyMetric
-from deepeval import evaluate
-
-client = OpenAI()
- 
-@observe()
-def your_llm_app(query: str) -> str:
-    return client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
-    ).choices[0].message.content
-
-dataset = EvaluationDataset()
-dataset.pull(alias="your-dataset-alias")
-
-# Process each golden in your dataset
-for goldens in dataset.goldens:
-    input = golden.input
-    test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
-    dataset.add_test_case(test_case)
-
-
-# Run an evaluation
-evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
-```
-
-Congratulations 🎉! Your test run is now available on Confident AI automatically as a testing report.
-
-### Identify Failing Test Case(s)
-
-Identify your failing test cases in the testing report on Confident AI.
-
-<Callout type="info">This testing report is also publicaly sharable.</Callout>
-
-<VideoDisplayer
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
-  width="100%"
-  title="Identify Failing LLM Test Cases"
-/>
-
-## Future Roadmap
-
-- [x] Editor table columns for custom metrics
-- [x] Better hyperparameters display
-- [x] Insights page
-- [ ] Full text-search on test cases
+Certaintly, checkout this section to learn how to start creating [metrics on the cloud](/docs/llm-evaluation/metrics/create-on-the-cloud) without needing to code.
