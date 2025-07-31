@@ -231,7 +231,7 @@
   //Directions
   &.horizontal {
     width: 100%;
-    max-width: calc(((100% / 3) - 14px));
+    max-width: calc(((100% / 3) - 19px));
     flex-direction: column;
     min-height: 478px;
     height: auto;
@@ -258,12 +258,17 @@
         max-height: fit-content;
         min-height: fit-content;
       }
-      
     }
     .textWrap {
       padding: 14px 30px 20px;
       @include responsive(xl) {
         padding: 14px 14px 10px 20px;
+      }
+      @include responsive(sm) {
+        gap: 0;
+      }
+      @include responsive(xs) {
+        padding: 10px 12px;
       }
       .heading {
         font-size: 1.7rem;
@@ -273,6 +278,9 @@
         }
         @include responsive(sm) {
           -webkit-line-clamp: 2;
+        }
+        @include responsive(xs) {
+          margin-bottom: 10px;
         }
       }
       .description {
@@ -284,9 +292,12 @@
         }
       }
       .author {
-        margin: 20px 0 0;
+        margin-top: 20px;
         @include responsive(xl) {
           margin-top: 14px;
+        }
+        @include responsive(xs) {
+          margin-top: 20px;
         }
         .profilePicture {
           width: 60px;
@@ -299,7 +310,8 @@
         .user {
           .username {
             font-size: 20px;
-            margin: 0;
+            font-weight: 400;
+            font-family: $PTSans;
             @include responsive(xl) {
               font-size: 16px;
             }
@@ -310,6 +322,7 @@
             .createdAt,
             .readingTime {
               font-size: 16px;
+              font-family: $PTSans;
               @include responsive(xl) {
                 font-size: 13px;
               }
@@ -321,7 +334,8 @@
               margin: 0 8px;
               strong {
                 font-size: 20px;
-                line-height: 100%;
+                height: 38px;
+                line-height: unset;
                 margin: 0;
                 @include responsive(xl) {
                   font-size: 13px;

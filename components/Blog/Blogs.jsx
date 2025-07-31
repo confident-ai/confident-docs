@@ -2,17 +2,14 @@
 
 import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
-import { formatDate } from "@/functions/format-date";
 import Skeleton from "@/components/Skeleton/Skeleton";
-import Link from "next/link";
 import Card from "./Card/Card";
 
-export default function Blogs() {
+export default function Blogs({ limit = 3, blogOrientation = 'horizontal', showTabs = false, blogVariant = 'light', exclude = null, disableLoader = true }) {
   const [isLoading, setIsLoading] = useState(true);
   const [tab, setTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const limit = 10;
 
   const totalPages = Math.ceil(totalCount / limit);
   const [blogs, setBlogs] = useState([]);
@@ -27,7 +24,7 @@ export default function Blogs() {
     const fetchBlogs = async () => {
       setIsLoading(true);
       const res = await fetch(
-        `/api/blogs?page=${currentPage}&limit=${limit}&category=${tab}`
+        `/api/blogs?page=${currentPage}&limit=${limit}&category=${tab}&excludeSlug=${exclude}`
       );
       const data = await res.json();
       setBlogs(data?.items);
@@ -43,8 +40,9 @@ export default function Blogs() {
   };
 
   return (
-    <div className={styles.blogSection}>
-      <div className={styles.inner}>
+    <div className={`${styles.blogSection} ${styles[blogOrientation]}`}>
+      <div className={`${styles.inner} ${styles[blogOrientation]}`}>
+        {showTabs && (
         <div className={styles.tabs}>
           {tabOptions.map(item => (
             <div
@@ -59,12 +57,13 @@ export default function Blogs() {
           ))}
           <span className={styles.slider} />
         </div>
+        )}
         <div className={styles.blogs}>
           {!isLoading &&
-            blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant="dark" />)}
+            blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant={blogVariant} orientation={blogOrientation} />)}
 
-          {isLoading &&
-            [...Array(10)].map((_, index) => (
+          {isLoading && !disableLoader &&
+            [...Array(limit)].map((_, index) => (
               <Skeleton key={index} className={styles.blogItem} style={{height: "250px"}} />
             ))}
         </div>

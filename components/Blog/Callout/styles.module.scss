@@ -44,6 +44,7 @@
     .description {
       line-height: 1.3em;
       font-family: $PTSans;
+      font-size: 15px;
     }
     .githubBtn {
       display: flex;
@@ -62,7 +63,7 @@
     }
   }
 
-  &.primary {
+  &.deepEval, &.DeepEval {
     .cta {
       box-shadow: -7px 8px 0 1px $purple;
       .githubBtn {
@@ -70,7 +71,7 @@
       }
     }
   }
-  &.secondary {
+  &.deepTeam,&.DeepTeam {
     .cta {
       box-shadow: -7px 8px 0 1px $pink-accent;
       .githubBtn {

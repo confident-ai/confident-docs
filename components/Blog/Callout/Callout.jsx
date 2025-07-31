@@ -1,15 +1,15 @@
 import styles from "./styles.module.scss";
 import { Star } from "lucide-react";
-export default function Callout({ theme = 'primary' }) {
+export default function Callout({ theme = 'deepEval' }) {
   return (
     <div className={`${styles.ctaWrap} ${styles[theme]}`}>
       <div className={styles.cta}>
         <span className={styles.subHeading}>Presenting...</span>
         <div className={styles.headingImg}>
-          <img src="/icons/deepEval-Text.svg" alt="Deep Eval" />
+          <img src={ theme === 'deepEval' ? "/icons/deepEval-Text.svg" : "/icons/deepTeam-Text.svg"} alt="Deep Eval" />
         </div>
         <p className={styles.description}>
-          The open-source LLM evaluation framework.
+          {theme === 'deepEval' ? 'The open-source LLM evaluation framework.' : 'The open-source LLM red teaming framework.'}
         </p>
         <a
           href="https://github.com/confident-ai/deepeval"

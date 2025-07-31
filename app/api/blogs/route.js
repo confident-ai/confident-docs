@@ -5,9 +5,10 @@ export async function GET(request) {
   const page = searchParams.get('page') || 1;
   const limit = searchParams.get('limit') || 10;
   const category = searchParams.get('category') || null;
+  const excludeSlug = searchParams.get('excludeSlug') || null;
 
   try {
-    const blogs = await getBlogs(Number(page), Number(limit), category);
+    const blogs = await getBlogs(Number(page), Number(limit), category, excludeSlug);
     return Response.json(blogs);
   } catch (err) {
     console.error('API Error:', err);

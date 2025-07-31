@@ -1,10 +1,13 @@
 @import "@/app/styles/vars";
 
 .blogSection {
-  background-color: $confident-dark;
   padding: 64px 20px 190px;
+  &.horizontal{
+    padding: 0!important;
+  }
   @include responsive(sm) {
     padding: 64px 24px 178px;
+    
   }
   @include responsive(xs) {
     padding: 64px 20px 155px;
@@ -12,6 +15,20 @@
   .inner {
     max-width: 1140px;
     margin: 0 auto;
+    &.horizontal{
+      max-width: 1280px;
+      .blogs{
+        gap: 28px;
+        margin-bottom: 40px;
+        min-width: unset!important;
+        @include responsive(md){
+          gap: 50px;
+        }
+        @include responsive(xs){
+          gap: 24px;
+        }
+      }
+    }
     @include responsive(lg) {
       max-width: 1100px;
       overflow-x: auto;

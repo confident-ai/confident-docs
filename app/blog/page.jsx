@@ -27,7 +27,7 @@ export default async function Page() {
   return (
     <>
       <GlobalLayout>
-        <Blogs />
+        <Blogs limit={10} showTabs={true} blogOrientation="vertical" blogVariant="dark" disableLoader={false} />
       </GlobalLayout>
     </>
   );

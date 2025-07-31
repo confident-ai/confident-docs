@@ -4,21 +4,37 @@ import Button from "@/components/Button/Button";
 import Link from "next/link";
 import { text } from "stream/consumers";
 
-export default function Feature() {
-  const features = [
-    "Regression test and evaluate LLM apps.",
-    "Easily A|B test prompts and models.",
-    "Edit and manage datasets on the cloud.",
-    "LLM observability with online evals.",
-    "Publicly sharable testing reports.",
-    "Automated human feedback collection.",
-  ];
+export default function Feature({ theme = 'deepEval' }) {
+  const features = {
+    deepEval: [
+      "Regression test and evaluate LLM apps.",
+      "Easily A|B test prompts and models.",
+      "Edit and manage datasets on the cloud.",
+      "LLM observability with online evals.",
+      "Publicly sharable testing reports.",
+      "Automated human feedback collection.",
+    ],
+    deepTeam: [
+      "Tailored frameworks (e.g. OWASP Top 10)",
+      "10+ LLM guardrails to guard malicious I/O",
+      "40+ plug-and-play vulnerabilities and 10+ attacks",
+      "Guardrails accuracy and latency reporting",
+      "Publicly sharable risk assessments.",
+      "On-demand custom guards available.",
+    ],
+  };
+  const selectedFeatures = features[theme] || [];
+
   return (
-    <div className={styles.feature}>
+    <div className={`${styles.feature} ${styles[theme]}`}>
       <div className={styles.inner}>
         <div className={styles.imageWrap}>
           <Image
-            src="/icons/confident-ai-logo.svg"
+            src={
+              theme === "deepEval"
+                ? "/icons/confident-ai-logo.svg"
+                : "/icons/deepTeam-logo.svg"
+            }
             width={150}
             height={150}
             alt="Confident Ai Logo"
@@ -27,20 +43,29 @@ export default function Feature() {
         <div className={styles.textWrap}>
           <div className={styles.heading}>
             <Image
-              src="/icons/confident-ai-logo.svg"
+              src={
+                theme === "deepEval"
+                  ? "/icons/confident-ai-logo.svg"
+                  : "/icons/deepTeam-logo.svg"
+              }
               width={80}
               height={80}
               alt="Confident Ai Logo"
               className={styles.logo}
             />
-            <h2>Confident AI: The DeepEval LLM Evaluation Platform</h2>
+            <h2>
+              {theme === "deepEval"
+                ? "Confident AI: The DeepEval LLM Evaluation Platform"
+                : "Got Red? Safeguard LLM Systems Today with Confident AI"}
+            </h2>
           </div>
           <p className={styles.description}>
-            The leading platform to evaluate and test LLM applications on the
-            cloud, native to DeepEval.{" "}
+            {theme === "deepEval"
+              ? "The leading platform to evaluate and test LLM applications on the cloud, native to DeepEval."
+              : "The leading platform to red-team LLM applications for your organization, powered by DeepTeam."}
           </p>
           <div className={styles.features}>
-            {features.map((feature, index) => (
+            {selectedFeatures.map((feature, index) => (
               <div className={styles.featureItem} key={index}>
                 <span className={styles.check}>
                   <Image
@@ -56,11 +81,17 @@ export default function Feature() {
           </div>
           <div className={styles.btnWrap}>
             <Button
-              to="https://app.confident-ai.com/auth/signup"
+              to={
+                theme === "deepEval"
+                  ? "https://app.confident-ai.com/auth/signup"
+                  : "/book-a-demo"
+              }
               variant="contained"
               sizes="xl"
-              color="purple200"
-              label="Try Now for Free"
+              color={theme === "deepEval" ? "purple200" : "red200"}
+              label={
+                theme === "deepEval" ? "Try Now For Free" : "Request a Demo"
+              }
               style={{
                 borderRadius: "8px",
                 boxShadow: " 0 2px 5px #0000006b",
@@ -70,9 +101,13 @@ export default function Feature() {
             />
             <Link
               className={styles.ctaLink}
-              href="https://github.com/confident-ai/deepeval"
+              href={
+                theme === "deepEval"
+                  ? "https://github.com/confident-ai/deepeval"
+                  : "https://github.com/confident-ai/deepteam"
+              }
             >
-              Checkout DeepEval
+              {theme === "deepEval" ? "Checkout DeepEval" : "Checkout DeepTeam"}
               <svg
                 width="18"
                 height="18"

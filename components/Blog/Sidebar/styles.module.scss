@@ -70,6 +70,8 @@
       }
     }
     .list {
+      max-height: 85vh;
+      overflow-y: auto;
       @include responsive(md) {
         transform-origin: top;
         max-height: 0;
@@ -107,6 +109,10 @@
 
           &.active {
             color: $purple;
+            font-weight: 600;
+          }
+          &.activeRed {
+            color: $pink-accent;
             font-weight: 600;
           }
           &:hover {

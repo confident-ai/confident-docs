@@ -2,7 +2,6 @@ import styles from "./styles.module.scss";
 import { formatDate } from "@/functions/format-date";
 
 export default function ArticleHeader({ content }) {
-  console.log(content.author);
   return (
     <>
       <div className={styles.articleAuthor}>

@@ -34,7 +34,7 @@
     padding: 8px 40px;
     font-size: 15px;
     line-height: 1.75em;
-    @include responsive(sm){
+    @include responsive(sm) {
       padding: 8px 20px;
       font-size: 12px;
       line-height: 2em;
@@ -55,8 +55,8 @@
     padding: 20px 25px;
     font-size: 19px;
     line-height: 1.75em;
-
-  } 
+    font-family: $Lexend;
+  }
 
   // Colors
   &.primary {
@@ -83,19 +83,23 @@
     background-color: $darkPurple-500;
     color: $white;
     border-color: $purple;
-    &:hover {
-      background-color: $white;
-      color: $black;
-    }
   }
-  &.purple200{
+  &.purple200 {
     background-color: $purple;
     color: $white;
-    &:hover{
+    &:hover {
+      background-color: $black !important;
+      color: $white !important;
+    }
+  }
+  &.red200 {
+    background-color: $pink-accent;
+    color: $white;
+    border-color: $pink-accent;
+    &:hover {
       background-color: $black!important;
       color: $white!important;
     }
-
   }
 
   //Variants

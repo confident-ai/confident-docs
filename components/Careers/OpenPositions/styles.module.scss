@@ -77,6 +77,9 @@
           gap: 15px;
           width: 100%;
           align-items: center;
+          @include responsive(md){
+            gap: 11px;
+          }
           @include responsive(sm) {
             gap: 10px;
             flex-direction: column;

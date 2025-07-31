@@ -4,39 +4,62 @@ import ArticleContent from "@/components/Blog/ArticleContent/ArticleContent";
 import ArticleHeader from "@/components/Blog/ArticleHeader/ArticleHeader";
 import Callout from "@/components/Blog/Callout/Callout";
 import SideBar from "@/components/Blog/SideBar/SideBar";
+import Blogs from "@/components/Blog/Blogs";
 import styles from "./styles.module.scss";
 
 export default async function Page({ params }) {
   const { slug } = await params;
   const blog = await getBlog(slug);
-  console.log(blog.fields);
+  const theme = blog?.fields?.theme[0] || "deepEval";
   return (
     <GlobalLayout staticHeader={true}>
       <div className={styles.Article}>
         <div className={styles.inner}>
           <div className={styles.contentWrap}>
-            <SideBar content={blog?.fields} mobile={true} />
-
+            <SideBar
+              content={blog?.fields}
+              mobile={true}
+              theme={theme}
+            />
             <ArticleHeader content={blog?.fields} />
             <div className={styles.mainContent}>
-              <Callout />
+              <Callout theme={theme} />
               <img
                 className={styles.featuredImage}
                 src={blog?.fields?.featuredImage?.fields?.file?.url}
                 alt="featured Image"
               />
-              <SideBar content={blog?.fields} />
-              <ArticleContent content={blog?.fields?.contentBody1} />
+              <SideBar
+                content={blog?.fields}
+                theme={theme}
+              />
+              <ArticleContent
+                content={blog?.fields?.contentBody1}
+                theme={theme}
+              />
               {blog?.fields?.contentBody2 && (
-                <ArticleContent content={blog?.fields?.contentBody2} />
+                <ArticleContent
+                  content={blog?.fields?.contentBody2}
+                  theme={theme}
+                />
               )}
               {blog?.fields?.contentBody3 && (
-                <ArticleContent content={blog?.fields?.contentBody3} />
+                <ArticleContent
+                  content={blog?.fields?.contentBody3}
+                  theme={theme}
+                />
               )}
               {blog?.fields?.contentBody4 && (
-                <ArticleContent content={blog?.fields?.contentBody4} />
+                <ArticleContent
+                  content={blog?.fields?.contentBody4}
+                  theme={theme}
+                />
               )}
             </div>
+          </div>
+          <div className={styles.blogWrap}>
+            <h2 className={styles.blogHeading}>More stories from us...</h2>
+            <Blogs limit={3} showTabs={false} blogOrientation="horizontal" blogVariant="light" exclude={slug} />
           </div>
         </div>
       </div>
@@ -53,11 +76,11 @@ export async function generateMetadata({ params }) {
     : `https:${imageUrl}`;
   return {
     title: `${blog?.fields?.title} - Confident AI`,
-    description: blog?.fields?.metaDescription,
+    description: blog?.fields?.excerpt,
     metadataBase: "https://confident-ai.com",
     openGraph: {
       title: `${blog?.fields?.title} - Confident AI`,
-      description: blog?.fields?.metaDescription,
+      description: blog?.fields?.excerpt,
       images: [
         {
           url: fullImageUrl,
@@ -74,7 +97,7 @@ export async function generateMetadata({ params }) {
     twitter: {
       card: "summary_large_image",
       title: `${blog?.fields?.title} - Confident AI`,
-      description: blog?.fields?.metaDescription,
+      description: blog?.fields?.excerpt,
       images: [fullImageUrl],
       creator: "@confident_ai",
     },

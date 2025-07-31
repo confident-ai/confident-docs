@@ -1,28 +1,56 @@
 @import "@/app/styles/vars";
 
+.ArticleContent:last-of-type p:last-of-type {
+  margin-bottom: 0;
+  font-size: 19px;
+  font-family: $PTSerif;
+  line-height: 1.473682em;
+
+  @include responsive(md) {
+    margin-bottom: 20px;
+  }
+  @include responsive(xs) {
+    font-size: 16px;
+    margin-bottom: 40px;
+    line-height: 1.75em;
+  }
+}
 .ArticleContent {
   font-size: 1.2em;
-  @include responsive(xs) {
-    order: 2;
-  }
-  &:last-of-type {
-    p {
-      &:last-of-type {
-        margin-bottom: 0;
-        font-size: 19px;
-        font-family: $PTSerif;
-        line-height: 1.473682em;
-        @include responsive(md) {
-          margin-bottom: 20px;
+  &.deepTeam {
+    a {
+      b {
+        color: $darkBlue-800;
+        transition: 0.3s ease color;
+
+        &:hover {
+          color: $pink-accent;
         }
-        @include responsive(xs) {
-          font-size: 16px;
-          margin-bottom: 40px;
-          line-height: 1.75em;
-        }
+      }
+      &:hover {
+        color: $darkBlue-900;
       }
     }
   }
+  &.deepEval {
+    a {
+      b {
+        color: $darkBlue-800;
+        transition: 0.3s ease color;
+
+        &:hover {
+          color: $purple-200;
+        }
+      }
+      &:hover {
+        color: $darkBlue-900;
+      }
+    }
+  }
+  @include responsive(xs) {
+    order: 2;
+  }
+
   @include responsive(sm) {
     max-width: 600px;
     margin: 0 auto;
@@ -46,18 +74,17 @@
       font-size: 1.1rem;
       line-height: 1.59091em;
     }
-
-    sub {
-      font-size: 13px;
-      font-family: $PTSerif;
-      line-height: 1.8em;
-    }
   }
   p:has(sub) {
     text-align: center;
     justify-content: center;
-    margin-top: -22px;
+    margin-top: -22px !important;
     margin-bottom: 30px;
+    display: flex;
+    gap: 4px;
+    sub {
+      margin-top: 0;
+    }
   }
   ol,
   ul {
@@ -67,14 +94,25 @@
     li {
       padding-left: 8px;
       margin-bottom: 8px;
-
+      .codeWrap {
+        display: inline;
+        pre {
+          padding: 0 !important;
+          display: inline;
+          border-radius: 0 !important;
+          width: fit-content;
+          code {
+            padding: 5px;
+            font-size: 14px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            color: black;
+          }
+        }
+      }
       p {
         display: inline;
         font-family: $PTSerif;
-
-        b {
-          margin-right: 5px;
-        }
       }
     }
   }
@@ -111,9 +149,6 @@
     color: $Blue;
     text-decoration: underline;
     transition: 0.3s ease color;
-    &:hover {
-      color: $darkBlue-900;
-    }
   }
   h2 {
     font-size: 32px;
@@ -142,29 +177,44 @@
 
     pre {
       margin: 0.5em 0;
-      padding: 1em;
+      padding: 19px;
       border-radius: 10px;
       line-height: 100%;
       overflow-x: auto;
       font-size: 0.75em;
       width: 100%;
-      @include responsive(sm){
-        padding: 13.5px;
+      @include responsive(sm) {
+        padding: 18.5px;
         margin: 6px 0;
       }
-      @include responsive(xs){
-        padding: 12.24px;
+      @include responsive(xs) {
+        padding: 17.24px;
       }
 
       code {
         font-size: 14px;
-        padding: 5px;
       }
     }
   }
-  img {
+  div {
     margin-bottom: 24px;
+    img {
+      width: 100%;
+      margin: 0 auto;
+      height: auto;
+    }
   }
+  sub {
+    font-size: 13px;
+    font-family: $PTSerif;
+    line-height: 2.659em;
+    margin-top: 8px;
+    display: block;
+  }
+  div:has(sub) {
+    text-align: center;
+  }
+
   blockquote {
     margin: 40px 0;
     border-left: 4px solid $violet-600;

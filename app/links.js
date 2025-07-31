@@ -13,17 +13,17 @@ const links = {
     { name: "LLM red-teaming", url: "/blog/llm-red-teaming" },
   ],
   resources: [
-    { name: "Blog", url: "/resources/blog" },
-    { name: "QuickStart", url: "/resources/quickstart" },
-    { name: "DeepEval Docs", url: "/resources/deepeval-docs" },
-    { name: "DeepTeam Docs", url: "/resources/deepteam-docs" },
+    { name: "Blog", url: "/blog" },
+    { name: "QuickStart", url: "/quickstart" },
+    { name: "DeepEval Docs", url: "/docs" },
+    { name: "DeepTeam Docs", url: "https://www.trydeepteam.com/ " },
   ],
   company: [
-    { name: "Open-source", url: "/company/open-source" },
-    { name: "Pricing", url: "/company/pricing" },
-    { name: "Careers", url: "/company/careers" },
-    { name: "Terms of Service", url: "/company/terms-of-service" },
-    { name: "Privacy Policy", url: "/company/privacy-policy" },
+    { name: "Open-source", url: "https://github.com/confident-ai/deepeval" },
+    { name: "Pricing", url: "/pricing" },
+    { name: "Careers", url: "/careers" },
+    { name: "Terms of Service", url: "/terms-of-service" },
+    { name: "Privacy Policy", url: "/privacy-policy" },
   ],
 };
 
