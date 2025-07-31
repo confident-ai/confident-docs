@@ -90,6 +90,14 @@ Span attributes start with `confident.span.*` namespace.
 - `confident.agent.attributes.input` for span input.
 - `confident.agent.attributes.output` for span output.
 
+[Tool Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#tool-attributes) specific to span type `tool`: 
+
+- `confident.tool.name` for span name.
+- `confident.tool.description` for span description.
+
+- `confident.tool.attributes.input_parameters` for span input parameters.
+- `confident.tool.attributes.output` for span output.
+
 
 <Callout>
 It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
