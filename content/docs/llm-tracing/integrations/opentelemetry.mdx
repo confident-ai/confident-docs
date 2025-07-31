@@ -58,6 +58,29 @@ Trace attributes are set in the span attributes.
 
 - `confident.trace.attributes` used for updating trace attributes like name, [tags](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/tags), [threads](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/threads) and [users](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/users).
 
+### Span attributes
+
+Span attributes start with `confident.span.*` namespace.
+
+- `confident.span.type` for [span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types).
+- `confident.span.input` for span input.
+- `confident.span.output` for span output.
+- `confident.span.error` for span error.
+- `confident.span.feedback` for span feedback.
+- `confident.span.metric_collection` for span metric collection.
+
+[LLM Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#llm-attributes) specific to span type `llm`: 
+
+- `confident.span.attributes.input` for span input.
+- `confident.span.attributes.output` for span output.
+- `confident.span.attributes.model` for span model.
+- `confident.span.attributes.prompt` for span prompt.
+- `confident.span.attributes.input_token_count` for span input token count.
+- `confident.span.attributes.output_token_count` for span output token count.
+- `confident.span.attributes.cost_per_input_token` for span cost per input token.
+- `confident.span.attributes.cost_per_output_token` for span cost per output token.
+
+
 
 
 <Callout>
