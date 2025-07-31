@@ -71,16 +71,24 @@ Span attributes start with `confident.span.*` namespace.
 
 [LLM Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#llm-attributes) specific to span type `llm`: 
 
-- `confident.span.attributes.input` for span input.
-- `confident.span.attributes.output` for span output.
-- `confident.span.attributes.model` for span model.
-- `confident.span.attributes.prompt` for span prompt.
-- `confident.span.attributes.input_token_count` for span input token count.
-- `confident.span.attributes.output_token_count` for span output token count.
-- `confident.span.attributes.cost_per_input_token` for span cost per input token.
-- `confident.span.attributes.cost_per_output_token` for span cost per output token.
+- `confident.llm.model` for span model.
+- `confident.llm.cost_per_input_token` for span cost per input token.
+- `confident.llm.output_token_count` for span output token count.
 
+- `confident.llm.attributes.input` for span input.
+- `confident.llm.attributes.output` for span output.
+- `confident.llm.attributes.prompt` for span prompt.
+- `confident.llm.attributes.input_token_count` for span input token count.
+- `confident.llm.attributes.cost_per_output_token` for span cost per output token.
 
+[Agent Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#agent-attributes) specific to span type `agent`: 
+
+- `confident.agent.name` for span name.
+- `confident.agent.available_tools` for span available tools.
+- `confident.agent.agent_handoffs` for span agent handoffs.
+
+- `confident.agent.attributes.input` for span input.
+- `confident.agent.attributes.output` for span output.
 
 
 <Callout>
