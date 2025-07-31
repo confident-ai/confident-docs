@@ -16,7 +16,10 @@ deepeval login --confident-api-key YOUR_API_KEY
 ```
 Add `ConfidentSpanExporter` to your OpenTelemetry tracer:
 
-```python showLineNumbers {5, 13,14}
+```python filename="example.py" showLineNumbers {8, 16}
+import time
+import json
+
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -28,29 +31,45 @@ if not isinstance(trace.get_tracer_provider(), TracerProvider):
     trace.set_tracer_provider(tracer_provider)
 else:
     tracer_provider = trace.get_tracer_provider()
-    
-exporter = ConfidentSpanExporter()
-span_processor = BatchSpanProcessor(span_exporter=exporter)
+
+span_processor = BatchSpanProcessor(ConfidentSpanExporter())
 tracer_provider.add_span_processor(span_processor)
 
 tracer = trace.get_tracer("deepeval_tracer")
 
-# start a span
-with tracer.start_as_current_span("chat gpt-4o") as parent_span:
-    parent_span.set_attribute("gen_ai.operation.name", "chat")
+def llm(input: str) -> str:
+    with tracer.start_as_current_span("llm_span") as span:
+        span.set_attribute("confident.span.type", "llm")
+        span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+        span.set_attribute("confident.llm.attributes.input", [
+            json.dumps({"role": "system", "content": "You are a helpful assistant."}),
+            json.dumps({"role": "user", "content": input})
+        ])
+        time.sleep(0.5)
+        span.set_attribute("confident.llm.attributes.output", "Hello world")
+    
+    return "Hello world"
 
+def my_app(input: str):
+    with tracer.start_as_current_span("my_app") as span:
+        span.set_attribute("confident.span.input", input)
+        res = llm(input)
+        span.set_attribute("confident.span.output", res)
+
+if __name__ == "__main__":
+    my_app("Hi")
 ```
-This will create a trace in the Observatory, with the span name `chat gpt-4o`.
+Run the script:
+
+```bash
+python example.py
+```
+
+This will create a trace in the Observatory, with the span name `my_app`.
 
 ## Attributes mapping
 
-Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [LLM Tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
-
-### Trace configuration
-Trace configuration attribues should be set in resource configuration of you `TracerProvider`, which will apply to all telemetry (traces, metrics, logs) for the lifetime of your application instance.
-
-- `confident.environment` used for setting [environment](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/environment).
-- `confident.sample_rate` used for setting [sample rate](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/sampling).
+Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
 
 ### Trace attributes
 
@@ -58,54 +77,111 @@ Trace attributes are set in the span attributes.
 
 - `confident.trace.attributes` used for updating trace attributes like name, [tags](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/tags), [threads](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/threads) and [users](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/users).
 
+```python showLineNumbers
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.attributes", json.dumps({
+            "name": "test_trace",
+            "tags": ["tag1", "tag2"],
+            "thread_id": "123",
+            "user_id": "456"
+        }))
+```
+
 <Callout>
 It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
 </Callout>
 
-### Span attributes
+#### **Custom Span**
 
-Span attributes start with `confident.span.*` namespace.
+Span attributes start with `confident.{span_type}.*` namespace.
 
-- `confident.span.type` for [span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types).
-- `confident.span.input` for span input.
-- `confident.span.output` for span output.
-- `confident.span.error` for span error.
-- `confident.span.feedback` for span feedback.
-- `confident.span.metric_collection` for span metric collection.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.span.type` | `str` | Used for setting [span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types) |
+| `confident.span.input` | `Any` | Span input |
+| `confident.span.output` | `Any` | Span output |
+| `confident.span.error` | `str` | Span error |
+| `confident.span.metric_collection` | `str` | Span [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) |
 
-[LLM Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#llm-attributes) specific to span type `llm`: 
+<Callout type="info">
+If the `confident.span.type` is not set, the default span type is [custom span](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#custom-span).
+</Callout>
 
-- `confident.llm.model` for span model.
-- `confident.llm.cost_per_input_token` for span cost per input token.
-- `confident.llm.output_token_count` for span output token count.
+#### **LLM Span**
 
-- `confident.llm.attributes.input` for span input.
-- `confident.llm.attributes.output` for span output.
-- `confident.llm.attributes.prompt` for span prompt.
-- `confident.llm.attributes.input_token_count` for span input token count.
-- `confident.llm.attributes.cost_per_output_token` for span cost per output token.
+To create a LLM span, set the `confident.span.type` to `llm`.
 
-[Agent Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#agent-attributes) specific to span type `agent`: 
+LLM span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#llm-span)
 
-- `confident.agent.name` for span name.
-- `confident.agent.available_tools` for span available tools.
-- `confident.agent.agent_handoffs` for span agent handoffs.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.llm.model` | `str` | LLM model |
+| `confident.llm.cost_per_input_token` | `float` | Cost per input token |
+| `confident.llm.cost_per_output_token` | `float` | Cost per output token |
 
-- `confident.agent.attributes.input` for span input.
-- `confident.agent.attributes.output` for span output.
+LLM attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#llm-attributes)
 
-[Tool Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#tool-attributes) specific to span type `tool`: 
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.llm.attributes.input` | `str`, `list[str]` | LLM Span input (parsed to `list[dict]` if `list[str]` is provided) |
+| `confident.llm.attributes.output` | `Any` | LLM Span output |
+| `confident.llm.attributes.input_token_count` | `int` | LLM Span input token count |
+| `confident.llm.attributes.cost_per_output_token` | `float` | LLM Span cost per output token |
 
-- `confident.tool.name` for span name.
-- `confident.tool.description` for span description.
 
-- `confident.tool.attributes.input_parameters` for span input parameters.
-- `confident.tool.attributes.output` for span output.
+#### **Agent span**
 
-[Retrieval Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes) specific to span type `retriever`: 
+To create an agent span, set the `confident.span.type` to `agent`.
 
-- `confident.retriever.name` for span name.
-- `confident.retriever.description` for span description.
+Agent span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#agent-span)
 
-- `confident.retriever.attributes.input` for span input.
-- `confident.retriever.attributes.output` for span output.
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.agent.name` | `str` | Agent span name |
+| `confident.agent.available_tools` | `list[str]` | Agent span available tools |
+| `confident.agent.agent_handoffs` | `list[str]` | Agent span agent handoffs |
+
+Agent attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#agent-attributes)
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.agent.attributes.input` | `Any` | Agent span input |
+| `confident.agent.attributes.output` | `Any` | Agent span output |
+
+#### **Tool span**
+
+To create a tool span, set the `confident.span.type` to `tool`.
+
+Tool span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#tool-span)
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.tool.name` | `str` | Tool span name |
+| `confident.tool.description` | `str` | Tool span description |
+
+Tool attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#tool-attributes)
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.tool.attributes.input_parameters` | `str` | Tool span input parameters (parsed to `dict` if `str` is provided) |
+| `confident.tool.attributes.output` | `Any` | Tool span output |
+
+#### **Retriever span**
+
+To create a retrieval span, set the `confident.span.type` to `retriever`.
+
+Retriever span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes)
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.retriever.embedder` | `str` | Retrieval span embedder model |
+
+Retriever attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes)
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `confident.retriever.attributes.embedding_input` | `str` | Retrieval span embedding input |
+| `confident.retriever.attributes.retrieval_context` | `list[str]` | Retrieval span retrieval context |
+| `confident.retriever.attributes.top_k` | `int` | Retrieval span top k |
+| `confident.retriever.attributes.chunk_size` | `int` | Retrieval span chunk size |
