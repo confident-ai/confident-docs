@@ -52,5 +52,14 @@ Trace configuration attribues should be set in resource configuration of you `Tr
 - `confident.environment` used for setting [environment](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/environment).
 - `confident.sample_rate` used for setting [sample rate](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/sampling).
 
+### Trace attributes
+
+Trace attributes are set in the span attributes.
+
+- `confident.trace.attributes` used for updating trace attributes like name, [tags](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/tags), [threads](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/threads) and [users](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/users).
 
 
+
+<Callout>
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+</Callout>
