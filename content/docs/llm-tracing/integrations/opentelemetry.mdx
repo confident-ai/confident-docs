@@ -58,6 +58,10 @@ Trace attributes are set in the span attributes.
 
 - `confident.trace.attributes` used for updating trace attributes like name, [tags](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/tags), [threads](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/threads) and [users](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/users).
 
+<Callout>
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+</Callout>
+
 ### Span attributes
 
 Span attributes start with `confident.span.*` namespace.
@@ -98,7 +102,10 @@ Span attributes start with `confident.span.*` namespace.
 - `confident.tool.attributes.input_parameters` for span input parameters.
 - `confident.tool.attributes.output` for span output.
 
+[Retrieval Span Attributes](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes) specific to span type `retriever`: 
 
-<Callout>
-It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
-</Callout>
+- `confident.retriever.name` for span name.
+- `confident.retriever.description` for span description.
+
+- `confident.retriever.attributes.input` for span input.
+- `confident.retriever.attributes.output` for span output.
