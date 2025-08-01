@@ -2,7 +2,7 @@
 
 .feature {
   display: flex;
-
+  margin-bottom: 0!important;
   .inner {
     display: flex;
     gap: 16px;
@@ -81,6 +81,9 @@
           font-weight: 600;
           max-width: 80%;
           margin-bottom: 0;
+          &.deepTeam{
+            max-width: 100%!important;
+          }
           @include responsive(xl) {
             max-width: 90%;
           }

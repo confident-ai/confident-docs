@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import Prism from "prismjs";
 import "prismjs/components/prism-python";
+import "@/app/styles/prism-vsc-dark-plus.css";
 import styles from "./styles.module.scss";
 
 export default function ShowCase() {

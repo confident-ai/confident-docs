@@ -4,7 +4,7 @@ import ConditionalHead from './ConditionalHead'
 export default async function RootLayout({ children }) {
   return (
     <html
-      style={{ scrollPaddingTop: "24px" }}
+      style={{ scrollPaddingTop: "24px", scrollBehavior: "smooth" }}
       // Not required, but good for SEO
       lang="en"
       // Required to be set

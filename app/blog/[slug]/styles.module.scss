@@ -68,10 +68,10 @@
     }
     .blogWrap{
       margin-top: 140px;
+      padding: 0 4px;
       @include responsive(xl){
         width: 86%;
         margin: 140px auto 0;
-        padding: 0 4px;
       }
       @include responsive(xs){
         width: 100%;

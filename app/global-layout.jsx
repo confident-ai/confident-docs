@@ -2,8 +2,6 @@
 import CustomNavbar from '@/components/CustomNavbar/CustomNavbar';
 import Footer from "@/components/Footer/Footer";
 import styles from "./styles.module.scss";
-import "@/app/styles/prism-vsc-dark-plus.css";
-// import "@/app/styles/prism-colddark-dark.css";
 import links from './links'
 import { useEffect, useState } from "react";
 

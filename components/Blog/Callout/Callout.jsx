@@ -1,5 +1,5 @@
+import Image from "next/image";
 import styles from "./styles.module.scss";
-import { Star } from "lucide-react";
 export default function Callout({ theme = 'deepEval' }) {
   return (
     <div className={`${styles.ctaWrap} ${styles[theme]}`}>
@@ -15,7 +15,7 @@ export default function Callout({ theme = 'deepEval' }) {
           href="https://github.com/confident-ai/deepeval"
           className={styles.githubBtn}
         >
-          <Star fill="#ffc107" width={26} height={26} color='#000' />
+          <Image src="/icons/star.svg" alt="star" width={26} height={26} />
           Star on GitHub
         </a>
       </div>

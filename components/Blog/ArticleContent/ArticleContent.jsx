@@ -3,6 +3,7 @@ import { BLOCKS } from "@contentful/rich-text-types";
 import Feature from "@/components/Blog/Feature/Feature";
 
 import Prism from "prismjs";
+import "@/app/styles/prism-colddark-dark.css";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-bash";

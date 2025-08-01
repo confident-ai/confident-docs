@@ -5,7 +5,15 @@ import styles from "./styles.module.scss";
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Card from "./Card/Card";
 
-export default function Blogs({ limit = 3, blogOrientation = 'horizontal', showTabs = false, blogVariant = 'light', exclude = null, disableLoader = true }) {
+export default function Blogs({
+  limit = 3,
+  blogOrientation = "horizontal",
+  showTabs = false,
+  blogVariant = "light",
+  exclude = null,
+  disableLoader = true,
+  category = null,
+}) {
   const [isLoading, setIsLoading] = useState(true);
   const [tab, setTab] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +32,9 @@ export default function Blogs({ limit = 3, blogOrientation = 'horizontal', showT
     const fetchBlogs = async () => {
       setIsLoading(true);
       const res = await fetch(
-        `/api/blogs?page=${currentPage}&limit=${limit}&category=${tab}&excludeSlug=${exclude}`
+        `/api/blogs?page=${currentPage}&limit=${limit}&category=${
+          category === null ? tab : category
+        }&excludeSlug=${exclude}`
       );
       const data = await res.json();
       setBlogs(data?.items);
@@ -43,28 +53,40 @@ export default function Blogs({ limit = 3, blogOrientation = 'horizontal', showT
     <div className={`${styles.blogSection} ${styles[blogOrientation]}`}>
       <div className={`${styles.inner} ${styles[blogOrientation]}`}>
         {showTabs && (
-        <div className={styles.tabs}>
-          {tabOptions.map(item => (
-            <div
-              className={`${styles.tab} ${
-                item.value === tab ? styles.active : ""
-              }`}
-              key={item.value}
-              onClick={() => onChangeTab(item.value)}
-            >
-              <span>{item.title}</span>
-            </div>
-          ))}
-          <span className={styles.slider} />
-        </div>
+          <div className={styles.tabs}>
+            {tabOptions.map(item => (
+              <div
+                className={`${styles.tab} ${
+                  item.value === tab ? styles.active : ""
+                }`}
+                key={item.value}
+                onClick={() => onChangeTab(item.value)}
+              >
+                <span>{item.title}</span>
+              </div>
+            ))}
+            <span className={styles.slider} />
+          </div>
         )}
         <div className={styles.blogs}>
           {!isLoading &&
-            blogs?.map((blog, idx) => <Card blog={blog} key={idx} variant={blogVariant} orientation={blogOrientation} />)}
+            blogs?.map((blog, idx) => (
+              <Card
+                blog={blog}
+                key={idx}
+                variant={blogVariant}
+                orientation={blogOrientation}
+              />
+            ))}
 
-          {isLoading && !disableLoader &&
+          {isLoading &&
+            !disableLoader &&
             [...Array(limit)].map((_, index) => (
-              <Skeleton key={index} className={styles.blogItem} style={{height: "250px"}} />
+              <Skeleton
+                key={index}
+                className={styles.blogItem}
+                style={{ height: "250px" }}
+              />
             ))}
         </div>
         <div className={styles.pagination}>

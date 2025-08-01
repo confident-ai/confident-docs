@@ -15,13 +15,12 @@ export default async function Page({ params }) {
     <GlobalLayout staticHeader={true}>
       <div className={styles.Article}>
         <div className={styles.inner}>
-          <div className={styles.contentWrap}>
-            <SideBar
+          <div className={`${styles.contentWrap}`}>
+            <SideBar content={blog?.fields} mobile={true} theme={theme} />
+            <ArticleHeader
               content={blog?.fields}
-              mobile={true}
-              theme={theme}
+              updatedAt={blog?.sys?.updatedAt}
             />
-            <ArticleHeader content={blog?.fields} />
             <div className={styles.mainContent}>
               <Callout theme={theme} />
               <img
@@ -29,10 +28,7 @@ export default async function Page({ params }) {
                 src={blog?.fields?.featuredImage?.fields?.file?.url}
                 alt="featured Image"
               />
-              <SideBar
-                content={blog?.fields}
-                theme={theme}
-              />
+              <SideBar content={blog?.fields} theme={theme} />
               <ArticleContent
                 content={blog?.fields?.contentBody1}
                 theme={theme}
@@ -59,7 +55,14 @@ export default async function Page({ params }) {
           </div>
           <div className={styles.blogWrap}>
             <h2 className={styles.blogHeading}>More stories from us...</h2>
-            <Blogs limit={3} showTabs={false} blogOrientation="horizontal" blogVariant="light" exclude={slug} />
+            <Blogs
+              limit={3}
+              showTabs={false}
+              blogOrientation="horizontal"
+              blogVariant="light"
+              exclude={slug}
+              category={blog.fields.category[0]}
+            />
           </div>
         </div>
       </div>

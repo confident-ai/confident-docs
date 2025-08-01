@@ -1,7 +1,7 @@
 import styles from "./styles.module.scss";
 import { formatDate } from "@/functions/format-date";
 
-export default function ArticleHeader({ content }) {
+export default function ArticleHeader({ content, updatedAt }) {
   return (
     <>
       <div className={styles.articleAuthor}>
@@ -24,10 +24,10 @@ export default function ArticleHeader({ content }) {
         </div>
         <div className={styles.articleMeta}>
           <span className={styles.publishDate}>
-            {formatDate(content.createdDate)}
+            {formatDate(updatedAt)}
           </span>
           <span className={styles.seperator}>.</span>
-          <span className={styles.readTime}>{content.readTime}</span>
+          <span className={styles.readTime}>{content?.readTime}</span>
         </div>
         <div className={styles.imageWrap}>
 

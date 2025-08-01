@@ -1,20 +1,5 @@
 @import "@/app/styles/vars";
 
-.ArticleContent:last-of-type p:last-of-type {
-  margin-bottom: 0;
-  font-size: 19px;
-  font-family: $PTSerif;
-  line-height: 1.473682em;
-
-  @include responsive(md) {
-    margin-bottom: 20px;
-  }
-  @include responsive(xs) {
-    font-size: 16px;
-    margin-bottom: 40px;
-    line-height: 1.75em;
-  }
-}
 .ArticleContent {
   font-size: 1.2em;
   &.deepTeam {
@@ -31,6 +16,9 @@
         color: $darkBlue-900;
       }
     }
+    blockquote {
+      border-color: $pink-accent;
+    }
   }
   &.deepEval {
     a {
@@ -46,15 +34,18 @@
         color: $darkBlue-900;
       }
     }
+    blockquote {
+      border-color: $violet-600;
+    }
   }
   @include responsive(xs) {
     order: 2;
   }
-
   @include responsive(sm) {
     max-width: 600px;
     margin: 0 auto;
   }
+
   p {
     margin-bottom: 32px;
     font-family: Georgia, "Times New Roman", Times, serif;
@@ -75,21 +66,11 @@
       line-height: 1.59091em;
     }
   }
-  p:has(sub) {
-    text-align: center;
-    justify-content: center;
-    margin-top: -22px !important;
-    margin-bottom: 30px;
-    display: flex;
-    gap: 4px;
-    sub {
-      margin-top: 0;
-    }
-  }
+
   ol,
   ul {
     padding-left: 40px;
-    margin: 32px 0;
+    margin: 32px 0 40px;
 
     li {
       padding-left: 8px;
@@ -116,6 +97,7 @@
       }
     }
   }
+
   hr {
     height: fit-content;
     border: none;
@@ -139,17 +121,21 @@
       }
     }
   }
+
   ul {
     list-style: disc;
   }
+
   ol {
     list-style: decimal;
   }
+
   a {
     color: $Blue;
     text-decoration: underline;
     transition: 0.3s ease color;
   }
+
   h2 {
     font-size: 32px;
     color: $darkBlue-800;
@@ -161,6 +147,7 @@
       font-size: 29px;
     }
   }
+
   h4 {
     font-size: 28px;
     font-family: $PTSans;
@@ -171,24 +158,25 @@
       font-size: 26px;
     }
   }
+
   .codeWrap {
     display: flex;
     margin: 0 0 2rem;
 
     pre {
       margin: 0.5em 0;
-      padding: 19px;
+      padding: 14.4px 19.4px;
       border-radius: 10px;
       line-height: 100%;
       overflow-x: auto;
       font-size: 0.75em;
       width: 100%;
       @include responsive(sm) {
-        padding: 18.5px;
+        padding: 13.6px 18.6px;
         margin: 6px 0;
       }
       @include responsive(xs) {
-        padding: 17.24px;
+        padding: 12.24px 17.24px;
       }
 
       code {
@@ -196,21 +184,23 @@
       }
     }
   }
+
   div {
     margin-bottom: 24px;
     img {
-      width: 100%;
       margin: 0 auto;
       height: auto;
     }
   }
+
   sub {
     font-size: 13px;
     font-family: $PTSerif;
     line-height: 2.659em;
-    margin-top: 8px;
+    margin-top: 4px;
     display: block;
   }
+
   div:has(sub) {
     text-align: center;
   }
@@ -230,6 +220,22 @@
       @include responsive(sm) {
         font-size: 1.2rem;
       }
+    }
+  }
+
+  hr + p {
+    margin-bottom: 0;
+    font-size: 19px;
+    font-family: $PTSerif;
+    line-height: 1.473682em;
+
+    @include responsive(md) {
+      margin-bottom: 20px;
+    }
+    @include responsive(xs) {
+      font-size: 16px;
+      margin-bottom: 40px;
+      line-height: 1.75em;
     }
   }
 }

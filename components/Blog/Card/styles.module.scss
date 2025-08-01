@@ -20,8 +20,8 @@
   .imageWrap {
     width: 100%;
     background-color: $lightGray-100;
-    min-width: 220px;
-    max-width: 220px;
+    min-width: 230px;
+    max-width: 230px;
     overflow: hidden;
     @include responsive(lg) {
       min-width: 200px;
@@ -292,7 +292,7 @@
         }
       }
       .author {
-        margin-top: 20px;
+        margin: 20px 0 0;
         @include responsive(xl) {
           margin-top: 14px;
         }

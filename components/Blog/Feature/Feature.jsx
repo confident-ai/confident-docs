@@ -53,7 +53,7 @@ export default function Feature({ theme = 'deepEval' }) {
               alt="Confident Ai Logo"
               className={styles.logo}
             />
-            <h2>
+            <h2 className={styles[theme]}>
               {theme === "deepEval"
                 ? "Confident AI: The DeepEval LLM Evaluation Platform"
                 : "Got Red? Safeguard LLM Systems Today with Confident AI"}
@@ -90,7 +90,7 @@ export default function Feature({ theme = 'deepEval' }) {
               sizes="xl"
               color={theme === "deepEval" ? "purple200" : "red200"}
               label={
-                theme === "deepEval" ? "Try Now For Free" : "Request a Demo"
+                theme === "deepEval" ? "Try Now for Free" : "Request a Demo"
               }
               style={{
                 borderRadius: "8px",
