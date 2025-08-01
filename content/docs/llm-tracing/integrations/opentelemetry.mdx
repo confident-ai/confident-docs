@@ -100,7 +100,7 @@ Span attributes start with `confident.{span_type}.*` namespace. [Span type](http
 - `retriever`: Retriever span.
 - `tool`: Tool span.
 
-Given below is the sample codes and mapping table for setting attributes for different span types.
+Given below is the sample codes for setting attributes for different span types.
 
 <Tabs items={["Default Span", "LLM Span", "Agent Span", "Retriever Span", "Tool Span"]}>
 
@@ -190,6 +190,37 @@ def tool_span(input: str):
 
 </Tabs>
 
+### LLM test case
+
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+```python showLineNumbers
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
+    
+    span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.span.llm_test_case.input', input)
+    span.set_attribute('confident.span.llm_test_case.actual_output', output)
+```
+
+<Callout>
+Make sure you have [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) created on the platform for running online evaluation on this test case.
+</Callout>
+
+LLM test case attributes mapping:
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.span.llm_test_case.input` | `str` | Yes | Test case input |
+| `confident.span.llm_test_case.actual_output` | `str` | Yes | Test case actual output |
+| `confident.span.llm_test_case.expected_output` | `str` | No | Test case expected output |
+| `confident.span.llm_test_case.context` | `list[str]` | No | Test case context |
+| `confident.span.llm_test_case.retrieval_context` | `list[str]` | No | Test case retrieval context |
+| `confident.span.llm_test_case.tools_called` | `str` | No | Should be stringified json of type [Tools Called](https://deepeval.com/docs/evaluation-test-cases#tools-called) |
+| `confident.span.llm_test_case.expected_tools` | `str` | No | Should be stringified json of type [Expected Tools](https://deepeval.com/docs/evaluation-test-cases#expected-tools) |
 
 #### **Default span**
 
