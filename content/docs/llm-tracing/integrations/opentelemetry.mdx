@@ -17,25 +17,24 @@ deepeval login --confident-api-key YOUR_API_KEY
 ```
 Add `ConfidentSpanExporter` to your OpenTelemetry tracer:
 
-```python filename="example.py" showLineNumbers {8, 16}
+```python filename="example.py" showLineNumbers {7, 15}
 import time
 import json
-
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from deepeval.tracing.otel.exporter import ConfidentSpanExporter
 
-if not isinstance(trace.get_tracer_provider(), TracerProvider):
-    tracer_provider = TracerProvider()
-    trace.set_tracer_provider(tracer_provider)
-else:
-    tracer_provider = trace.get_tracer_provider()
+# Set up tracer provider
+tracer_provider = trace.get_tracer_provider()
+if not isinstance(tracer_provider, TracerProvider):
+    trace.set_tracer_provider(TracerProvider())
 
-span_processor = BatchSpanProcessor(ConfidentSpanExporter())
-tracer_provider.add_span_processor(span_processor)
+# Add confident span exporter wrapped in batch span processor
+tracer_provider.add_span_processor(BatchSpanProcessor(ConfidentSpanExporter()))
 
+# Get tracer
 tracer = trace.get_tracer("deepeval_tracer")
 
 def llm(input: str) -> str:
@@ -57,8 +56,7 @@ def my_app(input: str):
         res = llm(input)
         span.set_attribute("confident.span.output", res)
 
-if __name__ == "__main__":
-    my_app("Hi")
+my_app("Hi")
 ```
 Run the script:
 
@@ -94,15 +92,22 @@ It is recommended to set trace attributes once in any span in a trace lifecycle.
 </Callout>
 
 ### Spans
-Given below is the sample codes for setting attributes for different span types.
 
-<Tabs items={["Custom Span", "LLM Span", "Agent Span", "Retriever Span", "Tool Span"]}>
+Span attributes start with `confident.{span_type}.*` namespace. [Span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types) can be one of the following:
+- `span`: Default (custom) span type.
+- `llm`: LLM span.
+- `agent`: Agent span.
+- `retriever`: Retriever span.
+- `tool`: Tool span.
+
+Given below is the sample codes and mapping table for setting attributes for different span types.
+
+<Tabs items={["Default Span", "LLM Span", "Agent Span", "Retriever Span", "Tool Span"]}>
 
 <Tabs.Tab>
 ```python showLineNumbers
 def meta_agent(input: str):
     with tracer.start_as_current_span("meta_agent") as span:
-
         span.set_attribute("confident.span.input", input)
         span.set_attribute("confident.span.output", input)
         span.set_attribute("confident.span.error", "Error")
@@ -186,23 +191,16 @@ def tool_span(input: str):
 </Tabs>
 
 
-#### **Custom Span**
-
-Span attributes start with `confident.{span_type}.*` namespace.
+#### **Default span**
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `confident.span.type` | `str` | Used for setting [span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types) |
 | `confident.span.input` | `Any` | Span input |
 | `confident.span.output` | `Any` | Span output |
 | `confident.span.error` | `str` | Span error |
 | `confident.span.metric_collection` | `str` | Span [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) |
 
-<Callout type="info">
-If the `confident.span.type` is not set, the default span type is [custom span](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#custom-span).
-</Callout>
-
-#### **LLM Span**
+#### **LLM span**
 
 To create a LLM span, set the `confident.span.type` to `llm`.
 
