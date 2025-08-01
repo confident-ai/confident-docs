@@ -112,7 +112,6 @@ def meta_agent(input: str):
             "explanation": "Explanation"
         }))
         span.set_attribute("confident.span.metric_collection", "My metrics")
-
         span.set_attribute("confident.trace.attributes", json.dumps({
             "name": "test_trace",
             "tags": ["tag1", "tag2"],
@@ -131,9 +130,8 @@ def llm_agent(input: str):
         span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
         span.set_attribute("confident.llm.cost_per_input_token", 0.01)
         span.set_attribute("confident.llm.cost_per_output_token", 0.02)
-        
-        span.set_attribute("confident.llm.attributes.input", [json.dumps(
-            {"role": "user", "content": input}),
+        span.set_attribute("confident.llm.attributes.input", [
+            json.dumps({"role": "user", "content": input}),
             json.dumps({"role": "system", "content": "You are a helpful assistant."})
         ])
         span.set_attribute("confident.llm.attributes.output", "Hello world")
@@ -152,7 +150,6 @@ def agent_span(input: str):
         span.set_attribute("confident.agent.name", "agent_span")
         span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
         span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
-        
         span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
         span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
 ```
@@ -166,7 +163,6 @@ def retriever_span(input: str):
     with tracer.start_as_current_span("retriever_span") as span:
         span.set_attribute("confident.span.type", "retriever")
         span.set_attribute("confident.retriever.embedder", "embedder")
-        
         span.set_attribute("confident.retriever.attributes.embedding_input", input)
         span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
         span.set_attribute("confident.retriever.attributes.top_k", 10)
@@ -182,7 +178,6 @@ def tool_span(input: str):
         span.set_attribute("confident.span.type", "tool")
         span.set_attribute("confident.tool.name", "tool name")
         span.set_attribute("confident.tool.description", "tool description")
-
         span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": input}))
         span.set_attribute("confident.tool.attributes.output", json.dumps({"output": input}))
 ```
