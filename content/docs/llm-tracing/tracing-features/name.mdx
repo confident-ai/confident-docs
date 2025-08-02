@@ -1,0 +1,57 @@
+---
+title: Name
+---
+
+import { Callout, Tabs } from "nextra/components";
+
+# Name
+
+Both traces and spans have names, and you can customize them based on your liking for better UI display.
+
+
+## Set Name on Trace
+
+You can name a trace at runtime by providing the `name` paramter in `update_current_trace`:
+
+```python filename="main.py" showLineNumbers {8}
+from openai import OpenAI 
+from deepeval.tracing import observe, update_current_trace
+
+client = OpenAI()
+ 
+@observe()
+def llm_app(query: str):
+    update_current_trace(name="Call LLM")
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+ 
+llm_app("Write me a poem.")
+```
+
+By default, the name on a trace is set to `None`.
+
+## Set Name on Span
+
+The default name for a span is the name of the function/method you're decorating. If you wish to overwrite this behavior, simply provide a `name` to the `@observe` decorator:
+
+```python filename="main.py" showLineNumbers {6}
+from openai import OpenAI 
+from deepeval.tracing import observe
+
+client = OpenAI()
+ 
+@observe(name="not_llm_app")
+def llm_app(query: str):
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+ 
+llm_app("Write me a poem.")
+```

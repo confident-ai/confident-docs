@@ -12,7 +12,7 @@ export default {
   "evaluation-features": {
     title: "Evaluation Features",
     theme: {
-      collapsed: true
+      collapsed: false
     }
   },
 }

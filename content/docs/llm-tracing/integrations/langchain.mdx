@@ -58,7 +58,40 @@ You can directly view the traces in the **Observatory** by clicking on the link 
 DeepEval's `CallbackHandler` is an implementation of LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
 </Callout>
 
-## Online Evaluation in Production
+## Advanced Usage
+
+### Trace attributes
+
+You can set custom trace attributes in your `CallbackHandler` by providing it for each agent invocation, including:
+
+- [Name](/docs/llm-tracing/tracing-features/name)
+- [Tags](/docs/llm-tracing/tracing-features/tags)
+- [Metadata](/docs/llm-tracing/tracing-features/metadata)
+- [Thread](/docs/llm-tracing/tracing-features/threads)
+- [User](/docs/llm-tracing/tracing-features/users)
+
+Each of the attributes are **optional**, and works exactly the same way as you would expect for the native tracing features on Confident AI:
+
+```python filename="main.py" showLineNumbers
+...
+
+llm_with_tools.invoke(
+    input=input,
+    config={
+        "callbacks": [
+            CallbackHandler(
+                name="Name of Trace",
+                tags=["Tag 1", "Tag 2"],
+                metadata={"Key": "Value"},
+                thread_id="your-thread-id",
+                user_id="your-user-id",
+            )
+        ]
+    },
+)
+```
+
+### Online evals
 You can run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) in production on your Langchain agents by simply providing `metric_collection` as an argument to `CallbackHandler`.
 
 <Callout type="info">
