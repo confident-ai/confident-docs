@@ -29,7 +29,7 @@ from deepeval
 from deepeval.integrations.langchain import CallbackHandler
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
-deepeval.login_with_confident_api_key("<your-confident-api-key>")
+deepeval.login("<your-confident-api-key>")
 
 def multiply(a: int, b: int) -> int:
     """Returns the product of two numbers"""

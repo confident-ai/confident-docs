@@ -26,7 +26,7 @@ from deepeval.integrations.llama_index import instrument_llama_index
 import deepeval
 
 # Login
-deepeval.login_with_confident_api_key("<your-confident-api-key>")
+deepeval.login("<your-confident-api-key>")
 
 # Let DeepEval collect traces
 instrument_llama_index(instrument.get_dispatcher())
@@ -52,7 +52,7 @@ from deepeval.integrations.llama_index import instrument_llama_index
 import deepeval
 
 # Don't forget to setup tracing
-deepeval.login_with_confident_api_key("<your-confident-api-key>")
+deepeval.login("<your-confident-api-key>")
 instrument_llama_index(instrument.get_dispatcher())
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
