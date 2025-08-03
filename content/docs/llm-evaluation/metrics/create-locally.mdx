@@ -201,13 +201,13 @@ Using multi-turn metrics (or "conversational metrics") on `deepeval` is as simpl
 from deepeval.metrics import (
     ConversationalGEval,
     ConversationCompletenessMetric,
-    ConversationRelevancyMetric,
+    TurnRelevancyMetric,
     RoleAdherenceMetric,
     KnowledgeRetentionMetric,
 )
 
 # You can customize settings on metrics
-relevancy = ConversationRelevancyMetric(threshold=0.5)
+relevancy = TurnRelevancyMetric(threshold=0.5)
 completeness = ConversationCompletenessMetric(strict_mode=True)
 role_adherence = RoleAdherenceMetric(include_reason=False)
 ```
