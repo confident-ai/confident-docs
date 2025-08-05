@@ -7,4 +7,7 @@ export default {
   opentelemetry: "",
   typescript: "",
   llamaindex: "",
+  crewai: "",
+  pydanticai: "",
+  golang: "",
 };
