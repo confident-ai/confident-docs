@@ -11,3 +11,13 @@ export const formatDate = (dateString) => {
     
     return date.toLocaleDateString('en-US', options);
 };
+
+export const formatMonthYear = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const options = {
+        year: 'numeric',
+        month: 'long'
+    };
+    return date.toLocaleDateString('en-US', options);
+};

@@ -1,6 +1,6 @@
 import Blogs from "@/components/Blog/Blogs";
 import GlobalLayout from "@/app/global-layout";
-
+import Banner from '@/components/Blog/Banner/Banner'
 export const metadata = {
   title: "Confident AI Blog - Resources to help teams stay confident in AI",
   description:
@@ -27,6 +27,7 @@ export default async function Page() {
   return (
     <>
       <GlobalLayout>
+        <Banner/>
         <Blogs limit={10} showTabs={true} blogOrientation="vertical" blogVariant="dark" disableLoader={false} />
       </GlobalLayout>
     </>

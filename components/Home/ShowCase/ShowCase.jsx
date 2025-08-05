@@ -1,29 +1,79 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import Prism from "prismjs";
+import "@/app/styles/prism-vsc-dark-plus.scss";
 import "prismjs/components/prism-python";
-import "@/app/styles/prism-vsc-dark-plus.css";
 import styles from "./styles.module.scss";
+
+function useTypingAnimation(html, inView, animated) {
+  const [typedHtml, setTypedHtml] = useState("");
+  const [charIndex, setCharIndex] = useState(0);
+  const [flatChars, setFlatChars] = useState([]);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setTypedHtml("");
+    setCharIndex(0);
+
+    if (animated) {
+      setTypedHtml(html);
+      setCharIndex(html.length);
+      setFlatChars([]);
+      return;
+    }
+
+    const chars = [];
+    let i = 0;
+    while (i < html.length) {
+      if (html[i] === "<") {
+        const end = html.indexOf(">", i);
+        chars.push(html.slice(i, end + 1));
+        i = end + 1;
+      } else if (html[i] === "&") {
+        const end = html.indexOf(";", i);
+        if (end !== -1) {
+          chars.push(html.slice(i, end + 1));
+          i = end + 1;
+        } else {
+          chars.push(html[i]);
+          i++;
+        }
+      } else {
+        chars.push(html[i]);
+        i++;
+      }
+    }
+    setFlatChars(chars);
+  }, [html, inView, animated]);
+
+  useEffect(() => {
+    if (charIndex < flatChars.length) {
+      timeoutRef.current = setTimeout(() => {
+        setTypedHtml(prev => prev + flatChars[charIndex]);
+        setCharIndex(prev => prev + 1);
+      }, 0);
+    }
+    return () => clearTimeout(timeoutRef.current);
+  }, [charIndex, flatChars]);
+
+  return typedHtml;
+}
 
 export default function ShowCase() {
   const [tab, setTab] = useState(0);
   const [hasAnimatedTab, setHasAnimatedTab] = useState({});
-  const [typedHtml, setTypedHtml] = useState("");
-  const [charIndex, setCharIndex] = useState(0);
-  const [flatChars, setFlatChars] = useState([]);
-  const typingTimeoutRef = useRef(null);
-
   const { ref, inView } = useInView({ triggerOnce: false });
 
+  // Data for the showcase
   const tabLabels = [
     "Testing Reports",
     "Tracing observability",
     "Dataset editor",
     "Prompt management",
   ];
-
   const rawCode = [
     `from deepeval.tracing import observe, update_current_span
 from deepeval.dataset import Golden, LLMTestCase
@@ -79,67 +129,6 @@ res = openai.ChatCompletion.create(
 ).choices[0].message["content"]
 print(res)`,
   ];
-
-  const highlightedMap = useMemo(() => {
-    return rawCode.map(code =>
-      Prism.highlight(code, Prism.languages.python, "python")
-    );
-  }, []);
-
-  // Precompute full lines for current tab's full code (for line numbers)
-  const fullLines = useMemo(() => {
-    if (!highlightedMap[tab]) return [];
-    return highlightedMap[tab].split("\n");
-  }, [tab, highlightedMap]);
-
-  // typedLines derived from typedHtml for rendering typed content
-  const typedLines = typedHtml.split("\n");
-
-  useEffect(() => {
-    const code = highlightedMap[tab];
-
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-
-    if (hasAnimatedTab[tab]) {
-      setTypedHtml(code);
-      setCharIndex(code.length);
-      setFlatChars([]);
-      return;
-    }
-
-    const chars = [];
-    let i = 0;
-    while (i < code.length) {
-      if (code[i] === "<") {
-        const end = code.indexOf(">", i);
-        chars.push(code.slice(i, end + 1));
-        i = end + 1;
-      } else {
-        chars.push(code[i]);
-        i++;
-      }
-    }
-
-    if (inView) {
-      setTypedHtml("");
-      setCharIndex(0);
-      setFlatChars(chars);
-    }
-  }, [tab, inView, hasAnimatedTab, highlightedMap]);
-
-  useEffect(() => {
-    if (charIndex < flatChars.length) {
-      typingTimeoutRef.current = setTimeout(() => {
-        setTypedHtml(prev => prev + flatChars[charIndex]);
-        setCharIndex(prev => prev + 1);
-      }, 0);
-    } else if (flatChars.length && charIndex === flatChars.length) {
-      setHasAnimatedTab(prev => ({ ...prev, [tab]: true }));
-    }
-
-    return () => clearTimeout(typingTimeoutRef.current);
-  }, [charIndex, flatChars, tab]);
-
   const titles = ["evaluate.py", "observability.py", "dataset.py", "prompt.py"];
   const videos = [
     "https://confident-landing.s3.us-east-1.amazonaws.com/evaluation-4k.mp4",
@@ -148,8 +137,32 @@ print(res)`,
     "https://confident-landing.s3.us-east-1.amazonaws.com/prompt-editor-4k.mp4",
   ];
 
+  const highlightedCode = useMemo(() => {
+    if (!rawCode[tab]) return "";
+    return Prism.highlight(rawCode[tab], Prism.languages.python, "python");
+  }, [tab, rawCode]);
+
+  const changeTab = index => {
+    setTab(index);
+  };
+
+  const animated = hasAnimatedTab[tab];
+  const typedHtml = useTypingAnimation(highlightedCode, inView, animated);
+
+  useEffect(() => {
+    if (typedHtml === highlightedCode && !animated) {
+      setHasAnimatedTab(prev => ({ ...prev, [tab]: true }));
+    }
+  }, [typedHtml, highlightedCode, tab, animated]);
+
+  const fullLines = useMemo(
+    () => highlightedCode.split("\n"),
+    [highlightedCode]
+  );
+  const typedLines = typedHtml.split("\n");
+
   return (
-    <div className={styles.showCaseSection} ref={ref}>
+    <div className={styles.showCaseSection} ref={ref} id="showcase">
       <div className={styles.inner}>
         <div className={styles.textWrap}>
           <span className={styles.subHeading} style={{ color: "#02e2ff" }}>
@@ -173,7 +186,7 @@ print(res)`,
                 className={`${styles.tab} ${
                   tab === index ? styles.activeTab : ""
                 }`}
-                onClick={() => setTab(index)}
+                onClick={() => changeTab(index)}
               >
                 <span>{label}</span>
               </div>

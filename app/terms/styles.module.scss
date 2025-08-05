@@ -1,0 +1,14 @@
+@import "@/app/styles/vars";
+.termsOfService {
+  padding: 100px 0 120px;
+  .inner {
+    padding: 0 20px;
+    max-width: $container_md;
+    margin: 0 auto;
+    font-family: $inter;
+    font-weight: 300;
+    @include responsive(md) {
+      padding: 0 24px;
+    }
+  }
+}

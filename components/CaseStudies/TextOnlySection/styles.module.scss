@@ -1,0 +1,116 @@
+@import "@/app/styles/vars";
+
+.TextOnlySection {
+  background-image: linear-gradient(180deg, $darkBlue, #101825);
+  background-color: $darkBlue;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  padding: 60px 0 120px;
+  border-bottom: 1px solid $darkBorder-100;
+
+  @include responsive(xl) {
+    padding: 60px 0 100px;
+  }
+  @include responsive(sm) {
+    padding: 40px 24px 80px;
+  }
+  @include responsive(xs) {
+    padding: 40px 20px 80px;
+  }
+  // @include responsive(md) {
+  //   padding: 140px 0 100px;
+  // }
+  // @include responsive(xs) {
+  //   padding: 100px 0;
+  // }
+
+  .inner {
+    display: flex;
+    max-width: 883px;
+    margin: 0 auto;
+    flex-direction: column;
+    align-items: center;
+    @include responsive(lg) {
+      max-width: 730px;
+    }
+    @include responsive(md) {
+      max-width: 600px;
+    }
+    @include responsive(sm) {
+      max-width: 100%;
+    }
+    .heading {
+      font-size: 36px;
+      font-weight: 400;
+      color: $white;
+      line-height: 1.333em;
+      font-family: $inter;
+      width: fit-content;
+      text-align: center;
+      margin-bottom: 30px;
+      @include responsive(sm){
+        font-size: 26px;
+      }
+      @include responsive(xs){
+        font-size: 22px;
+      }
+      // @include responsive(xl) {
+      //   font-size: 110px;
+      // }
+
+      // @include responsive(lg) {
+      //   font-size: 100px;
+      //   max-width: unset;
+      //   text-align: center;
+      // }
+
+      // @include responsive(sm) {
+      //   font-size: 44px;
+      // }
+      // @include responsive(xs) {
+      //   font-size: 40px;
+      // }
+    }
+
+    .buttonWrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+
+      @include responsive(sm) {
+        gap: 14px;
+        flex-direction: column;
+        a {
+          &:last-child {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  60% {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeUp {
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.6s;
+}

@@ -1,4 +1,4 @@
-@import '@/app/styles/vars';
+@import '../../../app/styles/vars';
 
 .Banner {
     padding: 140px 0;
@@ -21,10 +21,10 @@
             margin: 0 auto;
 
             .heading {
-                font-family: $inter;
+                font-family: 'Inter', sans-serif;
                 font-size: 70px;
                 font-weight: 400;
-                color: white;
+                color: $white;
                 line-height: 1.222em;
                 margin-bottom: 16px;
 
@@ -48,17 +48,15 @@
 
             .description {
                 font-size: 25px;
-                color: white;
-                font-family: $inter;
+                color: $white;
+                font-family: 'Inter', sans-serif;
                 max-width: 800px;
-                font-weight: 400;
                 margin-bottom: 40px;
                 line-height: 1.5em;
 
                 @include responsive(xl) {
-                    font-size: 22px;
-                    max-width: 55%;
-                    font-weight: 300;
+                    font-size: 20px;
+                    max-width: 72%;
                 }
 
                 @include responsive(sm) {
@@ -82,7 +80,7 @@
                 .btn {
                     padding: 15px 20px;
                     display: block;
-                    font-family: $inter;
+                    font-family: "Inter", sans-serif;
                     font-size: 16px;
                     transition: background-color 0.4s ease, color 0.4s ease;
                     line-height: 1.75em;
@@ -93,27 +91,27 @@
                         
                     }
                     &.contained {
-                        background-color: #fff;
-                        border: 2px solid #000;
+                        background-color: $white;
+                        border: 2px solid $black;
                         border-radius: 4px;
                         font-weight: 500;
-                        color: #000;
+                        color: $black;
 
                         &:hover {
-                            background-color: #000;
-                            color: #fff;
+                            background-color: $black;
+                            color: $white;
                         }
                     }
 
                     &.containedInverted {
-                        background-color: #10002a;
-                        border: 1px solid #fff;
+                        background-color: $darkPurple-500;
+                        border: 1px solid $white;
                         font-weight: 600;
-                        color: #fff;
+                        color: $white;
 
                         &:hover {
-                            background-color: #fff;
-                            color: #000;
+                            background-color: $white;
+                            color: $black;
                         }
                     }
                 }
@@ -123,13 +121,13 @@
     }
 
     .backgroundImage {
-        width: 1516px;
-        min-width: 1600px;
+        width: 82%;
+        min-width: 1000px;
         transition: opacity 0.2s;
         position: absolute;
         bottom: -21%;
         border-radius: 20px;
-        right: -703px;
+        right: -720px;
         z-index: -1;
         transform: rotateX(-48deg) rotateY(-4deg) rotate(-28deg);
         box-shadow: -80px 138px rgba(0, 0, 0, 0.3019607843);
@@ -142,32 +140,29 @@
 
 .BannerBottom {
     padding: 40px 20px 0;
-    background-color: #0b101b;
+    background-color: $darkBlue-900;
 
     .inner {
         max-width: 1180px;
         margin: 0 auto;
-        border: 1px solid #000;
-        border-bottom-color: #27272a;
-        padding: 0px 20px 35px;
+        border: 1px solid $black;
+        border-bottom-color: $zinc-800;
+        padding: 0 20px 20px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
 
         .heading {
             font-size: 20px;
-            font-weight: 500;
+            font-weight: 400;
             line-height: 1.222em;
-            color: white;
-            margin-bottom: 10px;
-            font-family: $inter;
+            color: $white;
+            margin-bottom: 13px;
+            font-family: 'Inter', sans-serif;
 
         }
 
         .description {
-            font-family: $inter;
-            color: #f0f3f8;
+            font-family: 'Inter', sans-serif;
+            color: $lightGray-10;
             text-align: center;
             width: 95%;
             font-size: 15px;

@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import styles from "./styles.module.scss";
 import { formatDate } from "@/functions/format-date";
-export default function Card({ blog, variant = "Dark", orientation }) {
+export default function Card({ blog, variant = "Dark", orientation, styles }) {
   return (
     <Link
       href={`/blog/${blog?.fields?.link}`}

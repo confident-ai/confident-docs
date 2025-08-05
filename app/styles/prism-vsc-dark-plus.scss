@@ -1,0 +1,101 @@
+#showcase {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 24px;
+  }
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #d4d4d4;
+    /* background: #1e1e1e; */
+    font-family: "Fira Code", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    tab-size: 4;
+    hyphens: none;
+  }
+
+  /* Syntax Tokens */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #6a9955;
+    font-style: italic;
+  }
+
+  .token.punctuation {
+    color: #fca7ff;
+  }
+
+  .token.property,
+  .token.tag,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #9cdcfe;
+  }
+
+  .token.boolean,
+  .token.number {
+    color: #ffe418;
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: #ffe418;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .token.variable {
+    color: #ff724c;
+  }
+
+  .token.atrule,
+  .token.keyword {
+    color: #00a3d0;
+  }
+
+  .token.function,
+  .token.class-name {
+    color: #4ec9b0;
+  }
+
+  .token.regex,
+  .token.important {
+    color: #d16969;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+  .token.italic {
+    font-style: italic;
+  }
+
+  /* Line numbers */
+  .line-numbers .line-numbers-rows {
+    border-right: 1px solid #444;
+    color: #858585;
+  }
+  .line-numbers-rows > span:before {
+    display: block;
+    padding-right: 0.5em;
+    text-align: right;
+  }
+
+  .token.triple-quoted-string {
+    color: #91d076;
+  }
+}

@@ -1,0 +1,98 @@
+@import '@/app/styles/vars';
+
+.Banner {
+    width: 100%;
+    height: 600px;
+    background-image: url('/img/blog-banner.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    @include responsive(xl) {
+        height: 483px;
+    }
+    @include responsive(md) {
+        height: 490px;
+    }
+
+
+    .inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 170px;
+        max-width: 745px;
+        margin: 0 auto;
+
+        @include responsive(xl) {
+            padding-top: 150px;
+        }
+
+        @include responsive(lg) {
+            padding-top: 130px;
+        }
+
+        @include responsive(md) {
+            padding-top: 110px;
+        }
+        @include responsive(sm) {
+            padding-top: 100px;
+        }
+
+        h1 {
+            font-family: $inter;
+            font-size: 66px;
+            font-weight: 500;
+            color: $white;
+            line-height: 1.231em;
+            text-shadow: 2px 2px $lightPurple-100;
+
+            @include responsive(xl) {
+                font-size: 47px;
+                font-family: $Lexend;
+                font-weight: 400;
+            }
+
+            @include responsive(md) {
+                font-size: 40px;
+            }
+
+            @include responsive(sm) {
+                font-size: 35px;
+                margin-bottom: 20px;
+            }
+            @include responsive(xs) {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+        }
+
+        p {
+            font-family: $inter;
+            font-size: 18px;
+            font-weight: 400;
+            text-align: center;
+            color: $white;
+            width: 68%;
+            line-height: 1.64706em;
+
+            @include responsive(xl) {
+                font-size: 17px;
+            }
+
+            @include responsive(lg) {
+                font-size: 15px;
+            }
+
+            @include responsive(md) {
+                font-size: 16px;
+                width: 61%;
+            }
+            @include responsive(xs) {
+                font-size: 12px;
+                width: 90%;
+                margin: 0 auto;
+            }
+        }
+    }
+}

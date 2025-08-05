@@ -3,7 +3,7 @@
 
 .TwoColumn {
     padding: 0 20px;
-    background: #0b101b;
+    background: $darkBlue-900;
     @include responsive(md){
         padding: 30px 20px;
     }
@@ -12,7 +12,7 @@
         max-width: 1180px;
         margin: 0 auto;
         justify-content: space-between;
-        border-bottom: 1px solid #363636;
+        border-bottom: 1px solid $darkBorder-100;
         padding: 80px 0;
 
         @include responsive(lg) {
@@ -33,14 +33,14 @@
             }
             .heading {
                 font-size: 30px;
-                color: #fff;
+                color: $white;
                 font-weight: 500;
                 margin-bottom: 20px;
                 line-height: 1.42em;
                 font-family: 'Inter', sans-serif;
 
                 span {
-                    color: #6e00ff;
+                    color: $purple;
                 }
 
                 @include responsive(md) {
@@ -50,7 +50,7 @@
             }
 
             .description {
-                color: #c9ced6;
+                color: $lightGray;
                 font-size: 20px;
                 font-weight: 400;
                 line-height: 1.6em;

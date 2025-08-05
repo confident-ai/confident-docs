@@ -1,9 +1,9 @@
 @import '../../../app/styles/vars';
 
 .TextOnlySection {
-    background: linear-gradient(180deg, #0e0e13, #000);
+    background: linear-gradient(180deg, $confident-dark, $black);
     padding: 100px 0 140px;
-    border-bottom: 1px solid #363636;
+    border-bottom: 1px solid $darkBorder-100;
 
     @include responsive(md) {
         padding: 70px 0;
@@ -29,7 +29,7 @@
         .heading {
             font-size: 54px;
             font-weight: 400;
-            color: white;
+            color: $white;
             line-height: 1.3em;
             font-family: 'Inter', sans-serif;
             width: fit-content;
@@ -74,7 +74,7 @@
                 padding: 16px 25px;
                 font-weight: 500;
                 font-family: 'Inter', sans-serif;
-                color: white;
+                color: $white;
                 font-size: 16px;
                 display: block;
                 @include responsive(sm){
@@ -82,29 +82,29 @@
                 }
 
                 &.outlined {
-                    border: 1px solid #6e00ff;
-                    background-color: #10002a;
+                    border: 1px solid $purple;
+                    background-color: $darkPurple-500;
                     font-weight: 700;
                     transition: background-color 0.475s, color 0.4s;
 
                     &:hover {
-                        background-color: #fff;
-                        color: #000;
+                        background-color: $white;
+                        color: $black;
                     }
 
 
                 }
 
                 &.contained {
-                    border: 2px solid #000;
-                    color: #000;
+                    border: 2px solid $black;
+                    color: $black;
                     font-weight: 500;
-                    background-color: #fff;
+                    background-color: $white;
                     transition: box-shadow 0.2s ease-in-out, background-color 0.475s, color 0.4s;
-                    box-shadow: 0 0 13px #fffade;
+                    box-shadow: 0 0 13px $lightGray-50;
 
                     &:hover {
-                        box-shadow: 0 0 19px #fffade;
+                        box-shadow: 0 0 19px $lightGray-50;
                     }
                 }
 

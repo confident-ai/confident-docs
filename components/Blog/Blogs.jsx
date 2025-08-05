@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
+import cardStyles from './card.module.scss'
 import Skeleton from "@/components/Skeleton/Skeleton";
 import Card from "./Card/Card";
 
@@ -75,16 +76,16 @@ export default function Blogs({
                 blog={blog}
                 key={idx}
                 variant={blogVariant}
+                styles={cardStyles}
                 orientation={blogOrientation}
               />
             ))}
 
           {isLoading &&
-            !disableLoader &&
             [...Array(limit)].map((_, index) => (
               <Skeleton
                 key={index}
-                className={styles.blogItem}
+                className={`${cardStyles.Card} ${cardStyles[blogOrientation]}`}
                 style={{ height: "250px" }}
               />
             ))}

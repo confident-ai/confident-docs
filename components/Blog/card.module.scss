@@ -236,10 +236,11 @@
     min-height: 478px;
     height: auto;
     @include responsive(xl) {
-      min-height: unset;
+      min-height: 423px;
     }
     @include responsive(md) {
       max-width: 100%;
+      min-height: 600px;
     }
     .imageWrap {
       min-width: unset;

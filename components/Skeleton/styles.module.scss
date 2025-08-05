@@ -4,11 +4,9 @@
     background-color: $darkBorder;
     opacity: 0.5;
     height: 100%;
-    width: 100%;
     position: relative;
     overflow: hidden;
     border:none !important;
-    
     &::before {
         content: '';
         position: absolute;

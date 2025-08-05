@@ -3,7 +3,7 @@ import { BLOCKS } from "@contentful/rich-text-types";
 import Feature from "@/components/Blog/Feature/Feature";
 
 import Prism from "prismjs";
-import "@/app/styles/prism-colddark-dark.css";
+import "@/app/styles/prism-colddark-dark.scss";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-bash";
@@ -154,7 +154,7 @@ export default function ArticleContent({ content, theme }) {
     },
   };
   return (
-    <div className={`${styles.ArticleContent} ${styles[theme]}`}>
+    <div className={`${styles.ArticleContent} ${styles[theme]}`} id='article-content'>
       {documentToReactComponents(content, options)}
       <Feature theme={theme} />
     </div>

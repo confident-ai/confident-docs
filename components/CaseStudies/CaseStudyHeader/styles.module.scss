@@ -1,0 +1,202 @@
+@import "@/app/styles/vars";
+.CaseStudyHeader {
+  background-color: $darkBlue-900;
+  @include responsive(md) {
+    padding-top: 40px;
+  }
+  @include responsive(sm) {
+    padding-left: 10px;
+  }
+  @include responsive(xs) {
+    padding-left: 0;
+  }
+  .inner {
+    max-width: 1605px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    @include responsive(xl) {
+      max-width: 1368px;
+    }
+    @include responsive(lg) {
+      max-width: 1180px;
+    }
+    @include responsive(md) {
+      flex-direction: column-reverse;
+    }
+    .textWrap {
+      padding: 60px 20px 60px 18%;
+      font-family: $inter;
+      color: $white;
+      width: 100%;
+      @include responsive(xl) {
+        padding: 60px 20px 60px 220px;
+      }
+      @include responsive(lg) {
+        padding: 60px 20px 60px 100px;
+      }
+      @include responsive(md) {
+        padding: 40px 60px 60px 100px;
+      }
+      @include responsive(sm) {
+        padding: 40px 20px;
+      }
+      .subTitle {
+        font-size: 13px;
+        line-height: 2.15385em;
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 700;
+        @include responsive(md) {
+          margin-bottom: 0;
+        }
+      }
+      .heading {
+        font-size: 58px;
+        font-family: $Montserrat;
+        line-height: 1.222em;
+        margin-bottom: 30px;
+        font-weight: 300;
+        @include responsive(xl) {
+          font-size: 49px;
+        }
+        @include responsive(lg) {
+          font-size: 48px;
+        }
+        @include responsive(sm) {
+          font-size: 43px;
+        }
+        @include responsive(xs) {
+          font-size: 37px;
+        }
+      }
+      .list {
+        gap: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        .listItem {
+          width: 100%;
+          max-width: calc(50% - 9px);
+          display: flex;
+          flex-direction: column;
+          font-family: $Montserrat;
+          .subHeading {
+            color: #7a14ff;
+            line-height: 28px;
+            font-size: 15px;
+            font-weight: 600;
+            @include responsive(lg) {
+              font-size: 13px;
+            }
+          }
+          .value {
+            line-height: 28px;
+            font-size: 17px;
+            font-weight: 300;
+            @include responsive(lg) {
+              font-size: 15px;
+            }
+          }
+        }
+      }
+    }
+    .imageWrap {
+      width: 43%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      border-left: 1px solid $darkBorder-200;
+      flex-shrink: 0;
+      @include responsive(xl) {
+        width: 40%;
+      }
+      @include responsive(lg) {
+        width: 42%;
+      }
+      @include responsive(md) {
+        border: none;
+      }
+      img {
+        margin-left: 100px;
+        border-radius: 14px;
+        @include responsive(md) {
+          width: 100px;
+          height: 100px;
+        }
+        @include responsive(sm) {
+          margin-left: 20px;
+          width: 97px;
+          height: 97px;
+        }
+        @include responsive(xs) {
+          width: 71px;
+          height: 71px;
+        }
+      }
+    }
+  }
+}
+.quote {
+  padding: 40px 25%;
+  background-color: $white-100;
+  border-bottom: 1px solid $black;
+  text-align: center;
+  margin-bottom: 16px;
+  @include responsive(lg) {
+    padding: 40px 220px;
+  }
+  @include responsive(md) {
+    padding: 40px 100px;
+  }
+  @include responsive(sm) {
+    padding: 30px 60px;
+  }
+  @include responsive(xs) {
+    padding: 30px 20px;
+  }
+  p {
+    color: $darkBlue-900;
+    font-size: 20px;
+    font-family: $inter;
+    margin-bottom: 30px;
+    @include responsive(sm){
+        font-size: 17px;
+    }
+    @include responsive(xs) {
+      font-size: 16px;
+    }
+  }
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    .representativeName {
+      top: 0;
+      color: $darkBlue-900;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: $inter;
+      display: block;
+      line-height: 1.866667em;
+      @include responsive(sm) {
+        font-size: 15px;
+      }
+      @include responsive(xs) {
+        font-size: 14px;
+      }
+    }
+    .representativeRole {
+      top: 0;
+      color: $darkBorder;
+      font-size: 15px;
+      font-family: $inter;
+      display: block;
+      line-height: 1.866667em;
+      @include responsive(sm) {
+        font-size: 14px;
+      }
+      @include responsive(xs) {
+        font-size: 13px;
+      }
+    }
+  }
+}

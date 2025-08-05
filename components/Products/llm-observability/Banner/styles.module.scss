@@ -24,7 +24,7 @@
                 font-family: 'Inter', sans-serif;
                 font-size: 70px;
                 font-weight: 400;
-                color: white;
+                color: $white;
                 line-height: 1.222em;
                 margin-bottom: 16px;
 
@@ -48,7 +48,7 @@
 
             .description {
                 font-size: 25px;
-                color: white;
+                color: $white;
                 font-family: 'Inter', sans-serif;
                 max-width: 800px;
                 margin-bottom: 40px;
@@ -91,27 +91,27 @@
                         
                     }
                     &.contained {
-                        background-color: #fff;
-                        border: 2px solid #000;
+                        background-color: $white;
+                        border: 2px solid $black;
                         border-radius: 4px;
                         font-weight: 500;
-                        color: #000;
+                        color: $black;
 
                         &:hover {
-                            background-color: #000;
-                            color: #fff;
+                            background-color: $black;
+                            color: $white;
                         }
                     }
 
                     &.containedInverted {
-                        background-color: #10002a;
-                        border: 1px solid #fff;
+                        background-color: $darkPurple-500;
+                        border: 1px solid $white;
                         font-weight: 600;
-                        color: #fff;
+                        color: $white;
 
                         &:hover {
-                            background-color: #fff;
-                            color: #000;
+                            background-color: $white;
+                            color: $black;
                         }
                     }
                 }
@@ -140,13 +140,13 @@
 
 .BannerBottom {
     padding: 40px 20px 0;
-    background-color: #0b101b;
+    background-color: $darkBlue-900;
 
     .inner {
         max-width: 1180px;
         margin: 0 auto;
-        border: 1px solid #000;
-        border-bottom-color: #27272a;
+        border: 1px solid $black;
+        border-bottom-color: $zinc-800;
         padding: 0 20px 20px;
         text-align: center;
 
@@ -154,7 +154,7 @@
             font-size: 20px;
             font-weight: 400;
             line-height: 1.222em;
-            color: white;
+            color: $white;
             margin-bottom: 13px;
             font-family: 'Inter', sans-serif;
 
@@ -162,7 +162,7 @@
 
         .description {
             font-family: 'Inter', sans-serif;
-            color: #f0f3f8;
+            color: $lightGray-10;
             text-align: center;
             width: 95%;
             font-size: 15px;
