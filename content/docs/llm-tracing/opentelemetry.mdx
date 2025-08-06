@@ -1,0 +1,239 @@
+---
+title: OpenTelemetry
+---
+import { Callout } from "nextra/components";
+import { Tabs } from "nextra/components";
+
+# OpenTelemetry
+
+[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
+
+[one line description here talking about how Confident AI's integration works]
+
+## Quickstart
+
+First set your `CONFIDENT_API_KEY` as an enviornment variable:
+
+```bash
+CONFIDENT_API_KEY="confident_us..."
+```
+
+Then trace your first LLM call:
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+<details>
+
+<summary>Click to see native python implementation using DeepEval</summary>
+
+```python filename="main.py"
+[code for telemetry]
+```
+
+</details>
+
+## Understanding OTEL with Confident AI
+
+[1-2 lines (possibility 2 bullet points) to talk abot what we're going to go through in this section]
+
+
+
+### OTEL endpoints
+
+[talk about the endpoint, what is does, supported protocols]
+
+### GenAI instrumentation
+
+[talk about how we adhere to genai convention from X]
+
+### Confident AI specific conventions
+
+[very breifly talk about how Confident AI adds an extra layer on top of the gen ai stuff]
+
+
+### Advanced configurations
+
+[talk about how the default env is "deveopment" but you can set it]
+[talk abotu sample rate]
+
+## Trace-Level Attribute Mappings
+
+[remmever to talk about how these are exactly the same as NOT using otel as found in other parts of the docs under "tracing features"]
+
+Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
+
+### Name
+
+[one sentence explanation, link to docs]
+
+[use this exact format, quoted code blocks for these bulllet points]
+
+- `"confident.trace.name"` - [one line description goes here, no period at the end]
+
+[one line description]
+
+[add a final code block here with all languages]
+
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+
+### Input/Output
+
+[same as above, this time just with 2 bullet points]
+
+### Metric Collection
+
+[same as above]
+
+### Test Case
+
+[same as above]
+
+### Tags
+
+[same as above]
+
+### Metadata
+
+[same as above]
+
+### Thread id
+
+[same as above]
+
+### User Id
+
+[same as above]
+
+## Span-Level Attribute Mappings
+
+[same as above]
+
+### Name
+
+[same as above]
+
+### Input/Output
+
+[same as above]
+
+### Metric Collection
+
+[same as above]
+
+### Test Case
+
+[same as above]
+
+### Metadata
+
+[same as above]
+
+### Type specific attributes
+
+[description with bullet points, then link to the span types docs]
+
+#### Custom
+
+[same]
+
+#### LLM
+
+[same]
+
+#### Agent
+
+[same]
+
+#### Tool
+
+[same]
+
+#### Retriever
+
+[same]
