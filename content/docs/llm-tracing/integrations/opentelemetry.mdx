@@ -74,17 +74,18 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 
 Trace attributes are set in the span attributes.
 
-- `confident.trace.attributes` used for updating trace attributes like name, [tags](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/tags), [threads](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/threads) and [users](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/users).
+- `confident.trace.name` (of type `str`) used for updating trace [name](/docs/llm-tracing/tracing-features/name).
+- `confident.trace.tags` (of type `list[str]`) used for updating trace [tags](/docs/llm-tracing/tracing-features/tags).
+- `confident.trace.thread_id` (of type `str`) used for updating trace [thread id](/docs/llm-tracing/tracing-features/threads).
+- `confident.trace.user_id` (of type `str`) used for updating trace [user id](/docs/llm-tracing/tracing-features/users).
 
 ```python showLineNumbers
 with tracer.start_as_current_span("custom_span") as span:
     # your code
-    span.set_attribute("confident.trace.attributes", json.dumps({
-            "name": "test_trace",
-            "tags": ["tag1", "tag2"],
-            "thread_id": "123",
-            "user_id": "456"
-        }))
+    span.set_attribute("confident.trace.name", "test_trace")
+    span.set_attribute("confident.trace.tags", ["tag1", "tag2"])
+    span.set_attribute("confident.trace.thread_id", "123")
+    span.set_attribute("confident.trace.user_id", "456")
 ```
 
 ### Trace input and output
