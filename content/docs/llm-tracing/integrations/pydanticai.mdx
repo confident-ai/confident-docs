@@ -9,6 +9,7 @@ import { Callout } from "nextra/components";
 [Pydantic AI](https://ai.pydantic.dev/) is a platform for building and deploying AI agents. It provides a set of tools and libraries for building and deploying AI agents.
 
 ## Quickstart
+
 Confident AI instruments PydanticAI to trace your agent's execution and achieve observability. 
 
 ```bash
@@ -20,9 +21,9 @@ With your Confident API key, setup the instrumentaion in your agent:
 import os
 import time
 from pydantic_ai.agent import Agent
-from deepeval.integrations.pydantic_ai import setup_instrumentation
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 
-setup_instrumentation(api_key="<your-confident-api-key>")
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
 
 os.environ['OPENAI_API_KEY'] = '<your-openai-api-key>'
 

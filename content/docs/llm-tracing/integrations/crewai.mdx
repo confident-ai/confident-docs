@@ -9,24 +9,24 @@ import { Callout } from "nextra/components";
 [CrewAI](https://www.crewai.com/) is a lean, lightning-fast Python framework for creating autonomous AI agents tailored to any scenario.
 
 ## Quickstart
-Confident AI provides a `instrumentator` that can trace CrewAI's execution with just a single line of code.
+Confident AI provides a `instrument_crewai` that can trace CrewAI's execution with just a single line of code.
 
 Install the following package:
 ```bash
 pip install -U deepeval
 ```
 
-With your Confident API key, initialize DeepEval's `instrumentator` in your agent's `main.py` script:
+With your Confident API key, initialize DeepEval's `instrument_crewai` in your agent's `main.py` script:
 
 ```python
-from deepeval.integrations.crewai import instrumentator
-instrumentator(api_key="<your-confident-api-key>")
+from deepeval.integrations.crewai import instrument_crewai
+instrument_crewai(api_key="<your-confident-api-key>")
 ```
 That's it! You can now see the traces on Confident AI's **Observability**.
 
 ## Basic CrewAI Agent
 
-Here's a basic example of a CrewAI agent with Confident AI's `instrumentator`:
+Here's a basic example of a CrewAI agent with Confident AI's `instrument_crewai`:
 
 ```bash
 pip install crewai
@@ -37,11 +37,11 @@ import os
 import time
 from crewai import Task, Crew, Agent
 
-from deepeval.integrations.crewai import instrumentator
+from deepeval.integrations.crewai import instrument_crewai
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 
-instrumentator(api_key="<your-confident-api-key>")
+instrument_crewai(api_key="<your-confident-api-key>")
 
 # Define your agents with roles and goals
 coder = Agent(
