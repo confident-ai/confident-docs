@@ -8,24 +8,70 @@ import { Tabs } from "nextra/components";
 
 [OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
 
-[one line description here talking about how Confident AI's integration works]
+**Confident AI** can recieve traces on `https://otel.confident-ai.com`. To export traces using the OpenTelemetry SDK, you can configure your Collector as follows:
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.confident-ai.com
+OTEL_EXPORTER_OTLP_HEADERS="x-confident-api-key= <your-confident-api-key>"
+```
 
 ## Quickstart
 
-First set your `CONFIDENT_API_KEY` as an enviornment variable:
+Given below is the quickstart for exporting traces to Confident AI OTLP endpoint (which will then published to **observatory**) for different languages.
+
+First set your `CONFIDENT_API_KEY` and `OTEL_EXPORTER_OTLP_ENDPOINT` as an enviornment variable:
 
 ```bash
-CONFIDENT_API_KEY="confident_us..."
+CONFIDENT_API_KEY="<your-confident-api-key>"
+OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.confident-ai.com"
 ```
 
 Then trace your first LLM call:
 
 <Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
-
 <Tabs.Tab>
 
-```python filename="main.py"
-[code for telemetry]
+Install opentelemetry dependencies:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
+```
+
+Run the following code:
+
+```python filename="main.py" showLineNumbers {8,9,15,16}
+import os
+
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+OTLP_ENDPOINT = os.getenv("OTLP_HTTP_ENDPOINT_TRACES")
+CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
+
+# Set up the tracer provider
+trace.set_tracer_provider(TracerProvider(
+    active_span_processor=BatchSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=OTLP_ENDPOINT + "/v1/traces",
+            headers={"x-confident-api-key": CONFIDENT_API_KEY}
+        )
+    )
+))
+
+# Create a tracer
+tracer = trace.get_tracer(__name__)
+
+# Start a span
+with tracer.start_as_current_span("confident-llm-span") as span:
+    
+    # Set attributes
+    span.set_attribute("confident.trace.name", "example-trace")
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-4o")
+    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+    span.set_attribute("confident.llm.attributes.output", "Paris")
 ```
 
 </Tabs.Tab>
@@ -33,7 +79,7 @@ Then trace your first LLM call:
 <Tabs.Tab>
 
 ```typescript filename="index.ts"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -41,7 +87,7 @@ Then trace your first LLM call:
 <Tabs.Tab>
 
 ```go filename="something.go"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -49,7 +95,7 @@ Then trace your first LLM call:
 <Tabs.Tab>
 
 ```ruby filename="something.rb"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -57,7 +103,7 @@ Then trace your first LLM call:
 <Tabs.Tab>
 
 ```csharp filename="something.cs"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -68,61 +114,89 @@ Then trace your first LLM call:
 
 <summary>Click to see native python implementation using DeepEval</summary>
 
-```python filename="main.py"
-[code for telemetry]
-```
+DeepEval provides a native `ConfidentSpanExporter` that directly exports traces to Confident AI **observatory**.
 
+```python filename="example.py" showLineNumbers {7, 15}
+import time
+import json
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+from deepeval.tracing.otel.exporter import ConfidentSpanExporter
+
+# Set up tracer provider
+tracer_provider = trace.get_tracer_provider()
+if not isinstance(tracer_provider, TracerProvider):
+    trace.set_tracer_provider(TracerProvider())
+
+# Add confident span exporter wrapped in batch span processor
+tracer_provider.add_span_processor(BatchSpanProcessor(ConfidentSpanExporter()))
+
+# Get tracer
+tracer = trace.get_tracer("deepeval_tracer")
+
+# set attributes
+with tracer.start_as_current_span("confident-llm-span") as span:
+    span.set_attribute("confident.trace.name", "example-trace")
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-4o")
+    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+    span.set_attribute("confident.llm.attributes.output", "Paris")
+```
 </details>
 
 ## Understanding OTEL with Confident AI
 
-[1-2 lines (possibility 2 bullet points) to talk abot what we're going to go through in this section]
+In this section, we will mainly discuss:
 
-
+- `gen_ai` attribute and event conventions
+- Confident AI specific conventions
+- Advanced configurations
 
 ### OTEL endpoints
 
-[talk about the endpoint, what is does, supported protocols]
+`https://otel.confident-ai.com` is a HTTP endpoint that accepts OpenTelemetry traces in the [OTLP format](https://opentelemetry.io/docs/specs/otlp/#otlphttp).
 
-### GenAI instrumentation
+<Callout type="warning">
+Please note that Confident AI does **not support** gRPC for the OpenTelemetry endpoint. Please use HTTP instead.
+</Callout>
 
-[talk about how we adhere to genai convention from X]
+### Attributes
 
-### Confident AI specific conventions
+**Confident AI** adheres to the [GenAI semantic convention](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and adds an extra layer on top of it to capture additional data about the LLM applications. Confident AI uses `confident.*` namespace to map specific attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model. These specific attributes always take precedence over `gen_ai.*` conventions and are recommended for all users that are manually instrumenting their applications.
 
-[very breifly talk about how Confident AI adds an extra layer on top of the gen ai stuff]
-
+<Callout type="warning">
+The **GenAI semantic conventions** are still under development and are subject to change.
+</Callout>
 
 ### Advanced configurations
 
-[talk about how the default env is "deveopment" but you can set it]
-[talk abotu sample rate]
+To be documented...
 
 ## Trace-Level Attribute Mappings
 
-[remmever to talk about how these are exactly the same as NOT using otel as found in other parts of the docs under "tracing features"]
+These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
 
-Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
+<Callout>
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+</Callout>
 
 ### Name
 
-[one sentence explanation, link to docs]
+The trace name is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
 
-[use this exact format, quoted code blocks for these bulllet points]
-
-- `"confident.trace.name"` - [one line description goes here, no period at the end]
-
-[one line description]
-
-[add a final code block here with all languages]
-
+- `"confident.trace.name"` (of type `str`) used for updating trace [name](/docs/llm-tracing/tracing-features/name)
 
 <Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
 
 <Tabs.Tab>
 
-```python filename="main.py"
-[code for telemetry]
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.name", "test_trace")
 ```
 
 </Tabs.Tab>
@@ -130,7 +204,7 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 <Tabs.Tab>
 
 ```typescript filename="index.ts"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -138,7 +212,7 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 <Tabs.Tab>
 
 ```go filename="something.go"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -146,7 +220,7 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 <Tabs.Tab>
 
 ```ruby filename="something.rb"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -154,7 +228,7 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 <Tabs.Tab>
 
 ```csharp filename="something.cs"
-[code for telemetry]
+[to be coded...]
 ```
 
 </Tabs.Tab>
@@ -164,76 +238,868 @@ Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes w
 
 ### Input/Output
 
-[same as above, this time just with 2 bullet points]
+You can set [trace input and output](/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) at runtime using the following attributes:
+
+- `confident.trace.input` (of type `Any`) used for updating trace input.
+- `confident.trace.output` (of type `Any`) used for updating trace output.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.input", input)
+    span.set_attribute("confident.trace.output", output)
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 ### Metric Collection
 
-[same as above]
+To be documented...
 
 ### Test Case
 
-[same as above]
+To be documented...
 
 ### Tags
 
-[same as above]
+[Tags](/docs/llm-tracing/tracing-features/tags) are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
+
+- `confident.trace.tags` (of type `list[str]`) used for updating trace tags.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+import json
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.tags", ["tag1", "tag2"])
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 ### Metadata
 
-[same as above]
+Attach [metadata](/docs/llm-tracing/tracing-features/metadata) to the trace. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+
+- `confident.trace.metadata` (of type `str`) used for updating trace metadata.
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+import json
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.metadata", json.dumps({"key": "value"}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 ### Thread id
 
-[same as above]
+A [thread](/docs/llm-tracing/tracing-features/threads) on Confident AI is a collection of one or more traces, letting you view full conversations — perfect for chat apps, agents, or any multi-turn interactions.
+
+- `confident.trace.thread_id` (of type `str`) used for updating trace **thread id**.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.thread_id", "123")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### User Id
 
-[same as above]
+Track user interactions by setting [user id](/docs/llm-tracing/tracing-features/users) in a trace — useful for monitoring token usage, identifying top users, and managing costs.
+
+- `confident.trace.user_id` (of type `str`) used for updating trace user id.
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.user_id", "123")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ## Span-Level Attribute Mappings
 
-[same as above]
+These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
 
 ### Name
 
-[same as above]
+The [name](/docs/llm-tracing/tracing-features/name) of the span is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
+
+- `confident.span.name` (of type `str`) used for updating span name.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.name", "custom_span")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Input/Output
 
-[same as above]
+You can set span [input and output](/docs/llm-tracing/tracing-features/input-output#set-span-io-at-runtime) at runtime using the following attributes:
+
+- `confident.span.input` (of type `Any`) used for updating span input.
+- `confident.span.output` (of type `Any`) used for updating span output.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.input", input)
+    span.set_attribute("confident.span.output", output)
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Metric Collection
 
-[same as above]
+[Metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud) allows you to run metrics on cloud and publish results to the observatory.
+
+- `confident.span.metric_collection` (of type `str`) update the name of the metric collection for the span.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.thread_id", "123")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Test Case
 
-[same as above]
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
+    
+    span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.span.llm_test_case.input', input)
+    span.set_attribute('confident.span.llm_test_case.actual_output', output)
+```
+
+<Callout>
+Make sure you have [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) created on the platform for running online evaluation on this test case.
+</Callout>
+
+LLM test case attributes mapping:
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.span.llm_test_case.input` | `str` | Yes | Test case input |
+| `confident.span.llm_test_case.actual_output` | `str` | Yes | Test case actual output |
+| `confident.span.llm_test_case.expected_output` | `str` | No | Test case expected output |
+| `confident.span.llm_test_case.context` | `list[str]` | No | Test case context |
+| `confident.span.llm_test_case.retrieval_context` | `list[str]` | No | Test case retrieval context |
+| `confident.span.llm_test_case.tools_called` | `str` | No | Should be stringified json of type [Tools Called](https://deepeval.com/docs/evaluation-test-cases#tools-called) |
+| `confident.span.llm_test_case.expected_tools` | `str` | No | Should be stringified json of type [Expected Tools](https://deepeval.com/docs/evaluation-test-cases#expected-tools) |
+
 
 ### Metadata
 
-[same as above]
+[Metadata](/docs/llm-tracing/tracing-features/metadata) can be attached to the span. This information can be used for filtering, grouping, and analyzing your spans in the observatory.
+
+- `confident.span.metadata` (of type `str`) used for updating span metadata.
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.metadata", json.dumps({"key": "value"}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Type specific attributes
 
-[description with bullet points, then link to the span types docs]
+[Span types](/docs/llm-tracing/tracing-features/span-types) are optional but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
 
-#### Custom
+- `llm`
+- `agent`
+- `retriever`
+- `tool`
 
-[same]
+You can set the span type using the following attribute:
 
-#### LLM
+- `confident.span.type` (of type `str`) used for updating span type.
 
-[same]
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
 
-#### Agent
+<Tabs.Tab>
 
-[same]
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.type", "llm")
+```
 
-#### Tool
+</Tabs.Tab>
 
-[same]
+<Tabs.Tab>
 
-#### Retriever
+```typescript filename="index.ts"
+[to be coded...]
+```
 
-[same]
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+Given below are attributes for specific span types. It is recommended to set these attributes in the span attributes using the `confident.{span_type}.*` namespace.
+
+#### **Custom**
+
+This is the default span type. All the attributes that we used above with `confident.span.*` namespace are applicable to this span type.
+
+#### **LLM**
+
+To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/tracing-features/span-types#llm-span).
+
+ Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.llm.model` | `str` | No | LLM model |
+| `confident.llm.cost_per_input_token` | `float` | No | Cost per input token |
+| `confident.llm.cost_per_output_token` | `float` | No | Cost per output token |
+| `confident.llm.attributes.input` | `str`, `list[str]` | Yes | LLM Span input (parsed to `list[dict]` if `list[str]` is provided) |
+| `confident.llm.attributes.output` | `Any` | Yes | LLM Span output |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
+
+Given below is the sample code for setting attributes for LLM span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("llm_span") as span:
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+    span.set_attribute("confident.llm.attributes.input", [
+        json.dumps({"role": "system", "content": "You are a helpful assistant."}),
+        json.dumps({"role": "user", "content": input})
+    ])
+    time.sleep(0.5)
+    span.set_attribute("confident.llm.attributes.output", "Hello world")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+
+#### **Agent**
+
+To create a Agent span, set the `confident.span.type` to `agent`. After that refer to the table below for more [Agent span attributes](/docs/llm-tracing/tracing-features/span-types#agent-span).
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.agent.name` | `str` | Yes | Agent span name |
+| `confident.agent.available_tools` | `list[str]` | No | Agent span available tools |
+| `confident.agent.agent_handoffs` | `list[str]` | No | Agent span agent handoffs |
+| `confident.agent.attributes.input` | `Any` | Yes | Agent span input |
+| `confident.agent.attributes.output` | `Any` | Yes | Agent span output |
+
+Given below is the sample code for setting attributes for Agent span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("agent_span") as span:
+    span.set_attribute("confident.span.type", "agent")
+    span.set_attribute("confident.agent.name", "agent_span")
+    span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
+    span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
+    
+    span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
+    span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+#### **Tool**
+
+To create a Tool span, set the `confident.span.type` to `tool`. After that refer to the table below for more [Tool span attributes](/docs/llm-tracing/tracing-features/span-types#tool-span).
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.tool.name` | `str` | Yes | Tool span name |
+| `confident.tool.description` | `str` | No | Tool span description |
+| `confident.tool.attributes.input_parameters` | `str` | No | Tool span input parameters (parsed to `dict` if `str` is provided) |
+| `confident.tool.attributes.output` | `Any` | No | Tool span output |
+
+Given below is the sample code for setting attributes for Tool span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("tool_span") as span:
+    span.set_attribute("confident.span.type", "tool")
+    span.set_attribute("confident.tool.name", "tool name")
+
+    span.set_attribute("confident.tool.description", "tool description")
+    span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": input}))
+    span.set_attribute("confident.tool.attributes.output", json.dumps({"output": input}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+
+#### **Retriever**
+
+To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/tracing-features/span-types#retriever-span).
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.retriever.embedder` | `str` | Yes | Retrieval span embedder model |
+| `confident.retriever.attributes.embedding_input` | `str` | Yes | Retrieval span embedding input |
+| `confident.retriever.attributes.retrieval_context` | `list[str]` | Yes | Retrieval span retrieval context |
+| `confident.retriever.attributes.top_k` | `int` | No | Retrieval span top k |
+| `confident.retriever.attributes.chunk_size` | `int` | No | Retrieval span chunk size |
+
+Given below is the sample code for setting attributes for Retriever span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("retriever_span") as span:
+    span.set_attribute("confident.span.type", "retriever")
+    span.set_attribute("confident.retriever.embedder", "embedder")
+
+    span.set_attribute("confident.retriever.attributes.embedding_input", input)
+    span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
+    span.set_attribute("confident.retriever.attributes.top_k", 10)
+    span.set_attribute("confident.retriever.attributes.chunk_size", 10)
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
