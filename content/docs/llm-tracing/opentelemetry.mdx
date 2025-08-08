@@ -302,7 +302,60 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ### Metadata
 
-[same as above]
+Attach [metadata](/docs/llm-tracing/tracing-features/metadata) to the trace. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+
+- `confident.trace.metadata` (of type `str`) used for updating trace metadata.
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+import json
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.metadata", json.dumps({"key": "value"}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 ### Thread id
 
