@@ -14,6 +14,9 @@
     @include responsive(md) {
         height: 490px;
     }
+    @include responsive(sm) {
+        height: 400px;
+    }
 
 
     .inner {
@@ -41,28 +44,29 @@
 
         h1 {
             font-family: $inter;
-            font-size: 66px;
-            font-weight: 500;
+            font-size: 80px;
+            font-weight: 600;
             color: $white;
             line-height: 1.231em;
-            text-shadow: 2px 2px $lightPurple-100;
+            text-shadow: 3px 3px $lightPurple-100;
 
             @include responsive(xl) {
-                font-size: 47px;
+                font-size: 60px;
                 font-family: $Lexend;
-                font-weight: 400;
+                font-weight: 500;
             }
 
             @include responsive(md) {
-                font-size: 40px;
+                font-size: 55px;
+                font-weight: 500;
             }
 
             @include responsive(sm) {
-                font-size: 35px;
+                font-size: 50px;
                 margin-bottom: 20px;
             }
             @include responsive(xs) {
-                font-size: 30px;
+                font-size: 40px;
                 margin-bottom: 4px;
             }
         }
