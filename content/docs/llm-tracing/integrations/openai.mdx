@@ -119,7 +119,7 @@ response = asyncio.run(generate_response("What is the weather in Tokyo?"))
 </Tabs.Tab>
 </Tabs>
 
-The above code will automatically capture the following information and send it to Observatory (no need to set the values of `LlmAttributes`):
+The above code will automatically capture the following information and send it to Observatory (no need to call `update_llm_span`):
 
 - `model`: Name of the OpenAI model
 - `input`: Input messages

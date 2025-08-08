@@ -246,8 +246,8 @@ from typing import List
 from deepeval.tracing import (
     observe,
     update_current_span,
-    RetrieverAttributes,
-    LlmAttributes,
+    update_retriever_span,
+    update_llm_span,
 )
 
 
@@ -269,9 +269,8 @@ def retrieve_documents(query: str) -> List[str]:
     ]
 
     update_current_span(
-        attributes=RetrieverAttributes(
-            embedding_input=query, retrieval_context=fetched_documents
-        )
+        input=query,
+        retrieval_context=fetched_documents,
     )
     return fetched_documents
 
@@ -282,7 +281,7 @@ def generate_response(input: str) -> str:
     # <--Include format prompts and call your LLM provider here-->
     output = "Generated response based on the prompt: " + input
 
-    update_current_span(attribtues=LlmAttributes(input=input, output=output))
+    update_llm_span(input=input, output=output)
     return output
 
 
