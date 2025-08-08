@@ -930,12 +930,12 @@ Given below is the sample code for setting attributes for Agent span type.
 ```python filename="main.py" showLineNumbers
 ...
 with tracer.start_as_current_span("agent_span") as span:
-        span.set_attribute("confident.span.type", "agent")
-        span.set_attribute("confident.agent.name", "agent_span")
-        span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
-        span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
-        span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
-        span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
+    span.set_attribute("confident.span.type", "agent")
+    span.set_attribute("confident.agent.name", "agent_span")
+    span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
+    span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
+    span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
+    span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
 ```
 
 </Tabs.Tab>
@@ -974,9 +974,67 @@ with tracer.start_as_current_span("agent_span") as span:
 
 </Tabs>
 
-#### Tool
+#### **Tool**
 
-[same]
+To create a Tool span, set the `confident.span.type` to `tool`. After that refer to the table below for more [Tool span attributes](/docs/llm-tracing/tracing-features/span-types#tool-span).
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.tool.name` | `str` | Yes | Tool span name |
+| `confident.tool.description` | `str` | No | Tool span description |
+
+Given below is the sample code for setting attributes for Tool span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("tool_span") as span:
+    span.set_attribute("confident.span.type", "tool")
+    span.set_attribute("confident.tool.name", "tool name")
+    span.set_attribute("confident.tool.description", "tool description")
+    span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": input}))
+    span.set_attribute("confident.tool.attributes.output", json.dumps({"output": input}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 #### Retriever
 
