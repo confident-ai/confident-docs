@@ -119,7 +119,7 @@ response = asyncio.run(generate_response("What is the weather in Tokyo?"))
 </Tabs.Tab>
 </Tabs>
 
-The above code will automatically capture the following information and send it to Observatory (no need to set the values of `LlmAttributes`):
+The above code will automatically capture the following information and send it to Observatory (no need to call `update_llm_span`):
 
 - `model`: Name of the OpenAI model
 - `input`: Input messages
@@ -144,7 +144,7 @@ You can also use DeepEval's OpenAI client to run [component-level evaluations](/
 <Details>
 <Summary>What metrics are supported?</Summary>
 
-DeepEval's OpenAI client populates an `LLMTestCase` for each call to `chat.completions.create` and `responses.create` with the `input`, `output` and `tools_called` parameters, so any metrics that only require these parameters will work out of the box.
+DeepEval's OpenAI client populates the [test case parameters](/docs/llm-tracing/tracing-features/test-cases) for each call to `chat.completions.create` and `responses.create` with the `input`, `output` and `tools_called` parameters, so any metrics that only require these parameters will work out of the box.
 
 If you need to run metrics that require other test case parameters such as the `expected_output`, you can pass them as arguments to DeepEval's OpenAI methods.
 
