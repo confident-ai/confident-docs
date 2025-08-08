@@ -8,24 +8,70 @@ import { Tabs } from "nextra/components";
 
 [OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
 
-[one line description here talking about how Confident AI's integration works]
+**Confident AI** can recieve traces on `https://otel.confident-ai.com`. To export traces using the OpenTelemetry SDK, you can configure your Collector as follows:
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.confident-ai.com
+OTEL_EXPORTER_OTLP_HEADERS="x-confident-api-key= <your-confident-api-key>"
+```
 
 ## Quickstart
 
-First set your `CONFIDENT_API_KEY` as an enviornment variable:
+Given below is the quickstart for exporting traces to Confident AI OTLP endpoint (which will then published to **observatory**) for different languages.
+
+First set your `CONFIDENT_API_KEY` and `OTEL_EXPORTER_OTLP_ENDPOINT` as an enviornment variable:
 
 ```bash
-CONFIDENT_API_KEY="confident_us..."
+CONFIDENT_API_KEY="<your-confident-api-key>"
+OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.confident-ai.com"
 ```
 
 Then trace your first LLM call:
 
 <Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
-
 <Tabs.Tab>
 
-```python filename="main.py"
-[code for telemetry]
+Install opentelemetry dependencies:
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
+```
+
+Run the following code:
+
+```python filename="main.py" showLineNumbers {8,9,15,16}
+import os
+
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+OTLP_ENDPOINT = os.getenv("OTLP_HTTP_ENDPOINT_TRACES")
+CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
+
+# Set up the tracer provider
+trace.set_tracer_provider(TracerProvider(
+    active_span_processor=BatchSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=OTLP_ENDPOINT + "/v1/traces",
+            headers={"x-confident-api-key": CONFIDENT_API_KEY}
+        )
+    )
+))
+
+# Create a tracer
+tracer = trace.get_tracer(__name__)
+
+# Start a span
+with tracer.start_as_current_span("confident-llm-span") as span:
+    
+    # Set attributes
+    span.set_attribute("confident.trace.name", "example-trace")
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-4o")
+    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+    span.set_attribute("confident.llm.attributes.output", "Paris")
 ```
 
 </Tabs.Tab>
@@ -68,35 +114,61 @@ Then trace your first LLM call:
 
 <summary>Click to see native python implementation using DeepEval</summary>
 
-```python filename="main.py"
-[code for telemetry]
-```
+DeepEval provides a native `ConfidentSpanExporter` that directly exports traces to Confident AI **observatory**.
 
+```python filename="example.py" showLineNumbers {7, 15}
+import time
+import json
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+from deepeval.tracing.otel.exporter import ConfidentSpanExporter
+
+# Set up tracer provider
+tracer_provider = trace.get_tracer_provider()
+if not isinstance(tracer_provider, TracerProvider):
+    trace.set_tracer_provider(TracerProvider())
+
+# Add confident span exporter wrapped in batch span processor
+tracer_provider.add_span_processor(BatchSpanProcessor(ConfidentSpanExporter()))
+
+# Get tracer
+tracer = trace.get_tracer("deepeval_tracer")
+
+# set attributes
+with tracer.start_as_current_span("confident-llm-span") as span:
+    span.set_attribute("confident.trace.name", "example-trace")
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-4o")
+    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+    span.set_attribute("confident.llm.attributes.output", "Paris")
+```
 </details>
 
 ## Understanding OTEL with Confident AI
 
-[1-2 lines (possibility 2 bullet points) to talk abot what we're going to go through in this section]
+In this section, we will mainly discuss:
 
-
+- `gen_ai` attribute and event conventions
+- Confident AI specific conventions
+- Advanced configurations
 
 ### OTEL endpoints
 
-[talk about the endpoint, what is does, supported protocols]
+`https://otel.confident-ai.com` is a HTTP endpoint that accepts OpenTelemetry traces in the [OTLP format](https://opentelemetry.io/docs/specs/otlp/#otlphttp).
 
-### GenAI instrumentation
+<Callout type="warning">
+Please note that Confident AI does **not support** gRPC for the OpenTelemetry endpoint. Please use HTTP instead.
+</Callout>
 
-[talk about how we adhere to genai convention from X]
+### Attributes
 
-### Confident AI specific conventions
+**Confident AI** adheres to the [GenAI semantic convention](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and adds an extra layer on top of it to capture additional data about the LLM applications. Confident AI uses `confident.*` namespace to map specific attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model. These specific attributes always take precedence over `gen_ai.*` conventions and are recommended for all users that are manually instrumenting their applications.
 
-[very breifly talk about how Confident AI adds an extra layer on top of the gen ai stuff]
-
-
-### Advanced configurations
-
-[talk about how the default env is "deveopment" but you can set it]
-[talk abotu sample rate]
+<Callout type="warning">
+The **GenAI semantic conventions** are still under development and are subject to change.
+</Callout>
 
 ## Trace-Level Attribute Mappings
 
