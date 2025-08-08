@@ -847,6 +847,10 @@ To create a LLM span, set the `confident.span.type` to `llm`. After that refer t
 | `confident.llm.model` | `str` | No | LLM model |
 | `confident.llm.cost_per_input_token` | `float` | No | Cost per input token |
 | `confident.llm.cost_per_output_token` | `float` | No | Cost per output token |
+| `confident.llm.attributes.input` | `str`, `list[str]` | Yes | LLM Span input (parsed to `list[dict]` if `list[str]` is provided) |
+| `confident.llm.attributes.output` | `Any` | Yes | LLM Span output |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
 
 Given below is the sample code for setting attributes for LLM span type.
 
@@ -856,22 +860,15 @@ Given below is the sample code for setting attributes for LLM span type.
 
 ```python filename="main.py" showLineNumbers
 ...
-with tracer.start_as_current_span("meta_agent") as span:
-    span.set_attribute("confident.span.input", input)
-    span.set_attribute("confident.span.output", input)
-    span.set_attribute("confident.span.error", "Error")
-    span.set_attribute("confident.span.feedback", json.dumps({
-        "rating": 1,
-        "expected_output": "Expected output",
-        "explanation": "Explanation"
-    }))
-    span.set_attribute("confident.span.metric_collection", "My metrics")
-    span.set_attribute("confident.trace.attributes", json.dumps({
-        "name": "test_trace",
-        "tags": ["tag1", "tag2"],
-        "thread_id": "123",
-        "user_id": "456"
-    }))
+with tracer.start_as_current_span("llm_span") as span:
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+    span.set_attribute("confident.llm.attributes.input", [
+        json.dumps({"role": "system", "content": "You are a helpful assistant."}),
+        json.dumps({"role": "user", "content": input})
+    ])
+    time.sleep(0.5)
+    span.set_attribute("confident.llm.attributes.output", "Hello world")
 ```
 
 </Tabs.Tab>
@@ -920,6 +917,8 @@ To create a Agent span, set the `confident.span.type` to `agent`. After that ref
 | `confident.agent.name` | `str` | Yes | Agent span name |
 | `confident.agent.available_tools` | `list[str]` | No | Agent span available tools |
 | `confident.agent.agent_handoffs` | `list[str]` | No | Agent span agent handoffs |
+| `confident.agent.attributes.input` | `Any` | Yes | Agent span input |
+| `confident.agent.attributes.output` | `Any` | Yes | Agent span output |
 
 Given below is the sample code for setting attributes for Agent span type.
 
@@ -934,6 +933,7 @@ with tracer.start_as_current_span("agent_span") as span:
     span.set_attribute("confident.agent.name", "agent_span")
     span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
     span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
+    
     span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
     span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
 ```
@@ -982,6 +982,8 @@ To create a Tool span, set the `confident.span.type` to `tool`. After that refer
 |-----------|------|------|-------------|
 | `confident.tool.name` | `str` | Yes | Tool span name |
 | `confident.tool.description` | `str` | No | Tool span description |
+| `confident.tool.attributes.input_parameters` | `str` | No | Tool span input parameters (parsed to `dict` if `str` is provided) |
+| `confident.tool.attributes.output` | `Any` | No | Tool span output |
 
 Given below is the sample code for setting attributes for Tool span type.
 
@@ -994,6 +996,7 @@ Given below is the sample code for setting attributes for Tool span type.
 with tracer.start_as_current_span("tool_span") as span:
     span.set_attribute("confident.span.type", "tool")
     span.set_attribute("confident.tool.name", "tool name")
+
     span.set_attribute("confident.tool.description", "tool description")
     span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": input}))
     span.set_attribute("confident.tool.attributes.output", json.dumps({"output": input}))
@@ -1059,7 +1062,7 @@ Given below is the sample code for setting attributes for Retriever span type.
 with tracer.start_as_current_span("retriever_span") as span:
     span.set_attribute("confident.span.type", "retriever")
     span.set_attribute("confident.retriever.embedder", "embedder")
-    
+
     span.set_attribute("confident.retriever.attributes.embedding_input", input)
     span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
     span.set_attribute("confident.retriever.attributes.top_k", 10)
