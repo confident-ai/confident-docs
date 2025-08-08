@@ -44,7 +44,7 @@ export async function generateMetadata({ params }) {
           url: fullImageUrl,
           width: 1200,
           height: 630,
-          alt: blog?.fields?.title,
+          alt: study?.fields?.title,
         },
       ],
       url: "https://confident-ai.com",

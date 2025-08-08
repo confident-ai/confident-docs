@@ -14,19 +14,7 @@ export default function TextOnlySection() {
   useEffect(() => {
     if (inView) setHasAnimated(true);
   }, [inView]);
-
-  const btns = [
-    {
-      label: "Request a Demo",
-      link: "https://www.confident-ai.com/book-a-demo",
-      btnVariant: "outlinedPurple",
-    },
-    {
-      label: "Try Now For Free",
-      link: "https://app.confident-ai.com/auth/signup?redirect_url=%2F",
-      btnVariant: "containedBW",
-    },
-  ];
+  
   return (
     <div className={styles.TextOnlySection} ref={ref}>
       <div className={styles.inner}>
