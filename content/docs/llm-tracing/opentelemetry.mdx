@@ -774,15 +774,142 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ### Type specific attributes
 
-[description with bullet points, then link to the span types docs]
+[Span types](/docs/llm-tracing/tracing-features/span-types) are optional but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
 
-#### Custom
+- `llm`
+- `agent`
+- `retriever`
+- `tool`
 
-[same]
+You can set the span type using the following attribute:
 
-#### LLM
+- `confident.span.type` (of type `str`) used for updating span type.
 
-[same]
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.type", "llm")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
+Given below are attributes for specific span types. It is recommended to set these attributes in the span attributes using the `confident.{span_type}.*` namespace.
+
+#### **Custom**
+
+This is the default span type. All the attributes that we used above with `confident.span.*` namespace are applicable to this span type.
+
+#### **LLM**
+
+To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/tracing-features/span-types#llm-span).
+
+ Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.llm.model` | `str` | No | LLM model |
+| `confident.llm.cost_per_input_token` | `float` | No | Cost per input token |
+| `confident.llm.cost_per_output_token` | `float` | No | Cost per output token |
+
+Given below is the sample code for setting attributes for LLM span type.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("meta_agent") as span:
+    span.set_attribute("confident.span.input", input)
+    span.set_attribute("confident.span.output", input)
+    span.set_attribute("confident.span.error", "Error")
+    span.set_attribute("confident.span.feedback", json.dumps({
+        "rating": 1,
+        "expected_output": "Expected output",
+        "explanation": "Explanation"
+    }))
+    span.set_attribute("confident.span.metric_collection", "My metrics")
+    span.set_attribute("confident.trace.attributes", json.dumps({
+        "name": "test_trace",
+        "tags": ["tag1", "tag2"],
+        "thread_id": "123",
+        "user_id": "456"
+    }))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 #### Agent
 
