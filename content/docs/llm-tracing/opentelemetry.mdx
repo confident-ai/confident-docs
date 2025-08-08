@@ -172,7 +172,7 @@ The **GenAI semantic conventions** are still under development and are subject t
 
 ## Trace-Level Attribute Mappings
 
-Trace level attributes are set in the span attributes. These are exactly the same as listed in [tracing features](/docs/llm-tracing/tracing-features/attributes). 
+These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
 
 <Callout>
 It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
@@ -515,27 +515,257 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ## Span-Level Attribute Mappings
 
-[same as above]
+These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
 
 ### Name
 
-[same as above]
+The [name](/docs/llm-tracing/tracing-features/name) of the span is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
+
+- `confident.span.name` (of type `str`) used for updating span name.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.name", "custom_span")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Input/Output
 
-[same as above]
+You can set span [input and output](/docs/llm-tracing/tracing-features/input-output#set-span-io-at-runtime) at runtime using the following attributes:
+
+- `confident.span.input` (of type `Any`) used for updating span input.
+- `confident.span.output` (of type `Any`) used for updating span output.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.input", input)
+    span.set_attribute("confident.span.output", output)
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Metric Collection
 
-[same as above]
+[Metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud) allows you to run metrics on cloud and publish results to the observatory.
+
+- `confident.span.metric_collection` (of type `str`) update the name of the metric collection for the span.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.thread_id", "123")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Test Case
 
-[same as above]
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
+    
+    span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.span.llm_test_case.input', input)
+    span.set_attribute('confident.span.llm_test_case.actual_output', output)
+```
+
+<Callout>
+Make sure you have [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) created on the platform for running online evaluation on this test case.
+</Callout>
+
+LLM test case attributes mapping:
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.span.llm_test_case.input` | `str` | Yes | Test case input |
+| `confident.span.llm_test_case.actual_output` | `str` | Yes | Test case actual output |
+| `confident.span.llm_test_case.expected_output` | `str` | No | Test case expected output |
+| `confident.span.llm_test_case.context` | `list[str]` | No | Test case context |
+| `confident.span.llm_test_case.retrieval_context` | `list[str]` | No | Test case retrieval context |
+| `confident.span.llm_test_case.tools_called` | `str` | No | Should be stringified json of type [Tools Called](https://deepeval.com/docs/evaluation-test-cases#tools-called) |
+| `confident.span.llm_test_case.expected_tools` | `str` | No | Should be stringified json of type [Expected Tools](https://deepeval.com/docs/evaluation-test-cases#expected-tools) |
+
 
 ### Metadata
 
-[same as above]
+[Metadata](/docs/llm-tracing/tracing-features/metadata) can be attached to the span. This information can be used for filtering, grouping, and analyzing your spans in the observatory.
+
+- `confident.span.metadata` (of type `str`) used for updating span metadata.
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.span.metadata", json.dumps({"key": "value"}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### Type specific attributes
 
