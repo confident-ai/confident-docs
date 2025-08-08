@@ -172,29 +172,27 @@ The **GenAI semantic conventions** are still under development and are subject t
 
 ## Trace-Level Attribute Mappings
 
-[remmever to talk about how these are exactly the same as NOT using otel as found in other parts of the docs under "tracing features"]
+Trace level attributes are set in the span attributes. These are exactly the same as listed in [tracing features](/docs/llm-tracing/tracing-features/attributes). 
 
-Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
+<Callout>
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+</Callout>
 
 ### Name
 
-[one sentence explanation, link to docs]
+The trace name is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
 
-[use this exact format, quoted code blocks for these bulllet points]
-
-- `"confident.trace.name"` - [one line description goes here, no period at the end]
-
-[one line description]
-
-[add a final code block here with all languages]
-
+- `"confident.trace.name"` (of type `str`) used for updating trace [name](/docs/llm-tracing/tracing-features/name)
 
 <Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
 
 <Tabs.Tab>
 
 ```python filename="main.py"
-[code for telemetry]
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.name", "test_trace")
 ```
 
 </Tabs.Tab>
