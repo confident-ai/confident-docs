@@ -298,9 +298,9 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ### Tags
 
-Tags are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
+[Tags](/docs/llm-tracing/tracing-features/tags) are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
 
-- `confident.trace.tags` (of type `list[str]`) used for updating trace [tags](/docs/llm-tracing/tracing-features/tags).
+- `confident.trace.tags` (of type `list[str]`) used for updating trace tags.
 
 <Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
 
@@ -410,7 +410,56 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ### Thread id
 
-[same as above]
+A [thread](/docs/llm-tracing/tracing-features/threads) on Confident AI is a collection of one or more traces, letting you view full conversations — perfect for chat apps, agents, or any multi-turn interactions.
+
+- `confident.trace.thread_id` (of type `str`) used for updating trace **thread id**.
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.thread_id", "123")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[code for telemetry]
+```
+
+</Tabs.Tab>
+
+</Tabs>
 
 ### User Id
 
