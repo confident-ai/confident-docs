@@ -51,21 +51,23 @@ Alternatively, you can set the environment directly in code:
     
     traceManager.configure({ environment: "production" });
     const openai = new OpenAI();
-    
-    const llmApp = (query: string): string => {
-      return openai.chat.completions.create({
+
+    const llmApp = async (query: string) => {
+      const response = await openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).then(response => response.choices[0].message.content);
+        messages: [{ role: "user", content: query }],
+      });
+      return response.choices[0].message.content;
     };
-    
+
     const observedLlmApp = observe({
-      fn: llmApp
+      type: "llm",
+      model: "gpt-4o",
+      fn: llmApp,
     });
-    
+
     observedLlmApp("Write me a poem.");
+
     ```
   </Tabs.Tab>
 </Tabs>
