@@ -802,6 +802,10 @@ with tracer.start_as_current_span("custom_span") as span:
 
 Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
 
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
 ```python filename="main.py" showLineNumbers
 ...
 with tracer.start_as_current_span("confident_evaluation") as span:
@@ -812,6 +816,43 @@ with tracer.start_as_current_span("confident_evaluation") as span:
     span.set_attribute('confident.span.llm_test_case.input', input)
     span.set_attribute('confident.span.llm_test_case.actual_output', output)
 ```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 LLM test case attributes mapping:
 
