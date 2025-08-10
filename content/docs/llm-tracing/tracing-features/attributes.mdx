@@ -40,30 +40,28 @@ These functions update the attributes for the **CURRENT** span of the component 
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {6}
-    import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
-    
-    const innerFunction = () => {
 
-      // Here, updateCurrentSpanAttributes() will update the Retriever span
-      updateCurrentSpan({
-        attributes: {
-          embeddingInput: query,
-          retrievalContext: fetchedDocuments
-        }
-      });
-    };
-    
+```typescript filename="index.ts" showLineNumbers {12}
+import { observe, updateRetrieverSpan } from "@deepeval-ts/tracing";
+
+const observedOuterFunction = observe({
+  fn: () => {
+
     const observedInnerFunction = observe({
-      type: "retriever",
-      fn: innerFunction,
+      type: "retriever", 
+      embedder: "text-embedding-ada-002",
+      fn: () => {
+
+        // Here, updateRetrieverSpan() will update the Retriever span
+        updateRetrieverSpan({embedder: "new embedder model", chunkSize: 10});
+      },
     });
 
-    const outerFunction = observe({
-      type: "custom",
-      fn: () => {observedInnerFunction()},
-    });
-    ```
+    observedInnerFunction();
+  };
+})
+```
+
   </Tabs.Tab>
 </Tabs>
 
@@ -80,7 +78,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers copy
+    ```python filename="main.py" showLineNumbers copy {7}
     from deepeval.tracing import update_llm_span
     from deepeval.prompt import Prompt
     
@@ -88,7 +86,6 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
     def generate_response(prompt: str) -> str:
         output = "Generated response"
         update_llm_span(
-            prompt=Prompt(alias=prompt),
             input_token_count=10,
             output_token_count=25,
             cost_per_input_token=0.01,
@@ -98,33 +95,34 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers copy
-    import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
-    
-    const generateResponse = (prompt: string): string => {
-      const output = "Generated response";
-      updateCurrentSpan({
-        attributes: {
-          input: prompt,
-          output: output
-        }
-      });
-      return output;
-    };
-    
-    const observedGenerateResponse = observe({
-      type: "llm",
-      model: "gpt-4",
-      fn: generateResponse,
-    });
-    ```
+  
+```typescript filename="index.ts" showLineNumbers copy {5}
+import { observe, updateLlmSpan } from '@deepeval-ts/tracing';
+
+const generateResponse = (prompt: string) => {
+  const output = "Generated response";
+  updateLlmSpan({
+    inputTokenCount: 10,
+    outputTokenCount: 25,
+    costPerInputToken: 0,
+    costPerOutputToken: 0,
+  });
+  return output;
+};
+
+const observedGenerateResponse = observe({
+  type: "llm",
+  model: "gpt-4",
+  fn: generateResponse,
+});
+```
+
   </Tabs.Tab>
 </Tabs>
 
 There are **SIX** optional parameters for `update_llm_span`:
 
 - [Optional] `model`: The model used, of type `str`.
-- [Optional] `prompt`: The prompt of type `Prompt` from `deepeval.prompt`.
 - [Optional] `input_token_count`: The number of tokens of type `float` in the input.
 - [Optional] `output_token_count`: The number of tokens of type `float` in the generated response.
 - [Optional] `cost_per_input_token`: The cost per input token of type `float`.
@@ -141,7 +139,7 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
 
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers copy
+    ```python filename="main.py" showLineNumbers copy {6}
     from deepeval.tracing import update_retriever_span
     
     @observe(type="retriever", embedder="text-embedding-ada-002")
@@ -156,16 +154,15 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers copy
-    import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+    ```typescript filename="index.ts" showLineNumbers copy {5}
+    import { observe, updateRetrieverSpan } from '@deepeval-ts/tracing';
     
     const retrieveDocuments = (query: string): string[] => {
       const fetchedDocuments = ["doc1", "doc2"];
-      updateCurrentSpan({
-        attributes: {
-          embeddingInput: query,
-          retrievalContext: fetchedDocuments
-        }
+      updateRetrieverSpan({ 
+        embedder: "text-embedding-ada-002", 
+        chunkSize: 10, 
+        topK: 5 
       });
       return fetchedDocuments;
     };
