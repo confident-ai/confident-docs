@@ -36,29 +36,27 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
+    ```typescript filename="index.ts" showLineNumbers {11}
     import OpenAI from 'openai';
     import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
     
     const openai = new OpenAI();
     
-    const llmApp = (query: string): string => {
-      const res = openai.chat.completions.create({
+    const llmApp = async (query: string) => {
+      const res = await openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      updateCurrentTrace({ input: query, output: res });
-      return res;
+        messages: [{ role: "user", content: query }],
+      });
+      updateCurrentTrace({ input: query, output: res.choices[0].message.content });
+      return res.choices[0].message.content;
     };
-    
+
     const observedLlmApp = observe({
-      fn: llmApp
+      fn: llmApp,
     });
-    
+
     observedLlmApp("Write me a poem.");
-    ```
+        ```
   </Tabs.Tab>
 </Tabs>
 
@@ -105,27 +103,25 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
+    ```typescript filename="index.ts" showLineNumbers {11}
     import OpenAI from 'openai';
     import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
     
     const openai = new OpenAI();
-    
-    const llmApp = (query: string): string => {
-      const res = openai.chat.completions.create({
+        
+    const llmApp = async (query: string) => {
+      const res = await openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      updateCurrentSpan({ input: query, output: res });
-      return res;
+        messages: [{ role: "user", content: query }],
+      });
+      updateCurrentSpan({ input: query, output: res.choices[0].message.content });
+      return res.choices[0].message.content;
     };
-    
+
     const observedLlmApp = observe({
-      fn: llmApp
+      fn: llmApp,
     });
-    
+
     observedLlmApp("Write me a poem.");
     ```
   </Tabs.Tab>
