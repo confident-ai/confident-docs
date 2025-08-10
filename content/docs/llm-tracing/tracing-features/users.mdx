@@ -36,26 +36,21 @@ You can use the `update_current_trace` function to set the `user_id` within trac
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
+    ```typescript filename="index.ts" showLineNumbers {10}
     import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
     import OpenAI from 'openai';
     
-    const llmApp = (query: string) => {
+    const llmApp = async (query: string) => {
       const openai = new OpenAI();
-      const res = openai.chat.completions.create({
+      const res = await openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      
+        messages: [{ role: "user", content: query }]
+      })      
       updateCurrentTrace({ userId: "your-user-id" });
-      return res;
+      return res.choices[0].message.content;
     };
     
-    const observedLlmApp = observe({
-      fn: llmApp
-    });
+    const observedLlmApp = observe({fn: llmApp});
     
     observedLlmApp("Write me a poem.");
     ```
