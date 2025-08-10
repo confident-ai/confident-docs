@@ -290,7 +290,57 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ### Metric Collection
 
-To be documented...
+[Metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud) allows you to run metrics on cloud and publish results to the observatory.
+
+- `"confident.trace.metric_collection"` (of type `str`) update the name of the metric collection for the trace
+
+<Tabs items={['Python', 'Java/Typescript', 'Golang', 'Ruby', 'C#']}  storageKey="languages">
+
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers
+...
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.metric_collection", "<your_metric_collection>")
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```typescript filename="index.ts"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go filename="something.go"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```ruby filename="something.rb"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```csharp filename="something.cs"
+[to be coded...]
+```
+
+</Tabs.Tab>
+
+</Tabs>
+
 
 ### Test Case
 
@@ -639,7 +689,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ...
 with tracer.start_as_current_span("custom_span") as span:
     # your code
-    span.set_attribute("confident.trace.thread_id", "123")
+    span.set_attribute("confident.span.metric_collection", "<your_metric_collection>")
 ```
 
 </Tabs.Tab>
