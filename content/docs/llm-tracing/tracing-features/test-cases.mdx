@@ -55,9 +55,25 @@ You can set span-level test case parameters in the `update_current_span` functio
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {6}
-    # TODO
-    ```
+
+```typescript filename="index.ts" showLineNumbers {5}
+import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
+import { ToolCall } from "@deepeval-ts/test-case";
+
+const toolCallingAgent = (query: string) => {
+  updateCurrentSpan({
+    input: query,
+    output: "Agent response",
+    toolsCalled: [new ToolCall({ name: "web_search", inputParameters: { query: query } })],
+  });
+  return "Agent response";
+};
+
+const observedToolCallingAgent = observe({ fn: toolCallingAgent });
+
+observedToolCallingAgent("What is weather in San Francisco?");
+```
+
   </Tabs.Tab>
 </Tabs>
 
@@ -73,7 +89,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
   <Tabs.Tab>
     ```python filename="main.py" showLineNumbers {9,19}
     from openai import OpenAI
-    from deepeval.tracing import observe, update_current_span
+    from deepeval.tracing import observe, update_current_trace
 
     client = OpenAI()
 
@@ -97,8 +113,35 @@ You can set trace-level test case parameters in the `update_current_trace` funct
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {5}
-    # TODO
-    ```
+
+  ```typescript filename="index.ts" showLineNumbers {9,21}
+  import OpenAI from "openai";
+import { observe, updateCurrentTrace } from "@deepeval-ts/tracing";
+
+const client = new OpenAI();
+
+const observedRetriever = observe({
+    fn: (query: string) => {
+      const retrieved_chunks = ["chunk1", "chunk2"];
+      updateCurrentTrace({ retrievalContext: retrieved_chunks });
+      return retrieved_chunks.join("\n");
+    },
+});
+
+const observedLLMApp = observe({
+    fn: async (query: string) => {
+      const retrieval_context = observedRetriever(query);
+      const res = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [ { role: "user", content: query + retrieval_context } ],
+      });
+      updateCurrentTrace({ input: query, output: res.choices[0].message.content });
+      return res.choices[0].message.content;
+    },
+});
+
+observedLLMApp("What is weather typically like in San Francisco?");
+```
+
   </Tabs.Tab>
 </Tabs>
