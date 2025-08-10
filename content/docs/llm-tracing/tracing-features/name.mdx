@@ -48,9 +48,7 @@ const llmApp = async (query: string) => {
     return response.choices[0].message.content;
 };
 
-const observedLlmApp = observe({
-    fn: llmApp
-});
+const observedLlmApp = observe({fn: llmApp});
 
 await observedLlmApp("Write me a poem.");
 ```
@@ -98,10 +96,7 @@ const llmApp = async (query: string) => {
     return response.choices[0].message.content;
 };
 
-const observedLlmApp = observe({
-    fn: llmApp,
-    name: "not_llm_app"
-});
+const observedLlmApp = observe({fn: llmApp});
 
 await observedLlmApp("Write me a poem.");
 ```
