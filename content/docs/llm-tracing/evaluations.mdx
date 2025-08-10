@@ -44,7 +44,7 @@ You'll also need to use `update_current_span` with [test case parameters](/docs/
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {8, 15}
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.tracing import observe, update_current_span
 from openai import OpenAI
 
@@ -66,21 +66,19 @@ llm_app("Write me a poem.")
 ```
   </Tabs.Tab>
   <Tabs.Tab>
-```typescript filename="index.ts" showLineNumbers copy {5,13}
+```typescript filename="index.ts" showLineNumbers copy {4,11}
 import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
 
-const generate = async (prompt: string): Promise<string> => {
-  updateCurrentSpan({
-    test_case: new LLMTestCase({input=prompt, actualOutput=fake_output})
-  })
+const llmApp = async (prompt: string) => {
+  updateCurrentSpan({input: prompt, output: "LLM response"})
   return "LLM response";
 }
  
-const observedGenerate = observe(
+const observedLlmApp = observe(
   type="llm",
   model: "gpt-4",
   metricCollection="My Collection",
-  fn: generate,
+  fn: llmApp,
 );
 ````
 
@@ -111,7 +109,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {8, 15}
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.tracing import observe, update_current_trace
 from openai import OpenAI
 
@@ -133,13 +131,11 @@ llm_app("Write me a poem.")
 ```
   </Tabs.Tab>
   <Tabs.Tab>
-```typescript filename="index.ts" showLineNumbers copy {5,13}
+```typescript filename="index.ts" showLineNumbers copy {4,11}
 import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
 
-const generate = async (prompt: string): Promise<string> => {
-  updateCurrentTrace({
-    test_case: new LLMTestCase({input=prompt, actualOutput=fake_output})
-  })
+const llmApp = async (prompt: string) => {
+  updateCurrentTrace({input=prompt, output="LLM response"})
   return "LLM response";
 }
  
@@ -147,7 +143,7 @@ const observedGenerate = observe(
   type="llm",
   model: "gpt-4",
   metricCollection="My Collection",
-  fn: generate,
+  fn: llmApp,
 );
 ```
   </Tabs.Tab>
