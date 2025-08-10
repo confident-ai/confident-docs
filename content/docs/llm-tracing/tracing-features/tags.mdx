@@ -48,12 +48,11 @@ Tags are applied at the trace level, making them visible for all spans within th
       updateCurrentTrace({ tags: ["Causal Chit-Chat"] });
         
       const openai = new OpenAI();
-      return openai.chat.completions.create({
+      const response = openai.chat.completions.create({
         model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
+        messages: [ { role: "user", content: query } ]
+      });
+      return response.choices[0].message.content;
     };
     
     const observedLlmApp = observe({
