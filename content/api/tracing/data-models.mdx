@@ -71,7 +71,11 @@ type Trace = {
 
     // Evals
     metricCollection?: string;
-    llmTestCase?: LLMTestCase;
+    retrievalContext?: string[];
+    context?: string[];
+    expectedOutput?: string;
+    toolsCalled?: ToolCall[];
+    expectedTools?: ToolCall[];
 }
 ```
 
@@ -96,7 +100,11 @@ type BaseSpan = {
 
     // Evals
     metricCollection?: string;
-    llmTestCase?: LLMTestCase;
+    retrievalContext?: string[];
+    context?: string[];
+    expectedOutput?: string;
+    toolsCalled?: ToolCall[];
+    expectedTools?: ToolCall[];
 }
 ```
 
@@ -113,8 +121,6 @@ If you provide spans through the `llmSpans` of a `Trace`, your span will be crea
 ```typescript filename="llm-span.d.ts"
 type LlmSpan = BaseSpan & {
   model: string;
-  input: Record<string, string> | string;
-  output: Record<string, string> | string;
   costPerInputToken?: number;
   costPerOutputToken?: number;
   inputTokenCount?: number;
@@ -131,8 +137,6 @@ If you provide spans through the `retrieverSpans` of a `Trace`, your span will b
 ```typescript filename="retriever-span.d.ts"
 type RetrieverSpan = BaseSpan & {
   embedder: string;
-  input: string;
-  output: string[];
   topK?: number;
   chunkSize?: number;
 }
