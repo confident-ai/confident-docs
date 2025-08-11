@@ -574,8 +574,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.name", "example-trace");
 ```
 
 </Tabs.Tab>
@@ -642,8 +643,10 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.input", input);
+span.SetAttribute("confident.trace.output", output);
 ```
 
 </Tabs.Tab>
@@ -705,8 +708,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>");
 ```
 
 </Tabs.Tab>
@@ -778,8 +782,11 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>");
+span.SetAttribute("confident.trace.llm_test_case.input", input);
+span.SetAttribute("confident.trace.llm_test_case.actual_output", output);
 ```
 
 </Tabs.Tab>
@@ -855,8 +862,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.tags", ["tag1", "tag2"]);
 ```
 
 </Tabs.Tab>
@@ -921,8 +929,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.metadata", `{"key": "value"}`);
 ```
 
 </Tabs.Tab>
@@ -954,7 +963,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.user_id": "123",
+    "confident.trace.thread_id": "123",
 });
 ```
 
@@ -976,7 +985,7 @@ span.SetAttributes(
 ```ruby filename="example.rb" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.user_id": "123",
+    "confident.trace.thread_id": "123",
 });
 ```
 
@@ -984,8 +993,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.thread_id", "123");
 ```
 
 </Tabs.Tab>
@@ -1016,7 +1026,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.name": "example-trace",
+    "confident.trace.user_id": "123",
 });
 ```
 
@@ -1027,7 +1037,7 @@ span.setAttributes({
 ```go filename="main.go" showLineNumbers
 ...
 span.SetAttributes(
-    attribute.String("confident.trace.name", "example-trace"),
+    attribute.String("confident.trace.user_id", "123"),
 )
 ```
 
@@ -1038,7 +1048,7 @@ span.SetAttributes(
 ```ruby filename="example.rb" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.name": "example-trace",
+    "confident.trace.user_id": "123",
 });
 ```
 
@@ -1046,8 +1056,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.trace.user_id", "123");
 ```
 
 </Tabs.Tab>
@@ -1112,8 +1123,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.name", "custom_span");
 ```
 
 </Tabs.Tab>
@@ -1179,8 +1191,10 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.input", input);
+span.SetAttribute("confident.span.output", output);
 ```
 
 </Tabs.Tab>
@@ -1241,8 +1255,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
 ```
 
 </Tabs.Tab>
@@ -1313,8 +1328,11 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
+span.SetAttribute("confident.span.llm_test_case.input", input);
+span.SetAttribute("confident.span.llm_test_case.actual_output", output);
 ```
 
 </Tabs.Tab>
@@ -1389,8 +1407,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.metadata", `{"key": "value"}`);
 ```
 
 </Tabs.Tab>
@@ -1458,8 +1477,9 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.type", "llm");
 ```
 
 </Tabs.Tab>
@@ -1555,8 +1575,15 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.type", "llm");
+span.SetAttribute("confident.llm.model", "gpt-3.5-turbo");
+span.SetAttribute("confident.llm.attributes.input", [
+    `{"role": "system", "content": "You are a helpful assistant."}`,
+    `{"role": "user", "content": "What is the capital of France?"}`
+]);
+span.SetAttribute("confident.llm.attributes.output", "Hello world");
 ```
 
 </Tabs.Tab>
@@ -1645,8 +1672,14 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.type", "agent");
+span.SetAttribute("confident.agent.name", "agent_span");
+span.SetAttribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"]);
+span.SetAttribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"]);
+span.SetAttribute("confident.agent.attributes.input", `{"input": input}`);
+span.SetAttribute("confident.agent.attributes.output", `{"output": input}`);
 ```
 
 </Tabs.Tab>
@@ -1728,8 +1761,13 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.span.type", "tool");
+span.SetAttribute("confident.tool.name", "tool name");
+span.SetAttribute("confident.tool.description", "tool description");
+span.SetAttribute("confident.tool.attributes.input_parameters", `{"input": input}`);
+span.SetAttribute("confident.tool.attributes.output", `{"output": input}`);
 ```
 
 </Tabs.Tab>
@@ -1817,8 +1855,13 @@ span.setAttributes({
 
 <Tabs.Tab>
 
-```csharp filename="something.cs"
-[to be coded...]
+```csharp filename="Program.cs" showLineNumbers
+...
+span.SetAttribute("confident.retriever.embedder", "embedder");
+span.SetAttribute("confident.retriever.attributes.embedding_input", input);
+span.SetAttribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"]);
+span.SetAttribute("confident.retriever.attributes.top_k", 10);
+span.SetAttribute("confident.retriever.attributes.chunk_size", 10);
 ```
 
 </Tabs.Tab>
