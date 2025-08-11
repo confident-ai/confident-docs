@@ -42,7 +42,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
-OTLP_ENDPOINT = os.getenv("OTLP_HTTP_ENDPOINT_TRACES")
+OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
 
 # Set up the tracer provider
