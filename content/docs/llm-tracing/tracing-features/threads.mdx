@@ -115,18 +115,15 @@ update_current_trace(thread_id="your-thread-id")
 
 You can also specify any tools that were called or retrieval context involved (for a RAG system) for any LLM generated text in a conversation (which in this case is the `output` on a trace).
 
-```python filename="main.py" {8}
+```python filename="main.py"
 from deepeval.test_case import ToolCall
-from deepeval.tracing import TurnContext
 ...
 
 update_current_trace(
   thread_id="your-thread-id", 
   output=res,
-  turn_context=TurnContext(
-    retrieval_context=["RAG context goes here."],
-    tools_called=[ToolCall(name="Websearch")]
-  )
+  retrieval_context=["RAG context goes here."],
+  tools_called=[ToolCall(name="Websearch")]
 )
 ```
 
