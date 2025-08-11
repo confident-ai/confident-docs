@@ -549,8 +549,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.name", "example-trace"),
+)
 ```
 
 </Tabs.Tab>
@@ -605,8 +608,12 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.input", input),
+    attribute.String("confident.trace.output", output),
+)
 ```
 
 </Tabs.Tab>
@@ -659,8 +666,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.metric_collection", "<your_metric_collection>"),
+)
 ```
 
 </Tabs.Tab>
@@ -717,8 +727,13 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.metric_collection", "<your_metric_collection>"),
+    attribute.String("confident.trace.llm_test_case.input", input),
+    attribute.String("confident.trace.llm_test_case.actual_output", output),
+)
 ```
 
 </Tabs.Tab>
@@ -785,8 +800,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.tags", []string{"tag1", "tag2"}),
+)
 ```
 
 </Tabs.Tab>
@@ -842,8 +860,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.metadata", `{"key": "value"}`),
+)
 ```
 
 </Tabs.Tab>
@@ -896,8 +917,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.thread_id", "123"),
+)
 ```
 
 </Tabs.Tab>
@@ -949,8 +973,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.trace.user_id", "123"),
+)
 ```
 
 </Tabs.Tab>
@@ -1006,8 +1033,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.name", "custom_span"),
+)
 ```
 
 </Tabs.Tab>
@@ -1061,8 +1091,12 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.input", input),
+    attribute.String("confident.span.output", output),
+)
 ```
 
 </Tabs.Tab>
@@ -1114,8 +1148,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
+)
 ```
 
 </Tabs.Tab>
@@ -1171,8 +1208,13 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
+    attribute.String("confident.span.llm_test_case.input", input),
+    attribute.String("confident.span.llm_test_case.actual_output", output),
+)
 ```
 
 </Tabs.Tab>
@@ -1238,8 +1280,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.metadata", `{"key": "value"}`),
+)
 ```
 
 </Tabs.Tab>
@@ -1298,8 +1343,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.type", "llm"),
+)
 ```
 
 </Tabs.Tab>
@@ -1371,8 +1419,14 @@ with tracer.start_as_current_span("llm_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.span.type", "llm"),
+    attribute.String("confident.llm.model", "gpt-3.5-turbo"),
+    attribute.String("confident.llm.attributes.input", []string{`{"role": "system", "content": "You are a helpful assistant."}`, `{"role": "user", "content": "What is the capital of France?"}`}),
+    attribute.String("confident.llm.attributes.output", "Hello world"),
+)
 ```
 
 </Tabs.Tab>
@@ -1437,8 +1491,16 @@ with tracer.start_as_current_span("agent_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.agent.name", "agent_span"),
+    attribute.String("confident.agent.available_tools", []string{"llm_agent", "retriever_span", "tool_span"}),
+    attribute.String("confident.agent.agent_handoffs", []string{"llm_agent", "retriever_span", "tool_span"}),
+    attribute.String("confident.agent.attributes.input", `{"input": input}`),
+    attribute.String("confident.agent.attributes.output", `{"output": input}`),
+    attribute.String("confident.span.type", "agent"),
+)
 ```
 
 </Tabs.Tab>
@@ -1499,8 +1561,15 @@ with tracer.start_as_current_span("tool_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.tool.name", "tool name"),
+    attribute.String("confident.tool.description", "tool description"),
+    attribute.String("confident.tool.attributes.input_parameters", `{"input": input}`),
+    attribute.String("confident.tool.attributes.output", `{"output": input}`),
+    attribute.String("confident.span.type", "tool"),
+)
 ```
 
 </Tabs.Tab>
@@ -1564,8 +1633,16 @@ with tracer.start_as_current_span("retriever_span") as span:
 
 <Tabs.Tab>
 
-```go filename="something.go"
-[to be coded...]
+```go filename="main.go" showLineNumbers
+...
+span.SetAttributes(
+    attribute.String("confident.retriever.embedder", "embedder"),
+    attribute.String("confident.retriever.attributes.embedding_input", input),
+    attribute.String("confident.retriever.attributes.retrieval_context", []string{"asd", "asd"}),
+    attribute.Int("confident.retriever.attributes.top_k", 10),
+    attribute.Int("confident.retriever.attributes.chunk_size", 10),
+    attribute.String("confident.span.type", "retriever"),
+)
 ```
 
 </Tabs.Tab>
