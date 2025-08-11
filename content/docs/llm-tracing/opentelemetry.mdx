@@ -314,12 +314,22 @@ go run .
 
 <Tabs.Tab>
 
+Create `Gemfile` file. This file contains the dependencies for the Ruby application.
+
 ```ruby filename="Gemfile"
 source 'https://rubygems.org'
 
 gem 'opentelemetry-sdk'
 gem 'opentelemetry-exporter-otlp'
 ```
+
+Install dependencies:
+
+```bash
+bundle install
+```
+
+Create `example.rb` file. This file contains the code for creating an LLM span.
 
 ```ruby filename="example.rb" showLineNumbers
 require 'opentelemetry/sdk'
@@ -355,6 +365,12 @@ end
 # Flush and allow time for HTTP export
 OpenTelemetry.tracer_provider.shutdown
 sleep 2
+```
+
+Run the code:
+
+```bash
+ruby example.rb
 ```
 
 </Tabs.Tab>
