@@ -321,7 +321,7 @@ gem 'opentelemetry-sdk'
 gem 'opentelemetry-exporter-otlp'
 ```
 
-```ruby filename="something.rb"
+```ruby filename="example.rb" showLineNumbers
 require 'opentelemetry/sdk'
 require 'opentelemetry/exporter/otlp'
 
@@ -343,11 +343,11 @@ end
 tracer = OpenTelemetry.tracer_provider.tracer(__FILE__)
 
 tracer.in_span('confident-llm-span-ruby') do |span|
-  span.set_attribute('confident.trace.name',                 'example-trace')
-  span.set_attribute('confident.span.type',                  'llm')
-  span.set_attribute('confident.llm.model',                  'gpt-4o')
-  span.set_attribute('confident.llm.attributes.input',       'What is the capital of France?')
-  span.set_attribute('confident.llm.attributes.output',      'Paris')
+  span.set_attribute('confident.trace.name', 'example-trace')
+  span.set_attribute('confident.span.type', 'llm')
+  span.set_attribute('confident.llm.model', 'gpt-4o')
+  span.set_attribute('confident.llm.attributes.input', 'What is the capital of France?')
+  span.set_attribute('confident.llm.attributes.output', 'Paris')
 
   puts 'Span created successfully!'
 end
@@ -563,8 +563,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
 ```
 
 </Tabs.Tab>
@@ -627,8 +630,12 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -687,8 +694,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+});
 ```
 
 </Tabs.Tab>
@@ -755,8 +765,13 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+    "confident.trace.llm_test_case.input": input,
+    "confident.trace.llm_test_case.actual_output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -810,7 +825,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.metadata": `{"key": "value"}`,
+    "confident.trace.tags": ["tag1", "tag2"],
 });
 ```
 
@@ -829,8 +844,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.tags": ["tag1", "tag2"],
+});
 ```
 
 </Tabs.Tab>
@@ -873,7 +891,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.trace.thread_id": "123",
+    "confident.trace.metadata": `{"key": "value"}`,
 });
 ```
 
@@ -892,8 +910,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metadata": `{"key": "value"}`,
+});
 ```
 
 </Tabs.Tab>
@@ -952,8 +973,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.user_id": "123",
+});
 ```
 
 </Tabs.Tab>
@@ -1003,7 +1027,7 @@ span.setAttributes({
 ```go filename="main.go" showLineNumbers
 ...
 span.SetAttributes(
-    attribute.String("confident.trace.user_id", "123"),
+    attribute.String("confident.trace.name", "example-trace"),
 )
 ```
 
@@ -1011,8 +1035,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
 ```
 
 </Tabs.Tab>
@@ -1055,8 +1082,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.span.input": input,
-    "confident.span.output": output,
+    "confident.span.name": "custom_span",
 });
 ```
 
@@ -1075,8 +1101,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.name": "custom_span",
+});
 ```
 
 </Tabs.Tab>
@@ -1117,7 +1146,8 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.span.metric_collection": "<your_metric_collection>",
+    "confident.span.input": input,
+    "confident.span.output": output,
 });
 ```
 
@@ -1137,8 +1167,12 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.input": input,
+    "confident.span.output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -1196,8 +1230,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+});
 ```
 
 </Tabs.Tab>
@@ -1240,6 +1277,7 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
     "confident.span.llm_test_case.input": input,
     "confident.span.llm_test_case.actual_output": output,
 });
@@ -1262,8 +1300,13 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+    "confident.span.llm_test_case.input": input,
+    "confident.span.llm_test_case.actual_output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -1316,7 +1359,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```typescript filename="index.ts" showLineNumbers
 ...
 span.setAttributes({
-    "confident.span.type": "llm",
+    "confident.span.metadata": `{"key": "value"}`,
 });
 ```
 
@@ -1335,8 +1378,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.metadata": `{"key": "value"}`,
+});
 ```
 
 </Tabs.Tab>
@@ -1401,8 +1447,11 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "llm",
+});
 ```
 
 </Tabs.Tab>
@@ -1489,8 +1538,17 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "llm",
+    "confident.llm.model": "gpt-3.5-turbo",
+    "confident.llm.attributes.input": [
+        `{"role": "system", "content": "You are a helpful assistant."}`,
+        `{"role": "user", "content": "What is the capital of France?"}`
+    ],
+    "confident.llm.attributes.output": "Hello world",
+});
 ```
 
 </Tabs.Tab>
@@ -1571,8 +1629,16 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "agent",
+    "confident.agent.name": "agent_span",
+    "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.attributes.input": `{"input": input}`,
+    "confident.agent.attributes.output": `{"output": input}`,
+});
 ```
 
 </Tabs.Tab>
@@ -1647,8 +1713,15 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "tool",
+    "confident.tool.name": "tool name",
+    "confident.tool.description": "tool description",
+    "confident.tool.attributes.input_parameters": `{"input": input}`,
+    "confident.tool.attributes.output": `{"output": input}`,
+});
 ```
 
 </Tabs.Tab>
@@ -1728,8 +1801,16 @@ span.SetAttributes(
 
 <Tabs.Tab>
 
-```ruby filename="something.rb"
-[to be coded...]
+```ruby filename="example.rb" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "retriever",
+    "confident.retriever.embedder": "embedder",
+    "confident.retriever.attributes.embedding_input": input,
+    "confident.retriever.attributes.retrieval_context": ["asd", "asd"],
+    "confident.retriever.attributes.top_k": 10,
+    "confident.retriever.attributes.chunk_size": 10,
+});
 ```
 
 </Tabs.Tab>
