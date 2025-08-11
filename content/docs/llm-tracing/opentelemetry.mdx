@@ -541,8 +541,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
 ```
 
 </Tabs.Tab>
@@ -600,8 +603,12 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -658,8 +665,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+});
 ```
 
 </Tabs.Tab>
@@ -719,8 +729,13 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+    "confident.trace.llm_test_case.input": input,
+    "confident.trace.llm_test_case.actual_output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -792,8 +807,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.metadata": `{"key": "value"}`,
+});
 ```
 
 </Tabs.Tab>
@@ -852,8 +870,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.thread_id": "123",
+});
 ```
 
 </Tabs.Tab>
@@ -909,8 +930,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.user_id": "123",
+});
 ```
 
 </Tabs.Tab>
@@ -965,8 +989,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
 ```
 
 </Tabs.Tab>
@@ -1025,8 +1052,12 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.input": input,
+    "confident.span.output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -1083,8 +1114,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+});
 ```
 
 </Tabs.Tab>
@@ -1140,8 +1174,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+});
 ```
 
 </Tabs.Tab>
@@ -1200,8 +1237,12 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.llm_test_case.input": input,
+    "confident.span.llm_test_case.actual_output": output,
+});
 ```
 
 </Tabs.Tab>
@@ -1272,8 +1313,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "llm",
+});
 ```
 
 </Tabs.Tab>
@@ -1335,8 +1379,11 @@ with tracer.start_as_current_span("custom_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "llm",
+});
 ```
 
 </Tabs.Tab>
@@ -1411,8 +1458,17 @@ with tracer.start_as_current_span("llm_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "llm",
+    "confident.llm.model": "gpt-3.5-turbo",
+    "confident.llm.attributes.input": [
+        `{"role": "system", "content": "You are a helpful assistant."}`,
+        `{"role": "user", "content": "What is the capital of France?"}`
+    ],
+    "confident.llm.attributes.output": "Hello world",
+});
 ```
 
 </Tabs.Tab>
@@ -1483,8 +1539,16 @@ with tracer.start_as_current_span("agent_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "agent",
+    "confident.agent.name": "agent_span",
+    "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.attributes.input": `{"input": input}`,
+    "confident.agent.attributes.output": `{"output": input}`,
+});
 ```
 
 </Tabs.Tab>
@@ -1553,8 +1617,15 @@ with tracer.start_as_current_span("tool_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "tool",
+    "confident.tool.name": "tool name",
+    "confident.tool.description": "tool description",
+    "confident.tool.attributes.input_parameters": `{"input": input}`,
+    "confident.tool.attributes.output": `{"output": input}`,
+});
 ```
 
 </Tabs.Tab>
@@ -1625,8 +1696,16 @@ with tracer.start_as_current_span("retriever_span") as span:
 
 <Tabs.Tab>
 
-```typescript filename="index.ts"
-[to be coded...]
+```typescript filename="index.ts" showLineNumbers
+...
+span.setAttributes({
+    "confident.span.type": "retriever",
+    "confident.retriever.embedder": "embedder",
+    "confident.retriever.attributes.embedding_input": input,
+    "confident.retriever.attributes.retrieval_context": ["asd", "asd"],
+    "confident.retriever.attributes.top_k": 10,
+    "confident.retriever.attributes.chunk_size": 10,
+});
 ```
 
 </Tabs.Tab>
