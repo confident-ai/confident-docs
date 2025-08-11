@@ -52,7 +52,7 @@ coder = Agent(
  
 # Create tasks for your agents
 task1 = Task(
-    description="Explain the latest trends in AI.",
+    description="Explain the given topic",
     expected_output="A clear and concise explanation.",
     agent=coder
 )
@@ -64,7 +64,9 @@ crew = Crew(
 )
 
 # Kickoff your crew
-result = crew.kickoff()
+result = crew.kickoff(
+    "input": "What are the LLMs?"
+)
 print(result)
 
 time.sleep(7) # Wait for traces to be posted to observatory
@@ -108,7 +110,43 @@ coder = Agent(
 ...
 
 # Kickoff your crew
-result = crew.kickoff()
+result = crew.kickoff(
+    "input": "What are the LLMs?"
+)
 time.sleep(7) # Wait for traces to be posted to observatory
 ```
+
+### End-to-end evals
+
+Confident AI enables you to perform [end-to-end evaluations](https://deepeval.com/docs/evaluation-end-to-end-llm-evals) on your CrewAI agent using `EvaluationDataset`.
+
+```python filename="main.py" showLineNumbers {4,19,22}
+from deepeval.integrations.crewai.agent import Agent
+...
+
+answer_relavancy_metric = AnswerRelevancyMetric()
+
+coder = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metrics=[answer_relavancy_metric],
+)
+
+goldens = [
+    Golden(input="What are Transformers in AI?"),
+    Golden(input="What is the biggest open source database?"),
+    Golden(input="What are LLMs?"),
+]
+
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
+    result = crew.kickoff(inputs={"input": golden.input})
+```
+
+
+
+
+
 
