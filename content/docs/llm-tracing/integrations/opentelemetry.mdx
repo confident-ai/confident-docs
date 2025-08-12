@@ -41,12 +41,12 @@ def llm(input: str) -> str:
     with tracer.start_as_current_span("llm_span") as span:
         span.set_attribute("confident.span.type", "llm")
         span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
-        span.set_attribute("confident.llm.attributes.input", [
+        span.set_attribute("confident.llm.span.input", [
             json.dumps({"role": "system", "content": "You are a helpful assistant."}),
             json.dumps({"role": "user", "content": input})
         ])
         time.sleep(0.5)
-        span.set_attribute("confident.llm.attributes.output", "Hello world")
+        span.set_attribute("confident.llm.span.output", "Hello world")
     
     return "Hello world"
 
