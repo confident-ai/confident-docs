@@ -1,0 +1,39 @@
+name: publish-docs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/heads/main') && github.run_number > 1 }} || ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Fern CLI tool
+        run: npm install -g fern-api
+
+      - name: Build and deploy all sites
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          FERN_TOKEN_EMNIFY: ${{ secrets.FERN_TOKEN_EMNIFY }}
+          FERN_TOKEN_WHEREVERSIM: ${{ secrets.FERN_TOKEN_WHEREVERSIM }}
+        run: npm run build-all-sites
+
+      - name: Cleanup temporary files
+        if: always()
+        run: |
+          rm -rf temp
