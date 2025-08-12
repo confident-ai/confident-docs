@@ -22,50 +22,48 @@ export CONFIDENT_SAMPLE_RATE=0.5
 Alternatively, you can set the sampling rate directly in code:
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {5}
-    from deepeval.tracing import observe, trace_manager
-    from openai import OpenAI
+<Tabs.Tab>
+```python filename="main.py" showLineNumbers {5}
+from deepeval.tracing import observe, trace_manager
+from openai import OpenAI
+ 
+client = OpenAI()
+trace_manager.configure(sampling_rate=0.5)
+ 
+@observe()
+def llm_app(query: str):
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+ 
+for _ in range(10):
+    llm_app("Write me a poem.")  # roughly half of these traces will be sent
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```typescript filename="index.ts" showLineNumbers {5}
+import { observe, traceManager } from '@deepeval-ts/tracing';
+import OpenAI from 'openai';
 
-    client = OpenAI()
-    trace_manager.configure(sample_rate=0.5)
-    
-    @observe()
-    def llm_app(query: str):
-        return client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
-        ).choices[0].message.content
-    
-    for _ in range(10):
-        llm_app("Write me a poem.")  # roughly half of these traces will be sent
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {5}
-    import { observe, traceManager } from '@deepeval-ts/tracing';
-    import OpenAI from 'openai';
-    
-    const openai = new OpenAI();
-    traceManager.configure({ sampleRate: 0.5 });
-    
-    const llmApp = (query: string) => {
-      const response = openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: query }]
-      });
-      return response.choices[0].message.content;
-    };
-    
-    const observedLlmApp = observe({fn: llmApp});
-    
-    for (let i = 0; i < 10; i++) {
-      observedLlmApp("Write me a poem."); // Roughly half of these traces will be sent
-    }
-    ```
-  </Tabs.Tab>
+const openai = new OpenAI();
+traceManager.configure({ sampleRate: 0.5 });
+
+const llmApp = (query: string) => {
+  const response = openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }]
+  });
+  return response.choices[0].message.content;
+};
+
+const observedLlmApp = observe({fn: llmApp});
+
+for (let i = 0; i < 10; i++) {
+  observedLlmApp("Write me a poem."); // Roughly half of these traces will be sent
+}
+```
+</Tabs.Tab>
 </Tabs>
 
 <Callout type="info">

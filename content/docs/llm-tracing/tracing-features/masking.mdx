@@ -16,51 +16,55 @@ Masking allows you to automatically redact or transform sensitive data in your t
 To implement masking, you need to define a masking function and configure the trace manager to use it.
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {10}
-    import re
-    from deepeval.tracing import observe, trace_manager
-    
-    def masking_function(data):
-        if isinstance(data, str):
-            data = re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
-            return data
+<Tabs.Tab>
+
+```python filename="main.py" showLineNumbers {10}
+import re
+from deepeval.tracing import observe, trace_manager
+ 
+def masking_function(data):
+    if isinstance(data, str):
+        data = re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
         return data
-    
-    trace_manager.configure(mask=masking_function)
-    
-    @observe(type="agent")
-    def agent(query: str):
-        return "4242-4242-4242-4242"
-    
-    my_agent("Test Masking")
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {10}
-    import { observe, traceManager } from '@deepeval-ts/tracing';
-    
-    const maskingFunction = (data: any): any => {
-      if (typeof data === 'string') {
-        return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
-      }
-      return data;
-    };
-    
-    traceManager.configure({ mask: maskingFunction });
-    
-    const agent = (query: string): string => {
-      return "4242-4242-4242-4242";
-    };
-    
-    const observedAgent = observe({
-      type: "agent",
-      fn: agent
-    });
-    
-    observedAgent("Test Masking");
-    ```
-  </Tabs.Tab>
+    return data
+ 
+trace_manager.configure(mask=masking_function)
+ 
+@observe()
+def llm_app(query: str):
+    return "4242-4242-4242-4242"
+ 
+llm_app("Test Masking")
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```typescript filename="index.ts" showLineNumbers {10}
+import { observe, traceManager } from '@deepeval-ts/tracing';
+
+const maskingFunction = (data: any): any => {
+  if (typeof data === 'string') {
+    return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
+  }
+  return data;
+};
+
+traceManager.configure({ mask: maskingFunction });
+
+const agent = (query: string): string => {
+  return "4242-4242-4242-4242";
+};
+
+const observedAgent = observe({
+  type: "agent",
+  fn: agent
+});
+
+observedAgent("Test Masking");
+```
+
+</Tabs.Tab>
 </Tabs>
 
 The masking function is automatically applied to:

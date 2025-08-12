@@ -23,53 +23,53 @@ export CONFIDENT_TRACE_ENVIRONMENT="staging"
 Alternatively, you can set the environment directly in code:
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {4}
-    from openai import OpenAI 
-    from deepeval.tracing import observe, trace_manager
-    
-    trace_manager.configure(environment="production")
-    client = OpenAI()
-    
-    @observe()
-    def llm_app(query: str):
-        return client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
-        ).choices[0].message.content
-    
-    
-    llm_app("Write me a poem.")
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {4}
-    import OpenAI from 'openai';
-    import { observe, traceManager } from '@deepeval-ts/tracing';
-    
-    traceManager.configure({ environment: "production" });
-    const openai = new OpenAI();
+<Tabs.Tab>
 
-    const llmApp = async (query: string) => {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: query }],
-      });
-      return response.choices[0].message.content;
-    };
+```python filename="main.py" showLineNumbers {4}
+from openai import OpenAI 
+from deepeval.tracing import observe, trace_manager
+ 
+trace_manager.configure(environment="production")
+client = OpenAI()
+ 
+@observe()
+def llm_app(query: str):
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+ 
+llm_app("Write me a poem.")
+```
 
-    const observedLlmApp = observe({
-      type: "llm",
-      model: "gpt-4o",
-      fn: llmApp,
-    });
+</Tabs.Tab>
+<Tabs.Tab>
 
-    observedLlmApp("Write me a poem.");
+```typescript filename="index.ts" showLineNumbers {4}
+import OpenAI from 'openai';
+import { observe, traceManager } from '@deepeval-ts/tracing';
 
-    ```
-  </Tabs.Tab>
+traceManager.configure({ environment: "production" });
+const openai = new OpenAI();
+
+const llmApp = async (query: string) => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  return response.choices[0].message.content;
+};
+
+const observedLlmApp = observe({
+  type: "llm",
+  model: "gpt-4o",
+  fn: llmApp,
+});
+
+observedLlmApp("Write me a poem.");
+```
+
+</Tabs.Tab>
 </Tabs>
 
 The `environment` can be either `"production"`, `"staging"`, or `"development"`, and helps you identify where your traces are coming from.

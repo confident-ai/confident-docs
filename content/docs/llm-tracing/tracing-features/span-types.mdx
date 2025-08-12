@@ -27,6 +27,8 @@ The most flexible `type` out of all (and the default type if `type` is not provi
 <Tabs items={['Python', 'JS/TypeScript']}>
   <Tabs.Tab>
     ```python
+    from deepeval.tracing import observe
+    
     @observe(name="RAG Pipeline")
     def rag_pipeline(query: str) -> str:
         pass
@@ -111,6 +113,7 @@ A Retriever span represents a component that fetches relevant information from a
   <Tabs.Tab>
     ```python filename="main.py" showLineNumbers copy
     from deepeval.tracing import observe
+    from typing import List
     
     @observe(type="retriever", embedder="text-embedding-ada-002")
     def retrieve_documents(query: str) -> List[str]:
@@ -240,12 +243,11 @@ graph TD
     A --> E
 ```
 
-```python filename="main.py" showLineNumbers copy {11, 18, 36, 46, 58}
+```python filename="main.py" showLineNumbers copy {10, 17, 34, 44, 56}
 from typing import List
 from deepeval.tracing import (
     observe,
     update_current_span,
-    update_retriever_span,
     update_llm_span,
 )
 
