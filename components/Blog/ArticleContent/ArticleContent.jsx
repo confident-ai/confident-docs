@@ -11,7 +11,7 @@ import "prismjs/components/prism-yaml";
 
 import styles from "./styles.module.scss";
 
-export default function ArticleContent({ content, theme }) {
+export default function ArticleContent({ content, theme, isLast }) {
   const generateSlug = text => {
     const slug = text
       .toLowerCase()
@@ -156,6 +156,12 @@ export default function ArticleContent({ content, theme }) {
   return (
     <div className={`${styles.ArticleContent} ${styles[theme]}`} id='article-content'>
       {documentToReactComponents(content, options)}
+      {isLast && (
+        <>
+          <hr />
+          <p>Do you want to brainstorm how to evaluate your LLM (application)? Ask us anything in our <a href="https://discord.com/invite/a3K9c8GRGt">discord</a>. I might give you an “aha!” moment, who knows?</p>
+        </>
+      )}
       <Feature theme={theme} />
     </div>
   );

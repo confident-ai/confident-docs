@@ -21,7 +21,21 @@
     display: flex;
     flex-direction: column;
     position: relative;
-
+    .notFoundTitle {
+      text-align: center;
+      color: #fff;
+      font-size: 8rem;
+      padding: 0 20px;
+      font-family: $Lexend;
+    }
+    .notFoundSubHeading {
+      text-align: center;
+      margin: 0 0 2rem;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0 20px;
+      font-family: $inter
+    }
     .contentWrap {
       max-width: 840px;
       width: 100%;

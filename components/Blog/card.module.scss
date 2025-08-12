@@ -233,14 +233,19 @@
     width: 100%;
     max-width: calc(((100% / 3) - 19px));
     flex-direction: column;
-    min-height: 478px;
+    min-height: 542px;
     height: auto;
     @include responsive(xl) {
       min-height: 423px;
+      max-height: 423px;
     }
     @include responsive(md) {
       max-width: 100%;
-      min-height: 600px;
+      min-height: 700px;
+      max-height: unset;
+    }
+    @include responsive(sm) {
+      min-height: 450px;
     }
     .imageWrap {
       min-width: unset;
@@ -256,14 +261,29 @@
         min-height: 228px;
       }
       @include responsive(md) {
-        max-height: fit-content;
-        min-height: fit-content;
+        max-height: 504px;
+        min-height: 504px;
+        img {
+          max-height: 504px;
+          min-height: 504px;
+        }
+      }
+      @include responsive(sm) {
+        max-height: 241px;
+        min-height: 241px;
+        img {
+          max-height: 241px;
+          min-height: 241px;
+        }
       }
     }
     .textWrap {
       padding: 14px 30px 20px;
       @include responsive(xl) {
         padding: 14px 14px 10px 20px;
+      }
+      @include responsive(md) {
+        margin-top: auto;
       }
       @include responsive(sm) {
         gap: 0;

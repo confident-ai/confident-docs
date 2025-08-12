@@ -19,18 +19,6 @@ export default function Banner() {
     if (inView) setHasAnimated(true);
   }, [inView]);
 
-  const btns = [
-    {
-      label: "Request a Demo",
-      link: "https://www.confident-ai.com/book-a-demo",
-      btnVariant: "outlinedPurple",
-    },
-    {
-      label: "Try Now For Free",
-      link: "https://app.confident-ai.com/auth/signup?redirect_url=%2F",
-      btnVariant: "containedBW",
-    },
-  ];
 
   return (
     <div className={styles.Banner}>
@@ -75,7 +63,7 @@ export default function Banner() {
             className={`${styles.btnWrap} ${hasAnimated ? styles.fadeUp2 : ""}`}
           >
             <Button
-              to="https://www.confident-ai.com/book-a-demo"
+              to="/book-a-demo"
               variant="outlined"
               color="purple"
               label="Request a Demo"

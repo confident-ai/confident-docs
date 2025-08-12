@@ -102,11 +102,11 @@
       display: flex;
       justify-content: center;
       min-height: 58.5px;
+      gap: 34px;
       .btn {
         padding: 15px 20px;
         display: block;
         font-size: 14px;
-        margin: 0 10px;
         font-family: $inter;
         background-color: $darkPurple-600;
         border: 2px solid $purple;
@@ -117,6 +117,15 @@
         display: flex;
         align-items: center;
         gap: 4px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        &:hover{
+          background-color: $white;
+          color: $black;
+        }
+        &.disabled{
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       }
     }
   }

@@ -2,24 +2,45 @@ import GlobalLayout from "@/app/global-layout";
 import CaseStudyHeader from "@/components/CaseStudies/CaseStudyHeader/CaseStudyHeader";
 import CaseStudyContent from "@/components/CaseStudies/CaseStudyContent/CaseStudyContent";
 import TextOnlySection from "@/components/CaseStudies/TextOnlySection/TextOnlySection";
-import { getCase } from "@/functions/get-case-study";
+import { getCase } from "@/functions/get-case-study"; // adjust path as needed
 import styles from "./styles.module.scss";
+import Button from "@/components/Button/Button";
 export default async function Page({ params }) {
   const { slug } = await params;
   const study = await getCase(slug);
   return (
     <>
       <GlobalLayout staticHeader>
-        <div className={styles.caseStudy}>
+        <div className={`${styles.caseStudy} ${!study || !study.fields ? styles.caseStudyNotFound : ""}`}>
           <div className={styles.container}>
-            <CaseStudyHeader content={study?.fields} />
-            <CaseStudyContent
-              content={study?.fields?.textBlock}
-              fields={study?.fields}
-            />
+            {!study || !study.fields ? (
+              <>
+                <h1 className={styles.caseStudyNotFoundTitle}>
+                  404
+                </h1>
+                <h2 className={styles.caseStudyNotFoundSubheading}>
+                  Case Study Not Found
+                </h2>
+                <Button
+                  to="/"
+                  variant="outlined"
+                  label="Back to home"
+                  color="purple"
+                  bordered
+                />
+              </>
+            ) : (
+              <>
+                <CaseStudyHeader content={study?.fields} />
+                <CaseStudyContent
+                  content={study?.fields?.textBlock}
+                  fields={study?.fields}
+                />
+                <TextOnlySection />
+              </>
+            )}
           </div>
         </div>
-        <TextOnlySection />
       </GlobalLayout>
     </>
   );
@@ -44,7 +65,7 @@ export async function generateMetadata({ params }) {
           url: fullImageUrl,
           width: 1200,
           height: 630,
-          alt: study?.fields?.title,
+          alt: study?.fields?.heading,
         },
       ],
       url: "https://confident-ai.com",

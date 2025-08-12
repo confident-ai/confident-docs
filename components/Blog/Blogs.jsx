@@ -86,14 +86,14 @@ export default function Blogs({
               <Skeleton
                 key={index}
                 className={`${cardStyles.Card} ${cardStyles[blogOrientation]}`}
-                style={{ height: "250px" }}
               />
             ))}
         </div>
         <div className={styles.pagination}>
-          {currentPage !== 1 && !isLoading && (
+          {currentPage !== 1 && (
             <button
-              className={styles.btn}
+              className={`${styles.btn} ${isLoading ? styles.disabled : ""}`}
+              disabled={isLoading}
               onClick={() => setCurrentPage(prev => prev - 1)}
             >
               <svg
@@ -110,12 +110,13 @@ export default function Blogs({
                   d="M8 10L4 6l4-4"
                 />
               </svg>
-              Previous
+              Back
             </button>
           )}
-          {currentPage !== totalPages && !isLoading && (
+          {currentPage !== totalPages && (
             <button
-              className={styles.btn}
+              className={`${styles.btn} ${isLoading ? styles.disabled : ""}`}
+              disabled={isLoading}
               onClick={() => setCurrentPage(prev => prev + 1)}
             >
               Next

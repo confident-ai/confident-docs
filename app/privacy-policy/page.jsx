@@ -25,7 +25,7 @@ export const metadata = {
 
 export default async function HomePage() {
   const term = await getTerm("privacy-policy");
-
+  console.log(term);
   return (
     <>
       <GlobalLayout staticHeader={true}>

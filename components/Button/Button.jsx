@@ -1,3 +1,4 @@
+"use client";
 import Link from 'next/link'
 import styles from "./styles.module.scss";
 export default function Button({
@@ -8,22 +9,37 @@ export default function Button({
   curved,
   color = 'primary',
   bordered,
+  onClick,
   ...other
 }) {
-  return (
-    <Link
-      href={to}
-      className={`
-            ${styles.btn} 
-            ${styles[variant]} 
-            ${styles[sizes]}
-            ${bordered ? styles.bordered : ''}
-            ${curved ? styles.curved : ""} 
-            ${styles[color]}
-            `}
-      {...other}
-    >
-      {label}
-    </Link>
-  );
+  const className = `
+    ${styles.btn} 
+    ${styles[variant]} 
+    ${styles[sizes]}
+    ${bordered ? styles.bordered : ''}
+    ${curved ? styles.curved : ""} 
+    ${styles[color]}
+  `;
+  if (to) {
+    return (
+      <Link
+        href={to}
+        className={className}
+        {...other}
+      >
+        {label}
+      </Link>
+    );
+  } else {
+    return (
+      <button
+        type="button"
+        className={className}
+        {...other}
+        onClick={onClick}
+      >
+        {label}
+      </button>
+    );
+  }
 }

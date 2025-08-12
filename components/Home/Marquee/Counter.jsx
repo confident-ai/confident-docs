@@ -9,15 +9,27 @@ export default function Counter({
     formatFn = (n) => n.toLocaleString(),
 }) {
     const [count, setCount] = useState(0);
+    const [pageLoaded, setPageLoaded] = useState(false);
     const start = useRef(null);
-    const hasStarted = useRef(false); // ensure it only runs once
+    const hasStarted = useRef(false);
     const { ref, inView } = useInView({
         triggerOnce: true,
-        threshold: 1, // 100% of the element must be in view
+        threshold: 1,
     });
 
     useEffect(() => {
-        if (!inView || hasStarted.current) return;
+        // Check if page is already loaded
+        if (document.readyState === "complete") {
+            setPageLoaded(true);
+        } else {
+            const handleLoad = () => setPageLoaded(true);
+            window.addEventListener("load", handleLoad);
+            return () => window.removeEventListener("load", handleLoad);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!inView || !pageLoaded || hasStarted.current) return;
 
         hasStarted.current = true;
 
@@ -25,7 +37,7 @@ export default function Counter({
             if (!start.current) start.current = timestamp;
             const progress = timestamp - start.current;
             const progressRatio = Math.min(progress / duration, 1);
-            const eased = progressRatio * (2 - progressRatio); // easeOutQuad
+            const eased = progressRatio * (2 - progressRatio);
             const currentValue = Math.floor(eased * target);
             setCount(currentValue);
 
@@ -35,7 +47,7 @@ export default function Counter({
         };
 
         requestAnimationFrame(step);
-    }, [inView, target, duration]);
+    }, [inView, target, duration, pageLoaded]);
 
     return <span style={{ color: 'white' }} ref={ref}>{formatFn(count)}+</span>;
 }

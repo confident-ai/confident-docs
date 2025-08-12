@@ -1,0 +1,29 @@
+@import '@/app/styles/vars';
+.notFound{
+    background-color: $confident-dark;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    .inner{
+        width: 100%;
+        max-width: $container_md;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        h1{
+            font-size: 8rem;
+            color: $white;
+            font-family: $Lexend;
+            line-height: 100%;
+        }
+        h2{
+            font-size: 1.5rem;
+            color: $white;
+            font-family: $Lexend;
+            line-height: 100%;
+            margin: 1rem 0;
+        }
+    }
+}

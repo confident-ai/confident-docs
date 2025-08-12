@@ -38,23 +38,27 @@ const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
   ];
 
 
-  if(isDocsPage){
-    return(
+  if (isDocsPage) {
+    return (
       <Navbar
-      logo={<Logo />}
-      projectLink="https://github.com/confident-ai/deepeval"
-      projectIcon={<GitHubButton />}
-      // chatLink="https://discord.gg/Up3gbNTF"
-    >
-      <SignUpButton />
-    </Navbar>
-    )
+        logo={<Logo />}
+        projectLink="https://github.com/confident-ai/deepeval"
+        projectIcon={<GitHubButton />}
+        // chatLink="https://discord.gg/Up3gbNTF"
+      >
+        <SignUpButton />
+      </Navbar>
+    );
   }
 
   return (
-    <div className={`${styles.NewHeader} ${staticHeader ? styles.staticHeader : ''} ${active ? styles.active : ""}`}>
+    <div
+      className={`${styles.NewHeader} ${
+        staticHeader ? styles.staticHeader : ""
+      } ${active ? styles.active : ""}`}
+    >
       <div className={styles.container}>
-        <Link href='/' className={styles.logoWrap}>
+        <Link href="/" className={styles.logoWrap}>
           <Image
             src="/icons/logo-without-border.svg"
             alt="White bowtie with confident AI written on the right side"
@@ -68,12 +72,29 @@ const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
           <div className={styles.nav}>
             {navLinks.map(link =>
               link.children ? (
-                <div className={styles.navItemWithPopover} key={link.label} onClick={() => setActivatePopOver(!activatePopOver)}>
+                <div
+                  className={styles.navItemWithPopover}
+                  key={link.label}
+                  onClick={() => setActivatePopOver(!activatePopOver)}
+                >
                   <span className={styles.navLink}>{link.label}</span>
-                  <div className={`${styles.arrow} ${activatePopOver ?  styles.active : ''}`}>
-                    <Image src='/icons/arrow-down.svg' width={10} height={10} alt='downwards facing arrow'/>
+                  <div
+                    className={`${styles.arrow} ${
+                      activatePopOver ? styles.active : ""
+                    }`}
+                  >
+                    <Image
+                      src="/icons/arrow-down.svg"
+                      width={10}
+                      height={10}
+                      alt="downwards facing arrow"
+                    />
                   </div>
-                  <div className={`${styles.popover} ${activatePopOver ? styles.active : ''}`} >
+                  <div
+                    className={`${styles.popover} ${
+                      activatePopOver ? styles.active : ""
+                    }`}
+                  >
                     <div className={styles.inner}>
                       {link.children.map(child => (
                         <Link href={child.href} key={child.label}>

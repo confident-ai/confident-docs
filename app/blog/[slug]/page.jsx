@@ -13,57 +13,71 @@ export default async function Page({ params }) {
   const theme = blog?.fields?.theme[0] || "deepEval";
   return (
     <GlobalLayout staticHeader={true}>
-      <div className={styles.Article}>
+      <div
+        className={styles.Article}
+        style={{ backgroundColor: !blog || !blog.fields ? "#0e0e13" : "" }}
+      >
         <div className={styles.inner}>
-          <div className={`${styles.contentWrap}`}>
-            <SideBar content={blog?.fields} mobile={true} theme={theme} />
-            <ArticleHeader
-              content={blog?.fields}
-              updatedAt={blog?.sys?.updatedAt}
-            />
-            <div className={styles.mainContent}>
-              <Callout theme={theme} />
-              <img
-                className={styles.featuredImage}
-                src={blog?.fields?.featuredImage?.fields?.file?.url}
-                alt="featured Image"
-              />
-              <SideBar content={blog?.fields} theme={theme} />
-              <ArticleContent
-                content={blog?.fields?.contentBody1}
-                theme={theme}
-              />
-              {blog?.fields?.contentBody2 && (
-                <ArticleContent
-                  content={blog?.fields?.contentBody2}
-                  theme={theme}
+          {!blog || !blog.fields ? (
+            <>
+              <h1 className={styles.notFoundTitle}>404</h1>
+              <h2 className={styles.notFoundSubHeading}>
+                Seems like you got lost, here are our latest articles:
+              </h2>
+              <div className="wrap" style={{ padding: "0 20px" }}>
+                <Blogs
+                  limit={3}
+                  blogOrientation="horizontal"
+                  blogVariant="dark"
                 />
-              )}
-              {blog?.fields?.contentBody3 && (
-                <ArticleContent
-                  content={blog?.fields?.contentBody3}
-                  theme={theme}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={`${styles.contentWrap}`}>
+                <SideBar content={blog?.fields} mobile={true} theme={theme} />
+                <ArticleHeader
+                  content={blog?.fields}
+                  updatedAt={blog?.sys?.updatedAt}
                 />
-              )}
-              {blog?.fields?.contentBody4 && (
-                <ArticleContent
-                  content={blog?.fields?.contentBody4}
-                  theme={theme}
+                <div className={styles.mainContent}>
+                  <Callout theme={theme} />
+                  <img
+                    className={styles.featuredImage}
+                    src={blog?.fields?.featuredImage?.fields?.file?.url}
+                    alt="featured Image"
+                  />
+                  <SideBar content={blog?.fields} theme={theme} />
+                  {Object.entries(blog?.fields || {})
+                    .filter(
+                      ([key]) =>
+                        key.startsWith("contentBody") && blog.fields[key]
+                    )
+                    .map(([key, value], idx, arr) => {
+                      const isLast = idx === arr.length - 1;
+                      return (
+                        <ArticleContent
+                          key={key}
+                          content={value}
+                          isLast={isLast}
+                        />
+                      );
+                    })}
+                </div>
+              </div>
+              <div className={styles.blogWrap}>
+                <h2 className={styles.blogHeading}>More stories from us...</h2>
+                <Blogs
+                  limit={3}
+                  showTabs={false}
+                  blogOrientation="horizontal"
+                  blogVariant="light"
+                  exclude={slug}
+                  category={blog.fields.category[0]}
                 />
-              )}
-            </div>
-          </div>
-          <div className={styles.blogWrap}>
-            <h2 className={styles.blogHeading}>More stories from us...</h2>
-            <Blogs
-              limit={3}
-              showTabs={false}
-              blogOrientation="horizontal"
-              blogVariant="light"
-              exclude={slug}
-              category={blog.fields.category[0]}
-            />
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </GlobalLayout>
@@ -78,7 +92,7 @@ export async function generateMetadata({ params }) {
     ? imageUrl
     : `https:${imageUrl}`;
   return {
-    title: `${blog?.fields?.title} - Confident AI`,
+    title: `${blog?.fields?.title || "404 Page not found"} - Confident AI`,
     description: blog?.fields?.excerpt,
     metadataBase: "https://confident-ai.com",
     openGraph: {

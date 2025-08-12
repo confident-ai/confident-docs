@@ -2,10 +2,6 @@ import styles from './styles.module.scss'
 import Button from '@/components/Button/Button'
 
 export default function TextSection() {
-    const btns = [
-        { label: 'READ CASE STUDY', btnVariant: 'containedBWBordered' },
-        { label: 'TRY IT NOW', link: 'https://documentation.confident-ai.com', btnVariant: 'outlinedBWBordered' },
-    ]
     return (
         <div className={styles.textSection}>
             <div className={styles.inner}>
@@ -22,7 +18,7 @@ export default function TextSection() {
                     </p>
                     <div className={styles.buttonWrap}>
                         <Button
-                            to='https://confident-ai.com/case-study/supernormal'
+                            to='/case-study/supernormal'
                             variant='outlined'
                             color='primary'
                             label='READ CASE STUDY'
@@ -32,7 +28,7 @@ export default function TextSection() {
                             style={{ boxShadow: '0 0 4px #fff'}}
                         />
                         <Button
-                            to='https://documentation.confident-ai.com'
+                            to='/docs'
                             variant='outlined'
                             color='secondary'
                             curved

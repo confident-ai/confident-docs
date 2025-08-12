@@ -10,7 +10,7 @@ export default function TextOnlySection() {
         </h2>
         <div className={styles.buttonWrap}>
           <Button
-            to="https://www.confident-ai.com/book-a-demo"
+            to="/book-a-demo"
             variant="contained"
             color="primary"
             label="Request a Demo"

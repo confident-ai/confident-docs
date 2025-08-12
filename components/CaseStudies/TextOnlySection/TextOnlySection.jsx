@@ -14,7 +14,8 @@ export default function TextOnlySection() {
   useEffect(() => {
     if (inView) setHasAnimated(true);
   }, [inView]);
-  
+
+
   return (
     <div className={styles.TextOnlySection} ref={ref}>
       <div className={styles.inner}>
