@@ -3,8 +3,9 @@ export default {
   "openai-agents": "",
   langgraph: "",
   langchain: "",
+  pydanticai: "",
+  crewai: "",
   litellm: "",
-  opentelemetry: "",
   typescript: "",
   llamaindex: "",
 };
