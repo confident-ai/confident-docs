@@ -6,4 +6,7 @@ export default {
   "integrations": "",
   "latency-and-cost-tracking": "",
   "performance-alerting": "",
+  "opentelemetry": {
+    display: "hidden"
+  },
 };

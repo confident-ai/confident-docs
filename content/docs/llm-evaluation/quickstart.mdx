@@ -1,0 +1,160 @@
+---
+title: Quickstart
+---
+
+import { Callout, Cards, Tabs } from "nextra/components";
+
+# LLM Evaluation Quickstart
+
+Get started with LLM evaluation on Confident AI by following this 5 min guide.
+
+## Installation
+
+Install DeepEval and setup your tracing enviornment:
+
+```bash
+pip install deepeval
+```
+
+Don't forget to login using your API key on Confident AI in the CLI:
+
+```bash
+deepeval login --confident-api-key YOUR_API_KEY
+```
+
+Or in code:
+
+```python filename="main.py"
+import deepeval
+
+deepeval.login("YOUR_API_KEY")
+```
+
+If you don't have an API key, first [create an account.](/docs/getting-started/setup#create-an-account)
+
+
+## Create Metric
+
+Import metrics import DeepEval. In this example we're using `GEval` to create a custom answer relevancy metric:
+
+```python filename="main.py"
+from deepeval.test_case import LLMTestCaseParams
+from deepeval.metrics import GEval
+
+metric = GEval(
+  name="Relevancy",
+  criteria="Determine how relevant the 'actual output' is to the 'input'",
+  evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT]
+)
+```
+
+<details>
+  <summary>How to customize your LLM judge?</summary>
+
+  99.99% of metrics on DeepEval uses LLM-as-a-judge, which means you'll have to set your evaluation model. For most users, this will be using OpenAI, and you'll need to set your OpenAI API key:
+
+  ```bash
+  export OPENAI_API_KEY="sk-..."
+  ```
+
+  You can also use other model providers that `deepeval` has integrations with, such as:
+
+  - [Ollama](https://deepeval.com/integrations/models/ollama)
+  - [Azure OpenAI](https://deepeval.com/integrations/models/azure-openai)
+  - [Anthropic](https://deepeval.com/integrations/models/anthropic)
+  - [Gemini](https://deepeval.com/integrations/models/gemini)
+  - [Vertex AI](https://deepeval.com/integrations/models/vertex-ai)
+  - [vLLM](https://deepeval.com/integrations/models/vllm)
+  - [LMStudio](https://deepeval.com/integrations/models/lmstudio)
+
+  Lastly, you can wrap your own LLM API in `deepeval`'s `DeepEvalBaseLLM` class to use **ANY** model of your choice. [Click here](https://deepeval.com/guides/guides-using-custom-llms) to learn how.
+
+  <Callout type="info">
+    This will run evaluations locally before sending results over to Confident AI.
+    You can also run evals on the cloud by [creating a metric
+    collection.](/docs/llm-evaluation/metrics/create-on-the-cloud)
+  </Callout>
+</details>
+
+## Prepare for Evaluation
+
+Decorate your LLM app (replace with your own):
+
+```python filename="main.py" showLineNumbers {6}
+from openai import OpenAI
+from deepeval.tracing import observe
+
+client = OpenAI()
+
+@observe()
+def your_llm_app(query: str) -> str:
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+```
+
+Pull the dataset you've created (full guide [here](/docs/dataset-editor/introduction)):
+
+```python filename="main.py" showLineNumbers {5}
+from deepeval.dataset import EvaluationDataset
+
+# Pull your dataset from Confident AI
+dataset = EvaluationDataset()
+dataset.pull(alias="your-dataset-alias")
+```
+
+## Run an LLM Eval
+
+Putting everything together, run your first LLM evaluation:
+
+```python filename="main.py" showLineNumbers {21, 26} copy
+from openai import OpenAI
+from deepeval.tracing import observe
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import evaluate
+
+client = OpenAI()
+ 
+@observe()
+def your_llm_app(query: str) -> str:
+    return client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+
+dataset = EvaluationDataset()
+dataset.pull(alias="your-dataset-alias")
+
+# Process each golden in your dataset
+for goldens in dataset.goldens:
+    input = golden.input
+    test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
+    dataset.add_test_case(test_case)
+
+
+# Run an evaluation
+evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
+```
+
+Congratulations 🎉! Your test run is now available on Confident AI automatically as a testing report.
+
+## Identify Failing Test Case(s)
+
+Identify your failing test cases in the testing report on Confident AI.
+
+<Callout type="info">This testing report is also publicaly sharable.</Callout>
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
+  width="100%"
+  title="Identify Failing LLM Test Cases"
+/>
+
+## Setup Notifications (recommended)
+
+You can also setup your project to receive notifications through either email, slack, discord, or teams each time an evaluation is completed, both locally or on the cloud, by configuring your project integrations in **Project Settings** > **Integrations**.
+
+To learn how, visit the [project integrations page.](/project-settings/integrations)

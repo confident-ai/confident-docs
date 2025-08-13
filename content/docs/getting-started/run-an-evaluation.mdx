@@ -12,7 +12,7 @@ Let's run your first **end-to-end** evaluation and create a [test run](/docs/con
 
 <summary>What is end-to-end evaluation?</summary>
 
-[End-to-end evaluation](/docs/llm-evaluation/run-evals/end-to-end-evals) refers to LLM evaluation where your LLM application is treated as a black-box, and only the system inputs and outputs are taken into account. When running end-to-end evaluations, you should only create test cases from the `input`s, `actual_outputs`s, and any other overarching parameter of your LLM system.
+[End-to-end evaluation](/docs/llm-evaluation/end-to-end-evals) refers to LLM evaluation where your LLM application is treated as a black-box, and only the system inputs and outputs are taken into account. When running end-to-end evaluations, you should only create test cases from the `input`s, `actual_outputs`s, and any other overarching parameter of your LLM system.
 
 <Callout>
 
@@ -77,7 +77,7 @@ for goldens in dataset.goldens:
         input=input,
         actual_output=your_llm_app(input) # Replace your_llm_app()
     )
-    dataset.test_cases.append(test_case) # Add the test case back to your dataset
+    dataset.add_test_case(test_case) # Add the test case back to your dataset
 ```
 
 All that's left after this is to use `dataset.test_cases` for evaluation.
@@ -105,7 +105,7 @@ In this example, we're going to use the answer relevancy metric (for the sake of
 
   > [!IMPORTANT]
   >
-  > While OpenAI models are the simplest option, you can also use [other model providers](https://deepeval.com/integrations/models/azure-openai), [custom models](https://deepeval.com/guides/guides-using-custom-llms), or run evaluations [directly on Confident AI](/docs/llm-evaluation/run-evals/end-to-end-evals#run-llm-evals-on-the-cloud). These advanced options are covered later in the documentation.
+  > While OpenAI models are the simplest option, you can also use [other model providers](https://deepeval.com/integrations/models/azure-openai), [custom models](https://deepeval.com/guides/guides-using-custom-llms), or run evaluations [directly on Confident AI](/docs/llm-evaluation/end-to-end-evals#run-llm-evals-on-the-cloud). These advanced options are covered later in the documentation.
 
 </details>
 
@@ -143,7 +143,7 @@ dataset.pull(alias="your-dataset-alias")
 for goldens in dataset.goldens:
     input = golden.input
     test_case = LLMTestCase(input=input, actual_output=your_llm_app(input))
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Define metric(s)
 metric = AnswerRelevancyMetric()
@@ -213,7 +213,7 @@ for goldens in dataset.goldens:
         input=golden.input,
         actual_output=your_llm_app(golden.input) # Hopefully you've made changes to your LLM app!
     )
-    dataset.test_cases.append(test_case) # Add the test case back to your dataset
+    dataset.add_test_case(test_case) # Add the test case back to your dataset
 
 evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
 ```

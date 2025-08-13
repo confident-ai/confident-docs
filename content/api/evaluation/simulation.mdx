@@ -1,0 +1,40 @@
+---
+title: Simulation
+---
+
+import { Callout } from "nextra/components";
+
+# Simulate Multi-Turn Conversations
+
+You can simulate user conversations by providing a list of conversational goldens and a list of ongoing turns.
+
+```bash filename="POST - /v1/simulate" showLineNumbers {10}
+curl -X POST "https://api.confident-ai.com/v1/simulate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "golden": {
+                "scenario": "A frustrated user asking for a refund.",
+                "userDescription": "A white male who is a customer for over 2 years."
+            },
+            "existingTurns": [
+                {"role": "assistant", "content": "Hey, how can I help you today?"}
+            ]
+        }'
+```
+
+```json filename="response" showLineNumbers {6}
+{
+  "success": true,
+  "data": {
+        "simulationId": "SIMULATION-ID",
+        "completed": false,
+        "userResponse": "I'd like my refund please.",
+        "turns": [
+            {"role": "assistant", "content": "Hey, how can I help you today?"},
+            {"role": "user", "content": "I'd like my refund please."}
+        ]
+    }
+}
+```
+

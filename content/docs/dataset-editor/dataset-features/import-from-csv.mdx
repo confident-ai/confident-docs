@@ -8,8 +8,6 @@ import { Callout } from "nextra/components";
 
 You can import goldens from CSV files by mapping each header column each respective golden fields. Alternatively, you can also [upload goldens via code](/docs/dataset-editor/dataset-features/push-pull-goldens) instead.
 
-## Video Demo
-
 <VideoDisplayer
   src="https://confident-docs.s3.us-east-1.amazonaws.com/dataset-editor:import-datasets.mp4"
   width="100%"
@@ -19,6 +17,8 @@ You can import goldens from CSV files by mapping each header column each respect
 ## Map Headers To Fields
 
 The first row of your CSV file must be the headers, which you'll use to determine which each golden field belongs to.
+
+### Single-Turn goldens
 
 As a quick recap, the golden fields include:
 
@@ -39,3 +39,16 @@ These fields are also part of a golden but you should probably not populate it s
 </Callout>
 
 Once you're done with your mapping, click **Next** to review your upload details. The platform will let you know whether there are duplicates, errors in type mismatches, and show you the final number of goldens that will be uploaded. Once you're happy with everything, click **Save**.
+
+### Multi-Turn goldens
+
+Multi-turn goldens have similar fields:
+
+- **Scenario:** a string (text) representing the scenario of which a user is interacting with your LLM chatbot.
+- **Expected Outcome:** a string (text) representing the ideal outcome based on for the given scenario.
+- **User Description:** a list of strings (text) representing the characteristics of the user interacting with your LLM chatbot.
+- **Comments:** a string (text) representing whatever comments your data annotators have for this particular golden (e.g. "Watch out for this expected output! It needs more work.").
+- **Additional Metadata:** a free-form JSON which you can use to include as any additional data which you can later make use of in code during evaluation time.
+
+
+As you may notice, the **scenario** is analogous to the **input** for single-turn goldens, while the **expected outcome** mirrors the **expected output**.

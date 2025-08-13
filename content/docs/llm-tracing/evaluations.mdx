@@ -101,7 +101,7 @@ If you specify a  `metricCollection` list but don't update your current span wit
 
 ### Traces
 
-Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluation/run-evals/end-to-end-evals), where you disregard the performance of individual spans within the trace and treat your application as a black-box.
+Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals), where you disregard the performance of individual spans within the trace and treat your application as a black-box.
 
 <Callout>
 You can run online evals on both traces and spans at the same time.
@@ -159,7 +159,7 @@ Also note that unlike evals on spans, the `metricCollection` **MUST BE DEFINED**
 
 ## Offline Evaluations
 
-Offline evaluations refer to evals that are ran retrospectively, after traces are ingested into Confident AI. 
+Offline evaluations refer to evals that are ran **retrospectively**, after traces are ingested into Confident AI. 
 
 ### Threads
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     response = llm_app(user_query, true)
     print(f"\n🤖 Response:\n{response}")
 
-evaluate_thread(thread_id=your_thread_id, metricCollection="Collection Name")
+evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
 
 You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`:
@@ -199,12 +199,33 @@ You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`
 ```python filename="main.py"
 ...
 
-a_evaluate_thread(thread_id=your_thread_id, metricCollection="Collection Name")
+a_evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
 
-You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input-output) of individual traces in a thread for multi-turn evaluation to work online. To recap, DeepEval uses the `input` of a trace as the `"user"` role content and the `output` of a trace as the `"assistant"` role content as turns in your thread.
+You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input-output) of individual traces in a thread for multi-turn evaluations to work. To recap, DeepEval uses the `input` of a trace as the `"user"` role content and the `output` of a trace as the `"assistant"` role content as turns in your thread.
 
+<Callout type="warning">
 If you don't set the `input` and/or `output`, Confident AI will have nothing in your thread to evaluate.
+</Callout>
+
+You can also set the retrieval context and tools called (if any) for each assistant/AI turn as part of the `output` setting, which would allow you to see the context of which an LLM generation was invoked in:
+
+```python filename="main.py" {8}
+from deepeval.test_case import ToolCall
+from deepeval.tracing import TurnContext
+...
+
+update_current_trace(
+  thread_id=your_thread_id, 
+  output=res,
+  turnContext=TurnContext(
+    retrieval_context=["..."], # optional list of strings
+    tools_called=[ToolCall(...)] # optional list of tools called
+  )
+)
+```
+
+To learn more, visit the [threads section.](/docs/llm-tracing/tracing-features/threads)
 
 ### Trace
 
@@ -213,7 +234,7 @@ Although less common since you can run online evals on traces, you can also run 
 ```python filename="main.py" showLineNumbers copy
 from deepeval.tracing import evaluate_trace
 
-evaluate_thread(trace_uuid=<your-trace-uuid>, metricCollection="Collection Name")
+evaluate_trace(trace_uuid=<your-trace-uuid>, metric_collection="Collection Name")
 ```
 
 <Callout>
@@ -229,7 +250,7 @@ The same offline evals can also be ran in the same say for spans:
 ```python filename="main.py" showLineNumbers copy
 from deepeval.tracing import evaluate_span
 
-evaluate_span(span_uuid=<your-span-uuid>, metricCollection="Collection Name")
+evaluate_span(span_uuid=<your-span-uuid>, metric_collection="Collection Name")
 ```
 
 <Callout>
@@ -277,7 +298,7 @@ your_thread_id = "your-thread-id"
 def outer_function():
     update_current_trace(thread_id=your_thread_id, test_case=...)
 
-evaluate_thread(thread_id=your_thread_id, metricCollection="Collection 2")
+evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
 ```
 
 **Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection. 

@@ -6,7 +6,7 @@ import { Cards, Callout } from "nextra/components";
 
 # Introduction to Datasets on Confident AI
 
-Confident AI's **Dataset Editor** allows you to create, manage, and annotate datasets for your LLM testing and evaluation needs. You can efficiently organize your **goldens** and maintain high-quality datasets for your LLM applications without relying on CSV files anymore.
+Confident AI's **Dataset Editor** allows you to create, manage, and annotate **single-turn** or **multi-turn** datasets for your LLM testing and evaluation needs. You can efficiently organize your **goldens** and maintain high-quality datasets for your LLM applications without relying on CSV files anymore.
 
 <Callout>
   If you're unsure what exactly is a dataset or golden, [click
@@ -20,8 +20,13 @@ Think of it like a Google Sheets or Notion CSV editor, but the difference is tha
 <Cards>
   <Cards.Card
     arrow
-    title="Annotate Datasets"
-    href="/docs/dataset-editor/annotate-datasets#create-goldens"
+    title="Using Dataset for Evals"
+    href="/docs/dataset-editor/dataset-features/pull-for-evaluation"
+  />
+  <Cards.Card
+    arrow
+    title="Push & Queue Goldens"
+    href="/docs/dataset-editor/dataset-features/push-queue-goldens"
   />
   <Cards.Card
     arrow
@@ -30,24 +35,17 @@ Think of it like a Google Sheets or Notion CSV editor, but the difference is tha
   />
   <Cards.Card
     arrow
-    title="Upload via DeepEval"
-    href="/docs/dataset-editor/dataset-features/push-pull-goldens"
+    title="Assign for Annotation"
+    href="/docs/dataset-editor/dataset-features/assign-goldens"
   />
   <Cards.Card
     arrow
     title="Custom Columns"
     href="/docs/dataset-editor/dataset-features/custom-columns"
   />
-  <Cards.Card
-    arrow
-    title="Dataset Backups"
-    href="/docs/dataset-editor/annotate-datasets#enable-backups--revision-history-recommended"
-  />
 </Cards>
 
 ## Quickstart
-
-This walkthrough will show how to use datasets on Confident AI for evaluation. Not all features will be covered, but if you follow all the steps you'll have the datasets features setup.
 
 ### Create a Dataset
 
@@ -82,7 +80,7 @@ for golden in dataset.goldens:
         input=golden.input,
         actual_output=your_llm_app(golden.input) # Replace your_llm_app()
     )
-    dataset.test_cases.append(test_case)
+    dataset.add_test_case(test_case)
 
 # Run an evaluation
 evaluate(test_cases=dataset.test_cases, metrics=[...])

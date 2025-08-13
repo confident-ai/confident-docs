@@ -3,6 +3,5 @@ export default {
         "display": "hidden"
     },
     "data-models": "",
-    "run-evals": "",
-    "simulation": "",
+    "pull-dataset": "",
 }

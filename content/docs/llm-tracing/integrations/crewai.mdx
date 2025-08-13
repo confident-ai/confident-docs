@@ -2,43 +2,46 @@
 title: CrewAI
 ---
 
+import { Callout } from "nextra/components";
+
 # CrewAI
 
 [CrewAI](https://www.crewai.com/) is a lean, lightning-fast Python framework for creating autonomous AI agents tailored to any scenario.
 
 ## Quickstart
-Confident AI provides a `instrumentator` that can trace CrewAI's execution with just a single line of code.
+Confident AI provides a `instrument_crewai` that can trace CrewAI's execution with just a single line of code.
 
 Install the following package:
 ```bash
 pip install -U deepeval
 ```
 
-With your Confident API key, initialize DeepEval's `instrumentator` in your agent's `main.py` script:
+With your Confident API key, initialize DeepEval's `instrument_crewai` in your agent's `main.py` script:
 
 ```python
-from deepeval.integrations.crewai import instrumentator
-instrumentator(api_key="<your-confident-api-key>")
+from deepeval.integrations.crewai import instrument_crewai
+instrument_crewai(api_key="<your-confident-api-key>")
 ```
 That's it! You can now see the traces on Confident AI's **Observability**.
 
 ## Basic CrewAI Agent
 
-Here's a basic example of a CrewAI agent with Confident AI's `instrumentator`:
+Here's a basic example of a CrewAI agent with Confident AI's `instrument_crewai`:
 
 ```bash
 pip install crewai
 ```
 
-```python filename="main.py" showLineNumbers {3, 8}
-from crewai import Agent, Task, Crew
+```python filename="main.py" showLineNumbers {5, 9}
 import os
-from deepeval.integrations.crewai import instrumentator
 import time
+from crewai import Task, Crew, Agent
+
+from deepeval.integrations.crewai import instrument_crewai
 
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 
-instrumentator(api_key="<your-confident-api-key>")
+instrument_crewai(api_key="<your-confident-api-key>")
 
 # Define your agents with roles and goals
 coder = Agent(
@@ -49,7 +52,7 @@ coder = Agent(
  
 # Create tasks for your agents
 task1 = Task(
-    description="Explain the latest trends in AI.",
+    description="Explain the given topic",
     expected_output="A clear and concise explanation.",
     agent=coder
 )
@@ -61,7 +64,9 @@ crew = Crew(
 )
 
 # Kickoff your crew
-result = crew.kickoff()
+result = crew.kickoff(
+    "input": "What are the LLMs?"
+)
 print(result)
 
 time.sleep(7) # Wait for traces to be posted to observatory
@@ -73,6 +78,75 @@ Run your agent:
 python main.py
 ```
 After execution, you can see the traces on Confident AI's **Observability**.
+
+## Advanced Usage
+
+### Online evals
+
+To run [online evaluations](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your CrewAI agent:
+
+1. Replace your CrewAI `Agent` with DeepEval's CrewAI `Agent` wrapper
+2. Provide `metric_collection` as an argument to DeepEval's `Agent` wrapper
+3. Run your agent
+
+
+<Callout type="info">
+The CrewAI **Agent** wrapper auto-populates the `input`, `actual_output`, `expected_output` and `tools_called` fields of [LLMTestCase](https://deepeval.com/docs/evaluation-test-cases) for each `Agent`. Therefore, you can't include metrics that require other parameters (e.g. `retrieval_context`) when creating your [metric collection](https://deepeval.com/docs/metrics-task-completion).
+</Callout>
+
+
+```python filename="main.py" showLineNumbers {1, 9}
+from deepeval.integrations.crewai.agent import Agent
+...
+
+# Define your agents with metric collection name
+coder = Agent(
+    role='Consultant',
+    goal='Write clear, concise explanation.',
+    backstory='An expert consultant with a keen eye for software trends.',
+    metric_collection="<your-metric-collection-name>"
+)
+
+...
+
+# Kickoff your crew
+result = crew.kickoff(
+    "input": "What are the LLMs?"
+)
+time.sleep(7) # Wait for traces to be posted to observatory
+```
+
+### End-to-end evals
+
+Confident AI enables you to perform [end-to-end evaluations](https://deepeval.com/docs/evaluation-end-to-end-llm-evals) on your CrewAI agent using `EvaluationDataset`.
+
+```python filename="main.py" showLineNumbers {4,19,22}
+from deepeval.integrations.crewai.agent import Agent
+...
+
+answer_relavancy_metric = AnswerRelevancyMetric()
+
+coder = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metrics=[answer_relavancy_metric],
+)
+
+goldens = [
+    Golden(input="What are Transformers in AI?"),
+    Golden(input="What is the biggest open source database?"),
+    Golden(input="What are LLMs?"),
+]
+
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
+    result = crew.kickoff(inputs={"input": golden.input})
+```
+
+
+
 
 
 

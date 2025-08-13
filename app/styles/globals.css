@@ -48,8 +48,8 @@
 }
 
 .docs-layout h1 {
-  font-family: 'Fira Code', monospace !important;
   font-weight: 600 !important;
+  font-size: 3rem;
 }
 
 .docs-layout h2 {
@@ -72,6 +72,13 @@
   border: 1px solid rgb(209, 209, 210) !important;
 }
 
+/* Nested tabpanel styling */
+/* div[role="tabpanel"] div[role="tabpanel"] {
+  margin-top: 0rem !important;
+  border: none !important;
+  padding: 0 !important;
+} */
+
 /* Add right border to the left navigation drawer */
 .docs-layout .nextra-sidebar {
   border-right: 1px solid rgba(0, 0, 0, 0.081);
@@ -88,7 +95,7 @@
 
 .docs-layout .custom-icon-tab-item {
   padding: 4px;
-  border: 1px solid rgb(213, 213, 216);
+  border: 1px solid rgb(147, 147, 157);
   background: white;
   border-radius: 4px;
 }
@@ -182,7 +189,8 @@
 .docs-layout button[data-href="/docs/project-settings"],
 .docs-layout button[data-href="/api/tracing"],
 .docs-layout button[data-href="/api/evaluation"],
-.docs-layout button[data-href="/api/metrics"] {
+.docs-layout button[data-href="/api/metrics"]
+.docs-layout button[data-href="/api/datasets"]{
   display: none !important;
 }
 
@@ -195,7 +203,8 @@
 .docs-layout button[data-href="/docs/project-settings"] + div > ul,
 .docs-layout button[data-href="/api/tracing"] + div > ul,
 .docs-layout button[data-href="/api/evaluation"] + div > ul,
-.docs-layout button[data-href="/api/metrics"] + div > ul {
+.docs-layout button[data-href="/api/metrics"] + div > ul,
+.docs-layout button[data-href="/api/datasets"] + div > ul{
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
@@ -209,7 +218,8 @@
 .docs-layout button[data-href="/docs/project-settings"] + div > ul::before,
 .docs-layout button[data-href="/api/tracing"] + div > ul::before,
 .docs-layout button[data-href="/api/evaluation"] + div > ul::before,
-.docs-layout button[data-href="/api/metrics"] + div > ul::before {
+.docs-layout button[data-href="/api/metrics"] + div > ul::before,
+.docs-layout button[data-href="/api/datasets"] + div > ul::before{
   display: none !important;
 }
 
@@ -222,7 +232,8 @@
 .docs-layout li:has(button[data-href="/docs/project-settings"]) > div,
 .docs-layout li:has(button[data-href="/api/tracing"]) > div,
 .docs-layout li:has(button[data-href="/api/evaluation"]) > div,
-.docs-layout li:has(button[data-href="/api/metrics"]) > div {
+.docs-layout li:has(button[data-href="/api/metrics"]) > div,
+.docs-layout li:has(button[data-href="/api/datasets"]) > div {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }

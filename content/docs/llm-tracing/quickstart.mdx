@@ -4,7 +4,7 @@ title: Quickstart
 
 import { Callout, Cards, Tabs } from "nextra/components";
 
-# Getting Started with LLM Tracing
+# LLM Tracing Quickstart
 
 5 minute quickstart to setup LLM tracing on Confident AI.
 
@@ -29,7 +29,7 @@ Or in code:
 ```python filename="main.py"
 import deepeval
 
-deepeval.login_with_confident_api_key("YOUR_API_KEY")
+deepeval.login("YOUR_API_KEY")
 ```
 
   </Tabs.Tab>
@@ -149,7 +149,7 @@ In a later section, you'll learn how to create [spans that are LLM specific](/do
 
 ## Run an Online Evaluation
 
-You can run online evaluation on both [end-to-end](/docs/llm-evaluation/run-evals/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/run-evals/component-level-evals) (metrics on the span) evaluations on Confident AI. 
+You can run online evaluation on both [end-to-end](/docs/llm-evaluation/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/component-level-evals) (metrics on the span) evaluations on Confident AI. 
 
 First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
@@ -218,7 +218,5 @@ observedLlmApp("Write me a poem.")
 
 Congratulations 🎉! Now whenever you run your LLM app, all traces will be logged **AND** evaluated on Confident AI. To the the **Observatory** to check it out.
 
-
 In the next section, we will dive deep into [online and offline evaluations for tracing.](/docs/llm-tracing/evaluations)
-
 

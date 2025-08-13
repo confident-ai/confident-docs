@@ -7,7 +7,7 @@ import { Globe, Percent, Braces, Tag, MessageSquare, EyeOff, User, Settings } fr
 
 # Introduction to LLM Tracing on Confident AI 
 
-Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps.
+Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps, but with an additional suite of 30+ evaluation metrics to track continuous performance over time.
 
 <details>
 
@@ -26,11 +26,42 @@ Confident AI offers **LLM tracing** for teams to trace and monitor LLM applicati
 </details>
 
 
+<Tabs items={['Traces', 'Spans (components)', 'Threads (conversations)']}>
+  <Tabs.Tab>
+
+You can log a **single-turn LLM interaction** through LLM tracing. Traces are a single execution of your LLM app, and running evals on traces is akin to the [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) for LLM evaluation in development.
+
 <VideoDisplayer
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/observability:llm-tracing.mp4"
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:traces.mp4"
   width="100%"
-  title="LLM Tracing for an Agentic RAG App"
+  title="LLM Tracing: Traces with Evals"
 />
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Spans are **individual components** such as LLM calls, agents, retrieveres, tools, etc. that make up a trace. Running evals on spans is akin to the [component-level evals](/docs/llm-evaluation/component-level-evals) for LLM evaluation in development.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:spans.mp4"
+  width="100%"
+  title="LLM Tracing: Spans with Evals"
+/>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Threads are **a group of traces**, grouped together via a `thread_id` that you provide during tracing. It represents a **multi-turn LLM interaction**, and running evals on threads require **multi-turn** metrics, akin to running evals on `ConversationalTestCase`s in development.
+
+<VideoDisplayer
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:threads.mp4"
+  width="100%"
+  title="LLM Tracing: Threads with Evals"
+/>
+
+  </Tabs.Tab>
+</Tabs>
+
 
 ## Get Started
 
@@ -129,7 +160,7 @@ And these are be either done in an **online** fashion (run evals as they are bei
 
 Confident AI tracing is designed to be completely non-intrusive to your application. It:
 
-- Can be disabled/enabled anytime through the `ENABLE_CONFIDENT_TRACING="YES"/"NO"` enviornment variable.
+- Can be disabled/enabled anytime through the `CONFIDENT_TRACING_ENABLED="YES"/"NO"` enviornment variable.
 - Requires no rewrite of your existing code - just add the `@observe` decorator.
 - Runs asynchronously in the background with zero impact on latency.
 - Fails silently if there are any issues, ensuring your app keeps running.

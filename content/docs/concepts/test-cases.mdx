@@ -45,7 +45,7 @@ Similarily, here's how you would define a `ConversationalTestCase` to evaluate a
 
 ```python filename="main.py" showLineNumbers copy
 from deepeval.test_case import Turn, ConversationalTestCase
-from deepeval.metrics import ConversationRelevancy
+from deepeval.metrics import TurnRelevancyMetric
 from deepeval import evaluate
 
 test_case = ConversationalTestCase(
@@ -60,7 +60,7 @@ test_case = ConversationalTestCase(
         ),
     ]
 )
-metric = ConversationRelevancy()
+metric = TurnRelevancyMetric()
 
 evaluate(test_cases=[test_case], metrics=[metric])
 ```

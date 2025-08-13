@@ -2,7 +2,7 @@
 title: Quickstart
 ---
 
-import { Cards, Callout } from "nextra/components";
+import { Cards, Callout, Tabs } from "nextra/components";
 
 # Evals API Quickstart
 
@@ -36,7 +36,7 @@ curl -X POST "https://api.confident-ai.com/v1/metrics" \
                 }
             ],
             "multiturn": false
-         }`
+         }'
 ```
 ```json filename="response"
 {"status": 200}
@@ -59,12 +59,10 @@ You can learn more about the metric collection data model here.
 
 ## Run Your First Evaluation
 
-You would ran evaluation by providing the name of the metric collection you just created and the list of test cases:
+To run an evaluation, provide the name of the metric collection you just created and the list of test cases:
 
-<Callout type="warning">
-This example shows a single-turn evaluation.
-</Callout>
-
+<Tabs items={['Single-Turn', 'Multi-Turn']}>
+<Tabs.Tab>
 ```bash showLineNumbers filename="POST request"
 curl -X POST "https://api.confident-ai.com/v1/evaluate" \
      -H "Content-Type: application/json" \
@@ -74,32 +72,44 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate" \
             "testCases": [
                 {
                     "input": "How tall is mount everest?",
-                    "actualOutput: "I don't know, pretty tall I guess?"
-                },
-            ],
-         }`
-```
-
-The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-runs) on Confident AI and return a structured response containing evaluation results for each test case. Here's what the response looks like:
-
-```json showLineNumbers filename="response"
-{
-    "success": true,
-    "data": [
-        {
-            "testRunId": <TEST-RUN-ID>,
-            "metrics": [
-                {
-                    "name": "Answer Relevancy",
-                    "score": 1,
-                    "reason": "Although dismissive, the actual output does address the question.",
-                    "error": null
+                    "actualOutput": "I don't know, pretty tall I guess?"
                 }
             ]
-        }
-    ]
+         }'
+```
+</Tabs.Tab>
+<Tabs.Tab >
+```bash showLineNumbers filename="POST request"
+curl -X POST "https://api.confident-ai.com/v1/evaluate" \
+     -H "Content-Type: application/json" \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d '{
+            "metricCollection": "Multi-Turn Collection Name",
+            "testCases": [
+                {
+                    "turns": [
+                        {"role": "user", "content": "How tall is Mount Everest?"},
+                        {"role": "assistant", "content": "Mount Everest is approximately 8,848 meters tall."},
+                        {"role": "user", "content": "Wow, that's really high! Has that changed recently?"},
+                        {"role": "assistant", "content": "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."}
+                    ]
+                }
+            ]
+         }'
+```
+</Tabs.Tab>
+</Tabs>
+
+The `/v1/evaluate` API endpoint will create a [test run](/docs/concepts/test-runs) on Confident AI and return a structured response containing the test run ID.
+
+```json filename="response"
+{
+    "success": true, 
+    "data": {"id": "TEST-RUN-ID"}
 }
 ```
+
+🎉 Congratulations! You've ran your first evaluation on Confident AI via the Evals API. To learn more about the `/v1/evaluate` endpoint, visit the [evaluation section.](/api/evaluation/run-evals)
 
 <Callout>
 For one-off evaluations, it is recommended that you use the `POST /v1/metric` endpoint instead, which avoids polluting your dashboard with necessary test runs.

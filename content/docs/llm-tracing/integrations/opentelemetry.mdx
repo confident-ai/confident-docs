@@ -2,241 +2,324 @@
 title: OpenTelemetry
 ---
 import { Callout } from "nextra/components";
+import { Tabs } from "nextra/components";
 
 # OpenTelemetry
-[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data.
+[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
 
-Here are few OpenTelemetry concepts:
-
-- **Span** is a single unit of work in OpenTelemetry.
-- **Trace** is a collection of spans in the form of a tree that are related to a single request.
-- **Span Processor** acts as a middleman that can process, modify, or decide how to deal with spans—such as whether to batch them together for efficiency, drop certain spans, or add extra information to them. 
-- **Span Exporter** delivers spans to a storage system.
-
-Confident AI integrates with OpenTelemetry that allows teams to export traces to the [Observatory](https://documentation.confident-ai.com/llm-tracing/introduction) via the `ConfidentSpanExporter`.
+Confident AI provides a `ConfidentSpanExporter` that allows teams to export traces to the [Observatory](https://documentation.confident-ai.com/llm-tracing/introduction). 
 
 ## Quickstart
-
-Install the following libraries:
-
-```bash
-pip install deepeval opentelemetry-api opentelemetry-sdk
-```
-
-- `opentelemetry-api`: Provides the core OpenTelemetry API (including `trace`).
-- `opentelemetry-sdk`: Provides the OpenTelemetry Python SDK (including `TracerProvider` and `BatchSpanProcessor`).
-
 Login using your API key on Confident AI in the CLI:
 
 ```bash
 deepeval login --confident-api-key YOUR_API_KEY
 ```
+Add `ConfidentSpanExporter` to your OpenTelemetry tracer:
 
-Use the following code to trace your OpenTelemetry spans:
-
-```python showLineNumbers {14, 19}
+```python filename="example.py" showLineNumbers {7, 15}
 import time
+import json
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from deepeval.tracing.otel.exporter import ConfidentSpanExporter
- 
-if not isinstance(trace.get_tracer_provider(), TracerProvider):
-    tracer_provider = TracerProvider()
-    trace.set_tracer_provider(tracer_provider)
-else:
-    tracer_provider = trace.get_tracer_provider()
- 
-exporter = ConfidentSpanExporter()
-span_processor = BatchSpanProcessor(exporter)
-tracer_provider.add_span_processor(span_processor)
-tracer = trace.get_tracer("test_tracer")
- 
-with tracer.start_as_current_span("chat gpt-4o") as parent_span:
-    parent_span.set_attribute("gen_ai.operation.name", "chat")
-    parent_span.set_attribute("gen_ai.request.model", "gpt-4o")
+
+# Set up tracer provider
+tracer_provider = trace.get_tracer_provider()
+if not isinstance(tracer_provider, TracerProvider):
+    trace.set_tracer_provider(TracerProvider())
+
+# Add confident span exporter wrapped in batch span processor
+tracer_provider.add_span_processor(BatchSpanProcessor(ConfidentSpanExporter()))
+
+# Get tracer
+tracer = trace.get_tracer("deepeval_tracer")
+
+def llm(input: str) -> str:
+    with tracer.start_as_current_span("llm_span") as span:
+        span.set_attribute("confident.span.type", "llm")
+        span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+        span.set_attribute("confident.llm.attributes.input", [
+            json.dumps({"role": "system", "content": "You are a helpful assistant."}),
+            json.dumps({"role": "user", "content": input})
+        ])
+        time.sleep(0.5)
+        span.set_attribute("confident.llm.attributes.output", "Hello world")
     
-    parent_span.add_event("gen_ai.system.message", {"content": "you are a helpful assistant"})
-    parent_span.add_event("gen_ai.user.message", {"content": "What is the capital of France?"})
- 
-# wait for queue to post traces to the Observatory
-time.sleep(6)
+    return "Hello world"
+
+def my_app(input: str):
+    with tracer.start_as_current_span("my_app") as span:
+        span.set_attribute("confident.span.input", input)
+        res = llm(input)
+        span.set_attribute("confident.span.output", res)
+
+my_app("Hi")
 ```
-**Congratulations 🎉!** This will create a trace in the Observatory.
+Run the script:
 
-`ConfidentSpanExporter` accepts any span that adheres to the [OpenTelemetry specification](https://opentelemetry.io/docs/concepts/signals/traces/). We encourage the use of [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/) to ensure that the spans are compatible with the Confident AI's Observatory.
-
-<Callout type="info">
-Attributes is a concept shared by both OpenTelemetry and Confident AI tracing, and are key-value pairs (like labels) that describe details about the operation the span represents. **Events** on the other hand, is OpenTelemetry specific and are specific moments or occurrences during the span’s lifetime. Each event has a name and a timestamp, and can also include its own attributes.
-</Callout>
-
-## Mapping
-
-Confident AI's OpenTelemetry integration allows you to map attributes and events to Confident AI's [span type attributes](/docs/llm-tracing/tracing-features/attributes). Below are the mappings for the `"llm"`, `"tool"`, `"agent"`, and `"retriever"` span types.
-
-### LLM attributes mapping
-
-Confident AI supports the following LLM operations:
-
-- `chat`
-- `text_completion`
-- `generate_content`
-
-```python showLineNumbers {5}
-# set the tracer
-with tracer.start_as_current_span("chat gpt-4o") as parent_span:
-    
-    # operation name can be chat, text_completion, generate_content
-    parent_span.set_attribute("gen_ai.operation.name", "chat")
-
-    # set model, usage, and cost per token
-    parent_span.set_attribute("gen_ai.request.model", "gpt-4o")
-    parent_span.set_attribute("gen_ai.usage.input_tokens", 10)
-    parent_span.set_attribute("gen_ai.usage.output_tokens", 20)
-    parent_span.set_attribute("confident.llm.cost_per_input_token", 0.0001)
-    parent_span.set_attribute("confident.llm.cost_per_output_token", 0.0002)
-
-    # input messages will be events in the span
-    parent_span.add_event("gen_ai.system.message", {"content": "you are a helpful assistant"})
-    parent_span.add_event("gen_ai.user.message", {"content": "What is the capital of France?"})
-
-    # output should be a single event per llm span
-    # event name can be gen_ai.assistant.message, gen_ai.choice, gen_ai.tool.message
-    parent_span.add_event("gen_ai.assistant.message", {"content": "The capital of France is Paris."}) 
+```bash
+python example.py
 ```
+
+This will create a trace in the Observatory, with the span name `my_app`.
+
+## Attributes mapping
+
+Confident AI uses `confident.*` namespace to map OpenTelemetry span attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model.
+
+### Trace attributes
+
+Trace attributes are set in the span attributes.
+
+- `confident.trace.name` (of type `str`) used for updating trace [name](/docs/llm-tracing/tracing-features/name).
+- `confident.trace.tags` (of type `list[str]`) used for updating trace [tags](/docs/llm-tracing/tracing-features/tags).
+- `confident.trace.thread_id` (of type `str`) used for updating trace [thread id](/docs/llm-tracing/tracing-features/threads).
+- `confident.trace.user_id` (of type `str`) used for updating trace [user id](/docs/llm-tracing/tracing-features/users).
+
+```python showLineNumbers
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.name", "test_trace")
+    span.set_attribute("confident.trace.tags", ["tag1", "tag2"])
+    span.set_attribute("confident.trace.thread_id", "123")
+    span.set_attribute("confident.trace.user_id", "456")
+```
+
+### Trace input and output
+
+You can set [trace input and output](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) at runtime using the following attributes:
+
+- `confident.trace.input` (of type `Any`) used for updating trace input.
+- `confident.trace.output` (of type `Any`) used for updating trace output.
+
+```python showLineNumbers
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.input", input)
+    span.set_attribute("confident.trace.output", output)
+```
+
 <Callout>
-  Attributes and event names starting with `gen_ai.`* are as per the [OpenTelemetry Semantic Conventions for Generative AI Systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/). Other names are specific to **Confident AI**.
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
 </Callout>
 
-The following table shows the properties that are mapped to [LLM span attributes](https://documentation.confident-ai.com/llm-tracing/tracing-features/attributes#llm-attributes).
+### Spans
 
-| LLM attribute | Property | Type |
-|----------|---------|--------|
-| `model` | `gen_ai.request.model` | Attribute | 
-| `input_tokens` | `gen_ai.usage.input_tokens` | Attribute |
-| `output_tokens` | `gen_ai.usage.output_tokens` | Attribute |
-| `cost_per_input_token` | `confident.llm.cost_per_input_token` | Attribute |
-| `cost_per_output_token` | `confident.llm.cost_per_output_token` | Attribute |
-| `input` |`gen_ai.system.message` `gen_ai.user.message`| Event | 
-| `output` |`gen_ai.assistant.message` `gen_ai.choice` `gen_ai.tool.message`| Event | 
+Span attributes start with `confident.{span_type}.*` namespace. [Span type](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types) can be one of the following:
+- `span`: Default (custom) span type.
+- `llm`: LLM span.
+- `agent`: Agent span.
+- `retriever`: Retriever span.
+- `tool`: Tool span.
 
+Given below is the sample codes for setting attributes for different span types.
 
-### Tool attributes mapping
+<Tabs items={["Default Span", "LLM Span", "Agent Span", "Retriever Span", "Tool Span"]}>
 
-Confident AI supports the following tool operations:
+<Tabs.Tab>
+```python showLineNumbers
+def meta_agent(input: str):
+    with tracer.start_as_current_span("meta_agent") as span:
+        span.set_attribute("confident.span.input", input)
+        span.set_attribute("confident.span.output", input)
+        span.set_attribute("confident.span.error", "Error")
+        span.set_attribute("confident.span.feedback", json.dumps({
+            "rating": 1,
+            "expected_output": "Expected output",
+            "explanation": "Explanation"
+        }))
+        span.set_attribute("confident.span.metric_collection", "My metrics")
+        span.set_attribute("confident.trace.attributes", json.dumps({
+            "name": "test_trace",
+            "tags": ["tag1", "tag2"],
+            "thread_id": "123",
+            "user_id": "456"
+        }))
+```
+</Tabs.Tab>
 
-- `execute_tool`
-- `invoke_agent`
+<Tabs.Tab>
+```python showLineNumbers
+def llm_agent(input: str):
 
-```python showLineNumbers {5}
-# set the tracer
-with tracer.start_as_current_span("execute_tool example_tool") as tool_span:
+    with tracer.start_as_current_span("llm_span") as span:
+        span.set_attribute("confident.span.type", "llm")
+        span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+        span.set_attribute("confident.llm.cost_per_input_token", 0.01)
+        span.set_attribute("confident.llm.cost_per_output_token", 0.02)
+        span.set_attribute("confident.llm.attributes.input", [
+            json.dumps({"role": "user", "content": input}),
+            json.dumps({"role": "system", "content": "You are a helpful assistant."})
+        ])
+        span.set_attribute("confident.llm.attributes.output", "Hello world")
+        span.set_attribute("confident.llm.attributes.output_token_count", 10)
+        span.set_attribute("confident.llm.attributes.input_token_count", 10)
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+```python showLineNumbers
+def agent_span(input: str):
+
+    with tracer.start_as_current_span("agent_span") as span:
+        span.set_attribute("confident.span.type", "agent")
+        span.set_attribute("confident.agent.name", "agent_span")
+        span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
+        span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
+        span.set_attribute("confident.agent.attributes.input", json.dumps({"input": input}))
+        span.set_attribute("confident.agent.attributes.output", json.dumps({"output": input}))
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+```python showLineNumbers
+def retriever_span(input: str):
     
-    # operation name can be execute_tool or invoke_agent
-    tool_span.set_attribute("gen_ai.operation.name", "execute_tool")
-
-    # set tool name and description
-    tool_span.set_attribute("gen_ai.tool.description", "example_tool_description")
-
-    # input and output must be a single event per toolspan
-    tool_span.add_event("confident.tool.input", {"temp": "example_tool_input"})
-    tool_span.add_event("confident.tool.output", {"temp": "example_tool_output"})
+    with tracer.start_as_current_span("retriever_span") as span:
+        span.set_attribute("confident.span.type", "retriever")
+        span.set_attribute("confident.retriever.embedder", "embedder")
+        span.set_attribute("confident.retriever.attributes.embedding_input", input)
+        span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
+        span.set_attribute("confident.retriever.attributes.top_k", 10)
+        span.set_attribute("confident.retriever.attributes.chunk_size", 10)
 ```
+</Tabs.Tab>
 
-The following table shows the properties that are mapped to [tool span attributes](https://documentation.confident-ai.com/llm-tracing/tracing-features/attributes#tool-attributes).
+<Tabs.Tab>
+```python showLineNumbers
+def tool_span(input: str):
 
-| Tool attribute | Property | Type |
-|----------|---------|--------|
-| `description` | `gen_ai.tool.description` | Attribute |
-| `input_parameters` | `confident.tool.input` | Event |
-| `output` | `confident.tool.output` | Event |
+    with tracer.start_as_current_span("tool_span") as span:
+        span.set_attribute("confident.span.type", "tool")
+        span.set_attribute("confident.tool.name", "tool name")
+        span.set_attribute("confident.tool.description", "tool description")
+        span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": input}))
+        span.set_attribute("confident.tool.attributes.output", json.dumps({"output": input}))
+```
+</Tabs.Tab>
 
-### Agent attributes mapping
-Confident AI supports the following agent operations:
-- `create_agent`
-- `invoke_agent`
+</Tabs>
 
-```python showLineNumbers {5}
-# set the tracer
-with tracer.start_as_current_span("create_agent example_agent") as agent_span:
+### LLM test case
+
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+```python showLineNumbers
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
     
-    # operation name can be create_agent or invoke_agent
-    agent_span.set_attribute("gen_ai.operation.name", "create_agent")
-    agent_span.set_attribute("gen_ai.agent.description", "example_agent_description")
-
-    # available tools and agent handoffs should be list of string names
-    agent_span.set_attribute("confident.agent.available_tools", ["example_tool"])  
-    agent_span.set_attribute("confident.agent.agent_handoffs", ["example_handoff"]) 
-
-    # input and output must be a single event per agent span
-    agent_span.add_event("confident.agent.input", {"input": "example_input"})
-    agent_span.add_event( "confident.agent.output", {"output": "example_output"})
+    span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.span.llm_test_case.input', input)
+    span.set_attribute('confident.span.llm_test_case.actual_output', output)
 ```
 
-
-The following table shows the properties that are mapped to [agent span attributes](https://documentation.confident-ai.com/llm-tracing/tracing-features/attributes#agent-attributes).
-
-| Agent attribute | Property | Type |
-|----------|---------|--------|
-| `available_tools` | `confident.agent.available_tools` | Attribute |
-| `agent_handoffs` | `confident.agent.agent_handoffs` | Attribute |
-| `input` | `confident.agent.input` | Event |
-| `output` | `confident.agent.output` | Event |
-
-
-### Retriever attributes mapping
-
-Confident AI supports the following retriever operations:
-
-- `embeddings`
-- `retrieve`
-
-```python showLineNumbers {5}
-# set the tracer
-with tracer.start_as_current_span("embeddings openai_ada") as retriever_span:
-    
-    # operation name can be embeddings or retrieve
-    retriever_span.set_attribute("gen_ai.operation.name", "embeddings")
-    retriever_span.set_attribute("gen_ai.request.model", "openai_ada")
-    retriever_span.set_attribute("confident.retriever.top_k", 10)
-    retriever_span.set_attribute("confident.retriever.chunk_size", 100)
-
-    # input and output must be a single event per retriever span
-    retriever_span.add_event("confident.retriever.input", {"input": "example_input"})
-    retriever_span.add_event("confident.retriever.output", {"output": "example_output"})
-```
-
-The following table shows the properties that are mapped to [retriever span attributes](https://documentation.confident-ai.com/llm-tracing/tracing-features/attributes#retriever-attributes).
-
-| Retriever attribute | Property | Type |
-|----------|---------|--------|
-| `embedder` | `gen_ai.request.model` | Attribute |
-| `top_k` | `confident.retriever.top_k` | Attribute |
-| `chunk_size` | `confident.retriever.chunk_size` | Attribute |
-| `embedding_input` | `confident.retriever.input` | Event |
-| `retrieval_context` | `confident.retriever.output` | Event |
-
-### Nested spans
-
-The Opentelemetry tracer supports nested spans. Nested spans appear as a child of the parent span in the **Observatory**.
-
-```python showLineNumbers {1, 8}
-with tracer.start_as_current_span("chat gpt-4o") as parent_span:
-    parent_span.set_attribute("gen_ai.operation.name", "generate_content")
-    parent_span.set_attribute("gen_ai.request.model", "gpt-4o")
-
-    parent_span.add_event("gen_ai.system.message", {"content": "you are a helpful assistant"})
-    parent_span.add_event("gen_ai.user.message", {"content": "What is the capital of France?"})
-
-    with tracer.start_as_current_span("execute_tool example_tool") as tool_span:
-        tool_span.set_attribute("gen_ai.operation.name", "execute_tool")
-        tool_span.set_attribute("gen_ai.tool.description", "example_tool_description")
-
-        tool_span.add_event("confident.tool.input", {"temp": "example_tool_input"})
-        tool_span.add_event("confident.tool.output", {"temp": "example_tool_output"})
-```
-
-<Callout type="info">
-  All the OpenTelemetry spans' attributes and events are available in a [span's `metadata` property](/docs/llm-tracing/tracing-features/metadata) as a fallback.
+<Callout>
+Make sure you have [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) created on the platform for running online evaluation on this test case.
 </Callout>
+
+LLM test case attributes mapping:
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.span.llm_test_case.input` | `str` | Yes | Test case input |
+| `confident.span.llm_test_case.actual_output` | `str` | Yes | Test case actual output |
+| `confident.span.llm_test_case.expected_output` | `str` | No | Test case expected output |
+| `confident.span.llm_test_case.context` | `list[str]` | No | Test case context |
+| `confident.span.llm_test_case.retrieval_context` | `list[str]` | No | Test case retrieval context |
+| `confident.span.llm_test_case.tools_called` | `str` | No | Should be stringified json of type [Tools Called](https://deepeval.com/docs/evaluation-test-cases#tools-called) |
+| `confident.span.llm_test_case.expected_tools` | `str` | No | Should be stringified json of type [Expected Tools](https://deepeval.com/docs/evaluation-test-cases#expected-tools) |
+
+#### **Default span**
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.span.input` | `Any` | No | Span input |
+| `confident.span.output` | `Any` | No | Span output |
+| `confident.span.error` | `str` | No | Span error |
+| `confident.span.metric_collection` | `str` | No | Span [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) |
+
+#### **LLM span**
+
+To create a LLM span, set the `confident.span.type` to `llm`.
+
+LLM span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#llm-span)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.llm.model` | `str` | No | LLM model |
+| `confident.llm.cost_per_input_token` | `float` | No | Cost per input token |
+| `confident.llm.cost_per_output_token` | `float` | No | Cost per output token |
+
+LLM attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#llm-attributes)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.llm.attributes.input` | `str`, `list[str]` | Yes | LLM Span input (parsed to `list[dict]` if `list[str]` is provided) |
+| `confident.llm.attributes.output` | `Any` | Yes | LLM Span output |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
+| `confident.llm.attributes.input_token_count` | `int` | No | LLM Span input token count |
+
+
+#### **Agent span**
+
+To create an agent span, set the `confident.span.type` to `agent`.
+
+Agent span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#agent-span)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.agent.name` | `str` | Yes | Agent span name |
+| `confident.agent.available_tools` | `list[str]` | No | Agent span available tools |
+| `confident.agent.agent_handoffs` | `list[str]` | No | Agent span agent handoffs |
+
+Agent attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#agent-attributes)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.agent.attributes.input` | `Any` | Yes | Agent span input |
+| `confident.agent.attributes.output` | `Any` | Yes | Agent span output |
+
+#### **Tool span**
+
+To create a tool span, set the `confident.span.type` to `tool`.
+
+Tool span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/span-types#tool-span)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.tool.name` | `str` | Yes | Tool span name |
+| `confident.tool.description` | `str` | No | Tool span description |
+
+Tool attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#tool-attributes)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.tool.attributes.input_parameters` | `str` | No | Tool span input parameters (parsed to `dict` if `str` is provided) |
+| `confident.tool.attributes.output` | `Any` | No | Tool span output |
+
+#### **Retriever span**
+
+To create a retrieval span, set the `confident.span.type` to `retriever`.
+
+Retriever span attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.retriever.embedder` | `str` | Yes | Retrieval span embedder model |
+
+Retriever attributes: [reference](https://documentation.confident-ai.com/docs/llm-tracing/tracing-features/attributes#retriever-attributes)
+
+| Attribute | Type | Required | Description |
+|-----------|------|------|-------------|
+| `confident.retriever.attributes.embedding_input` | `str` | Yes | Retrieval span embedding input |
+| `confident.retriever.attributes.retrieval_context` | `list[str]` | Yes | Retrieval span retrieval context |
+| `confident.retriever.attributes.top_k` | `int` | No | Retrieval span top k |
+| `confident.retriever.attributes.chunk_size` | `int` | No | Retrieval span chunk size |
