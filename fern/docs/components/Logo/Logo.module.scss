@@ -1,0 +1,40 @@
+@import '@/app/styles/colors.scss';
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-shrink: 0;
+  
+  @media (max-width: 1000px) {
+    margin-top: -0.5rem;
+  }
+}
+
+.deepeval {
+    color: rgb(106, 0, 255);
+}
+
+.tagline {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-left: 14px;
+  color: $gray-600;
+  
+  @media (max-width: 1000px) {
+    margin-left: 0;
+    position: absolute;
+    bottom: -4px;
+    right: -0.8rem;
+  }
+}
+
+.cursorBlink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+} 
