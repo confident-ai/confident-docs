@@ -69,7 +69,6 @@ import pytest
 from deepeval.dataset import EvaluationDataset
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.tracing import observe, update_current_span
-from deepeval import evaluate
 
 client = OpenAI()
 
@@ -88,7 +87,9 @@ def llm_app(query: str) -> str:
 dataset = EvaluationDataset()
 dataset.pull(alias="your-dataset-alias")
 
-evaluate(goldens=[dataset.goldens], observed_callback=llm_app)
+for golden in dataset.evals_iterator():
+    # Call your llm_app
+    llm_app(golden.input)
 ```
     </Tabs.Tab>
 </Tabs>
@@ -173,15 +174,16 @@ deepeval test run test_llm_app.py
 
 Run an evaluation using your dataset of `Golden`s using the `evaluate` function:
 
-```python {8}
+```python filename="main.py"
 from deepeval.dataset import EvaluationDataset
-from deepeval import evaluate
 ...
 
 dataset = EvaluationDataset()
 dataset.pull(alias="your-dataset-alias")
 
-evaluate(goldens=[dataset.goldens], observed_callback=llm_app)
+for golden in dataset.evals_iterator():
+    # Call your llm_app
+    llm_app(golden.input)
 ```
 
 **Congratulations 🎉!** Your test run should now be available on Confident AI as a [testing report](/docs/llm-evaluation/evaluation-features/testing-reports) ✅. Click around the testing report on Confident AI, and take tyour time to get familarized with it.
