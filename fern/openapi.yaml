@@ -171,6 +171,7 @@ paths:
         - LLM Evaluation
       summary: Run LLM Evals
       operationId: evaluateLLM
+      description: Run online evals for your test cases using the metrics in `metricCollection`.
       requestBody:
         required: true
         content:
@@ -209,6 +210,7 @@ paths:
         - LLM Evaluation
       summary: Simulate Conversation
       operationId: simulateConversation
+      description: Simulate conversations for your `goldens` along with existing turns.
       requestBody:
         required: true
         content:
