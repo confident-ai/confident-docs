@@ -1,18 +1,12 @@
-"use client"
 import "nextra-theme-docs/style.css";
 import ConditionalHead from "./ConditionalHead";
-import { usePathname } from "next/navigation";
+import "@/app/styles/globalLayout-styles.css";
 
 export default async function RootLayout({ children }) {
-  const pathname = usePathname();
-  const isDocsOrBlog =
-    pathname === "/docs" ||
-    pathname.startsWith("/docs/") ||
-    pathname.startsWith("/blog/");
   return (
     <html
-      style={{ backgroundColor: isDocsOrBlog ? "" : "#0e0e13" }}
       // Not required, but good for SEO
+      id="html"
       lang="en"
       // Required to be set
       dir="ltr"

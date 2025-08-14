@@ -54,11 +54,11 @@ export async function generateMetadata({ params }) {
     ? imageUrl
     : `https:${imageUrl}`;
   return {
-    title: `${study?.fields?.heading} - Confident AI`,
+    title: `${study?.fields?.heading}`,
     description: study?.fields?.quote,
     metadataBase: "https://confident-ai.com",
     openGraph: {
-      title: `${study?.fields?.heading} - Confident AI`,
+      title: `${study?.fields?.heading}`,
       description: study?.fields?.quote,
       images: [
         {
@@ -68,17 +68,14 @@ export async function generateMetadata({ params }) {
           alt: study?.fields?.heading,
         },
       ],
-      url: "https://confident-ai.com",
-      siteName: "Confident AI",
       locale: "en_US",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${study?.fields?.heading} - Confident AI`,
+      title: `${study?.fields?.heading}`,
       description: study?.fields?.quote,
       images: [fullImageUrl],
-      creator: "@confident_ai",
     },
   };
 }

@@ -6,7 +6,20 @@ import GlobalLayout from '@/app/global-layout'
 
 export const metadata = {
   title: 'LLM Observability',
-  description: 'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
+  description: "Confident AI LLM Observability provides end-to-end monitor & tracing of LLM applications in production with best-in-class evaluations powered by DeepEval.",
+  openGraph: {
+    title: 'LLM Observability',
+    description:
+      "Confident AI LLM Observability provides end-to-end monitor & tracing of LLM applications in production with best-in-class evaluations powered by DeepEval.",
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LLM Observability',
+    description:
+      "Confident AI LLM Observability provides end-to-end monitor & tracing of LLM applications in production with best-in-class evaluations powered by DeepEval.",
+  },
 };
 export default function Page() {
   return (

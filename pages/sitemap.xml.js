@@ -12,7 +12,13 @@ export async function getServerSideProps({ res }) {
     select: "fields.link",
   });
 
+  const caseStudies = await client.getEntries({
+    content_type: "caseStudies",
+    select: "fields.link",
+  });
+
   const blogLinks = entries.items.map(item => item.fields.link);
+  const caseStudyLinks = caseStudies.items.map(item => item.fields.link);
 
   const staticPaths = [
     "",
@@ -21,14 +27,15 @@ export async function getServerSideProps({ res }) {
     "book-a-demo",
     "privacy-policy",
     "terms",
-    "blog",
     "pricing",
     "careers",
+    "blog",
   ];
 
   const allUrls = [
     ...staticPaths.map(path => `${siteUrl}/${path}`),
     ...blogLinks.map(link => `${siteUrl}/blog/${link}`),
+    ...caseStudyLinks.map(link => `${siteUrl}/case-study/${link}`),
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

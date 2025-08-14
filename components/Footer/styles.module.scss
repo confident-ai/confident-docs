@@ -18,7 +18,7 @@
             color: $black;
           }
           .codeEmbedded {
-            background-color: $darkBlue;
+            background-color: $confident-dark;
             width: fit-content;
             border-radius: 8px;
             display: flex;
@@ -45,7 +45,7 @@
     }
   }
   &.dark {
-    background-color: $darkBlue;
+    background-color: $confident-dark;
         .inner {
       .logoWrap {
         .first {
@@ -59,7 +59,7 @@
             color: $white;
           }
           .codeEmbedded {
-            background-color: $darkBlue;
+            background-color: $confident-dark;
             width: fit-content;
             border-radius: 8px;
             display: flex;

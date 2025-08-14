@@ -203,7 +203,7 @@
     border-color: $lightGray;
     .textWrap {
       .heading {
-        color: $darkBlue;
+        color: $confident-dark;
       }
       .description {
         color: $darkBorder;
@@ -214,7 +214,7 @@
         }
         .user {
           .username {
-            color: $darkBlue;
+            color: $confident-dark;
           }
           .infoWrap {
             .createdAt,
@@ -236,8 +236,8 @@
     min-height: 542px;
     height: auto;
     @include responsive(xl) {
-      min-height: 423px;
-      max-height: 423px;
+      min-height: 430px;
+      max-height: 430px;
     }
     @include responsive(md) {
       max-width: 100%;

@@ -10,8 +10,6 @@ export const metadata = {
   openGraph: {
     title: "Privacy Policy",
     description: "Companies of all sizes use Confident AI to justify why their LLM applications - RAG, Agents, or Chatbots, deserves to be in production.",
-    url: "https://confident-ai.com",
-    siteName: "Confident AI",
     locale: "en_US",
     type: 'website',
   },
@@ -19,7 +17,6 @@ export const metadata = {
     card: 'summary_large_image',
     title: "Privacy Policy",
     description: "Companies of all sizes use Confident AI to justify why their LLM applications - RAG, Agents, or Chatbots, deserves to be in production.",
-    creator: '@confident_ai',
   },
 };
 

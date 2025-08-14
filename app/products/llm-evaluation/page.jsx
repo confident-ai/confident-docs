@@ -4,8 +4,21 @@ import TextOnlySection from '@/components/Products/TextOnlySection/TextOnlySecti
 import GlobalLayout from '@/app/global-layout'
 
 export const metadata = {
-  title: 'LLM Evaulation',
-  description: 'The DeepEval LLM evaluation platform to test, benchmark, safeguard, and improve LLM application performance, with best-in-class metrics and guardrails.',
+  title: 'LLM Evaluation',
+  description: "Confident AI's LLM evaluation solution provides an end-to-end LLM testing suite to benchmark LLM systems, compare prompts and models, and catch regressions with best-in-class evaluations powered by DeepEval.",
+  openGraph: {
+    title: 'LLM Evaluation',
+    description:
+      "Confident AI's LLM evaluation solution provides an end-to-end LLM testing suite to benchmark LLM systems, compare prompts and models, and catch regressions with best-in-class evaluations powered by DeepEval.",
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LLM Evaluation',
+    description:
+      "Confident AI's LLM evaluation solution provides an end-to-end LLM testing suite to benchmark LLM systems, compare prompts and models, and catch regressions with best-in-class evaluations powered by DeepEval.",
+  },
 };
 export default function Page() {
   return (

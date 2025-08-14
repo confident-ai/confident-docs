@@ -4,6 +4,7 @@ import Button from "@/components/Button/Button";
 import CustomNavbar from "@/components/CustomNavbar/CustomNavbar";
 import Footer from "@/components/Footer/Footer";
 import links from "./links";
+import Link from "next/link";
 export default function notFound() {
   return (
     <>
@@ -12,13 +13,14 @@ export default function notFound() {
         <div className={styles.inner}>
           <h1>404</h1>
           <h2>Page Not found</h2>
+          <Link href="/">
           <Button
-            onClick={() => window.history.back()}
             variant="outlined"
-            label="Go Back"
+            label="Back to Home"
             color="purple"
             bordered
           />
+          \</Link>
         </div>
       </div>
       <Footer variant="dark" links={links} />

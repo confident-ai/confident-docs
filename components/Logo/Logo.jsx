@@ -19,4 +19,4 @@ const Logo = ({ width = 180, height = 150 }) => {
   );
 };
 
-export default Logo;
+export default Logo; 

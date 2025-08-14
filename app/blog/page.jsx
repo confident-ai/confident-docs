@@ -10,8 +10,6 @@ export const metadata = {
     title: "Confident AI Blog - Resources to help teams stay confident in AI",
     description:
       "Join our weekly newsletter to stay confident in the AI systems you build. Our articles include tutorials, guides, and essays to safely build and evaluate LLMs.",
-    url: "https://confident-ai.com",
-    siteName: "Confident AI",
     locale: "en_US",
     type: "website",
   },
@@ -20,7 +18,6 @@ export const metadata = {
     title: "Confident AI Blog - Resources to help teams stay confident in AI",
     description:
       "Join our weekly newsletter to stay confident in the AI systems you build. Our articles include tutorials, guides, and essays to safely build and evaluate LLMs.",
-    creator: "@confident_ai",
   },
 };
 export default async function Page() {

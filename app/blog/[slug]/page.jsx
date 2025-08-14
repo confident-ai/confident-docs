@@ -93,8 +93,7 @@ export async function generateMetadata({ params }) {
     : `https:${imageUrl}`;
   return {
     title: `${blog?.fields?.title || "404 Page not found"} - Confident AI`,
-    description: blog?.fields?.excerpt,
-    metadataBase: "https://confident-ai.com",
+
     openGraph: {
       title: `${blog?.fields?.title} - Confident AI`,
       description: blog?.fields?.excerpt,
@@ -106,8 +105,6 @@ export async function generateMetadata({ params }) {
           alt: blog?.fields?.title,
         },
       ],
-      url: "https://confident-ai.com",
-      siteName: "Confident AI",
       locale: "en_US",
       type: "website",
     },
@@ -116,7 +113,6 @@ export async function generateMetadata({ params }) {
       title: `${blog?.fields?.title} - Confident AI`,
       description: blog?.fields?.excerpt,
       images: [fullImageUrl],
-      creator: "@confident_ai",
     },
   };
 }

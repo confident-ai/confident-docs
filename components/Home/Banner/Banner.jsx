@@ -19,7 +19,6 @@ export default function Banner() {
     if (inView) setHasAnimated(true);
   }, [inView]);
 
-
   return (
     <div className={styles.Banner}>
       <div className={styles.inner}>

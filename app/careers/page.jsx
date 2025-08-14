@@ -12,8 +12,6 @@ export const metadata = {
     title: "Careers",
     description:
       "Build and grow the world's biggest's open-source LLM evaluation product.",
-    url: "https://confident-ai.com",
-    siteName: "Confident AI",
     locale: "en_US",
     type: "website",
   },
@@ -22,7 +20,6 @@ export const metadata = {
     title: "Careers",
     description:
       "Build and grow the world's biggest's open-source LLM evaluation product.",
-    creator: "@confident_ai",
   },
 };
 export default function HomePage() {

@@ -94,6 +94,10 @@
     background-color: $darkPurple-500;
     color: $white;
     border-color: $purple;
+     &:hover {
+      background-color: $white !important;
+      color: $black !important;
+    }
   }
   &.purple200 {
     background-color: $purple;

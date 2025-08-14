@@ -5,7 +5,7 @@ import Logo from "@/components/Logo/Logo";
 import GitHubButton from "@/components/GitHubButton/GitHubButton";
 import SignUpButton from "@/components/SignUpButton";
 import Button from "@/components/Button/Button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +13,8 @@ import Link from "next/link";
 const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
   const [active, setActive] = useState();
   const [activatePopOver, setActivatePopOver] = useState(false);
+  const popoverRef = useRef(null);
+  
   const navLinks = [
     {
       label: "Products",
@@ -37,13 +39,25 @@ const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
     { label: "Careers", href: "/careers" },
   ];
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!activatePopOver) return;
+      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+        setActivatePopOver(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, [activatePopOver]);
 
   if (isDocsPage) {
     return (
       <Navbar
         logo={<Logo />}
         projectLink="https://github.com/confident-ai/deepeval"
-        projectIcon={<GitHubButton />}
+        projectIcon={<GitHubButton asIcon={true} />}
         // chatLink="https://discord.gg/Up3gbNTF"
       >
         <SignUpButton />
@@ -73,9 +87,13 @@ const CustomNavbar = ({ isDocsPage, staticHeader = false }) => {
             {navLinks.map(link =>
               link.children ? (
                 <div
+                  ref={popoverRef}
                   className={styles.navItemWithPopover}
                   key={link.label}
-                  onClick={() => setActivatePopOver(!activatePopOver)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActivatePopOver(!activatePopOver);
+                  }}
                 >
                   <span className={styles.navLink}>{link.label}</span>
                   <div
