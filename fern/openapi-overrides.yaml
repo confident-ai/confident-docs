@@ -25,6 +25,41 @@ paths:
           required: true
           schema:
             type: string
+          description: The id of the metric collection you want to update
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/datasets:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: alias
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the dataset
+  /v1/evaluate:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+  /v1/simulate:
+     post:
+      parameters:
         - in: header
           name: CONFIDENT_API_KEY
           required: true
