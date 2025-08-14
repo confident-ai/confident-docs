@@ -13,6 +13,8 @@ layout:
   content-width: 55rem
   sidebar-width: 300px
 
+css: assets/styles.css
+
 tabs:
   api-reference:
     slug: api-reference
@@ -29,7 +31,7 @@ navigation:
       - section: Get Started
         contents:
           - page: Welcome
-            path: docs/pages/welcome.mdx
+            path: docs/pages/docs.mdx
           - page: How It Works
             path: docs/pages/how-it-works.mdx
           - page: Getting Started
@@ -142,5 +144,5 @@ colors:
 logo:
   dark: docs/assets/logo.png
   light: docs/assets/logo.png
-  height: 20
+  height: 40
   href: https://buildwithfern.com/?utm_campaign=demo&utm_medium=plantstore&utm_source=logo
