@@ -210,7 +210,7 @@ print(res)`,
               </div>
             </div>
 
-            <div className={styles.video}>
+            <div className={styles.video} suppressHydrationWarning>
               {videos.map((videoSrc, index) => (
                 <video
                   key={index}
