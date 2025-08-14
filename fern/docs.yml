@@ -3,102 +3,124 @@ instances:
     # custom-domain: confident-ai.dev # specify your custom domain when you are ready to go live
 
 title: Confident AI
+favicon: docs/assets/logo.png
 
 layout:
+  tabs-placement: header
   searchbar-placement: header
+  header-height: 80px
   page-width: full
+  content-width: 55rem
+  sidebar-width: 300px
 
+tabs:
+  api-reference:
+    slug: api-reference
+    icon: terminal
+    display-name: API Reference
+  documentation:
+    slug: documentation
+    icon: book
+    display-name: Documentation
+  
 navigation:
-  - section: Get Started
-    contents:
-      - page: Welcome
-        path: docs/pages/welcome.mdx
-      - page: How It Works
-        path: docs/pages/how-it-works.mdx
-      - page: Getting Started
-        path: docs/pages/getting-started.mdx
-      - page: Concepts
-        path: docs/pages/concepts.mdx
-      - page: SDKs
-        path: docs/pages/sdks.mdx
-        slug: sdks
-  - section: LLM Evaluation
-    contents:
-      - page: Introduction
-        path: docs/pages/llm-evaluation/introduction.mdx
-      - page: Quickstart
-        path: docs/pages/llm-evaluation/quickstart.mdx
-      - page: End-to-End Evals
-        path: docs/pages/llm-evaluation/end-to-end-evals.mdx
-      - page: Component-Level Evals
-        path: docs/pages/llm-evaluation/component-level-evals.mdx
-      - page: Metrics
-        path: docs/pages/llm-evaluation/metrics.mdx
-      - page: Evaluation Features
-        path: docs/pages/llm-evaluation/evaluation-features.mdx
-  - section: LLM Tracing
-    contents:
-      - page: Introduction
-        path: docs/pages/llm-tracing/introduction.mdx
-      - page: Quickstart
-        path: docs/pages/llm-tracing/quickstart.mdx
-      - page: Online & Offline Evaluations
-        path: docs/pages/llm-tracing/online-offline-evaluations.mdx
-      - page: Tracing Features
-        path: docs/pages/llm-tracing/tracing-features.mdx
-      - page: OpenTelemetry
-        path: docs/pages/llm-tracing/opentelemetry.mdx
-      - page: Integrations
-        path: docs/pages/llm-tracing/integrations.mdx
-      - page: Latency and Cost Tracking
-        path: docs/pages/llm-tracing/latency-cost-tracking.mdx
-      - page: Performance Alerting
-        path: docs/pages/llm-tracing/performance-alerting.mdx
-  - section: Dataset Editor
-    contents:
-      - page: Introduction
-        path: docs/pages/dataset-editor/introduction.mdx
-      - page: Dataset Features
-        path: docs/pages/dataset-editor/dataset-features.mdx
-  - section: Prompt Management
-    contents:
-      - page: Introduction
-        path: docs/pages/prompt-management/introduction.mdx
-      - page: Prompt Versioning
-        path: docs/pages/prompt-management/prompt-versioning.mdx
-      - page: Prompt Usage
-        path: docs/pages/prompt-management/prompt-usage.mdx
-      - page: Prompt Testing
-        path: docs/pages/prompt-management/prompt-testing.mdx
-      - page: Prompt Suggestions
-        path: docs/pages/prompt-management/prompt-suggestions.mdx
-  - section: Human-in-the-Loop
-    contents:
-      - page: Overview
-        path: docs/pages/human-in-the-loop/overview.mdx
-      - page: Collection User Feedback
-        path: docs/pages/human-in-the-loop/collection-user-feedback.mdx
-      - page: Collection Internal Feedback
-        path: docs/pages/human-in-the-loop/collection-internal-feedback.mdx
-  - section: Project Settings
-    contents:
-      - page: Invite Team Members
-        path: docs/pages/project-settings/invite-team-members.mdx
-      - page: Integrations
-        path: docs/pages/project-settings/integrations.mdx
-      - page: Setup LLM Connection
-        path: docs/pages/project-settings/setup-llm-connection.mdx
-  - section: Appendix Resources
-    contents:
-      - page: Why Confident AI
-        path: docs/pages/appendix/why-confident-ai.mdx
-      - page: LLM Use Cases
-        path: docs/pages/appendix/llm-use-cases.mdx
-      - page: Data Handling
-        path: docs/pages/appendix/data-handling.mdx
-      - page: On-Prem Hosting
-        path: docs/pages/appendix/on-prem-hosting.mdx
-  - api: API Reference
+  - tab: documentation
+    layout:
+      - section: Get Started
+        contents:
+          - page: Welcome
+            path: docs/pages/welcome.mdx
+          - page: How It Works
+            path: docs/pages/how-it-works.mdx
+          - page: Getting Started
+            path: docs/pages/getting-started.mdx
+          - page: Concepts
+            path: docs/pages/concepts.mdx
+          - page: SDKs
+            path: docs/pages/sdks.mdx
+            slug: sdks
+      - section: LLM Evaluation
+        contents:
+          - page: Introduction
+            path: docs/pages/llm-evaluation/introduction.mdx
+          - page: Quickstart
+            path: docs/pages/llm-evaluation/quickstart.mdx
+          - page: End-to-End Evals
+            path: docs/pages/llm-evaluation/end-to-end-evals.mdx
+          - page: Component-Level Evals
+            path: docs/pages/llm-evaluation/component-level-evals.mdx
+          - page: Metrics
+            path: docs/pages/llm-evaluation/metrics.mdx
+          - page: Evaluation Features
+            path: docs/pages/llm-evaluation/evaluation-features.mdx
+      - section: LLM Tracing
+        contents:
+          - page: Introduction
+            path: docs/pages/llm-tracing/introduction.mdx
+          - page: Quickstart
+            path: docs/pages/llm-tracing/quickstart.mdx
+          - page: Online & Offline Evaluations
+            path: docs/pages/llm-tracing/online-offline-evaluations.mdx
+          - page: Tracing Features
+            path: docs/pages/llm-tracing/tracing-features.mdx
+          - page: OpenTelemetry
+            path: docs/pages/llm-tracing/opentelemetry.mdx
+          - page: Integrations
+            path: docs/pages/llm-tracing/integrations.mdx
+          - page: Latency and Cost Tracking
+            path: docs/pages/llm-tracing/latency-cost-tracking.mdx
+          - page: Performance Alerting
+            path: docs/pages/llm-tracing/performance-alerting.mdx
+      - section: Dataset Editor
+        contents:
+          - page: Introduction
+            path: docs/pages/dataset-editor/introduction.mdx
+          - page: Dataset Features
+            path: docs/pages/dataset-editor/dataset-features.mdx
+      - section: Prompt Management
+        contents:
+          - page: Introduction
+            path: docs/pages/prompt-management/introduction.mdx
+          - page: Prompt Versioning
+            path: docs/pages/prompt-management/prompt-versioning.mdx
+          - page: Prompt Usage
+            path: docs/pages/prompt-management/prompt-usage.mdx
+          - page: Prompt Testing
+            path: docs/pages/prompt-management/prompt-testing.mdx
+          - page: Prompt Suggestions
+            path: docs/pages/prompt-management/prompt-suggestions.mdx
+      - section: Human-in-the-Loop
+        contents:
+          - page: Overview
+            path: docs/pages/human-in-the-loop/overview.mdx
+          - page: Collection User Feedback
+            path: docs/pages/human-in-the-loop/collection-user-feedback.mdx
+          - page: Collection Internal Feedback
+            path: docs/pages/human-in-the-loop/collection-internal-feedback.mdx
+      - section: Project Settings
+        contents:
+          - page: Invite Team Members
+            path: docs/pages/project-settings/invite-team-members.mdx
+          - page: Integrations
+            path: docs/pages/project-settings/integrations.mdx
+          - page: Setup LLM Connection
+            path: docs/pages/project-settings/setup-llm-connection.mdx
+      - section: Appendix Resources
+        contents:
+          - page: Why Confident AI
+            path: docs/pages/appendix/why-confident-ai.mdx
+          - page: LLM Use Cases
+            path: docs/pages/appendix/llm-use-cases.mdx
+          - page: Data Handling
+            path: docs/pages/appendix/data-handling.mdx
+          - page: On-Prem Hosting
+            path: docs/pages/appendix/on-prem-hosting.mdx
+  - tab: api-reference
+    layout:
+      - api: API Reference
+        flattened: true
+        skip-slug: true
+        paginated: true
 
 navbar-links:
   - type: secondary
@@ -122,5 +144,3 @@ logo:
   light: docs/assets/logo.png
   height: 20
   href: https://buildwithfern.com/?utm_campaign=demo&utm_medium=plantstore&utm_source=logo
-
-favicon: docs/assets/logo.png
