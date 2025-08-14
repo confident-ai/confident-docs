@@ -1,0 +1,33 @@
+paths:
+  /v1/metric-collections:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/metric-collections/{id}:
+    put:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
