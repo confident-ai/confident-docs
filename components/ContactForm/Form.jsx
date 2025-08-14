@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import styles from "./styles.module.scss";
+import BackedBy from "@/components/BackedBy/backedBy";
 
 export default function Form() {
   const [formData, setFormData] = useState({
@@ -151,17 +152,7 @@ export default function Form() {
                 The leading LLM evaluation solution trusted by over{" "}
                 <b>500 customers.</b>
               </p>
-              <div className={styles.backedBy}>
-                <Image
-                  alt="Y Combinator company logo"
-                  src="/icons/brand-icons/ycombinator.svg"
-                  width={28}
-                  height={28}
-                />
-                <div className={styles.BackedByText}>
-                  <span>Backed by</span>Y Combinator
-                </div>
-              </div>
+              <BackedBy />
             </div>
             <div className={styles.Form}>
               <form onSubmit={handleSubmit}>

@@ -6,6 +6,7 @@ import Marquee from "@/components/Home/Marquee/Marquee";
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import Button from "@/components/Button/Button";
+import BackedBy from "@/components/BackedBy/backedBy";
 
 export default function Banner() {
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -22,17 +23,8 @@ export default function Banner() {
   return (
     <div className={styles.Banner}>
       <div className={styles.inner}>
-        <div className={styles.backedBy}>
-          <Image
-            alt="Y Combinator company logo"
-            src="/icons/brand-icons/ycombinator.svg"
-            width={28}
-            height={28}
-          />
-          <div className={styles.BackedByText}>
-            <span>Backed by</span>Y Combinator
-          </div>
-        </div>
+
+        <BackedBy />
 
         <div className={styles.textWrap} ref={ref}>
           <h1

@@ -12,12 +12,20 @@ export default function Memberships() {
           Forever <sup>$</sup>0
         </>
       ),
+      url: "https://app.confident-ai.com/?utm_source=landing",
       subTitle: "As expected",
       description: "For those just curious about Confident AI.",
       Features: {
         highlights: [
           { title: "DeepEval testing reports on Confident AI" },
-          { title: <>Evals in development and <br className={styles.mobileResp}/>CI/CD</> },
+          {
+            title: (
+              <>
+                Evals in development and <br className={styles.mobileResp} />
+                CI/CD
+              </>
+            ),
+          },
           { title: "LLM tracing" },
           { title: "Prompt versioning" },
           { title: "Community and documentation support" },
@@ -39,6 +47,7 @@ export default function Memberships() {
           From <sup>$</sup>19<sup>.99</sup>
         </>
       ),
+      url: "https://app.confident-ai.com/?utm_source=landing",
       subTitle: "Per user per month",
       description: "For teams proving ROI with LLM products.",
       Features: {
@@ -68,13 +77,14 @@ export default function Memberships() {
     },
     {
       type: "Premium",
-      chipColor: "#6d18ff", // Use the "BEST VALUE" color or highlight
+      chipColor: "#6d18ff",
       chipBorder: "#a9afba",
       heading: (
         <>
           From <sup>$</sup>79<sup>.99</sup>
         </>
       ),
+      url: "https://app.confident-ai.com/?utm_source=landing",
       subTitle: "Per user per month",
       description:
         "For teams shipping mission critical LLM products to production.",
@@ -103,8 +113,9 @@ export default function Memberships() {
     },
     {
       type: "Enterprise",
-      chipBorder: "#a9afba", // Custom pricing usually shown as premium
-      heading: <>Custom pricing</>,
+      chipBorder: "#a9afba",
+      heading: "Custom pricing",
+      url: "/book-a-demo",
       subTitle: "Unlimited advanced everything",
       description: "For high-scale, enhanced security, and compliance needs.",
       Features: {
@@ -163,66 +174,36 @@ export default function Memberships() {
                   <h3 className={styles.heading}>{item.heading}</h3>
                   <p className={styles.subTitle}>{item.subTitle}</p>
                   <div className={styles.btnWrap}>
-                    {index !== memberships.length - 1 && (
-                      <Button
-                        to="https://app.confident-ai.com/auth/signup?redirect_url=%2F"
-                        variant="contained"
-                        color="primary"
-                        curved
-                        label={
-                          <>
-                            Try Now For Free
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width={7.5}
-                              height={13}
-                              viewBox="0 0 320 512"
-                            >
-                              <path
-                                fill="#000"
-                                d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256L73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
-                              ></path>
-                            </svg>
-                          </>
-                        }
-                        sizes="xs"
-                        style={{
-                          fontWeight: "500",
-                          lineHeight: "1.866667em",
-                          boxShadow: "unset",
-                        }}
-                      />
-                    )}
-                    {index === memberships.length - 1 && (
-                      <Button
-                        to="https://app.confident-ai.com/auth/signup?redirect_url=%2F"
-                        variant="contained"
-                        color="primary"
-                        curved
-                        label={
-                          <>
-                            Contact Us
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width={7.5}
-                              height={13}
-                              viewBox="0 0 320 512"
-                            >
-                              <path
-                                fill="#000"
-                                d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256L73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
-                              ></path>
-                            </svg>
-                          </>
-                        }
-                        sizes="xs"
-                        style={{
-                          fontWeight: "500",
-                          lineHeight: "1.866667em",
-                          boxShadow: "unset",
-                        }}
-                      />
-                    )}
+                    <Button
+                      to={item.url}
+                      variant="contained"
+                      color="primary"
+                      curved
+                      label={
+                        <>
+                          {item.type === "Enterprise"
+                            ? "Contact Us"
+                            : "Try Now For Free"}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width={7.5}
+                            height={13}
+                            viewBox="0 0 320 512"
+                          >
+                            <path
+                              fill="#000"
+                              d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256L73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"
+                            ></path>
+                          </svg>
+                        </>
+                      }
+                      sizes="xs"
+                      style={{
+                        fontWeight: "500",
+                        lineHeight: "1.867em",
+                        boxShadow: "unset",
+                      }}
+                    />
                   </div>
                   <p className={styles.description}>{item.description}</p>
                 </div>

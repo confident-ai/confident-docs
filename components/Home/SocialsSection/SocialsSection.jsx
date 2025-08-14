@@ -1,7 +1,17 @@
+"use client";
 import Link from "next/link";
 import styles from "./styles.module.scss";
 import Image from "next/image";
+import { getGithubStars } from "@/functions/get-stars";
+import { useEffect, useState } from "react";
+
 export default function SocialsSection() {
+  const [githubStars, setGithubStars] = useState("10k+");
+  
+  useEffect(() => {
+    getGithubStars().then(setGithubStars);
+  }, []);
+
   const cards = [
     {
       icon: '/icons/discord.svg',
@@ -13,7 +23,7 @@ export default function SocialsSection() {
       icon: '/icons/github.svg',
       cardHeading: "GitHub",
       socialLink: "https://github.com/confident-ai/deepeval",
-      cardDescription: "8,000+ stars",
+      cardDescription: `${githubStars} stars`,
     },
     {
       icon: '/icons/documentations.svg',

@@ -5,12 +5,12 @@ const links = {
     { name: "LLM Observability", url: "/products/llm-observability" },
   ],
   blog: [
-    { name: "LLM evaluation metrics", url: "/blog/llm-evaluation-metrics-the-ultimate-llm-evaluation-guide" },
-    { name: "LLM-as-a-judge", url: "/blog/llm-as-a-judge-simply-explained-a-complete-guide-to-run-llm-evals-at-scale" },
-    { name: "LLM chatbot evaluation", url: "/blog/top-llm-chatbot-evaluation-metrics-conversation-testing-techniques" },
+    { name: "LLM evaluation metrics", url: "/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation" },
+    { name: "LLM-as-a-judge", url: "/blog/why-llm-as-a-judge-is-the-best-llm-evaluation-method" },
+    { name: "LLM chatbot evaluation", url: "/blog/llm-chatbot-evaluation-explained-top-chatbot-evaluation-metrics-and-testing-techniques" },
     { name: "LLM testing", url: "/blog/llm-testing-in-2024-top-methods-and-strategies" },
-    { name: "LLM dataset generation", url: "/blog/using-llms-for-synthetic-data-generation-the-definitive-guide" },
-    { name: "LLM red-teaming", url: "/blog/llm-red-teaming-the-complete-step-by-step-guide-to-llm-safety" },
+    { name: "LLM dataset generation", url: "/blog/the-definitive-guide-to-synthetic-data-generation-using-llms" },
+    { name: "LLM red-teaming", url: "/blog/red-teaming-llms-a-step-by-step-guide" },
   ],
   resources: [
     { name: "Blog", url: "/blog" },

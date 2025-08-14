@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import styles from "./GitHubButton.module.scss";
 import { Github, Star } from "lucide-react";
-import { formatStars } from "@/functions/format-stars";
+import { getGithubStars } from "@/functions/get-stars";
 import Link from "next/link";
 
 
@@ -10,16 +10,7 @@ const GitHubButton = ({ darkMode = false, asIcon = false }) => {
   const [githubStars, setGithubStars] = useState("10k+"); // fallback default
 
   useEffect(() => {
-    fetch("https://api.github.com/repos/confident-ai/deepeval")
-      .then(res => res.json())
-      .then(data => {
-        if (data?.stargazers_count) {
-          setGithubStars(data.stargazers_count);
-        }
-      })
-      .catch(err => {
-        console.error("Failed to fetch GitHub stars:", err);
-      });
+    getGithubStars().then(setGithubStars);
   }, []);
   
   const content = (
@@ -31,7 +22,7 @@ const GitHubButton = ({ darkMode = false, asIcon = false }) => {
       >
         <Github size={20} fill={"black"} color="black" />
       </div>
-      <span>{formatStars(githubStars)}</span>
+      <span>{githubStars}</span>
       <Star size={16} fill="#ffdd00" color={darkMode ? "#ffdd00" : "black"} />
     </>
   );

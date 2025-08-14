@@ -96,48 +96,7 @@
             font-weight: 700;
           }
         }
-        .backedBy {
-          display: flex;
-          align-items: center;
-          padding: 8px 20px;
-          border: 1px solid $darkBorder;
-          border-radius: 11px;
-          gap: 16px;
-          background-color: $confident-dark;
-          width: fit-content;
-          @include responsive(xs) {
-            margin: 0 auto;
-            padding: 8px 14px;
-          }
-          .BackedByText {
-            font-family: $inter;
-            span {
-              display: block;
-              color: $lightGray-100;
-              font-size: 12px;
-              margin-bottom: 4px;
-              font-weight: 300;
-              @include responsive(xs) {
-                font-size: 10px;
-              }
-            }
-            color: $white;
-            line-height: 100%;
-            font-size: 15px;
-            font-weight: 500;
-            @include responsive(xs) {
-              font-size: 13px;
-            }
-          }
-
-          img {
-            border-radius: 4px;
-            @include responsive(xs) {
-              width: 24px;
-              height: 24px;
-            }
-          }
-        }
+        
         ul {
           list-style: disc;
           padding-left: 40px;
