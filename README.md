@@ -12,6 +12,23 @@ Generate production-ready TypeScript and Python SDKs in under 5 minutes using Fe
 
 </div>
 
+
+
+## Quick Start
+
+```bash
+
+git clone https://github.com/fern-demo/confident-ai-fern-config.git
+
+cd confident-ai-fern-config
+
+npm install -g fern-api
+
+fern docs dev
+```
+
+Should open up in localhost:3000
+
 ## Customer Showcase
 
 Get inspired by SDKs built with Fern: [Merge](https://github.com/merge-api/merge-node-client) | [Square](https://github.com/square/square-go-sdk) | [ElevenLabs](https://github.com/elevenlabs/elevenlabs-python) | [Flatfile](https://github.com/FlatFilers/flatfile-node) |
