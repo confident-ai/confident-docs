@@ -119,6 +119,10 @@ navigation:
             path: docs/pages/appendix/on-prem-hosting.mdx
   - tab: api-reference
     layout:
+      - section: "API Reference"
+        contents:
+          - page: Introduction
+            path: docs/api-docs/introduction.mdx
       - api: API Reference
         flattened: true
         skip-slug: true
