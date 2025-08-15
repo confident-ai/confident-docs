@@ -13,53 +13,53 @@ Both traces and spans have inputs and outputs, which you can set dynamically wit
 You can set the `input` and `output` of a trace using the `update_current_trace` function:
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {15}
-    from openai import OpenAI
-    from deepeval.tracing import observe, update_current_trace
+<Tabs.Tab>
 
-    client = OpenAI()
-     
-    @observe()
-    def llm_app(query: str):
-        res = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
-        ).choices[0].message.content
-    
-        update_current_trace(input=query, output=res)
-        return res
-     
-    llm_app("Write me a poem.")
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
-    import OpenAI from 'openai';
-    import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
-    
-    const openai = new OpenAI();
-    
-    const llmApp = (query: string): string => {
-      const res = openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      updateCurrentTrace({ input: query, output: res });
-      return res;
-    };
-    
-    const observedLlmApp = observe({
-      fn: llmApp
-    });
-    
-    observedLlmApp("Write me a poem.");
-    ```
-  </Tabs.Tab>
+```python filename="main.py" showLineNumbers {13}
+from openai import OpenAI
+from deepeval.tracing import observe, update_current_trace
+ 
+client = OpenAI()
+ 
+@observe()
+def llm_app(query: str):
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+ 
+    update_current_trace(input=query, output=res)
+    return res
+ 
+llm_app("Write me a poem.")
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```typescript filename="index.ts" showLineNumbers {11}
+import OpenAI from 'openai';
+import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+  
+const openai = new OpenAI();
+  
+const llmApp = async (query: string) => {
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  updateCurrentTrace({ input: query, output: res.choices[0].message.content });
+  return res.choices[0].message.content;
+};
+
+const observedLlmApp = observe({
+  fn: llmApp,
+});
+
+observedLlmApp("Write me a poem.");
+```
+
+</Tabs.Tab>
 </Tabs>
 
 The `input` and `output` can be **ANY TYPE**, and is useful for visualization on the UI (even more so if you're using [conversation threads](/docs/llm-tracing/tracing-features/threads)).
@@ -82,53 +82,53 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
 </Callout>
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {15}
-    from openai import OpenAI
-    from deepeval.tracing import observe, update_current_span
+<Tabs.Tab>
 
-    client = OpenAI()
-     
-    @observe()
-    def llm_app(query: str):
-        res = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
-        ).choices[0].message.content
+```python filename="main.py" showLineNumbers {13}
+from openai import OpenAI
+from deepeval.tracing import observe, update_current_span
+ 
+client = OpenAI()
+ 
+@observe()
+def llm_app(query: str):
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+ 
+    update_current_span(input=query, output=res)
+    return res
+ 
+llm_app("Write me a poem.")
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```typescript filename="index.ts" showLineNumbers {11}
+import OpenAI from 'openai';
+import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+
+const openai = new OpenAI();
     
-        update_current_span(input=query, output=res)
-        return res
-     
-    llm_app("Write me a poem.")
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
-    import OpenAI from 'openai';
-    import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
-    
-    const openai = new OpenAI();
-    
-    const llmApp = (query: string): string => {
-      const res = openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      updateCurrentSpan({ input: query, output: res });
-      return res;
-    };
-    
-    const observedLlmApp = observe({
-      fn: llmApp
-    });
-    
-    observedLlmApp("Write me a poem.");
-    ```
-  </Tabs.Tab>
+const llmApp = async (query: string) => {
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  updateCurrentSpan({ input: query, output: res.choices[0].message.content });
+  return res.choices[0].message.content;
+};
+
+const observedLlmApp = observe({
+  fn: llmApp,
+});
+
+observedLlmApp("Write me a poem.");
+```
+
+</Tabs.Tab>
 </Tabs>
 
 This example is the same as the one for tracing except for the `update_current_trace`, and that's not a mistake. You can set `input` and `output`s the same way as you do for traces, and if a trace's I/O is not set it defaults to the I/O of the root span.

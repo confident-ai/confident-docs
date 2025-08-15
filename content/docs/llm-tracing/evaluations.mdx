@@ -40,12 +40,11 @@ Online evaluations refer to evals that are ran in real-time, as traces are inges
 
 Simply provide the name of the metric collection to tell Confident AI the specify set of referenceless metrics you wish to run in the `@observe` decorator. 
 
-You'll also need to use `update_current_span` with an `LLMTestCase` at runtime to actually trigger an online evaluation on the server-side:
+You'll also need to use `update_current_span` with [test case parameters](/docs/llm-tracing/tracing-features/test-cases) at runtime to actually trigger an online evaluation on the server-side:
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {7, 16}
-from deepeval.test_case import LLMTestCase
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.tracing import observe, update_current_span
 from openai import OpenAI
 
@@ -60,28 +59,26 @@ def llm_app(query: str) -> str:
         ]
     ).choices[0].message.content
 
-    update_current_span(test_case=LLMTestCase(input=query, actual_output=res))
+    update_current_span(input=query, output=res)
     return res
 
 llm_app("Write me a poem.")
 ```
   </Tabs.Tab>
   <Tabs.Tab>
-```typescript filename="index.ts" showLineNumbers copy {5,13}
+```typescript filename="index.ts" showLineNumbers copy {4,11}
 import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
 
-const generate = async (prompt: string): Promise<string> => {
-  updateCurrentSpan({
-    test_case: new LLMTestCase({input=prompt, actualOutput=fake_output})
-  })
+const llmApp = async (prompt: string) => {
+  updateCurrentSpan({input: prompt, output: "LLM response"})
   return "LLM response";
 }
  
-const observedGenerate = observe(
+const observedLlmApp = observe(
   type="llm",
   model: "gpt-4",
   metricCollection="My Collection",
-  fn: generate,
+  fn: llmApp,
 );
 ````
 
@@ -112,8 +109,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tabs.Tab>
-```python filename="main.py" showLineNumbers copy {7, 16}
-from deepeval.test_case import LLMTestCase
+```python filename="main.py" showLineNumbers copy {6, 15}
 from deepeval.tracing import observe, update_current_trace
 from openai import OpenAI
 
@@ -128,20 +124,18 @@ def llm_app(query: str) -> str:
         ]
     ).choices[0].message.content
 
-    update_current_trace(test_case=LLMTestCase(input=query, actual_output=res))
+    update_current_trace(input=query, output=res)
     return res
 
 llm_app("Write me a poem.")
 ```
   </Tabs.Tab>
   <Tabs.Tab>
-```typescript filename="index.ts" showLineNumbers copy {5,13}
+```typescript filename="index.ts" showLineNumbers copy {4,11}
 import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
 
-const generate = async (prompt: string): Promise<string> => {
-  updateCurrentTrace({
-    test_case: new LLMTestCase({input=prompt, actualOutput=fake_output})
-  })
+const llmApp = async (prompt: string) => {
+  updateCurrentTrace({input=prompt, output="LLM response"})
   return "LLM response";
 }
  
@@ -149,7 +143,7 @@ const observedGenerate = observe(
   type="llm",
   model: "gpt-4",
   metricCollection="My Collection",
-  fn: generate,
+  fn: llmApp,
 );
 ```
   </Tabs.Tab>
@@ -208,20 +202,17 @@ You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input
 If you don't set the `input` and/or `output`, Confident AI will have nothing in your thread to evaluate.
 </Callout>
 
-You can also set the retrieval context and tools called (if any) for each assistant/AI turn as part of the `output` setting, which would allow you to see the context of which an LLM generation was invoked in:
+You can also set the retrieval context and tools called (if any) for each assistant/AI turn, which would allow you to see the context of which an LLM generation was invoked in:
 
 ```python filename="main.py" {8}
 from deepeval.test_case import ToolCall
-from deepeval.tracing import TurnContext
 ...
 
 update_current_trace(
   thread_id=your_thread_id, 
   output=res,
-  turnContext=TurnContext(
-    retrieval_context=["..."], # optional list of strings
-    tools_called=[ToolCall(...)] # optional list of tools called
-  )
+  retrieval_context=["..."], # optional list of strings
+  tools_called=[ToolCall(...)] # optional list of tools called
 )
 ```
 
@@ -272,8 +263,8 @@ from deepeval.tracing import observe, update_current_span, update_current_trace
 def outer_function():
     @observe(metric_collection="Collection 2")
     def inner_function():
-        update_current_span(test_case=...)
-        update_current_trace(test_case=...)
+        update_current_span(...)
+        update_current_trace(...)
 ```
 
 **Answer:** This will run `"Collection 1"` for traces, and `"Collection 2"` for spans.
@@ -296,13 +287,9 @@ your_thread_id = "your-thread-id"
 
 @observe(metric_collection="Collection 1")
 def outer_function():
-    update_current_trace(thread_id=your_thread_id, test_case=...)
+    update_current_trace(thread_id=your_thread_id, ...)
 
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
 ```
 
 **Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection. 
-
-<Callout type="warning">
-Note that setting the `test_case` for a trace has no bearing on the `input` and `output`.
-</Callout>

@@ -104,7 +104,7 @@ Confident AI supports online evaluation on your LlamaIndex `FunctionAgent`, `ReA
 3. Run your agent
 
 <Callout type="info">
-The **Workflow** agent wrapper auto-populates the `input`, `actual_output`, and `tools_called` fields of [LLMTestCase](https://deepeval.com/docs/evaluation-test-cases) for each `Agent`. Therefore, you can't include metrics that require other parameters (e.g. `retrieval_context`) when creating your [metric collection](https://deepeval.com/docs/metrics-task-completion).
+The **Workflow** agent wrapper auto-populates the `input`, `actual_output`, and `tools_called` [test case parameters](/docs/llm-tracing/tracing-features/test-cases) for each `Agent`. Therefore, you can't include metrics that require other parameters (e.g. `retrieval_context`) when creating your [metric collection](https://deepeval.com/docs/metrics-task-completion).
 </Callout>
 
 ```python filename="main.py" showLineNumbers {1, 9}

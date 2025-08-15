@@ -12,9 +12,9 @@ This page shows you how to run online evaluations using the Evals API. For a dee
 
 ### Traces
 
-You can run online evaluations on traces during **ingestion or update** by providing a test case argument **AND** valid [metric collection name](/api/metrics/collections):
+You can run online evaluations on traces during **ingestion or update** by providing the input and output of the trace, and a valid [metric collection name](/api/metrics/collections):
 
-```bash filename="POST - /v1/traces" showLineNumbers {12, 13}
+```bash filename="POST - /v1/traces" showLineNumbers {12}
 curl -X POST "https://api.confident-ai.com/v1/traces" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
@@ -27,10 +27,6 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                     "startTime": "2024-01-15T10:30:00Z",
                     "endTime": "2024-01-15T10:30:05Z",
                     "metricCollection": "Your Metric Collection",
-                    "llmTestCase": {
-                        "input": "What is the capital of France?",
-                        "actualOutput": "The capital of France is Paris."
-                    }
                 }
             ]
          }'
@@ -43,16 +39,13 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
 The metric collection you provide must be a **single-turn** one.
 </Callout>
 
-You may notice that the `input` and `output`/`actualOutput` fields are duplicated between the trace and the "llmTestCase". This is intentional. 
-
-Confident AI does not assume that the `input`s and `output`s of a trace are automatically the same as those of a test case. In fact, the `input` and `output` fields in a trace have no impact on evaluations at all.
-
+The `input` and `output` fields are automatically taken to create a test case for the metric collection. Read more about test case parameters [here](/docs/llm-tracing/tracing-features/test-cases).
 
 ### Spans
 
-You can run online evaluations on spans during trace **ingestion or update** by providing a test case argument **AND** valid [metric collection name](/api/metrics/collections), but this time on a span instead:
+You can run online evaluations on spans during trace **ingestion or update** by providing the input and output of the span, and a valid [metric collection name](/api/metrics/collections), but this time on a span instead:
 
-```bash filename="POST - /v1/traces" showLineNumbers {17, 18}
+```bash filename="POST - /v1/traces" showLineNumbers {17}
 curl -X POST "https://api.confident-ai.com/v1/traces" \
      -H "Content-Type: application/json" \
      -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
@@ -69,11 +62,7 @@ curl -X POST "https://api.confident-ai.com/v1/traces" \
                         "output": "The capital of France is Paris.",
                         "startTime": "2024-01-15T10:30:00Z",
                         "endTime": "2024-01-15T10:30:05Z",
-                        "metricCollection": "Your Metric Collection",
-                        "llmTestCase": {
-                            "input": "What is the capital of France?",
-                            "actualOutput": "The capital of France is Paris."
-                        }
+                        "metricCollection": "Your Metric Collection"
                     }
                 ]
             }]
@@ -134,7 +123,7 @@ curl -X POST "https://api.confident-ai.com/v1/evaluate/traces/:uuid" \
 {"success": true}
 ```
 
-Confident AI assumes that your trace will already have all the test case data required during ingestion, hence you cannot supply an updated, or new test case through this endpoint.
+Confident AI assumes that your trace will already have all the test case parameters required during ingestion, hence you cannot supply an updated, or new test case through this endpoint.
 
 ### Spans
 

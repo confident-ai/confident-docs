@@ -13,53 +13,46 @@ You can track user interactions with your LLM app by setting the `user_id` in a 
 You can use the `update_current_trace` function to set the `user_id` within traces:
 
 <Tabs items={['Python', 'JS/TypeScript']}>
-  <Tabs.Tab>
-    ```python filename="main.py" showLineNumbers {15}
-    from deepeval.tracing import observe, update_current_trace
-    from openai import OpenAI
-    
-    client = OpenAI()
-    
-    @observe()
-    def llm_app(query: str):
-        res = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
-        ).choices[0].message.content
+<Tabs.Tab>
+```python filename="main.py" showLineNumbers {13}
+from deepeval.tracing import observe, update_current_trace
+from openai import OpenAI
+ 
+client = OpenAI()
+ 
+@observe()
+def llm_app(query: str):
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+ 
+    update_current_trace(user_id="your-user-id")
+    return res
+ 
+llm_app("Write me a poem.")
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```typescript filename="index.ts" showLineNumbers {10}
+import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+import OpenAI from 'openai';
 
-        update_current_trace(user_id="your-user-id")
-        return res
-    
-    llm_app("Write me a poem.")
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```typescript filename="index.ts" showLineNumbers {13}
-    import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
-    import OpenAI from 'openai';
-    
-    const llmApp = (query: string) => {
-      const openai = new OpenAI();
-      const res = openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "user", content: query }
-        ]
-      }).choices[0].message.content;
-      
-      updateCurrentTrace({ userId: "your-user-id" });
-      return res;
-    };
-    
-    const observedLlmApp = observe({
-      fn: llmApp
-    });
-    
-    observedLlmApp("Write me a poem.");
-    ```
-  </Tabs.Tab>
+const llmApp = async (query: string) => {
+  const openai = new OpenAI();
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }]
+  })      
+  updateCurrentTrace({ userId: "your-user-id" });
+  return res.choices[0].message.content;
+};
+
+const observedLlmApp = observe({fn: llmApp});
+
+observedLlmApp("Write me a poem.");
+```
+</Tabs.Tab>
 </Tabs>
 
 The `user_id` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.

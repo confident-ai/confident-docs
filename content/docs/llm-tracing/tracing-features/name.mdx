@@ -18,7 +18,7 @@ You can name a trace at runtime by providing the `name` paramter in `update_curr
 ```python filename="main.py" showLineNumbers {8}
 from openai import OpenAI 
 from deepeval.tracing import observe, update_current_trace
-
+ 
 client = OpenAI()
  
 @observe()
@@ -48,9 +48,7 @@ const llmApp = async (query: string) => {
     return response.choices[0].message.content;
 };
 
-const observedLlmApp = observe({
-    fn: llmApp
-});
+const observedLlmApp = observe({fn: llmApp});
 
 await observedLlmApp("Write me a poem.");
 ```
@@ -68,7 +66,7 @@ The default name for a span is the name of the function/method you're decorating
 ```python filename="main.py" showLineNumbers {8}
 from openai import OpenAI 
 from deepeval.tracing import observe, update_current_span
-
+ 
 client = OpenAI()
  
 @observe()
@@ -76,7 +74,7 @@ def llm_app(query: str):
     update_current_span(name="Call LLM")
     return client.chat.completions.create(
         model="gpt-4o",
-        messages=[{ role: "user", content: query }]
+        messages=[{"role": "user", "content": query}]
     ).choices[0].message.content
  
 llm_app("Write me a poem.")
@@ -98,10 +96,7 @@ const llmApp = async (query: string) => {
     return response.choices[0].message.content;
 };
 
-const observedLlmApp = observe({
-    fn: llmApp,
-    name: "not_llm_app"
-});
+const observedLlmApp = observe({fn: llmApp});
 
 await observedLlmApp("Write me a poem.");
 ```
