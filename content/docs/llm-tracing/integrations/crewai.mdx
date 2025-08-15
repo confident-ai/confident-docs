@@ -65,11 +65,8 @@ crew = Crew(
 
 # Kickoff your crew
 result = crew.kickoff(
-    "input": "What are the LLMs?"
+    {"input": "What are the LLMs?"}
 )
-print(result)
-
-time.sleep(7) # Wait for traces to be posted to observatory
 ```
 
 Run your agent:
@@ -111,17 +108,18 @@ coder = Agent(
 
 # Kickoff your crew
 result = crew.kickoff(
-    "input": "What are the LLMs?"
+    {"input": "What are the LLMs?"}
 )
-time.sleep(7) # Wait for traces to be posted to observatory
 ```
 
 ### End-to-end evals
 
 Confident AI enables you to perform [end-to-end evaluations](https://deepeval.com/docs/evaluation-end-to-end-llm-evals) on your CrewAI agent using `EvaluationDataset`.
 
-```python filename="main.py" showLineNumbers {4,19,22}
+```python filename="main.py" showLineNumbers {6,21,24}
 from deepeval.integrations.crewai.agent import Agent
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import EvaluationDataset, Golden
 ...
 
 answer_relavancy_metric = AnswerRelevancyMetric()
