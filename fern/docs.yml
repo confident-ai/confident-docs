@@ -2,7 +2,7 @@ instances:
   - url: confident-ai.docs.buildwithfern.com # update this to {yourorg}.docs.buildwithfern.com
     # custom-domain: confident-ai.dev # specify your custom domain when you are ready to go live
 
-title: Confident AI
+title: Confident AI Docs
 favicon: docs/assets/logo.png
 
 layout:
@@ -24,99 +24,123 @@ tabs:
     slug: documentation
     icon: book
     display-name: Documentation
-  
+  integrations:
+    slug: integrations
+    icon: fa-light fa-plug
+    display-name: Integrations
+
 navigation:
   - tab: documentation
     layout:
       - section: Get Started
         contents:
-          - page: Welcome
+          - page: Introduction
             path: docs/pages/docs.mdx
-          - page: How It Works
-            path: docs/pages/how-it-works.mdx
-          - page: Getting Started
+            icon: fa-light fa-info-circle
+          - page: Setup and Installation
             path: docs/pages/getting-started.mdx
-          - page: Concepts
-            path: docs/pages/concepts.mdx
-          - page: SDKs
-            path: docs/pages/sdks.mdx
-            slug: sdks
+            icon: fa-light fa-play
       - section: LLM Evaluation
         contents:
           - page: Introduction
             path: docs/pages/llm-evaluation/introduction.mdx
+            icon: fa-light fa-info-circle
           - page: Quickstart
             path: docs/pages/llm-evaluation/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: End-to-End Evals
             path: docs/pages/llm-evaluation/end-to-end-evals.mdx
+            icon: fa-light fa-route
           - page: Component-Level Evals
             path: docs/pages/llm-evaluation/component-level-evals.mdx
+            icon: fa-light fa-puzzle-piece
           - page: Metrics
             path: docs/pages/llm-evaluation/metrics.mdx
+            icon: fa-light fa-chart-bar
           - page: Evaluation Features
             path: docs/pages/llm-evaluation/evaluation-features.mdx
+            icon: fa-light fa-star
       - section: LLM Tracing
         contents:
           - page: Introduction
             path: docs/pages/llm-tracing/introduction.mdx
+            icon: fa-light fa-info-circle
           - page: Quickstart
             path: docs/pages/llm-tracing/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: Online & Offline Evaluations
             path: docs/pages/llm-tracing/online-offline-evaluations.mdx
+            icon: fa-light fa-toggle-on
           - page: Tracing Features
             path: docs/pages/llm-tracing/tracing-features.mdx
-          - page: OpenTelemetry
-            path: docs/pages/llm-tracing/opentelemetry.mdx
-          - page: Integrations
-            path: docs/pages/llm-tracing/integrations.mdx
+            icon: fa-light fa-layer-group
           - page: Latency and Cost Tracking
             path: docs/pages/llm-tracing/latency-cost-tracking.mdx
+            icon: fa-light fa-stopwatch
           - page: Performance Alerting
             path: docs/pages/llm-tracing/performance-alerting.mdx
+            icon: fa-light fa-bell
       - section: Dataset Editor
         contents:
           - page: Introduction
             path: docs/pages/dataset-editor/introduction.mdx
+            icon: fa-light fa-info-circle
           - page: Dataset Features
             path: docs/pages/dataset-editor/dataset-features.mdx
+            icon: fa-light fa-table
       - section: Prompt Management
         contents:
           - page: Introduction
             path: docs/pages/prompt-management/introduction.mdx
+            icon: fa-light fa-info-circle
           - page: Prompt Versioning
             path: docs/pages/prompt-management/prompt-versioning.mdx
+            icon: fa-light fa-code-branch
           - page: Prompt Usage
             path: docs/pages/prompt-management/prompt-usage.mdx
+            icon: fa-light fa-circle-play
           - page: Prompt Testing
             path: docs/pages/prompt-management/prompt-testing.mdx
+            icon: fa-light fa-flask
           - page: Prompt Suggestions
             path: docs/pages/prompt-management/prompt-suggestions.mdx
+            icon: fa-light fa-wand-magic-sparkles
       - section: Human-in-the-Loop
         contents:
           - page: Overview
             path: docs/pages/human-in-the-loop/overview.mdx
+            icon: fa-light fa-eye
           - page: Collection User Feedback
             path: docs/pages/human-in-the-loop/collection-user-feedback.mdx
+            icon: fa-light fa-comment-dots
           - page: Collection Internal Feedback
             path: docs/pages/human-in-the-loop/collection-internal-feedback.mdx
+            icon: fa-light fa-comments
       - section: Project Settings
         contents:
           - page: Invite Team Members
             path: docs/pages/project-settings/invite-team-members.mdx
+            icon: fa-light fa-user-plus
           - page: Integrations
             path: docs/pages/project-settings/integrations.mdx
+            icon: fa-light fa-puzzle-piece
           - page: Setup LLM Connection
             path: docs/pages/project-settings/setup-llm-connection.mdx
+            icon: fa-light fa-plug
       - section: Appendix Resources
         contents:
           - page: Why Confident AI
             path: docs/pages/appendix/why-confident-ai.mdx
+            icon: fa-light fa-question
           - page: LLM Use Cases
             path: docs/pages/appendix/llm-use-cases.mdx
+            icon: fa-light fa-list-check
           - page: Data Handling
             path: docs/pages/appendix/data-handling.mdx
+            icon: fa-light fa-shield-check
           - page: On-Prem Hosting
             path: docs/pages/appendix/on-prem-hosting.mdx
+            icon: fa-light fa-server
   - tab: api-reference
     layout:
       - section: "API Reference"
@@ -127,6 +151,45 @@ navigation:
         flattened: true
         skip-slug: true
         paginated: true
+  - tab: integrations
+    layout:
+      - page: Integrations
+        path: docs/pages/integrations/integrations.mdx
+        icon: fa-light fa-plug
+      - section: Native Integrations
+        contents:
+          - page: OpenTelemetry
+            path: docs/pages/integrations/opentelemetry.mdx
+            icon: fa-light fa-satellite-dish
+          - page: Python
+            path: docs/pages/integrations/native/python.mdx
+            icon: brands python
+          - page: Typescript
+            path: docs/pages/integrations/native/typescript.mdx
+            icon: fa-light fa-code
+      - section: Third-Party Integrations
+        contents:
+          - page: Crew AI
+            path: docs/pages/integrations/third-party/crew-ai.mdx
+            icon: fa-light fa-user-group
+          - page: LangChain
+            path: docs/pages/integrations/third-party/langchain.mdx
+            icon: fa-light fa-chain
+          - page: LangGraph
+            path: docs/pages/integrations/third-party/langgraph.mdx
+            icon: fa-light fa-code
+          - page: Litellm
+            path: docs/pages/integrations/third-party/litellm.mdx
+            icon: fa-light fa-code
+          - page: OpenAI Agents
+            path: docs/pages/integrations/third-party/openai-agents.mdx
+            icon: fa-light fa-code
+          - page: OpenAI
+            path: docs/pages/integrations/third-party/openai.mdx
+            icon: fa-light fa-code
+          - page: Pydantic AI
+            path: docs/pages/integrations/third-party/pydantic-ai.mdx
+            icon: fa-light fa-code
 
 navbar-links:
   - type: secondary
@@ -138,15 +201,15 @@ navbar-links:
 
 colors:
   accentPrimary:
-    dark: '#0E0D12'
-    light: '#6a00ff'
+    dark: "#001229"
+    light: "#001229"
 
   background:
-    dark: '#0E0D12'
-    light: '#f8f8f8'
+    dark: "#0E0E13"
+    light: "#fdfdfa"
 
 logo:
-  dark: docs/assets/logo.png
-  light: docs/assets/logo.png
-  height: 40
+  dark: docs/assets/docs-logo.svg
+  light: docs/assets/docs-logo.svg
+  height: 32
   href: https://buildwithfern.com/?utm_campaign=demo&utm_medium=plantstore&utm_source=logo

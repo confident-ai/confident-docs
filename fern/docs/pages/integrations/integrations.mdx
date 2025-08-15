@@ -1,0 +1,78 @@
+---
+slug: integrations
+description: Get started with Confident AI for LLM evaluation and observability
+---
+
+Confident AI supports a wide range of integrations to seamlessly fit into your existing workflow. Whether you're using native SDKs or third-party frameworks, we've got you covered.
+
+## Overview
+
+Integrations come in handy for two different workflows:
+
+1. When you wish to trace your LLM app, and
+2. When you wish to run evals in development
+
+All integrations support the former use case. For running evals in development, you'll need to check in each individual integration's documentation pages to know whether they are capable of running end-to-end, component-level, and multi-turn evals.
+
+## Native Integrations
+
+<CardGroup cols={3}>
+  <Card
+    title="OpenTelemetry"
+    icon="satellite-dish"
+    href="/integrations/opentelemetry"
+  >
+    Industry-standard observability framework for comprehensive telemetry data
+    collection.
+  </Card>
+  <Card title="Python" icon="code" href="/integrations/native/python">
+    Native Python SDK for seamless integration with your Python applications.
+  </Card>
+  <Card title="TypeScript" icon="code" href="/integrations/native/typescript">
+    Native TypeScript SDK for modern JavaScript and TypeScript applications.
+  </Card>
+</CardGroup>
+
+## Third-Party Integrations
+
+<CardGroup cols={2}>
+  <Card title="Crew AI" icon="code" href="/integrations/third-party/crew-ai">
+    Multi-agent orchestration framework for collaborative AI workflows.
+  </Card>
+  <Card
+    title="LangChain"
+    icon="code"
+    href="/integrations/third-party/langchain"
+  >
+    Popular framework for developing applications with large language models.
+  </Card>
+  <Card
+    title="LangGraph"
+    icon="code"
+    href="/integrations/third-party/langgraph"
+  >
+    Graph-based approach to building stateful multi-actor applications with
+    LLMs.
+  </Card>
+  <Card title="LiteELM" icon="code" href="/integrations/third-party/litellm">
+    Unified API for calling 100+ LLM APIs using the OpenAI format.
+  </Card>
+  <Card
+    title="OpenAI Agents"
+    icon="code"
+    href="/integrations/third-party/openai-agents"
+  >
+    Integration with OpenAI's agent framework for building intelligent
+    assistants.
+  </Card>
+  <Card title="OpenAI" icon="code" href="/integrations/third-party/openai">
+    Direct integration with OpenAI's GPT models and API.
+  </Card>
+  <Card
+    title="Pydantic AI"
+    icon="code"
+    href="/integrations/third-party/pydantic-ai"
+  >
+    Type-safe agent framework built on Pydantic for Python applications.
+  </Card>
+</CardGroup>
