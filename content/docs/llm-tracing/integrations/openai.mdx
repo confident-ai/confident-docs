@@ -36,7 +36,7 @@ from deepeval.tracing import observe, trace_manager
 
 client = OpenAI()
 
-@observe(type="llm")
+@observe()
 def generate_response(input: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4.1",
@@ -59,7 +59,7 @@ from deepeval.tracing import observe, trace_manager
 
 client = OpenAI()
 
-@observe(type="llm")
+@observe()
 def generate_response(input: str) -> str:
     response = client.responses.create(
         model="gpt-4.1",
@@ -81,7 +81,7 @@ from deepeval.tracing import observe, trace_manager
 
 client = AsyncOpenAI()
 
-@observe(type="llm")
+@observe()
 async def generate_response(input: str) -> str:
     response = await client.chat.completions.create(
         model="gpt-4.1",
@@ -105,7 +105,7 @@ from deepeval.tracing import observe, trace_manager
 
 client = AsyncOpenAI()
 
-@observe(type="llm")
+@observe()
 async def generate_response(input: str) -> str:
     response = await client.responses.create(
         model="gpt-4.1",
@@ -139,7 +139,7 @@ We use [Monkey Patching](https://www.browserstack.com/guide/monkey-patching) und
 ## Using OpenAI in Component-level Evaluations
 
 
-You can also use DeepEval's OpenAI client to run [component-level evaluations](/docs/llm-evaluation/component-level-evals) locally. To do this, replace your existing `OpenAI` client, pass in `metrics`, and invoke your LLM application under the `dataset` generator.
+You can also use DeepEval's OpenAI client to run [component-level evaluations](/docs/llm-evaluation/component-level-evals) locally. To do this, replace your existing `OpenAI` client, pass in `metrics`, and invoke your LLM application under the `EvaluationDataset` iterator.
 
 <Details>
 <Summary>What metrics are supported?</Summary>
@@ -161,18 +161,17 @@ response = client.chat.completions.create(
 <Tabs items={['Chat Completions', 'Responses', 'Async Chat Completions', 'Async Responses']}>
   <Tabs.Tab>
 
-```python showLineNumbers copy {3, 19}
+```python showLineNumbers copy {3, 18}
 import time
 
 from deepeval.openai import OpenAI
 from deepeval.tracing import observe, trace_manager
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.dataset import Golden
-from deepeval.evaluate import dataset
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = OpenAI()
 
-@observe(type="llm")
+@observe()
 def generate_response(input: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4.1",
@@ -184,30 +183,30 @@ def generate_response(input: str) -> str:
     )
     return response
 
-# Create goldens
+# Create dataset
 goldens = [
     Golden(input="What is the weather in Bogotá, Colombia?"),
     Golden(input="What is the weather in Paris, France?"),
 ]
+dataset = EvaluationDataset(goldens=goldens)
 
 # Run component-level evaluation
-for golden in dataset(goldens=goldens):
+for golden in dataset.evals_iterator():
     generate_response(golden.input)
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-```python showLineNumbers copy {3, 17}
+```python showLineNumbers copy {3, 16}
 import time
 
 from deepeval.openai import OpenAI
 from deepeval.tracing import observe, trace_manager
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.dataset import Golden
-from deepeval.evaluate import dataset
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = OpenAI()
 
-@observe(type="llm")
+@observe()
 def generate_response(input: str) -> str:
     response = client.responses.create(
         model="gpt-4.1",
@@ -217,31 +216,31 @@ def generate_response(input: str) -> str:
     )
     return response
 
-# Create goldens
+# Create dataset
 goldens = [
     Golden(input="What is the weather in Bogotá, Colombia?"),
     Golden(input="What is the weather in Paris, France?"),
 ]
+dataset = EvaluationDataset(goldens=goldens)
 
 # Run component-level evaluation
-for golden in dataset(goldens=goldens):
+for golden in dataset.evals_iterator():
     generate_response(golden.input)
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-```python showLineNumbers copy {4, 20}
+```python showLineNumbers copy {4, 19}
 import time
 import asyncio
 
 from deepeval.openai import AsyncOpenAI
 from deepeval.tracing import observe, trace_manager
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.dataset import Golden
-from deepeval.evaluate import dataset, test_run
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = AsyncOpenAI()
 
-@observe(type="llm")
+@observe()
 async def generate_response(input: str) -> str:
     response = await client.chat.completions.create(
         model="gpt-4.1",
@@ -253,32 +252,32 @@ async def generate_response(input: str) -> str:
     )
     return response
 
-# Create goldens
+# Create dataset
 goldens = [
     Golden(input="What is the weather in Bogotá, Colombia?"),
     Golden(input="What is the weather in Paris, France?"),
 ]
+dataset = EvaluationDataset(goldens=goldens)
 
 # Run component-level evaluation
-for golden in dataset(goldens=goldens):
+for golden in dataset.evals_iterator():
     task = asyncio.create_task(generate_response(golden.input))
-    test_run.append(task)
+    dataset.evaluate(task)
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-```python showLineNumbers copy {4, 18}
+```python showLineNumbers copy {4, 17}
 import time
 import asyncio
 
 from deepeval.openai import AsyncOpenAI
 from deepeval.tracing import observe, trace_manager
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.dataset import Golden
-from deepeval.evaluate import dataset, test_run
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = AsyncOpenAI()
 
-@observe(type="llm")
+@observe()
 async def generate_response(input: str) -> str:
     response = await client.responses.create(
         model="gpt-4.1",
@@ -288,11 +287,17 @@ async def generate_response(input: str) -> str:
     )
     return response
 
-for golden in dataset(goldens=goldens):
-    task = asyncio.create_task(generate_response(golden.input))
-    test_run.append(task)
+# Create dataset
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+dataset = EvaluationDataset(goldens=goldens)
 
-asyncio.run(asyncio.gather(*test_run))
+# Run component-level evaluation
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(generate_response(golden.input))
+    dataset.evaluate(task)
 ```
 </Tabs.Tab>
 </Tabs>
@@ -300,23 +305,26 @@ asyncio.run(asyncio.gather(*test_run))
 
 ## End-to-End Evaluations
 
-To run end-to-end evaluations direclty on your OpenAI client, use the `dataset` generator to call OpenAI's `chat.completions.create` or `responses.create` for each golden. 
+To run end-to-end evaluations directly on your OpenAI client, use the `EvaluationDataset` iterator to call OpenAI's `chat.completions.create` or `responses.create` for each golden. 
 
 
 <Tabs items={['Chat Completions', 'Responses', 'Async Chat Completions', 'Async Responses']}>
 <Tabs.Tab value="chat-completions" label="Chat Completions">
 
-```python showLineNumbers {2,18}
-from deepeval.tracing import observe
+```python showLineNumbers {1,21}
 from deepeval.openai import OpenAI
-from deepeval.evaluate import dataset
-
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import Golden
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = OpenAI()
 
-for golden in dataset(alias="Your Dataset Name"):
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
     # run OpenAI client
     client.chat.completions.create(
         model="gpt-4o",
@@ -331,17 +339,20 @@ for golden in dataset(alias="Your Dataset Name"):
 </Tabs.Tab>
 <Tabs.Tab>
 
-```python showLineNumbers {2,16}
-from deepeval.tracing import observe
+```python showLineNumbers {1,19}
 from deepeval.openai import OpenAI
-from deepeval.evaluate import dataset
-
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import Golden
+from deepeval.dataset import EvaluationDataset, Golden
 
 client = OpenAI()
 
-for golden in dataset(alias="Your Dataset Name"):
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
     # run OpenAI client
     client.responses.create(
         model="gpt-4o",
@@ -354,17 +365,21 @@ for golden in dataset(alias="Your Dataset Name"):
 </Tabs.Tab>
 <Tabs.Tab>
 
-```python showLineNumbers {2,19}
-from deepeval.tracing import observe
+```python showLineNumbers {1,23}
 from deepeval.openai import AsyncOpenAI
-from deepeval.evaluate import dataset, test_run
-
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import Golden
+from deepeval.dataset import EvaluationDataset, Golden
+import asyncio
 
 client = AsyncOpenAI()
 
-for golden in dataset(alias="Your Dataset Name"):
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
     # add OpenAI client task
     task = asyncio.create_task(
         client.chat.completions.create(
@@ -376,23 +391,27 @@ for golden in dataset(alias="Your Dataset Name"):
             metrics=[AnswerRelevancyMetric(), BiasMetric()]
         )
     )
-    test_run.append(task)
+    dataset.evaluate(task)
 ```
 
 </Tabs.Tab>
 <Tabs.Tab>
 
-```python showLineNumbers {2,17}
-from deepeval.tracing import observe
+```python showLineNumbers {1,21}
 from deepeval.openai import AsyncOpenAI
-from deepeval.evaluate import dataset, test_run
-
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import Golden
+from deepeval.dataset import EvaluationDataset
+import asyncio
 
 client = AsyncOpenAI()
 
-for golden in dataset(alias="Your Dataset Name"):
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+for golden in dataset.evals_iterator():
     # add OpenAI client task
     task = asyncio.create_task(
         client.responses.create(
@@ -402,7 +421,7 @@ for golden in dataset(alias="Your Dataset Name"):
             metrics=[AnswerRelevancyMetric(), BiasMetric()]
         )
     )
-    test_run.append(task)
+    dataset.evaluate(task)
 ```
 
 </Tabs.Tab>
