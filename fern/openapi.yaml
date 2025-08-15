@@ -39,7 +39,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateMetricCollection'
+              $ref: "#/components/schemas/CreateMetricCollection"
             examples:
               example1:
                 summary: Create a Metric Collection
@@ -47,7 +47,7 @@ paths:
                   name: "Collection Name"
                   multiTurn: false
                   metricSettings:
-                    - metric: 
+                    - metric:
                         value: "Answer Relevancy"
                       threshold: 0.8
       responses:
@@ -89,7 +89,7 @@ paths:
                           name: "New Collection Name"
                           multiTurn: false
                           metricSettings:
-                            - metric: 
+                            - metric:
                                 name: "Faithfulness"
                               activated: true
                               threshold: 0.5
@@ -110,7 +110,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateMetricCollection'
+              $ref: "#/components/schemas/CreateMetricCollection"
             examples:
               example1:
                 summary: Update Metric Collection Example
@@ -118,7 +118,7 @@ paths:
                   name: "New Collection Name"
                   multiTurn: false
                   metricSettings:
-                    - metric: 
+                    - metric:
                         name: "Faithfulness"
                       threshold: 0.5
       responses:
@@ -142,12 +142,12 @@ paths:
       operationId: getDatasetByAlias
       description: Returns a dataset by its alias. The dataset may include either single-turn `goldens` or multi-turn `conversationalGoldens`.
       responses:
-        '200':
+        "200":
           description: Dataset retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetDatasetResponse'
+                $ref: "#/components/schemas/GetDatasetResponse"
               examples:
                 SingleTurn:
                   summary: Single-turn dataset
@@ -177,24 +177,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EvaluateRequest'
+              $ref: "#/components/schemas/EvaluateRequest"
             examples:
-                example1:
-                  summary: Run an LLM Eval
-                  value:
-                    metricCollection: "Collection Name"
-                    testCases: 
-                      input:
-                        value: "How tall is mount everest?"
-                      actualOutput: 
-                        value: "I don't know, pretty tall I guess?"
+              example1:
+                summary: Run an LLM Eval
+                value:
+                  metricCollection: "Collection Name"
+                  testCases:
+                    input:
+                      value: "How tall is mount everest?"
+                    actualOutput:
+                      value: "I don't know, pretty tall I guess?"
       responses:
-        '200':
+        "200":
           description: Successful Evaluation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EvaluateResponse'
+                $ref: "#/components/schemas/EvaluateResponse"
               examples:
                 example1:
                   summary: Run an LLM Eval
@@ -216,7 +216,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SimulateRequest'
+              $ref: "#/components/schemas/SimulateRequest"
             examples:
               example1:
                 golden:
@@ -226,12 +226,12 @@ paths:
                   role: "assistant"
                   content: "Hey, how can I help you today?"
       responses:
-        '200':
+        "200":
           description: Successful Simulation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimulateResponse'
+                $ref: "#/components/schemas/SimulateResponse"
               examples:
                 example1:
                   success: true
@@ -263,7 +263,7 @@ components:
               metric:
                 type: object
                 properties:
-                  name: 
+                  name:
                     type: string
                   criteria:
                     type: string
@@ -271,7 +271,7 @@ components:
                     type: string
                   evaluationParams:
                     type: array
-                  multiTurn: 
+                  multiTurn:
                     type: boolean
                 required:
                   - name
@@ -419,11 +419,11 @@ components:
         goldens:
           type: array
           items:
-            $ref: '#/components/schemas/Golden'
+            $ref: "#/components/schemas/Golden"
         conversationalGoldens:
           type: array
           items:
-            $ref: '#/components/schemas/ConversationalGolden'
+            $ref: "#/components/schemas/ConversationalGolden"
       required:
         - datasetId
 
@@ -472,7 +472,7 @@ components:
         turns:
           type: array
           items:
-            $ref: '#/components/schemas/Turn'
+            $ref: "#/components/schemas/Turn"
         scenario:
           type: string
         expectedOutcome:
@@ -493,8 +493,8 @@ components:
           type: array
           items:
             oneOf:
-              - $ref: '#/components/schemas/LLMTestCase'
-              - $ref: '#/components/schemas/ConversationalTestCase'
+              - $ref: "#/components/schemas/LLMTestCase"
+              - $ref: "#/components/schemas/ConversationalTestCase"
         hyperparameters:
           type: object
           additionalProperties: true
@@ -530,7 +530,7 @@ components:
         existingTurns:
           type: array
           items:
-            $ref: '#/components/schemas/Turn'
+            $ref: "#/components/schemas/Turn"
       required:
         - golden
         - existingTurns
@@ -552,4 +552,4 @@ components:
             turns:
               type: array
               items:
-                $ref: '#/components/schemas/Turn'
+                $ref: "#/components/schemas/Turn"
