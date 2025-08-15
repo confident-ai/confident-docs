@@ -18,7 +18,7 @@ tags:
     externalDocs:
       description: Learn about datasets
       url: https://documentation.confident-ai.com/api/datasets/data-models
-  - name: LLM Evaluation
+  - name: Evaluation
     description: Run your evals using API
     externalDocs:
       description: Learn about evaluations
@@ -41,15 +41,26 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateMetricCollection'
             examples:
-              example1:
-                summary: Create a Metric Collection
+              SingleTurn:
+                summary: Single-Turn Collection
+                value:
+                  name: "Collection Name"
+                  multiTurn: false
+              MultiTurn:
+                summary: Multi-Turn Collection
+                value:
+                  name: "Collection Name"
+                  multiTurn: true
+              MetricSettings:
+                summary: With Metric Settings
                 value:
                   name: "Collection Name"
                   multiTurn: false
                   metricSettings:
-                    - metric: 
-                        value: "Answer Relevancy"
-                      threshold: 0.8
+                    - metric:
+                        name: Answer Relevancy
+                        threshold: 0.8
+
       responses:
         "200":
           description: Metric Collection successfully added
@@ -58,12 +69,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/CreateMetricResponse"
               examples:
-                example1:
-                  summary: Create a Metric Collection
+                SingleTurn:
+                  summary: Single-Turn Collection
                   value:
                     success: true
                     data:
                       id: METRIC-COLLECTION-ID
+                MultiTurn:
+                  summary: Multi-Turn Collection
+                  value:
+                    success: true
+                    data:
+                      id: METRIC-COLLECTION-ID
+                MetricSettings:
+                  summary: With Metric Settings
+                  value:
+                    success: true
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -112,7 +133,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateMetricCollection'
             examples:
-              example1:
+              UpdateCollection:
                 summary: Update Metric Collection Example
                 value:
                   name: "New Collection Name"
@@ -129,7 +150,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UpdateMetricCollectionResponse"
               examples:
-                example1:
+                UpdateCollection:
                   summary: Update Metric Collection Example
                   value:
                     success: true
@@ -152,23 +173,27 @@ paths:
                 SingleTurn:
                   summary: Single-turn dataset
                   value:
-                    datasetId: "DATASET-ID"
-                    goldens:
-                      - input: "How's the weather like in NYC?"
-                        expectedOutput: "No idea"
+                    success: true
+                    data:
+                      datasetId: "DATASET-ID"
+                      goldens:
+                        - input: "How's the weather like in NYC?"
+                          expectedOutput: "No idea"
                 MultiTurn:
                   summary: Multi-turn dataset
                   value:
-                    datasetId: "DATASET-ID"
-                    conversationalGoldens:
-                      - scenario: "Booking a hotel"
-                        expectedOutcome: "Successfully booked"
-                        userDescription: "Finds hotels in NYC"
+                    success: true
+                    data:
+                      datasetId: "DATASET-ID"
+                      conversationalGoldens:
+                        - scenario: "Booking a hotel"
+                          expectedOutcome: "Successfully booked"
+                          userDescription: "Finds hotels in NYC"
   /v1/evaluate:
     post:
       x-fern-server-name: Confident AI
       tags:
-        - LLM Evaluation
+        - Evaluation
       summary: Run LLM Evals
       operationId: evaluateLLM
       description: Run online evals for your test cases using the metrics in `metricCollection`.
@@ -179,15 +204,45 @@ paths:
             schema:
               $ref: '#/components/schemas/EvaluateRequest'
             examples:
-                example1:
-                  summary: Run an LLM Eval
+                SingleTurn:
+                  summary: Single-Turn
                   value:
                     metricCollection: "Collection Name"
                     testCases: 
-                      input:
-                        value: "How tall is mount everest?"
-                      actualOutput: 
-                        value: "I don't know, pretty tall I guess?"
+                      input: "How tall is mount everest?"
+                      actualOutput: "No clue, pretty tall I guess?"
+                MultiTurn:
+                  summary: Multi-Turn
+                  value:
+                    metricCollection: "Multi-Turn Collection Name"
+                    testCases:
+                      - turns:
+                          - role: user
+                            content: "How tall is Mount Everest?"
+                          - role: assistant
+                            content: "Mount Everest is approximately 8,848 meters tall."
+                          - role: user
+                            content: "Wow, that is really high! Has that changed recently?"
+                          - role: assistant
+                            content: "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
+                LogParameters:
+                  summary: Logging Parameters
+                  value:
+                    metricCollection: "Collection Name"
+                    testCases: 
+                      input: "How tall is mount everest?"
+                      actualOutput: "No clue, pretty tall I guess?"
+                    hyperparameters:
+                      model: "gpt-40-mini"
+                      prompt-version: "ai_generation_v2"
+                LogIdentifier:
+                  summary: Logging Identifier
+                  value:
+                    metricCollection: "Collection Name"
+                    testCases: 
+                      input: "How tall is mount everest?"
+                      actualOutput: "No clue, pretty tall I guess?"
+                    identifier: "run-399-102"
       responses:
         '200':
           description: Successful Evaluation
@@ -196,18 +251,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/EvaluateResponse'
               examples:
-                example1:
-                  summary: Run an LLM Eval
+                SingleTurn:
+                  summary: Single-Turn
                   value:
                     success: true
                     data:
                       id: "TEST-RUN-ID"
+                MultiTurn:
+                  summary: Multi-Turn
+                  value:
+                    success: true
+                    data:
+                      id: "MULTITURN-TEST-RUN-ID"
+                LogParameters:
+                  summary: Logging Parameters
+                  value:
+                    success: true
+                    data:
+                      id: "MULTITURN-TEST-RUN-ID"
+                LogIdentifier:
+                  summary: Logging Identifier
+                  value:
+                    success: true
+                    data:
+                      id: "MULTITURN-TEST-RUN-ID"
 
   /v1/simulate:
     post:
       x-fern-server-name: Confident AI
       tags:
-        - LLM Evaluation
+        - Evaluation
       summary: Simulate Conversation
       operationId: simulateConversation
       description: Simulate conversations for your `goldens` along with existing turns.
@@ -219,12 +292,14 @@ paths:
               $ref: '#/components/schemas/SimulateRequest'
             examples:
               example1:
-                golden:
-                  scenario: "A frustrated user asking for a refund."
-                  userDescription: "A white male who is a customer for over 2 years."
-                existingTurns:
-                  role: "assistant"
-                  content: "Hey, how can I help you today?"
+                summary: Basic simulation example
+                value:
+                  golden:
+                    scenario: "A frustrated user asking for a refund."
+                    userDescription: "A white male who is a customer for over 2 years."
+                  existingTurns:
+                    - role: "assistant"
+                      content: "Hey, how can I help you today?"
       responses:
         '200':
           description: Successful Simulation
@@ -234,16 +309,18 @@ paths:
                 $ref: '#/components/schemas/SimulateResponse'
               examples:
                 example1:
-                  success: true
-                  data:
-                    simulationId: "SIMULATION-ID"
-                    completed: false
-                    userResponse: "I'd like my refund please."
-                    turns:
-                      - role: "assistant"
-                        content: "Hey, how can I help you today?"
-                      - role: "user"
-                        content: "I'd like my refund please."
+                  summary: Successful simulated turn
+                  value:
+                    success: true
+                    data:
+                      simulationId: "SIMULATION-ID"
+                      completed: false
+                      userResponse: "I'd like my refund please."
+                      turns:
+                        - role: "assistant"
+                          content: "Hey, how can I help you today?"
+                        - role: "user"
+                          content: "I'd like my refund please."
 
 components:
   schemas:
@@ -254,6 +331,8 @@ components:
         name:
           type: string
           description: Name of the metric collection
+        multiTurn:
+          type: boolean
         metricSettings:
           type: array
           description: List of metric settings for the collection
@@ -279,7 +358,6 @@ components:
                 type: boolean
               threshold:
                 type: number
-                description: Threshold value for the metric
               includeReason:
                 type: boolean
               strictMode:
@@ -289,7 +367,6 @@ components:
       required:
         - name
         - multiTurn
-        - metricSettings
 
     CreateMetricResponse:
       type: object
@@ -305,7 +382,6 @@ components:
             - id
       required:
         - success
-        - data
 
     UpdateMetricCollectionResponse:
       type: object
@@ -344,12 +420,12 @@ components:
                           properties:
                             name:
                               type: string
-                            required:
-                              - name
                         activated:
                           type: boolean
                         threshold:
                           type: number
+                          minimum: 0
+                          maximum: 1
                         includeReason:
                           type: boolean
                         strictMode:
@@ -378,54 +454,117 @@ components:
           type: string
         expectedOutput:
           type: string
+          nullable: true
         actualOutput:
           type: string
+          nullable: true
         context:
           type: array
           items:
             type: string
+          nullable: true
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
         expectedTools:
           type: array
+          items:
+            type: string
+          nullable: true
         toolsCalled:
           type: array
+          items:
+            type: string
+          nullable: true
+        additionalMetadata:
+          type: object
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        sourceFile:
+          type: string
+          nullable: true
         customColumnKeyValues:
           type: object
           additionalProperties:
             type: string
+      required:
+        - input
+
 
     ConversationalGolden:
       type: object
       properties:
         scenario:
           type: string
-        expectedOutcome:
-          type: string
         userDescription:
           type: string
+          nullable: true
+        expectedOutcome:
+          type: string
+          nullable: true
+        turns:
+          type: array
+          items:
+            type: object
+          nullable: true
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+        additionalMetadata:
+          type: object
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        sourceFile:
+          type: string
+          nullable: true
         customColumnKeyValues:
           type: object
           additionalProperties:
             type: string
+      required:
+        - scenario
 
     GetDatasetResponse:
       type: object
       properties:
-        datasetId:
-          type: string
-        goldens:
-          type: array
-          items:
-            $ref: '#/components/schemas/Golden'
-        conversationalGoldens:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationalGolden'
+        success: 
+          type: boolean
+        data:
+          oneOf:
+            - type: object
+              properties:
+                datasetId:
+                  type: string
+                goldens:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Golden'
+              required:
+                - datasetId
+                - goldens
+            - type: object
+              properties:
+                datasetId:
+                  type: string
+                conversationalGoldens:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ConversationalGolden'
+              required:
+                - datasetId
+                - conversationalGoldens
       required:
-        - datasetId
+        - success
+        - data
+
 
     LLMTestCase:
       type: object
