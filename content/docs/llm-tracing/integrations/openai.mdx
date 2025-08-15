@@ -400,7 +400,7 @@ for golden in dataset.evals_iterator():
 ```python showLineNumbers {1,21}
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import EvaluationDataset
+from deepeval.dataset import EvaluationDataset, Golden
 import asyncio
 
 client = AsyncOpenAI()
