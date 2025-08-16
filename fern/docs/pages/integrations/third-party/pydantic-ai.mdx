@@ -2,3 +2,134 @@
 slug: integrations/third-party/pydantic-ai
 description: Get started with Confident AI for LLM evaluation and observability
 ---
+
+[Pydantic AI](https://ai.pydantic.dev/) is a python-native LLM agent framework built on the foundations of pydantic validation. Confident AI allows you to trace and evaluate Pydantic AI agents in just a few lines of code.
+
+## Quickstart
+
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install pydantic-ai sdk -U deepeval
+```
+
+</Step>
+
+<Step title="Configure Pydantic AI">
+
+Instrument Pydantic AI with your Confident AI API key using `instrument_pydantic_ai`.
+
+```python main.py {7}
+import os
+import time
+from pydantic_ai.agent import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+os.environ['OPENAI_API_KEY'] = '<your-openai-api-key>'
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent(
+    'openai:gpt-4o-mini',
+    system_prompt='Be concise, reply with one sentence.',
+)
+
+result = agent.run_sync('Where does "hello world" come from?')
+time.sleep(10)
+```
+
+</Step>
+
+<Step title="Run Pydantic AI">
+
+Invoke your agent by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Trace attributes
+
+To set custom trace attributes in your agent, replace your Pydantic `Agent` with DeepEval’s and provide `trace_attributes` as an argument to `Agent`.
+
+```python main.py {1, 4}
+from deepeval.integrations.pydantic_ai import Agent
+...
+
+agent = Agent(
+    'openai:gpt-4o-mini',
+    system_prompt='Be concise, reply with one sentence.',
+    trace_attributes={
+        "name": "test_name",
+        "tags": ["test_tag_1", "test_tag_2"],
+        "metadata": {"test_metadata_key": "test_metadata_value"},
+        "thread_id": "test_thread_id",
+        "user_id": "test_user_id",
+    }
+)
+```
+
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/tracing-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/tracing-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/tracing-features/thread-id).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/tracing-features/user-id).
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/tracing-features) on Confident AI.
+</Info>
+
+### Online evals
+
+To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your Pydantic AI agent, replace your Pydantic AI `Agent` with DeepEval’s, and provide a metric collection as an argument to `Agent`.
+
+```python main.py {1, 7}
+from deepeval.integrations.pydantic_ai import Agent
+...
+
+agent = Agent(
+    'openai:gpt-4o-mini',
+    system_prompt='Be concise, reply with one sentence.',
+    metric_collection='<your-metric-collection-name>',
+)
+```
+
+<ParamField path="metric_collection" type="str" required={false}>
+  The name of the metric collection. To create a metric collection, visit
+  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
+</ParamField>
+
+<Warning>
+  Your metric collection must only contain metrics that only evaluate the input
+  and actual output of your Pydantic agent.
+</Warning>

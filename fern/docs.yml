@@ -182,6 +182,9 @@ navigation:
           - page: Litellm
             path: docs/pages/integrations/third-party/litellm.mdx
             icon: fa-light fa-train
+          - page: LlamaIndex
+            path: docs/pages/integrations/third-party/llama-index.mdx
+            icon: fa-light fa-horse-head
           - page: OpenAI Agents
             path: docs/pages/integrations/third-party/openai-agents.mdx
             icon: fa-light fa-robot

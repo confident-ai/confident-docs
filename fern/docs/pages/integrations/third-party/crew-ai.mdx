@@ -23,14 +23,14 @@ pip install -U deepeval crewai
 
 Instrument CrewAI with your Confident AI API key using `instrument_crewai`.
 
-```python main.py {6}
+```python main.py {7}
 import os
 import time
 from crewai import Task, Crew, Agent
 from deepeval.integrations.crewai import instrument_crewai
 
-instrument_crewai(api_key="<your-confident-api-key>")
 os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+instrument_crewai(api_key="<your-confident-api-key>")
 
 # Define your agents with roles and goals
 coder = Agent(

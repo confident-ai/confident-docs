@@ -1,0 +1,144 @@
+---
+slug: integrations/third-party/llama-index
+description: Get started with Confident AI for LLM evaluation and observability
+---
+
+[LlamaIndex](https://www.llamaindex.ai/) is an LLM framework that makes it easy to build knowledge agents from complex data. Confident AI allows you to trace and evaluate LlamaIndex agents in just a few lines of code.
+
+## Quickstart
+
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval llama-index
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure LlamaIndex">
+
+Instrument LlamaIndex using `instrument_llama_index` to enable Confident AI's `LlamaIndexSpanHandler`.
+
+```python main.py {5, 8}
+import os
+from llama_index.core.agent.workflow import FunctionAgent
+from llama_index.llms.openai import OpenAI
+import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrument_llama_index
+
+os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+instrument_llama_index(instrument.get_dispatcher())
+
+def multiply(a: float, b: float) -> float:
+    """Useful for multiplying two numbers."""
+    return a * b
+
+agent = FunctionAgent(
+    tools=[multiply],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant that can perform calculations.",
+)
+```
+
+<Note>
+  Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as
+  traces and publish them to Confident AI.
+</Note>
+
+</Step>
+
+<Step title="Run LlamaIndex">
+
+Invoke your agent and run the script to see your traces on Confident AI.
+
+```python main.py
+import asyncio
+import time
+...
+
+async def main():
+    response = await agent.run("What's 7 * 8?")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Online evals
+
+Confident AI supports [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. To enable online evals, replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
+
+```python main.py {1, 9}
+from deepeval.integrations.llama_index import FunctionAgent
+
+...
+
+agent = FunctionAgent(
+    tools=[multiply],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant that can perform calculations.",
+    metric_collection="test_collection_1",
+)
+
+async def main():
+    response = await agent.run("What's 7 * 8?")
+    print(response)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+<ParamField path="metric_collection" type="str" required={false}>
+  The name of the metric collection. To create a metric collection, visit
+  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
+</ParamField>
+
+<Warning>
+  Your metric collection should only contain metrics that don't require
+  `retrieval_context`, `context`, `expected_output`, or `expected_tools` for
+  evaluation.
+</Warning>
