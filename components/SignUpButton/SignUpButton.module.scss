@@ -9,14 +9,32 @@
   border: 1px solid black;
   border-radius: 10px;
   transition: all 0.2s ease-in-out;
-  box-shadow: -5px 5px 0 #6912ff;
+  box-shadow: 5px 5px 0 #6912ff;
   transform: translateY(-5px) translateX(5px);
+  background-color: white;
+  cursor: pointer;
+
+  &.darkMode {
+    color: white;
+    border: 1px solid $purple;
+    transform: translateY(0px) translateX(0px);
+    box-shadow: none;
+    background-color: $darkPurple-500;
+    &:hover {
+      background-color: $white;
+      color: $black;
+      border: 1px solid $white;
+      transform: translateY(-3px) translateX(0px);
+    }
+  }
+   
+  &:hover {
+    box-shadow: 0px 0px 0 $white;
+    transform: translateY(0px) translateX(10px);
+  }
 }
 
-.signUpButton:hover {
-  box-shadow: 0px 0px 0 #ffffff;
-  transform: translateY(0px) translateX(10px);
-}
+
 
 
 @media (max-width: 1080px) {

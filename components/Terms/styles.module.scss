@@ -1,0 +1,188 @@
+@import "@/app/styles/vars";
+.termsContent {
+  h1 {
+    font-size: 34px;
+    margin-bottom: 32px;
+    line-height: 1.222em;
+  }
+  h2 {
+    font-size: 24px;
+    margin-bottom: 24px;
+    line-height: 32px;
+  }
+  h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    line-height: 28px;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: $white;
+    font-weight: 400;
+    a {
+      color: white;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease, border 0.3s ease,;
+      position: relative;
+
+      &:hover{
+        &:after{
+            background-color: $lightGray-600;
+        }
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        display: block;
+        background: white;
+        transform: scaleX(0);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        width: 100%;
+      }
+    }
+    &:hover {
+      a {
+        opacity: 1;
+        pointer-events: auto;
+        &::after {
+          transform: scaleX(1);
+        }
+      }
+    }
+  }
+  .dateModified {
+    font-size: 15px;
+    color: $lightGray-100;
+    margin-bottom: 32px;
+    line-height: 28px;
+    display: block;
+  }
+  p {
+    font-size: 15px;
+    color: $lightGray-100;
+    margin-bottom: 24px;
+    line-height: 28px;
+    &:last-of-type{
+        margin-bottom: 0;
+    }
+    @include responsive(xl) {
+      font-size: 16px;
+    }
+    @include responsive(lg) {
+      font-size: 15px;
+    }
+    @include responsive(sm) {
+      font-size: 14px;
+      line-height: 24px;
+    }
+    b {
+      color: $lightGray-10;
+      font-weight: 700;
+    }
+    a {
+      color: $white;
+      border-bottom: 1px solid $lightGray-600;
+      transition: 0.3s ease border-color;
+      &:hover {
+        border-color: $white;
+      }
+    }
+  }
+  ol,
+  ul {
+    padding-left: 20px;
+    margin: 0px 0 64px;
+    ol,
+    ul {
+      margin-bottom: 0;
+    }
+    li {
+      padding-left: 8px;
+      margin-bottom: 12px;
+      line-height: 28px;
+      color: $translucentGray;
+      @include responsive(xl) {
+        color: $lightGray-100;
+      }
+      p {
+        margin: 0;
+      }
+    }
+  }
+  ol {
+    list-style: decimal;
+  }
+  ul {
+    list-style: disc;
+  }
+  .table {
+    margin-bottom: 32px;
+    .tableRow {
+      display: flex;
+      padding: 10px 20px 10px 0;
+      border-bottom: 1px solid $lightGray-700;
+      gap: 20px;
+      @include responsive(xs) {
+        gap: 10px;
+        padding: 10px 0;
+      }
+      &.cols-2 {
+        .tableCell,
+        .tableHeaderCell {
+          width: calc((100% / 2) - 10px);
+        }
+      }
+      &.cols-3 {
+        .tableCell,
+        .tableHeaderCell {
+          width: calc((100% / 3) - 10px);
+        }
+      }
+      &.cols-6 {
+        .tableCell,
+        .tableHeaderCell {
+          width: calc((100% / 6) - 10px);
+          @include responsive(xs) {
+            width: auto;
+          }
+          p {
+            @include responsive(xs) {
+              font-size: 11px;
+              line-height: normal;
+            }
+          }
+        }
+      }
+
+      .tableHeaderCell,
+      .tableCell {
+        p {
+          margin: 0;
+          @include responsive(xl) {
+            font-size: 16px;
+          }
+          @include responsive(sm) {
+            font-size: 14px;
+          }
+        }
+      }
+      .tableCell {
+        &:first-of-type {
+          p {
+            @include responsive(xs) {
+              font-size: 11px;
+              line-height: normal;
+            }
+          }
+        }
+      }
+    }
+  }
+}

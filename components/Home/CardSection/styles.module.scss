@@ -1,0 +1,177 @@
+@import "@/app/styles/vars";
+
+.CardSection {
+  background-color: $confident-dark;
+  padding: 70px 0;
+  border-bottom: 1px solid $darkBorder-100;
+  @include responsive(sm) {
+    padding: 60px 0;
+  }
+  .inner {
+    display: flex;
+    gap: 50px;
+    margin: 30px auto 20px;
+    width: 75%;
+    max-width: 1800px;
+    @include responsive(xl) {
+      width: 75%;
+    }
+    @include responsive(lg) {
+      width: 80%;
+    }
+
+    @include responsive(md) {
+      width: 90%;
+    }
+    @include responsive(sm) {
+      margin: 10px auto;
+    }
+
+    .textWrap {
+      width: 100%;
+
+      .subHeading {
+        color: $lightGray;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: $inter;
+        margin-bottom: 20px;
+        display: block;
+        text-transform: uppercase;
+        line-height: 2em;
+      }
+
+      .heading {
+        margin-bottom: 80px;
+        font-size: 70px;
+        font-weight: 400;
+        color: $white;
+        line-height: 1.3em;
+        font-family: $inter;
+        max-width: 80%;
+
+        @include responsive(xl) {
+          font-size: 60px;
+        }
+
+        @include responsive(md) {
+          font-size: 55px;
+          margin-bottom: 50px;
+          max-width: 94%;
+        }
+        @include responsive(sm) {
+          font-size: 50px;
+        }
+        @include responsive(xs) {
+          max-width: 100%;
+          font-size: 38px;
+        }
+      }
+
+      .cards {
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.105) 1px,
+          transparent 1px
+        );
+        background-size: 20px 20px;
+        display: flex;
+        border: 1px solid $darkBorder-100;
+        border-radius: 12px;
+        width: 100%;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+
+        &.centeredCards {
+          @include responsive(md) {
+            justify-content: center;
+            .card {
+              &:last-of-type {
+                border-left: none;
+              }
+            }
+          }
+        }
+
+        .card {
+          border-right: 1px solid $lightGray-500;
+          padding: 35px 20px 35px 25px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          &:last-of-type {
+            border: none;
+          }
+
+          @include responsive(md) {
+            width: 100% !important;
+            border-bottom: 1px solid $lightGray-500;
+            border-right: none;
+            padding: 20px 20px 20px 25px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+          }
+
+          @include responsive(xs) {
+            width: 100% !important;
+
+            &:first-child {
+              border-right: none;
+            }
+
+            &:last-of-type {
+              border-left: none;
+            }
+          }
+
+          .cardStep {
+            border: 1px solid $white;
+            color: $white;
+            border-radius: 13px;
+            font-family: $inter;
+            padding: 7px 10px;
+            font-size: 14px;
+            width: fit-content;
+            margin-bottom: 19px;
+
+            span {
+              line-height: 1.75em;
+              display: block;
+            }
+          }
+
+          .cardIcon {
+            margin-bottom: 14px;
+          }
+
+          .cardHeading {
+            font-size: 24px;
+            font-weight: 400;
+            font-family: $inter;
+            color: $white;
+            margin-bottom: 19px;
+            display: flex;
+            gap: 10px;
+            line-height: 1.2em;
+          }
+
+          .cardDescription {
+            color: $lightGray-100;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 2em;
+            font-family: $inter;
+            margin-bottom: 16px;
+          }
+        }
+      }
+
+      .buttonWrap {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+      }
+    }
+  }
+}

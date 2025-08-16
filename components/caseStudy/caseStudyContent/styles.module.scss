@@ -1,0 +1,132 @@
+@import "@/app/styles/vars";
+.caseContent {
+  max-width: 850px;
+  margin: 0 auto;
+  width: 70%;
+  @include responsive(sm){
+    width: 80%;
+  }
+  @include responsive(xs){
+    width: 90%;
+  }
+  p {
+    margin-bottom: 16px;
+    font-family: $inter;
+    line-height: 1.75em;
+    &:last-of-type {
+      margin: 0;
+    }
+    sub {
+      padding-top: 40px;
+
+      display: block;
+      line-height: normal;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 2.15385em;
+      color: $purple;
+      bottom: 0;
+      font-family: $inter;
+      @include responsive(xs){
+        padding-top: 20px;
+      }
+    }
+    a {
+      color: $Blue;
+      text-decoration: underline;
+      transition: 0.3s ease color;
+      &:hover {
+        color: $darkBlue-800;
+      }
+    }
+  }
+  p:has(sub) {
+    margin: 0 !important;
+  }
+  p:has(sup) {
+    margin: 0 !important;
+  }
+  .blockquote {
+    display: flex;
+    blockquote {
+      margin: 16px 0 48px;
+      border-left: 5px solid $violet-600;
+      padding: 0 32px;
+      @include responsive(sm) {
+        padding: 0 0 0 32px;
+      }
+      p {
+        line-height: 2rem;
+        margin-bottom: 32px;
+        font-size: 24px;
+
+        b {
+          color: $darkBlue-900;
+          font-weight: 500;
+        }
+        sup {
+          top: 0;
+          color: inherit;
+          font-size: 17px;
+        }
+      }
+      p:has(sup) {
+        color: $lightGray-800;
+        line-height: 1.166665em !important;
+      }
+    }
+  }
+
+  h2 {
+    font-size: 44px;
+    font-family: $inter;
+    margin-bottom: 16px;
+    line-height: 1.316em;
+    @include responsive(lg) {
+      font-size: 38px;
+    }
+    @include responsive(md) {
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
+    @include responsive(sm) {
+      font-size: 26px;
+    }
+  }
+  ol,
+  ul {
+    padding-left: 40px;
+    margin: 0 0 18px;
+
+    li {
+      padding-left: 8px;
+      margin-bottom: 8px;
+      .codeWrap {
+        display: inline;
+        pre {
+          padding: 0 !important;
+          display: inline;
+          border-radius: 0 !important;
+          width: fit-content;
+          code {
+            padding: 5px;
+            font-size: 14px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            color: black;
+          }
+        }
+      }
+      p {
+        display: inline;
+      }
+    }
+  }
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+}

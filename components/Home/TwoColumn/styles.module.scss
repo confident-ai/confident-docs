@@ -1,0 +1,137 @@
+@import "@/app/styles/vars";
+
+.TwoColumn {
+  padding: 90px 0;
+  border-bottom: 1px solid $darkBorder-100;
+  background: $confident-dark;
+    @include responsive(sm){
+        padding: 70px 0;
+    }
+    @include responsive(xs){
+        padding: 60px 0;
+    }
+  .inner {
+    display: flex;
+    margin: 0 auto;
+    gap: 80px;
+    width: 75%;
+    @include responsive(xl) {
+      width: 75%;
+    }
+    @include responsive(lg) {
+      width: 80%;
+    }
+
+    @include responsive(md) {
+      width: 90%;
+      gap: 42px;
+    }
+
+    @include responsive(md) {
+      flex-direction: column-reverse;
+    }
+
+    .textWrap {
+      .subHeading {
+        color: $lightGray;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 400;
+        font-family: $inter;
+        display: block;
+        line-height: 1.75em;
+      }
+
+      .heading {
+        font-size: 40px;
+        color: $white;
+        font-weight: 400;
+        margin-bottom: 16px;
+        font-family: $inter;
+        line-height: 1.316em;
+        @include responsive(lg) {
+          font-size: 38px;
+        }
+        @include responsive(md) {
+          font-size: 30px;
+          margin-bottom: 12px;
+        }
+        @include responsive(sm) {
+          font-size: 26px;
+        }
+        @include responsive(xs) {
+          font-size: 25px;
+        }
+      }
+
+      .description {
+        color: $lightGray-100;
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 1.8em;
+        max-width: 95%;
+        font-family: $inter;
+
+        @include responsive(md) {
+          font-size: 16px;
+          max-width: 100%;
+          margin-bottom: 16px;
+        }
+        @include responsive(sm) {
+          font-size: 15px;
+        }
+        @include responsive(xs) {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .imageWrap {
+      flex: none;
+      width: 50%;
+      max-width: 55%;
+      box-shadow: 0 2px 20px $black;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      height: fit-content;
+      @include responsive(xl) {
+        width: 55%;
+      }
+      @include responsive(md) {
+        width: 90%;
+        max-width: 90%;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        background-image: linear-gradient(
+          321deg,
+          #6464ff00 72%,
+          #47494c26 73%,
+          #fff0 86%
+        );
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px solid $darkBorder-100;
+        border-radius: 8px;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+}
+
+.row {
+  flex-direction: row;
+}
+
+.rowReverse {
+  flex-direction: row-reverse;
+}

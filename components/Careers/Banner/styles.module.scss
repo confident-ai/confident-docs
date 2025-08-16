@@ -1,0 +1,249 @@
+@import "@/app/styles/vars";
+
+.Banner {
+  width: 100%;
+  padding: 134px 0 0;
+  z-index: 1;
+  background-color: $confident-dark;
+  position: relative;
+  @include responsive(md) {
+    padding: 111px 0 0;
+  }
+  @include responsive(sm) {
+    padding: 60px 0 0;
+  }
+  @include responsive(xs) {
+    padding: 50px 0 0;
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    max-width: 1280px;
+    margin: 0 auto;
+    z-index: 2;
+
+    .textWrap {
+      margin-bottom: 92px;
+      padding: 0 60px;
+      @include responsive(sm) {
+        margin-bottom: 72px;
+      }
+
+      .subHeading {
+        display: block;
+        margin: 0 auto;
+        width: fit-content;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        color: $lightPurple;
+        line-height: 1.75em;
+        font-family: $inter;
+      }
+
+      .bannerHeading {
+        color: $white;
+        text-align: center;
+        width: 100%;
+        font-family: $inter;
+        font-size: 50px;
+        font-weight: 400;
+        line-height: 1.222em;
+        max-width: 80%;
+        margin: 0 auto 20px auto;
+        @include responsive(md) {
+          font-size: 46px;
+          max-width: unset;
+          br {
+            display: none;
+          }
+        }
+        @include responsive(sm) {
+          font-size: 36px;
+        }
+        @include responsive(xs) {
+          font-size: 40px;
+        }
+      }
+
+      .bannerDescription {
+        color: $lightGray;
+        text-align: center;
+        width: 100%;
+        max-width: 50%;
+        font-size: 22px;
+        font-weight: 300;
+        line-height: 1.6em;
+        margin: 0 auto;
+        font-family: $inter;
+        @include responsive(xl) {
+          font-size: 18px;
+          max-width: 500px;
+        }
+        @include responsive(sm) {
+          font-size: 16px;
+        }
+        @include responsive(xs) {
+          font-size: 13px;
+        }
+      }
+    }
+    .bottomWrap {
+      .first,
+      .second {
+        padding: 0 100px;
+        font-family: $inter;
+        margin-bottom: 96px;
+        @include responsive(md) {
+          width: 90%;
+          padding: 0;
+          margin: 0 auto 96px;
+        }
+        .heading {
+          color: $white;
+          font-size: 27px;
+          margin-bottom: 16px;
+          line-height: 1.316em;
+          @include responsive(md) {
+            font-size: 24px;
+          }
+        }
+
+        .paragraph {
+          color: $lightGray;
+          font-size: 16px;
+          line-height: 1.75em;
+          font-weight: 300;
+          display: block;
+          @include responsive(md) {
+            font-size: 14px;
+          }
+          @include responsive(sm) {
+            font-size: 13px;
+          }
+          a {
+            color: $Blue;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+            font-weight: 400;
+            &:hover {
+              color: $darkBlue-900;
+            }
+          }
+        }
+        .values {
+          color: $lightGray;
+          line-height: 1.75em;
+          margin-bottom: 10px;
+          font-weight: 300;
+          @include responsive(md) {
+            font-size: 14px;
+          }
+          @include responsive(sm) {
+            font-size: 13px;
+          }
+        }
+
+        .list {
+          color: $lightGray;
+          list-style: disc;
+          padding-left: 40px;
+          font-weight: 300;
+          font-family: $inter;
+          margin-bottom: 20px;
+
+          li {
+            padding-left: 8px;
+            line-height: 1.866667em;
+            font-size: 15px;
+            margin-bottom: 8px;
+          }
+        }
+      }
+      .first {
+        .heading {
+          @include responsive(sm) {
+            margin-bottom: 12px;
+          }
+        }
+        .paragraph {
+          @include responsive(sm) {
+            line-height: 2.2em;
+          }
+        }
+      }
+    }
+  }
+
+  .meteors {
+    position: absolute;
+    width: 1px;
+    height: 30px;
+    background: $white;
+    border-radius: 50%;
+    opacity: 0.5;
+    top: 200px;
+    left: 100px;
+    z-index: -1;
+    animation-name: meteor;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-duration: 4.5s; // uniform duration
+    pointer-events: none;
+    left: 20%;
+    transform: translateY(400px);
+    border-radius: 100%;
+    @include responsive(sm) {
+      display: none;
+    }
+    &:first-of-type {
+      left: 50%;
+      transform: translateY(768px);
+    }
+
+    &:last-of-type {
+      left: 80%;
+      transform: translateY(700px);
+    }
+  }
+
+  @keyframes meteor {
+    0% {
+      opacity: 0.4;
+    }
+
+    20% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+  }
+
+  .absoluteBackground {
+    position: absolute;
+    background-image: radial-gradient(
+        circle closest-side at 50% 35%,
+        $translucentDarkBlue,
+        $confident-dark
+      ),
+      url(../../../public/img/grid-bg.svg);
+    background-repeat: repeat, repeat;
+    background-size: auto, auto;
+    background-position: 0 0, 50%;
+    background-attachment: scroll, scroll;
+    top: -60px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.5;
+    left: 0;
+    @include responsive(sm) {
+      display: none;
+    }
+  }
+}

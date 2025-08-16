@@ -1,0 +1,165 @@
+@import "@/app/styles/vars";
+
+.feature {
+  display: flex;
+  margin-bottom: 0!important;
+  .inner {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    background-color: $lightYellow-100;
+    padding: 40px 40px 40px 20px;
+    margin: 16px 0 32px;
+    @include responsive(md) {
+      padding: 30px 40px;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    @include responsive(sm) {
+      padding: 30px 20px;
+      height: 736px;
+    }
+    @include responsive(xs) {
+      display: none;
+    }
+    .imageWrap {
+      flex-shrink: 0;
+      width: 23%;
+      display: flex;
+      justify-content: center;
+      margin-right: 10px;
+      margin-bottom: 0;
+      @include responsive(md) {
+        display: none;
+      }
+      img {
+        width: 150px;
+        height: 150px;
+        margin: 0;
+      }
+    }
+    .textWrap {
+      width: 76%;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0;
+
+      @include responsive(md) {
+        width: 100%;
+      }
+
+      .heading {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        @include responsive(md) {
+          margin-bottom: 20px;
+        }
+        @include responsive(sm) {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .logo {
+          display: none;
+          @include responsive(md) {
+            display: block;
+            flex-shrink: 0;
+            aspect-ratio: 1;
+            width: 80px;
+            margin: 0 20px 0 0;
+
+          }
+          @include responsive(sm) {
+            margin-bottom: 20px;
+          }
+        }
+        h2 {
+          font-family: $Lexend;
+          font-size: 1.9rem;
+          line-height: 1.38em;
+          color: $darkBlue-700;
+          font-weight: 600;
+          max-width: 80%;
+          margin-bottom: 0;
+          &.deepTeam{
+            max-width: 100%!important;
+          }
+          @include responsive(xl) {
+            max-width: 90%;
+          }
+          @include responsive(md) {
+            max-width: 100%;
+            font-size: 1.8rem;
+          }
+          @include responsive(sm) {
+            max-width: 76%;
+            font-size: 1.7rem;
+          }
+        }
+      }
+      .description {
+        font-family: $Lexend;
+        font-size: 18px;
+        line-height: 1.8em;
+        color: $darkBlue-700;
+        font-weight: 300;
+        margin-bottom: 34px;
+      }
+      .features {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 22px;
+        margin: 0 0 34px;
+        .featureItem {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          font-family: $inter;
+          font-size: 15px;
+          line-height: 1.4em;
+          color: $darkBlue-700;
+          margin-bottom: 0;
+          font-weight: 700;
+          width: 100%;
+          max-width: calc(50% - 11px);
+          img {
+            min-width: 18px;
+            min-height: 18px;
+            width: 18px;
+            margin: 0;
+          }
+        }
+      }
+      .btnWrap {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 0;
+        @include responsive(sm) {
+          flex-direction: column;
+        }
+        a {
+          @include responsive(sm) {
+            width: 100%;
+            &:first-of-type {
+              display: flex;
+              justify-content: center;
+              width: calc(100% - 20px);
+            }
+          }
+        }
+        .ctaLink {
+          display: flex;
+          color: $darkBlue-400;
+          font-family: $Lexend;
+          gap: 8px;
+          font-size: 17px;
+          align-items: center;
+          text-decoration: underline;
+          font-weight: 500;
+
+        }
+      }
+    }
+  }
+}

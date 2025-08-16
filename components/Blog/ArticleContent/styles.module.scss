@@ -1,0 +1,241 @@
+@import "@/app/styles/vars";
+
+.ArticleContent {
+  font-size: 1.2em;
+  &.deepTeam {
+    a {
+      b {
+        color: $darkBlue-800;
+        transition: 0.3s ease color;
+
+        &:hover {
+          color: $pink-accent;
+        }
+      }
+      &:hover {
+        color: $darkBlue-900;
+      }
+    }
+    blockquote {
+      border-color: $pink-accent;
+    }
+  }
+  &.deepEval {
+    a {
+      b {
+        color: $darkBlue-800;
+        transition: 0.3s ease color;
+
+        &:hover {
+          color: $purple-200;
+        }
+      }
+      &:hover {
+        color: $darkBlue-900;
+      }
+    }
+    blockquote {
+      border-color: $violet-600;
+    }
+  }
+  @include responsive(xs) {
+    order: 2;
+  }
+  @include responsive(sm) {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  p {
+    margin-bottom: 32px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    color: $darkBlue-800;
+    line-height: 1.8em;
+    font-weight: 400;
+    code {
+      padding: 5px;
+      font-size: 14px;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    @include responsive(lg) {
+      line-height: 1.458335em;
+    }
+    @include responsive(md) {
+      font-size: 1.1rem;
+      line-height: 1.59091em;
+    }
+  }
+
+  ol,
+  ul {
+    padding-left: 40px;
+    margin: 32px 0 40px;
+
+    li {
+      padding-left: 8px;
+      margin-bottom: 8px;
+      .codeWrap {
+        display: inline;
+        pre {
+          padding: 0 !important;
+          display: inline;
+          border-radius: 0 !important;
+          width: fit-content;
+          code {
+            padding: 5px;
+            font-size: 14px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            color: black;
+          }
+        }
+      }
+      p {
+        display: inline;
+        font-family: $PTSerif;
+      }
+    }
+  }
+
+  hr {
+    height: fit-content;
+    border: none;
+    display: flex;
+    justify-content: center;
+    &:after {
+      content: "* * * * *";
+      margin: 10px 0 40px;
+      display: flow-root;
+      font-size: 22px;
+      line-height: 28px;
+      font-family: $inter;
+      font-weight: 300;
+      position: static;
+      @include responsive(md) {
+        font-size: 21px;
+      }
+      @include responsive(xs) {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    }
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  a {
+    color: $Blue;
+    text-decoration: underline;
+    transition: 0.3s ease color;
+  }
+
+  h2 {
+    font-size: 32px;
+    color: $darkBlue-800;
+    font-family: $PTSans;
+    margin-bottom: 16px;
+    line-height: 1.316em;
+    font-weight: 700;
+    @include responsive(md) {
+      font-size: 29px;
+    }
+  }
+
+  h4 {
+    font-size: 28px;
+    font-family: $PTSans;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.273em;
+    @include responsive(md) {
+      font-size: 26px;
+    }
+  }
+
+  .codeWrap {
+    display: flex;
+    margin: 0 0 2rem;
+
+    pre {
+      margin: 0.5em 0;
+      padding: 14.4px 19.4px;
+      border-radius: 10px;
+      line-height: 100%;
+      overflow-x: auto;
+      font-size: 0.75em;
+      width: 100%;
+      @include responsive(sm) {
+        padding: 13.6px 18.6px;
+        margin: 6px 0;
+      }
+      @include responsive(xs) {
+        padding: 12.24px 17.24px;
+      }
+
+      code {
+        font-size: 14px;
+      }
+    }
+  }
+
+  div {
+    margin-bottom: 24px;
+    img {
+      margin: 0 auto;
+      height: auto;
+    }
+  }
+
+  sub {
+    font-size: 13px;
+    font-family: $PTSerif;
+    line-height: 2.659em;
+    margin-top: 4px;
+    display: block;
+  }
+
+  div:has(sub) {
+    text-align: center;
+  }
+
+  blockquote {
+    margin: 40px 0;
+    border-left: 4px solid $violet-600;
+    padding: 4px 0 4px 20px;
+    p {
+      line-height: 1.636em;
+      font-family: $PTSerif;
+      margin: 0;
+      font-size: 1.2rem;
+      @include responsive(md) {
+        font-size: 1.2rem;
+      }
+      @include responsive(sm) {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  hr + p {
+    margin-bottom: 0;
+    font-size: 19px;
+    font-family: $PTSerif;
+    line-height: 1.473682em;
+
+    @include responsive(md) {
+      margin-bottom: 20px;
+    }
+    @include responsive(xs) {
+      font-size: 16px;
+      margin-bottom: 40px;
+      line-height: 1.75em;
+    }
+  }
+}

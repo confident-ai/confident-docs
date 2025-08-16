@@ -1,0 +1,253 @@
+@import "./styles/colors.scss";
+
+.all {
+  background-color: $confident-dark;
+  padding-top: 64px;
+  &.staticHeader {
+    padding-top: 0;
+  }
+}
+
+
+/* Loader overlay animation */
+@keyframes fadeOutOverlay {
+  from {
+    opacity: 1;
+    pointer-events: all;
+  }
+  to {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+.loaderOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: $confident-dark;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &.loaded {
+    animation: fadeOutOverlay 1s forwards;
+  }
+}
+
+// Global Error Styling System
+.error {
+  // Error state for form inputs
+  &.input {
+    border-color: $pink-accent !important;
+    box-shadow: 0 0 0 2px rgba(255, 0, 88, 0.2) !important;
+    
+    &:focus {
+      border-color: $pink-accent !important;
+      box-shadow: 0 0 0 2px rgba(255, 0, 88, 0.3) !important;
+    }
+  }
+  
+  // Error state for buttons
+  &.button {
+    background-color: $pink-accent !important;
+    color: $white !important;
+    border-color: $pink-accent !important;
+    
+    &:hover {
+      background-color: darken($pink-accent, 10%) !important;
+    }
+  }
+  
+  // Error state for text
+  &.text {
+    color: $pink-accent !important;
+  }
+  
+  // Error state for backgrounds
+  &.background {
+    background-color: rgba(255, 0, 88, 0.1) !important;
+  }
+}
+
+// Error message styling
+.errorMessage {
+  color: $pink-accent;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  &::before {
+    content: "⚠";
+    font-size: 14px;
+  }
+  
+  // Variants
+  &.small {
+    font-size: 10px;
+  }
+  
+  &.large {
+    font-size: 14px;
+  }
+  
+  &.withIcon {
+    &::before {
+      content: "⚠";
+      font-size: 16px;
+    }
+  }
+}
+
+// Error alert/notification styling
+.errorAlert {
+  background-color: rgba(255, 0, 88, 0.1);
+  border: 1px solid $pink-accent;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .errorIcon {
+    color: $pink-accent;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  
+  .errorContent {
+    flex: 1;
+    
+    .errorTitle {
+      font-weight: 600;
+      color: $pink-accent;
+      margin-bottom: 2px;
+    }
+    
+    .errorDescription {
+      color: $lightGray-100;
+      font-size: 14px;
+    }
+  }
+  
+  // Variants
+  &.compact {
+    padding: 8px 12px;
+    
+    .errorIcon {
+      font-size: 14px;
+    }
+  }
+  
+  &.dismissible {
+    position: relative;
+    padding-right: 40px;
+    
+    .dismissButton {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: $lightGray-100;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $white;
+      }
+    }
+  }
+}
+
+// Error loading states
+.errorLoading {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 0, 88, 0.2),
+      transparent
+    );
+    animation: errorShimmer 1.5s infinite;
+  }
+}
+
+@keyframes errorShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// Error validation states
+.validationError {
+  border-color: $pink-accent;
+  animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+// Success state for comparison
+.success {
+  &.input {
+    border-color: $emerald-500 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+  }
+  
+  &.text {
+    color: $emerald-500 !important;
+  }
+  
+  &.background {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+  }
+}
+
+.successMessage {
+  color: $emerald-500;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  &::before {
+    content: "✓";
+    font-size: 14px;
+  }
+}

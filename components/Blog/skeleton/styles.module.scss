@@ -1,0 +1,18 @@
+@import "@/app/styles/vars";
+
+@keyframes skeleton-breathing {
+  0% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.skeleton {
+  background-color: $darkBorder;
+  animation: skeleton-breathing 1.5s ease-in-out infinite;
+    }

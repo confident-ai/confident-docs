@@ -1,0 +1,51 @@
+@import "@/app/styles/vars.scss";
+
+.backedBy {
+    display: flex;
+    align-items: center;
+    padding: 9px 20px;
+    border: 1px solid $darkBorder;
+    border-radius: 11px;
+    gap: 16px;
+    margin-top: 36px;
+    background-color: $confident-dark;
+    margin-bottom: 20px;
+    width: fit-content;
+    @include responsive(md) {
+      margin-top: 0;
+    }
+    @include responsive(xs) {
+      padding: 9px 13px;
+    }
+
+    .BackedByText {
+      font-family: $inter;
+
+      span {
+        display: block;
+        color: $lightGray-100;
+        font-size: 12px;
+        margin-bottom: 2px;
+        font-weight: 500;
+        @include responsive(xs) {
+          font-size: 10px;
+        }
+      }
+
+      color: $white;
+      line-height: 100%;
+      font-size: 15px;
+      font-weight: 600;
+      @include responsive(xs) {
+        font-size: 13px;
+      }
+    }
+
+    img {
+      border-radius: 4px;
+      @include responsive(xs) {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }

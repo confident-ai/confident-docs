@@ -1,0 +1,88 @@
+@import "@/app/styles/vars";
+.ctaWrap {
+  min-height: 100%;
+  max-width: 205px;
+  width: 100%;
+  position: absolute;
+  left: -255px;
+  top: 0;
+  @include responsive(xl) {
+    left: -230px;
+    max-width: 204px;
+  }
+  @include responsive(lg) {
+    left: -224px;
+    max-width: 200px;
+  }
+  @media (max-width: 1200px) {
+    display: none;
+  }
+  .cta {
+    position: sticky;
+    top: 24px;
+    left: 0;
+    padding: 8px 20px;
+    border: 3px solid $black;
+    border-radius: 10px;
+    min-height: 233px;
+    @include responsive(xl) {
+      min-height: 234px;
+    }
+    @include responsive(lg) {
+      min-height: 232px;
+    }
+    .subHeading {
+      font-size: 16px;
+      font-family: $PTSans;
+    }
+    .headingImg {
+      margin: 20px 0 8px;
+      img {
+        width: 100%;
+      }
+    }
+    .description {
+      line-height: 1.3em;
+      font-family: $PTSans;
+      font-size: 16px;
+    }
+    .githubBtn {
+      display: flex;
+      gap: 4px;
+      margin-top: 15px;
+      padding: 9px 0;
+      display: flex;
+      justify-content: center;
+      line-height: 1.75em;
+      border: 4px solid $black;
+      color: $white;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      font-family: $inter;
+    }
+  }
+
+  &.deepEval,
+  &.DeepEval {
+    .cta {
+      box-shadow: -7px 8px 0 1px $purple;
+
+      .githubBtn {
+        background-color: $purple;
+      }
+    }
+  }
+  &.deepTeam,
+  &.DeepTeam {
+    .cta {
+      box-shadow: -7px 8px 0 1px $pink-accent;
+      .description {
+        font-size: 15px;
+      }
+      .githubBtn {
+        background-color: $pink-accent;
+      }
+    }
+  }
+}

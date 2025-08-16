@@ -1,9 +1,9 @@
 import { useMDXComponents as getThemeComponents } from 'nextra-theme-docs' // nextra-theme-blog or your custom theme
-import ComparisonTable from './components/ComparisonTable'
-import VideoDisplayer from './components/VideoDisplayer'
-import ImageDisplayer from './components/ImageDisplayer'
+import ComparisonTable from './components/mdxComponents/ComparisonTable'
+import VideoDisplayer from './components/mdxComponents/VideoDisplayer'
+import ImageDisplayer from './components/mdxComponents/ImageDisplayer'
 import SignUpButton from './components/SignUpButton'
-import NavIconTabItem from './components/NavIconTabItem'
+import NavIconTabItem from './components/mdxComponents/NavIconTabItem'
  
 // Get the default MDX components
 const themeComponents = getThemeComponents()

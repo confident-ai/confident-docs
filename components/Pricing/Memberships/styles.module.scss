@@ -1,0 +1,288 @@
+@import "../../../app/styles/vars";
+
+.memberships {
+  width: 100%;
+  padding: 78px 0 180px;
+  margin-bottom: 20px;
+
+  z-index: 1;
+  background-color: $confident-dark;
+  position: relative;
+  @include responsive(md) {
+    padding: 55px 0 100px;
+    margin-bottom: 0;
+  }
+  @include responsive(sm) {
+    padding: 0px 0 100px;
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1342px;
+    margin: 0 auto;
+    gap: 16px;
+    @include responsive(lg) {
+      max-width: 1280px;
+    }
+    .textWrap {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin-bottom: 60px;
+      @include responsive(sm) {
+        margin-bottom: 40px;
+        padding: 0 60px;
+      }
+      h1 {
+        font-size: 64px;
+        font-family: $inter;
+        margin-bottom: 20px;
+        color: $white;
+        line-height: 1.222em;
+        font-weight: 500;
+        @include responsive(xs) {
+          font-size: 40px;
+          margin-bottom: 12px;
+        }
+      }
+
+      p {
+        font-size: 22px;
+        font-family: $inter;
+        color: $lightGray;
+        font-weight: 300;
+        max-width: 45%;
+        text-align: center;
+        margin-bottom: 16px;
+        line-height: 1.6em;
+        @include responsive(xl) {
+          font-size: 18px;
+          max-width: 500px;
+        }
+        @include responsive(sm) {
+          font-size: 16px;
+          max-width: 500px;
+        }
+        @include responsive(xs) {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .membershipsWrap {
+      .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        @include responsive(md) {
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+        .card {
+          background-color: $darkBlue-900;
+          position: relative;
+          border: 0.5px solid $darkBorder;
+          padding: 40px;
+          min-height: 788px;
+          @include responsive(lg) {
+            &:last-of-type {
+              .type {
+                border-color: $darkBorder !important;
+              }
+            }
+          }
+          @include responsive(md) {
+            width: 100% !important;
+            max-width: 403px;
+          }
+          @include responsive(xs) {
+            max-width: unset;
+            width: 90% !important;
+            margin: 0 auto;
+          }
+          .bestValueBadge {
+            position: absolute;
+            transform: rotate(35deg);
+            font-size: 18px;
+            background-color: $lightYellow-200;
+            border: 3px solid $purple-100;
+            padding: 6px 12px;
+            top: 10px;
+            right: -40px;
+            transform: rotate(31deg);
+            z-index: 1;
+            font-family: $Ubuntu;
+            font-weight: 400;
+            text-transform: uppercase;
+            line-height: 1.555556em;
+            @include responsive(xl) {
+              font-size: 17px;
+            }
+            @include responsive(xs) {
+              font-size: 11px;
+              padding: 10px;
+              right: -14px;
+            }
+          }
+          .type {
+            border: 1px solid $white;
+            padding: 5px 12px;
+            color: $white;
+            line-height: 100%;
+            font-size: 15px;
+            border-radius: 48px;
+            display: block;
+            font-weight: 300;
+            font-family: $Lato;
+            width: fit-content;
+            margin-bottom: 30px;
+
+            @include responsive(lg) {
+              font-size: 14px;
+              border-color: $darkBorder;
+              margin-bottom: 20px;
+            }
+          }
+          .info {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid $darkBorder;
+            min-height: 222px;
+            border-radius: 1px;
+            @include responsive(xs) {
+              min-height: 233px;
+            }
+            .heading {
+              font-size: 30px;
+              color: $white;
+              font-family: "Palatino Linotype";
+              line-height: 1.273em;
+              @include responsive(lg) {
+                font-size: 28px;
+              }
+              @include responsive(xs) {
+                font-size: 25px;
+              }
+              sup {
+                &:first-child {
+                  font-style: italic;
+                  margin-right: 5px;
+                  line-height: 100%;
+                  font-size: 75%;
+                }
+              }
+            }
+
+            .subTitle {
+              color: $lightGray-100;
+              font-size: 14px;
+              font-family: $inter;
+              font-weight: 300;
+              line-height: 2em;
+            }
+            .btnWrap {
+              margin: 24px 0 20px;
+              @include responsive(lg) {
+                margin: 24px 0;
+              }
+              @include responsive(xs) {
+                margin: 24px 0 24px;
+              }
+            }
+
+            .description {
+              font-size: 14px;
+              color: $lightGray-100;
+              font-weight: 300;
+              font-family: $inter;
+              line-height: 2em;
+            }
+          }
+
+          .featureSection {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            .container:last-of-type {
+              margin-bottom: 40px;
+              @include responsive(lg) {
+                margin-bottom: 0;
+              }
+            }
+            h4 {
+              font-size: 16px;
+              color: $white;
+              font-weight: 700;
+              font-family: $inter;
+              margin-bottom: 10px;
+            }
+
+            span {
+              color: $lightGray;
+              margin-bottom: 0;
+              font-size: 14px;
+              font-family: $inter;
+              display: flex;
+              gap: 8px;
+              line-height: 2em;
+              margin-bottom: 8px;
+              font-weight: 300;
+              @include responsive(md) {
+                gap: 10px;
+                br {
+                  display: none;
+                }
+              }
+
+              svg {
+                min-width: 20px;
+                margin-top: 5px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .absoluteBackground {
+    position: absolute;
+    background-image: radial-gradient(
+        circle closest-side at 50% 50%,
+        $translucentDarkBlue 75%,
+        $confident-dark
+      ),
+      url(../../../public/img/grid-bg.svg);
+    background-repeat: repeat, repeat;
+    background-size: auto, auto;
+    background-position: 0 0, 50%;
+    background-attachment: scroll, scroll;
+    top: -100px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.5;
+    left: 0;
+    @include responsive(xl) {
+      top: -120px;
+    }
+    @include responsive(lg) {
+      top: -136px;
+    }
+    @include responsive(md) {
+      top: -10.5%;
+      background-size: auto, 81px, 81px;
+    }
+    @include responsive(sm) {
+      display: none;
+    }
+  }
+}
+.mobileResp {
+  display: none;
+  @include responsive(lg) {
+    display: block;
+  }
+}

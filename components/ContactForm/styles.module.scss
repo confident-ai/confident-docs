@@ -1,0 +1,320 @@
+@import "@/app/styles/vars";
+.contactForm {
+  padding: 84px 0 60px;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.105) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+  @include responsive(md) {
+    padding: 44px 0 60px;
+  }
+  @include responsive(sm) {
+    padding-bottom: 40px;
+  }
+  .inner {
+    max-width: $container_md;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+    @include responsive(xl) {
+      margin-bottom: 40px;
+    }
+    @include responsive(md) {
+      padding: 0 24px;
+    }
+    @include responsive(xs) {
+      padding: 0 20px;
+    }
+
+    .formTextWrap {
+      display: flex;
+      gap: 80px;
+      width: 95%;
+      margin: 0 auto;
+      @include responsive(md) {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .textWrap {
+        width: 100%;
+        max-width: calc(55% - 40px);
+        @include responsive(md) {
+          max-width: 100%;
+        }
+
+        .heading {
+          color: $white;
+          font-size: 68px;
+          font-weight: 400;
+          font-family: $inter;
+          line-height: 1.231em;
+          margin-bottom: 40px;
+          @include responsive(xl) {
+            font-size: 66px;
+          }
+          @include responsive(lg) {
+            font-size: 70px;
+          }
+          @include responsive(sm) {
+            font-size: 44px;
+            margin-bottom: 30px;
+          }
+          @include responsive(xs) {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 500;
+          }
+        }
+        .paragraph {
+          font-size: 18px;
+          margin: 20px 0;
+          font-weight: 300;
+          font-family: $PTSans;
+          color: $lightGray;
+          line-height: 1.555556em;
+          @include responsive(xl) {
+            font-size: 16px;
+            line-height: 1.75em;
+          }
+          @include responsive(md) {
+            font-size: 13px;
+            margin: 0 0 10px;
+            line-height: 2.15385em;
+            &:last-of-type {
+              margin-bottom: 20px;
+            }
+          }
+          @include responsive(xs) {
+            line-height: 1.7em;
+            margin-bottom: 20px;
+          }
+          &:last-of-type {
+            color: $lightGray-100;
+          }
+          b {
+            color: $white;
+            font-weight: 700;
+          }
+        }
+        
+        ul {
+          list-style: disc;
+          padding-left: 40px;
+          margin-bottom: 20px;
+          font-family: $PTSans;
+          @include responsive(xs) {
+            padding-left: 20px;
+          }
+
+          li {
+            font-size: 16px;
+            font-weight: 300;
+            padding-left: 8px;
+            margin-bottom: 8px;
+            line-height: 1.75em;
+            color: $lightGray-100;
+            @include responsive(xs) {
+              font-size: 13px;
+              line-height: 1.7em;
+            }
+            b {
+              color: $white;
+              font-weight: 700;
+            }
+          }
+          li {
+            font-size: 16px;
+            font-weight: 300;
+            padding-left: 8px;
+            margin-bottom: 8px;
+            line-height: 1.75em;
+            color: $lightGray-100;
+            @include responsive(xs) {
+              font-size: 13px;
+              &:last-of-type {
+                margin-bottom: none;
+              }
+            }
+            b {
+              color: $white;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+      .Form {
+        width: 100%;
+        max-width: calc(45% - 40px);
+        form {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0 20px;
+        }
+        @include responsive(md) {
+          max-width: 100%;
+        }
+        .input {
+          margin-top: 24px;
+          display: flex;
+          flex-direction: column;
+          color: white;
+          width: 100%;
+          font-family: $PTSans;
+          &.wrapInput {
+            width: calc(50% - 10px);
+          }
+          label {
+            margin-bottom: 4px;
+            line-height: 1.75em;
+          }
+          input,
+          select {
+            padding: 8px 12px;
+            background-color: $darkGray;
+            border-radius: 8px;
+            border: 1px solid $darkBorder;
+            line-height: 1.42857;
+            font-size: 14px;
+            color: $lightGray;
+            height: 38px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            
+            &:focus {
+              outline: none;
+              border-color: $purple-200;
+              box-shadow: 0 0 0 2px rgba(109, 11, 255, 0.2);
+            }
+            &.error{
+              border-color: $pink-accent;
+            }
+          }
+          input {
+            font-family: $PTSans;
+          }
+          select {
+            font-family: $inter;
+            font-weight: 300;
+          }
+          input::placeholder {
+            color: #999;
+            font-size: 0.9rem;
+            opacity: 1; /* prevents it from being too light */
+          }
+          
+          // Error styling
+          &.error {
+            input,
+            select {
+              border-color: $pink-accent;
+              box-shadow: 0 0 0 2px rgba(255, 0, 88, 0.2);
+              
+              &:focus {
+                border-color: $pink-accent;
+                box-shadow: 0 0 0 2px rgba(255, 0, 88, 0.3);
+              }
+            }
+          }
+        }
+        
+        // Error message styling
+        .errorMessage {
+          color: $pink-accent;
+          font-size: 12px;
+          font-weight: 400;
+          margin-top: 4px;
+          font-family: $PTSans;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          
+          &::before {
+            content: "⚠";
+            font-size: 14px;
+          }
+        }
+        .privacyPolicy {
+          margin: 30px 0 20px;
+          @include responsive(sm) {
+            margin: 30px 0;
+          }
+          p {
+            font-family: $PTSans;
+            font-size: 12px;
+            color: $lightGray-10;
+            line-height: 1.7em;
+            font-weight: 300;
+            a {
+              color: $purple-200;
+              text-decoration: underline;
+              transition: color 0.3s ease;
+              &:hover {
+                color: $white;
+              }
+            }
+          }
+        }
+        .btnWrap {
+          padding: 2px;
+          border: 1.5px solid $white;
+          border-radius: 50px;
+          width: 100%;
+
+          @include responsive(lg) {
+            padding: 3px;
+          }
+          .submitBtn {
+            padding: 15px 20px;
+            width: 100%;
+            text-align: center;
+            background-color: $white;
+            color: $darkBlue-900;
+            font-weight: 500;
+            border-radius: 50px;
+            border: 2px solid $black;
+            line-height: 1.75em;
+            font-family: $inter;
+          }
+        }
+      }
+    }
+  }
+}
+.calendlyPopup{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .closeBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    color: $white;
+    font-size: 24px;
+    font-weight: 300;
+    font-family: $inter;
+    cursor: pointer;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .popUpInner{
+    width: 100%;
+    height: 800px;
+    iframe{
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .lmtWIHO_gkbTeeyuvoJC{
+    align-items: center !important;
+  }
+}

@@ -1,0 +1,80 @@
+@import "@/app/styles/vars";
+
+.TextSection {
+  padding: 0 100px;
+  font-family: $inter;
+  max-width: $container_md;
+  width: 100%;
+  margin: 0 auto 90px;
+  @include responsive(md) {
+    padding: 0;
+    width: 90%;
+    max-width: unset;
+    margin-bottom: 90px;
+  }
+  .heading {
+    color: $white;
+    font-size: 27px;
+    margin: 16px 0;
+    line-height: 1.316em;
+    @include responsive(md) {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+  }
+
+  .paragraph {
+    color: $lightGray;
+    font-size: 16px;
+    line-height: 1.75em;
+    font-weight: 300;
+    display: block;
+    margin-bottom: 30px;
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+    @include responsive(md) {
+      font-size: 14px;
+    }
+    @include responsive(sm) {
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    b {
+      color: white;
+      font-weight: 700;
+    }
+  }
+  .ulHeading {
+    color: $lightGray;
+    line-height: 1.75em;
+    margin-bottom: 10px;
+    font-weight: 300;
+    @include responsive(md) {
+      font-size: 14px;
+    }
+    @include responsive(sm) {
+      font-size: 13px;
+    }
+  }
+
+  .list {
+    color: $lightGray;
+    list-style: disc;
+    padding-left: 40px;
+    font-weight: 300;
+    font-family: $inter;
+    margin-bottom: 20px;
+
+    li {
+      padding-left: 8px;
+      line-height: 1.866667em;
+      font-size: 15px;
+      margin-bottom: 8px;
+      b {
+        color: white;
+        font-weight: 700;
+      }
+    }
+  }
+}
