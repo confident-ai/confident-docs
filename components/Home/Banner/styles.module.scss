@@ -261,12 +261,6 @@
 
     .absoluteBackground {
       position: absolute;
-      background-image: radial-gradient(
-          circle closest-side at 50% 42%,
-          $translucentDarkBlue 90%,
-          $confident-dark
-        ),
-        url(../../../public/img/grid-bg.svg);
       background-repeat: repeat, repeat;
       background-size: auto, auto;
       background-position: 0 0, 50%;

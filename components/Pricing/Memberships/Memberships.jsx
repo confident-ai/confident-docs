@@ -282,7 +282,7 @@ export default function Memberships() {
           </div>
         </div>
       </div>
-      <div className={styles.absoluteBackground}></div>
+      <div style={{ backgroundImage: "radial-gradient(circle closest-side at 50% 50%, #0b101b00 75%, #0e0e13), url('/img/grid-bg.svg')" }} className={styles.absoluteBackground}></div>
     </div>
   );
 }

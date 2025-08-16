@@ -64,7 +64,7 @@ export default function Banner() {
       {[0, 1, 2].map((_, i) => (
         <span key={i} className={styles.meteors} />
       ))}
-      <div className={styles.absoluteBackground}></div>
+      <div style={{ backgroundImage: "radial-gradient(circle closest-side at 50% 50%, #0b101b00 75%, #0e0e13), url('/img/grid-bg.svg')" }} className={styles.absoluteBackground}></div>
     </div>
   );
 }
