@@ -1,7 +1,111 @@
 ---
-subtitle: Get started with Confident AI
+subtitle: Create an account and install DeepEval
 slug: getting-started
 description: Quick setup guide for Confident AI
 ---
 
-Content coming soon...
+## Overview
+
+To use Confident AI, you will mostly likely need to setup something through DeepEval, our open-source SDK for running LLM evals. You'll need to:
+
+- Create a free account
+- Login with your Confident API key in DeepEval
+
+## Login with your API key
+
+<Tabs>
+  <Tab title="Python">
+    <Steps>
+      <Step title="Install DeepEval">
+        At the root of your project directory, install `deepeval`:
+        
+        ```bash
+        pip install -U deepeval
+        ```
+
+      </Step>
+      <Step title="Create an account">
+        Navigate to [app.confident-ai.com](https://app.confident-ai.com) and create a free account. Once logged in, you'll be able to access your **project** API key from the dashboard.
+
+      </Step>
+
+            <Step title="Set API key as env variable">
+        Set your project API key as an environment variable:
+
+        ```bash
+        export CONFIDENT_API_KEY="confident_us..."
+        ```
+
+        Alternatively, you can login directly using DeepEval:
+
+        ```bash
+        deepeval login
+        ```
+
+        This will prompt you to enter your API key and save it locally.
+
+      </Step>
+    </Steps>
+
+  </Tab>
+  <Tab title="Typescript">
+    <Steps>
+      <Step title="Install DeepEval">
+        At the root of your project directory install the TypeScript SDK:
+        
+        ```bash
+        npm install deepeval-ts
+        ```
+      </Step>
+      <Step title="Create an account">
+        Navigate to [app.confident-ai.com](https://app.confident-ai.com) and create a free account. Once logged in, you'll be able to access your **project** API key from the dashboard.
+      </Step>
+
+      <Step title="Set API key as env variable">
+        Set your project API key as an environment variable:
+
+        ```bash
+        export CONFIDENT_API_KEY="confident_us..."
+        ```
+
+        Or add it to your `.env` file:
+
+        ```bash
+        CONFIDENT_API_KEY=your-api-key-here
+        ```
+      </Step>
+    </Steps>
+
+  </Tab>
+</Tabs>
+
+<Tip>
+
+Confident AI’s data lives in the US by default, but if you’re a customer with a data residency in the EU, you’ll need to run this command to point deepeval to use Confdient AI’s API endpoints on our EU servers and databases instead:
+
+```bash
+export CONFIDENT_BASE_URL="https://eu.api.confident-ai.com"
+```
+
+This step is only required if you’ve created an account in the EU data region.
+
+</Tip>
+
+## Next Steps
+
+Now that you have Confident AI set up, the next section will guide you through **LLM evaluation in development**. This is where you'll learn to systematically test and improve your AI applications before deployment.
+
+The benefits of running evals in development include:
+
+- **Prevent regressions** - Catch breaking changes before they reach production
+- **Optimize performance** - Find the best prompts, models, and parameters for your use case
+- **Build confidence** - Get data-driven insights into your AI application's quality
+- **Save time** - Automate manual testing with 40+ pre-built evaluation metrics
+- **Enable iteration** - Compare different versions of your AI system objectively
+- **Quality assurance** - Ensure consistent performance across different inputs and scenarios
+
+<Warning>
+  No dataset yet? Start with [LLM Tracing](/docs/llm-tracing-introduction)
+  instead to run ad-hoc evals and automatically build datasets from your
+  production traces.
+</Warning>
