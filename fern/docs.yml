@@ -147,6 +147,7 @@ navigation:
         contents:
           - page: Introduction
             path: docs/api-docs/introduction.mdx
+            icon: circle-info
       - api: API Reference
         flattened: true
         skip-slug: true

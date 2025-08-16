@@ -1,8 +1,111 @@
 ---
-title: LLM Evaluation Introduction
-subtitle: Introduction to LLM Evaluation
-slug: introduction
-description: Learn about LLM evaluation with Confident AI
+title: Introduction
+subtitle: Welcome to Confident AI API reference.
+slug: api-reference-introduction
+description: Introduction To All Of Confident AI's API References.
 ---
 
-This is just an API intro
+Confident AI enables organizations to offload evaluations, tracing, dataset management, and prompt versioning via a comprehensive **RESTFUL Evals API**.
+
+Whether you're evaluating LLM outputs in production or integrating directly with [DeepEval](https://github.com/confident-ai/deepeval), the platform supports a multi-tenant structure for clean project-level isolation and scalability.
+
+## Installation
+
+You can interact with our API through HTTP or Websocket requests from any langauage. However, if you would like to use our official python or typescript SDK, just install them using the following command:
+
+<CodeBlocks>
+  ```bash title="Python"
+    pip install -U deepeval
+  ```
+  ```bash title="Typescript"
+    npm install deepeval-ts
+  ```
+</CodeBlocks>
+
+Click here to learn more about [DeepEval](https://www.deepeval.com)
+
+## Authentication
+
+Conifdent AI uses API keys for authentication. Every request to the API must include your API key, used to authenticate your requests and track usage quota.
+
+### Create An Account
+
+If you don't already have a Confident AI account, visit [app.confident-ai.com](https://app.confident-ai.com) and create one. You can create an account using your email address or through Google authentication for a faster process.
+
+<Callout>
+  If you wish to **sign in using SSO**, checkout our [enterprise
+  offering.](https://confident-ai.com/pricing)
+</Callout>
+
+After creating your account, you'll be guided through the onboarding process. You'll find your **Project** API key at the last step of the onboarding. 
+
+Follow these steps and get your API key now:
+
+<Steps>
+  <Step title="Sign Up to Confident AI">
+    Go to [app.confident-ai.com](https://app.confident-ai.com) and signup now.
+  </Step>
+
+  <Step title="Create A Project">
+    Create a new project for your organization or application. After creating one, open your project and go to **Project Settings**. You'll find your project details like **Project Name**, **Project Id** and **Project API Key**. You can copy your `Project API Key` and start using it now.
+    <Frame caption="An image showing confident-ai project settings page">
+        <img src="./path/to/image.jpg" alt="Sample photo of mountains"/>
+    </Frame>
+  </Step>
+
+  <Step title="Use Your API Key">
+    You can now use your Project API Key to fully integrate your DeepEval evaluations with our platform by logging in to your development and production environment.
+    <CodeBlocks>
+
+    ```bash title="Bash"
+        export CONFIDENT_API_KEY=YOUR-API-KEY
+    ```
+    ```bash title="CLI"
+        deepeval login --confident-api-key YOUR_API_KEY
+    ```
+    ```python title="Python"
+        import deepeval
+
+        deepeval.login("YOUR_API_KEY")
+    ```
+
+    </CodeBlocks>
+  </Step>
+</Steps>
+
+🎉🥳 **Congratulations!** You now have a Confident AI account that will give you professional reports of your LLM application's performance all the time.
+
+## FAQs
+
+<AccordionGroup>
+
+    <Accordion title="How the Evals API different from DeepEval?">
+
+    The Evals API provides more low-level control over the DeepEval client and provide benefits that DeepEval alone doesn't offer:
+
+    **Managed Infrastructure**: Serverless evaluations on our managed servers, error handling for metric failures and retries, cost management and billing optimization, automatic scaling based on evaluation volume. 
+
+    **Platform Dashboard**: Visual results for each customer dataset, historical tracking and trends, team collaboration features, custom analytics dashboards.
+
+    </Accordion>
+
+    <Accordion title="How is the Evals API different from using the platform?">
+
+    The Evals API and platform serve different use cases in your LLM application development workflow:
+
+    **Platform (Dashboard)**: Use when your engineering teams need to improve an LLM application. It provides visual test case creation, interactive evaluation results, team collaboration features, and built-in dashboards.
+
+    **Evals API**: Use when building an LLM application that needs to automate evaluations for different customers, run evaluations programmatically, build custom dashboards, integrate into existing workflows, or scale across multiple customer environments.
+
+    Both approaches use the same underlying evaluation engine, so you can start with the platform for development and use the API for production automation.
+
+    </Accordion>
+
+    <Accordion title="Who is this for?">
+
+    1. Organizations that need to **scale evaluations across multiple customers or environments** while maintaining visibility into results.
+    2. Users that aren't working with Python or Typescript. If users are working with either Python or Typescript, using DeepEval as your client library is highly recommended.
+
+    </Accordion>
+
+</AccordionGroup>

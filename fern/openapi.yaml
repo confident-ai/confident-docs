@@ -309,7 +309,7 @@ paths:
                 $ref: "#/components/schemas/SimulateResponse"
               examples:
                 example1:
-                  summary: Successful simulated turn
+                  summary: Basic simulation example
                   value:
                     success: true
                     data:
