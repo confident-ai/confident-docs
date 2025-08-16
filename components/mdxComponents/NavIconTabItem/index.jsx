@@ -1,5 +1,3 @@
-import React from 'react';
-
 const NavIconTabItem = ({ 
   icon: Icon, 
   label, 

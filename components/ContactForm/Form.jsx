@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import styles from "./styles.module.scss";
-import BackedBy from "@/components/BackedBy/backedBy";
+import BackedBy from "@/components/backedBy/backedBy";
 
 export default function Form() {
   const [formData, setFormData] = useState({

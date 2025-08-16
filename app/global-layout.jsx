@@ -1,8 +1,7 @@
 "use client"
-import CustomNavbar from '@/components/CustomNavbar/CustomNavbar';
-import Footer from "@/components/Footer/Footer";
+import CustomNavbar from '@/components/customNavbar/customNavbar';
+import Footer from "@/components/footer/footer";
 import styles from "./styles.module.scss";
-import links from './links'
 import { useEffect, useState } from "react";
 
 export default function GlobalLayout({ children, variant = 'dark', isDocsPage = false, staticHeader }) {
@@ -29,7 +28,7 @@ export default function GlobalLayout({ children, variant = 'dark', isDocsPage = 
       >
         <CustomNavbar isDocsPage={isDocsPage} staticHeader={staticHeader} />
         {children}
-        <Footer variant={variant} links={links} />
+        <Footer variant={variant}  />
       </div>
       <div className={`${styles.loaderOverlay} ${loaded ? styles.loaded : ''}`}></div>
     </>

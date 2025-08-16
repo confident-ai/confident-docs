@@ -1,4 +1,4 @@
-import Memberships from '@/components/Pricing/Memberships/Memberships'
+import Memberships from '@/components/pricing/memberships/memberships'
 import GlobalLayout from '../global-layout'
 
 export const metadata = {

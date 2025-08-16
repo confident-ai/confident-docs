@@ -1,6 +1,6 @@
 import styles from "./styles.module.scss";
 import Image from "next/image";
-import links from "@/app/links.js";
+import links from "@/app/data/links.js";
 
 export default function Footer({ variant }) {
   const socials = [

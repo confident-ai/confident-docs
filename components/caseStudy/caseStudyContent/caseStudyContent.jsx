@@ -1,3 +1,4 @@
+
 import styles from "./styles.module.scss";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";

@@ -1,6 +1,6 @@
-import Blogs from "@/components/Blog/Blogs";
+import Blogs from "@/components/blog/blogs";
 import GlobalLayout from "@/app/global-layout";
-import Banner from '@/components/Blog/Banner/Banner'
+import Banner from '@/components/blog/banner/banner'
 export const metadata = {
   title: "Confident AI Blog - Resources to help teams stay confident in AI",
   description:

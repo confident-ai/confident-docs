@@ -1,6 +1,6 @@
-import Banner from '@/components/Products/Banner/Banner'
-import TwoColumn from '@/components/Products/TwoColumn/TwoColumn'
-import TextOnlySection from '@/components/Products/TextOnlySection/TextOnlySection'
+import Banner from '@/components/products/banner/banner'
+import TwoColumn from '@/components/products/twoColumn/twoColumn'
+import TextOnlySection from '@/components/products/textOnlySection/textOnlySection'
 import GlobalLayout from '@/app/global-layout'
 
 export const metadata = {

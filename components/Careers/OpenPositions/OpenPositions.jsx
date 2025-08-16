@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "./styles.module.scss";
-import Button from "@/components/Button/Button";
+import Button from "@/components/button/button";
 export default function OpenPositions() {
   const Positions = [
     {

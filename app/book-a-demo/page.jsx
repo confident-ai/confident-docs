@@ -1,4 +1,4 @@
-import Form from "@/components/ContactForm/Form";
+import Form from "@/components/contactForm/form";
 import GlobalLayout from "../global-layout";
 
 export const metadata = {

@@ -1,7 +1,8 @@
 import { createClient } from "contentful";
 
-export async function getServerSideProps({ res }) {
+export default async function sitemap() {
   const siteUrl = "https://www.confident-ai.com";
+
   const client = createClient({
     space: process.env.CONTENTFUL_SPACE_ID,
     accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
@@ -32,29 +33,20 @@ export async function getServerSideProps({ res }) {
     "blog",
   ];
 
-  const allUrls = [
-    ...staticPaths.map(path => `${siteUrl}/${path}`),
-    ...blogLinks.map(link => `${siteUrl}/blog/${link}`),
-    ...caseStudyLinks.map(link => `${siteUrl}/case-study/${link}`),
+  return [
+    // Static pages
+    ...staticPaths.map(path => ({
+      url: `${siteUrl}/${path}`,
+    })),
+
+    // Blog articles
+    ...blogLinks.map(link => ({
+      url: `${siteUrl}/blog/${link}`,
+    })),
+
+    // Case studies
+    ...caseStudyLinks.map(link => ({
+      url: `${siteUrl}/case-study/${link}`,
+    })),
   ];
-
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${allUrls
-  .map(
-    url => `<url>
-                <loc>${url}</loc>
-            </url>`
-  )
-  .join("\n")} </urlset>`;
-
-  res.setHeader("Content-Type", "text/xml");
-  res.write(sitemap);
-  res.end();
-
-  return { props: {} };
-}
-
-export default function Sitemap() {
-  return null;
 }

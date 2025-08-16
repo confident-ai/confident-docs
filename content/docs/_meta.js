@@ -1,5 +1,5 @@
 import { CircleHelp, MessageSquareText, PenLine, Settings, FlaskConical, User, Lightbulb, House, ShieldAlert, BookOpen, Folders, GitBranch } from 'lucide-react'
-import NavIconTabItem from '@/components/NavIconTabItem'
+import NavIconTabItem from '@/components/mdxComponents/NavIconTabItem'
 
 export default {
   "how-it-works": "",

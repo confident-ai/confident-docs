@@ -27,8 +27,8 @@ export default function Banner({ heading, description, image }) {
 
         <div className={styles.backgroundImage}>
           <img
-            src="/img/llm-eval-bg.svg"
-            alt="screen of a browser displaying the llm evaluation feature of deep eval"
+            src={image}
+            alt="Products page banner"
           />
         </div>
       </div>

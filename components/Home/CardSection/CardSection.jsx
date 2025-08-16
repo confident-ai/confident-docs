@@ -1,5 +1,5 @@
 import styles from "./styles.module.scss";
-import Button from "@/components/Button/Button";
+import Button from "@/components/button/button";
 export default function CardSection() {
   const cards = [
     {
@@ -21,13 +21,7 @@ export default function CardSection() {
         "Generate test reports to catch regressions and debug with traces.",
     },
   ];
-  const btns = [
-    {
-      label: "GO TO QUICK START",
-      link: "https://documentation.confident-ai.com/getting-started/create-account",
-      btnVariant: "containedBW",
-    },
-  ];
+
 
   return (
     <div className={styles.CardSection}>

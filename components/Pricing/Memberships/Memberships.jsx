@@ -1,6 +1,5 @@
-import { ChevronRight } from "lucide-react";
 import styles from "./styles.module.scss";
-import Button from "@/components/Button/Button";
+import Button from "@/components/button/button";
 export default function Memberships() {
   const memberships = [
     {

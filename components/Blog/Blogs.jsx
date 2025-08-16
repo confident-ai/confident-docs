@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import cardStyles from './card.module.scss'
-import Skeleton from "@/components/Skeleton/Skeleton";
-import Card from "./Card/Card";
+import Skeleton from "@/components/blog/skeleton/skeleton";
+import Card from "./card/card";
 
 export default function Blogs({
   limit = 3,
@@ -12,7 +12,6 @@ export default function Blogs({
   showTabs = false,
   blogVariant = "light",
   exclude = null,
-  disableLoader = true,
   category = null,
 }) {
   const [isLoading, setIsLoading] = useState(true);

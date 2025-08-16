@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import Prism from "prismjs";
-import "@/app/styles/prism-vsc-dark-plus.scss";
+import "@/app/styles/Prism-Styles/prism-vsc-dark-plus.scss";
 import "prismjs/components/prism-python";
 import styles from "./styles.module.scss";
 

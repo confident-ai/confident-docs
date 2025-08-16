@@ -1,11 +1,11 @@
-import Banner from '@/components/Home/Banner/Banner';
-import TextSection from '@/components/Home/TextSection/TextSection';
-import TwoColumn from '@/components/Home/TwoColumn/TwoColumn';
-import ShowCase from '@/components/Home/ShowCase/ShowCase';
-import CardSection from '@/components/Home/CardSection/CardSection';
-import SecurityInsurance from '@/components/Home/SecurityInsurance/SecurityInsurance';
-import TextOnlySection from '@/components/Home/TextOnlySection/TextOnlySection';
-import SocialsSection from '@/components/Home/SocialsSection/SocialsSection';
+import Banner from '@/components/home/banner/banner';
+import TextSection from '@/components/home/textSection/textSection';
+import TwoColumn from '@/components/home/twoColumn/twoColumn';
+import ShowCase from '@/components/home/showCase/showCase';
+import CardSection from '@/components/home/cardSection/cardSection';
+import SecurityInsurance from '@/components/home/securityInsurance/securityInsurance';
+import TextOnlySection from '@/components/home/textOnlySection/textOnlySection';
+import SocialsSection from '@/components/home/socialsSection/socialsSection';
 import GlobalLayout from './global-layout';
 
 export const metadata = {

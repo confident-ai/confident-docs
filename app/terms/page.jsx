@@ -2,7 +2,7 @@ import { getTerm } from "@/functions/get-terms";
 import styles from "./styles.module.scss";
 
 import GlobalLayout from "../global-layout";
-import TermsContent from "@/components/Terms/TermsContent";
+import Terms from "@/components/terms/terms";
 export const metadata = {
   title: "Terms & Conditions - Confident AI",
   description:
@@ -31,7 +31,7 @@ export default async function HomePage() {
       <GlobalLayout staticHeader={true}>
         <div className={`${styles.termsOfService}`}>
           <div className={styles.inner}>
-            <TermsContent content={term?.fields?.textBlock} term={term} />
+            <Terms content={term?.fields?.textBlock} term={term} />
           </div>
         </div>
       </GlobalLayout>

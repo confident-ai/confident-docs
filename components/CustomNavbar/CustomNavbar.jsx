@@ -1,12 +1,10 @@
 "use client";
 import styles from "./styles.module.scss";
 import { Navbar } from "nextra-theme-docs";
-import Logo from "@/components/Logo/Logo";
-import GitHubButton from "@/components/GitHubButton/GitHubButton";
+import Logo from "@/components/mdxComponents/Logo/Logo";
+import GitHubButton from "@/components/gitHubButton/gitHubButton";
 import SignUpButton from "@/components/SignUpButton";
-import Button from "@/components/Button/Button";
 import { useState, useEffect, useRef } from "react";
-import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 

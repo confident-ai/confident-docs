@@ -1,10 +1,10 @@
 import { getBlog } from "@/functions/get-blogs";
 import GlobalLayout from "@/app/global-layout";
-import ArticleContent from "@/components/Blog/ArticleContent/ArticleContent";
-import ArticleHeader from "@/components/Blog/ArticleHeader/ArticleHeader";
-import Callout from "@/components/Blog/Callout/Callout";
-import SideBar from "@/components/Blog/SideBar/SideBar";
-import Blogs from "@/components/Blog/Blogs";
+import ArticleContent from "@/components/blog/articleContent/articleContent";
+import ArticleHeader from "@/components/blog/articleHeader/articleHeader";
+import Callout from "@/components/blog/callout/callout";
+import SideBar from "@/components/blog/sidebar/sidebar";
+import Blogs from "@/components/blog/blogs";
 import styles from "./styles.module.scss";
 
 export default async function Page({ params }) {

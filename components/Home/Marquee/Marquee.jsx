@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-
-import Counter from "@/components/Home/Marquee/Counter";
+import { getGithubStars } from "@/functions/get-stars";
+import Counter from "@/components/home/marquee/counter";
 import styles from "./styles.module.scss";
 
 export default function Marquee() {
@@ -19,16 +19,7 @@ export default function Marquee() {
   ];
   const [githubStars, setGithubStars] = useState(0); // fallback default
   useEffect(() => {
-    fetch("https://api.github.com/repos/confident-ai/deepeval")
-      .then(res => res.json())
-      .then(data => {
-        if (data?.stargazers_count) {
-          setGithubStars(data.stargazers_count);
-        }
-      })
-      .catch(err => {
-        console.error("Failed to fetch GitHub stars:", err);
-      });
+    getGithubStars({ format: false }).then(setGithubStars);
   }, []);
   return (
     <div className={styles.marqueeContainer}>
@@ -55,7 +46,7 @@ export default function Marquee() {
           </div>
           <div className={styles.socialProof}>
             {githubStars > 0 && <Counter target={githubStars} />}
-            <span className={styles.proofsTitle}>Github stars</span>
+            <span className={styles.proofsTitle}>Github stars</span>  
           </div>
           <div className={styles.socialProof}>
             <Counter target={500000} />

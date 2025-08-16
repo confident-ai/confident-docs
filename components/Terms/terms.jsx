@@ -2,7 +2,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { formatDate } from "@/functions/format-date";
 import { BLOCKS } from "@contentful/rich-text-types";
 import styles from "./styles.module.scss";
-export default function TermsContent({ content, term }) {
+export default function Terms({ content, term }) {
   const generateSlug = (text, options = {}) => {
     const { lower = true, strict = false } = options;
     let slug = text

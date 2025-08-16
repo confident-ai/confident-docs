@@ -1,7 +1,11 @@
-export async function getGithubStars(){
+export async function getGithubStars({ format = true } = {}) {
   const response = await fetch("https://api.github.com/repos/confident-ai/deepeval");
   const data = await response.json();
-  return formatStars(data.stargazers_count);
+  if( format === true) {
+    return formatStars(data.stargazers_count);
+  }else{
+    return data.stargazers_count;
+  }
 }
 
 const formatStars = (n) => {

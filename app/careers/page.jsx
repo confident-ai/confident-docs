@@ -1,6 +1,6 @@
-import Banner from "@/components/Careers/Banner/Banner";
-import OpenPositions from "@/components/Careers/OpenPositions/OpenPositions";
-import TextSection from "@/components/Careers/TextSection/TextSection";
+import Banner from "@/components/careers/banner/banner";
+import OpenPositions from "@/components/careers/openPositions/openPositions";
+import TextSection from "@/components/careers/textSection/textSection";
 import GlobalLayout from "../global-layout";
 
 export const metadata = {

@@ -27,7 +27,6 @@ const GitHubButton = ({ darkMode = false, asIcon = false }) => {
     </>
   );
 
-  // If asIcon is true, render as div to avoid nested anchor tags
   if (asIcon) {
     return (
       <div className={`${styles.githubButton} ${darkMode ? styles.darkMode : ""}`}>

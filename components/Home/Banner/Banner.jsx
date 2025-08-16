@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import styles from "./styles.module.scss";
-import Marquee from "@/components/Home/Marquee/Marquee";
+import Marquee from "@/components/home/marquee/marquee";
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import Button from "@/components/Button/Button";
-import BackedBy from "@/components/BackedBy/backedBy";
+import Button from "@/components/button/button";
+import BackedBy from "@/components/backedBy/backedBy";
 
 export default function Banner() {
   const [hasAnimated, setHasAnimated] = useState(false);
