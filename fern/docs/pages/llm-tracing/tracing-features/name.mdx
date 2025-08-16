@@ -1,0 +1,109 @@
+---
+subtitle: LLM Tracing Name
+slug: llm-tracing-features-name
+description: Learn about name in LLM Tracing
+---
+
+oth traces and spans have names, and you can customize them based on your liking for better UI display.
+
+## Set Name on Trace
+
+You can name a trace at runtime by providing the `name` paramter in `update_current_trace`:
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {8}
+            from openai import OpenAI 
+            from deepeval.tracing import observe, update_current_trace
+            
+            client = OpenAI()
+            
+            @observe()
+            def llm_app(query: str):
+                update_current_trace(name="Call LLM")
+                return client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+            
+            llm_app("Write me a poem.")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {7}
+            import OpenAI from 'openai';
+            import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+
+            const openai = new OpenAI();
+
+            const llmApp = async (query: string) => {
+                updateCurrentTrace({ name: "Call LLM" });
+                const response = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                })
+                return response.choices[0].message.content;
+            };
+
+            const observedLlmApp = observe({fn: llmApp});
+
+            await observedLlmApp("Write me a poem.");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+By default, the name on a trace is set to `None`.
+
+## Set Name on Span
+
+The default name for a span is the name of the function/method you're decorating. If you wish to overwrite this behavior, simply provide a `name` to the `update_current_span` function:
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {8}
+            from openai import OpenAI 
+            from deepeval.tracing import observe, update_current_span
+            
+            client = OpenAI()
+            
+            @observe()
+            def llm_app(query: str):
+                update_current_span(name="Call LLM")
+                return client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+            
+            llm_app("Write me a poem.")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {7}
+            import OpenAI from 'openai';
+            import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+
+            const openai = new OpenAI();
+
+            const llmApp = async (query: string) => {
+                updateCurrentSpan({ name: "Call LLM" });
+                const response = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                })
+                return response.choices[0].message.content;
+            };
+
+            const observedLlmApp = observe({fn: llmApp});
+
+            await observedLlmApp("Write me a poem.");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>

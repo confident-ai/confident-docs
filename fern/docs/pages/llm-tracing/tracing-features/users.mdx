@@ -1,0 +1,60 @@
+---
+subtitle: LLM Tracing Users
+slug: llm-tracing-features-users
+description: Learn about users in LLM Tracing
+---
+
+You can track user interactions with your LLM app by setting the `user_id` in a trace. This allows you to track things such as how much tokens each user is costing you, who interacted with your LLM app the most, etc.
+
+## Set Users At Runtime
+
+You can use the `update_current_trace` function to set the `user_id` within traces:
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {13}
+            from deepeval.tracing import observe, update_current_trace
+            from openai import OpenAI
+            
+            client = OpenAI()
+            
+            @observe()
+            def llm_app(query: str):
+                res = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+            
+                update_current_trace(user_id="your-user-id")
+                return res
+            
+            llm_app("Write me a poem.")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {10}
+            import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+            import OpenAI from 'openai';
+
+            const llmApp = async (query: string) => {
+            const openai = new OpenAI();
+            const res = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [{ role: "user", content: query }]
+            })      
+            updateCurrentTrace({ userId: "your-user-id" });
+            return res.choices[0].message.content;
+            };
+
+            const observedLlmApp = observe({fn: llmApp});
+
+            observedLlmApp("Write me a poem.");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+The `user_id` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.

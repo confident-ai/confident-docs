@@ -1,0 +1,276 @@
+---
+subtitle: LLM Tracing Masking
+slug: llm-tracing-features-masking
+description: Learn about masking in LLM Tracing
+---
+
+Masking allows you to automatically redact or transform sensitive data in your traces before they're sent to the observatory. Masking is essential for several reasons:
+
+- **Security**: Prevent exposure of credentials or sensitive business data
+- **Regulatory Compliance**: Meet requirements like GDPR, HIPAA, or CCPA
+
+## Configure Masking
+
+To implement masking, you need to define a masking function and configure the trace manager to use it.
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {10}
+            import re
+            from deepeval.tracing import observe, trace_manager
+            
+            def masking_function(data):
+                if isinstance(data, str):
+                    data = re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
+                    return data
+                return data
+            
+            trace_manager.configure(mask=masking_function)
+            
+            @observe()
+            def llm_app(query: str):
+                return "4242-4242-4242-4242"
+            
+            llm_app("Test Masking")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {10}
+            import { observe, traceManager } from '@deepeval-ts/tracing';
+
+            const maskingFunction = (data: any): any => {
+            if (typeof data === 'string') {
+                return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
+            }
+            return data;
+            };
+
+            traceManager.configure({ mask: maskingFunction });
+
+            const agent = (query: string): string => {
+            return "4242-4242-4242-4242";
+            };
+
+            const observedAgent = observe({
+            type: "agent",
+            fn: agent
+            });
+
+            observedAgent("Test Masking");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+The masking function is automatically applied to:
+
+1. **Span attributes**: Any attributes passed to span decorators or wrappers
+2. **Observed function I/O**: all input parameters and return values of functions with `@observe` decorator.
+
+<Callout>
+    Since the masking function is applied to an observed function's inputs, outputs, and span attributes, it must handle the various data types defined for each field as necessary.
+</Callout>
+
+## Example Masking functions
+
+### Credit card number
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py"
+            import re
+            from typing import Any
+            
+            def mask_credit_card(data: Any) -> Any:
+                if isinstance(data, str):
+                    return re.sub(r'\b(?:\d{4}[- ]?){3}\d{4}\b', '[REDACTED CARD]', data)
+                elif isinstance(data, list):
+                    return [mask_credit_card(item) for item in data]
+                elif isinstance(data, dict):
+                    return {k: mask_credit_card(v) for k, v in data.items()}
+                else:
+                    return data
+            
+            
+            print(mask_credit_card("My card number is 4111 1111 1111 1234."))
+            # Output: My card number is [REDACTED CARD].
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts"
+            function maskCreditCard(data: any): any {
+            if (typeof data === 'string') {
+                return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
+            } else if (Array.isArray(data)) {
+                return data.map(item => maskCreditCard(item));
+            } else if (data !== null && typeof data === 'object') {
+                return Object.fromEntries(
+                Object.entries(data).map(([k, v]) => [k, maskCreditCard(v)])
+                );
+            } else {
+                return data;
+            }
+            }
+            
+            console.log(maskCreditCard("My card number is 4111 1111 1111 1234."));
+            // Output: My card number is [REDACTED CARD].
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+### Email address
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py"
+            import re
+            from typing import Any
+            
+            def mask_email(data: Any) -> Any:
+                if isinstance(data, str):
+                    return re.sub(r'\b([\w.%+-])[^\s@]*(@[\w.-]+\.\w+)', r'\1*****\2', data)
+                elif isinstance(data, list):
+                    return [mask_email(item) for item in data]
+                elif isinstance(data, dict):
+                    return {k: mask_email(v) for k, v in data.items()}
+                else:
+                    return data
+            
+            print(mask_email("Contact me at johndoe@example.com."))
+            # Output: Contact me at j*****@example.com.
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts"
+            function maskEmail(data: any): any {
+            if (typeof data === 'string') {
+                return data.replace(/\b([\w.%+-])[^\s@]*(@[\w.-]+\.\w+)/g, '$1*****$2');
+            } else if (Array.isArray(data)) {
+                return data.map(item => maskEmail(item));
+            } else if (data !== null && typeof data === 'object') {
+                return Object.fromEntries(
+                Object.entries(data).map(([k, v]) => [k, maskEmail(v)])
+                );
+            } else {
+                return data;
+            }
+            }
+            
+            console.log(maskEmail("Contact me at johndoe@example.com."));
+            // Output: Contact me at j*****@example.com.
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+### Bank account number
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py"
+            import re
+            from typing import Any
+            
+            def mask_bank_account(data: Any) -> Any:
+                if isinstance(data, str):
+                    return re.sub(
+                        r'\b\d{6,}(?!\d)',
+                        lambda m: '*' * (len(m.group()) - 4) + m.group()[-4:],
+                        data
+                    )
+                elif isinstance(data, list):
+                    return [mask_bank_account(item) for item in data]
+                elif isinstance(data, dict):
+                    return {k: mask_bank_account(v) for k, v in data.items()}
+                else:
+                    return data
+            
+            
+            print(mask_bank_account("My account is 9876543210."))
+            # Output: My account is ******3210.
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts"
+            function maskBankAccount(data: any): any {
+            if (typeof data === 'string') {
+                return data.replace(/\b\d{6,}(?!\d)/g, match => {
+                return '*'.repeat(match.length - 4) + match.slice(-4);
+                });
+            } else if (Array.isArray(data)) {
+                return data.map(item => maskBankAccount(item));
+            } else if (data !== null && typeof data === 'object') {
+                return Object.fromEntries(
+                Object.entries(data).map(([k, v]) => [k, maskBankAccount(v)])
+                );
+            } else {
+                return data;
+            }
+            }
+            
+            console.log(maskBankAccount("My account is 9876543210."));
+            // Output: My account is ******3210.
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+### Passport number
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py"
+            import re
+            from typing import Any
+            
+            def mask_passport_number(data: Any) -> Any:
+                if isinstance(data, str):
+                    return re.sub(r'\b([A-Z])([A-Z0-9]{6,8})([A-Z0-9])\b', r'\1*******\3', data)
+                elif isinstance(data, list):
+                    return [mask_passport_number(item) for item in data]
+                elif isinstance(data, dict):
+                    return {k: mask_passport_number(v) for k, v in data.items()}
+                return data
+            
+            print(mask_passport_number("Passport: A12345678."))
+            # Output: Passport: A*******8.
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts"
+            function maskPassportNumber(data: any): any {
+            if (typeof data === 'string') {
+                return data.replace(/\b([A-Z])([A-Z0-9]{6,8})([A-Z0-9])\b/g, '$1*******$3');
+            } else if (Array.isArray(data)) {
+                return data.map(item => maskPassportNumber(item));
+            } else if (data !== null && typeof data === 'object') {
+                return Object.fromEntries(
+                Object.entries(data).map(([k, v]) => [k, maskPassportNumber(v)])
+                );
+            } else {
+                return data;
+            }
+            }
+            
+            console.log(maskPassportNumber("Passport: A12345678."));
+            // Output: Passport: A*******8.
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>

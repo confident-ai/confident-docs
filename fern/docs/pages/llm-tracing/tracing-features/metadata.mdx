@@ -1,0 +1,72 @@
+---
+subtitle: LLM Tracing Metadata
+slug: llm-tracing-features-metadata
+description: Learn about masking in LLM Tracing
+---
+
+With Confident AI, you can attach additional metadata to both traces and spans. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+
+## Add Metadata
+
+Use `update_current_span` and `update_current_trace` to add **span-level** and **trace-level** metadata. 
+
+Each metadata argument is a dictionary whose keys are strings and whose values are any JSON-serializable type.
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {7,15}
+            from deepeval.tracing import observe, update_current_span, update_current_trace
+            
+            @observe()
+            async def llm_app(query: str):
+                # Add span-level metadata
+                update_current_span(
+                    metadata={
+                        "source": "knowledge_base_1",
+                        "retrieved_documents": 3
+                    }
+                )
+                
+                # Add trace-level metadata
+                update_current_trace(
+                    metadata={
+                        "user_id": "user-456",
+                        "app_version": "1.2.3",
+                    }
+                )
+            
+            llm_app("Test Metadata")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {6,14}
+            import { observe, updateCurrentSpan, updateCurrentTrace } from '@deepeval-ts/tracing';
+            
+            const llmApp = (query: string) => {
+            // Add span-level metadata
+            updateCurrentSpan({
+                metadata: {
+                source: "knowledge_base_1",
+                retrieved_documents: 3
+                }
+            });
+                
+            // Add trace-level metadata
+            updateCurrentTrace({
+                metadata: {
+                user_id: "user-456",
+                app_version: "1.2.3",
+                }
+            });
+            };
+            
+            const observedLlmApp = observe({fn: llmApp});
+            
+            observedLlmApp("Test Metadata");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>

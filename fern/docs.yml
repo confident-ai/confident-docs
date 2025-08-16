@@ -71,15 +71,51 @@ navigation:
           - page: Online & Offline Evaluations
             path: docs/pages/llm-tracing/online-offline-evaluations.mdx
             icon: fa-light fa-toggle-on
-          - page: Tracing Features
-            path: docs/pages/llm-tracing/tracing-features.mdx
+          - section: Tracing Features
+            contents:
+              - page: Test Cases
+                path: docs/pages/llm-tracing/tracing-features/test-cases.mdx
+                icon: fa-light fa-hashtag
+              - page: Attributes
+                path: docs/pages/llm-tracing/tracing-features/attributes.mdx
+                icon: fa-light fa-table-cells
+              - page: Environment
+                path: docs/pages/llm-tracing/tracing-features/environment.mdx
+                icon: fa-light fa-globe
+              - page: Input/Output
+                path: docs/pages/llm-tracing/tracing-features/input-output.mdx
+                icon: fa-light fa-i-cursor
+              - page: Masking
+                path: docs/pages/llm-tracing/tracing-features/masking.mdx
+                icon: fa-light fa-eye-slash
+              - page: Metadata
+                path: docs/pages/llm-tracing/tracing-features/metadata.mdx
+                icon: fa-light fa-brackets-curly
+              - page: Name
+                path: docs/pages/llm-tracing/tracing-features/name.mdx
+                icon: fa-light fa-signature
+              - page: Sampling
+                path: docs/pages/llm-tracing/tracing-features/sampling.mdx
+                icon: fa-light fa-percent
+              - page: Span Types
+                path: docs/pages/llm-tracing/tracing-features/span-types.mdx
+                icon: fa-light fa-gear
+              - page: Tags
+                path: docs/pages/llm-tracing/tracing-features/tags.mdx
+                icon: fa-light fa-tag
+              - page: Threads
+                path: docs/pages/llm-tracing/tracing-features/threads.mdx
+                icon: fa-light fa-message-dots
+              - page: Users
+                path: docs/pages/llm-tracing/tracing-features/users.mdx
+                icon: fa-light fa-user
             icon: fa-light fa-layer-group
           - page: Latency and Cost Tracking
             path: docs/pages/llm-tracing/latency-cost-tracking.mdx
             icon: fa-light fa-stopwatch
-          - page: Performance Alerting
-            path: docs/pages/llm-tracing/performance-alerting.mdx
-            icon: fa-light fa-bell
+          # - page: Performance Alerting
+          #   path: docs/pages/llm-tracing/performance-alerting.mdx
+          #   icon: fa-light fa-bell
       - section: Dataset Editor
         contents:
           - page: Introduction

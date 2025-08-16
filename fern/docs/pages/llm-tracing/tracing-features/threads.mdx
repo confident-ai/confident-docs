@@ -1,0 +1,160 @@
+---
+subtitle: LLM Tracing Threads
+slug: llm-tracing-features-threads
+description: Learn about threads in LLM Tracing
+---
+
+A "thread" on Confident AI is a group of one or more traces. This is useful for those building AI chatrooms, conversational agents, etc., where you wish to view entire conversations on Confident AI.
+
+<Callout>
+It is traces that are grouped together, not spans.
+</Callout>
+
+## Set Threads At Runtime
+
+You can use the `update_current_trace` function to set the `thread_id` within traces, which Confident AI will use to group traces together:
+
+<Tabs>
+    <Tab title="Python">
+        <CodeBlock>
+            ```python title="main.py" {13}
+            from deepeval.tracing import observe, update_current_trace
+            from openai import OpenAI
+            
+            client = OpenAI()
+            
+            @observe()
+            def llm_app(query: str):
+                res = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+            
+                update_current_trace(thread_id="your-thread-id", input=query, output=res)
+                return res
+            
+            llm_app("Write me a poem.")
+            ```
+        </CodeBlock>
+    </Tab>
+    <Tab title="Js/TypeScript">
+        <CodeBlock>
+            ```typescript title="index.ts" {13}
+            import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+            import OpenAI from 'openai';
+            
+            const llmApp = (query: string) => {
+            const openai = new OpenAI();
+            const res = openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                { role: "user", content: query }
+                ]
+            }).choices[0].message.content;
+            
+            updateCurrentTrace({ threadId: "your-thread-id", input: query, output: res });
+            return res;
+            };
+
+            const observedLlmApp = observe({
+            fn: llmApp
+            });
+
+            observedLlmApp("Write me a poem.");
+            ```
+        </CodeBlock>
+    </Tab>
+</Tabs>
+
+The `thread_id` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI. 
+
+<Callout>
+If the I/O is not provided, it will be set to the [default I/O values of the trace.](/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) 
+</Callout>
+
+### Inputs/Outputs
+
+Note that although not strictly enforced, you should aim to make the **input** the user **text** input that is incoming to your multi-turn LLM app, and the output being the generated **text** output. Essentially, your trace should represent the observable system inputs and outputs of your application.
+
+<CodeBlock>
+```python filename="main.py" showLineNumbers {15, 18}
+from deepeval.tracing import observe, update_current_trace
+from openai import OpenAI
+
+client = OpenAI()
+
+@observe()
+def llm_app(query: str):
+    messages = {"role": "user", "content": query}
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=messages
+    ).choices[0].message[0]
+
+    # ✅ Do this, query is the raw user input
+    update_current_trace(thread_id="your-thread-id", input=query, output=res)
+
+    # ❌ Don't do this, messages is not the raw user input
+    # update_current_trace(thread_id="your-thread-id", input=messages, output=res)
+    return res
+```
+</CodeBlock>
+
+Also note that you **don't** have to set `input`s/`output`s for a trace that does not contain an user input or LLM output. You can simply leave it blank, and Confident AI will format the turns accordingly on the UI and for evals.
+
+<CodeBlock>
+```python filename="example.py"
+# ✅ You can set inputs and not set outputs
+update_current_trace(thread_id="your-thread-id", input=query)
+
+# ✅ You can set outputs and not set inputs
+update_current_trace(thread_id="your-thread-id", output=res)
+
+# ✅ You can omit setting both, given that there is at least one trace with input/output set for a thread
+update_current_trace(thread_id="your-thread-id")
+```
+</CodeBlock>
+
+### Tools Called and Retrieval Context
+
+You can also specify any tools that were called or retrieval context involved (for a RAG system) for any LLM generated text in a conversation (which in this case is the `output` on a trace).
+
+<CodeBlock>
+```python filename="main.py"
+from deepeval.test_case import ToolCall
+...
+
+update_current_trace(
+  thread_id="your-thread-id", 
+  output=res,
+  retrieval_context=["RAG context goes here."],
+  tools_called=[ToolCall(name="Websearch")]
+)
+```
+</CodeBlock>
+
+<Callout>
+Learn more about the data model of `ToolCall` [here.](/docs/concepts/test-cases#llmtestcase)
+</Callout>
+
+The turn context is complimentry to the `output`, and allows you to log any additional context involved in the generation of this turn.
+
+## Run Offline Evals on Threads
+
+Use the `evaluate_thread` method to run offline evals on conversations **once they've finished running**:
+
+<CodeBlock>
+```python filename="main.py"
+from deepeval.tracing import evaluate_thread
+
+evaluate_thread(thread_id="your-thread-id", metric_collection="Metric Collection")
+```
+</CodeBlock>
+
+You'll need to create a **multi-turn** metric collection on Confident AI if you haven't already to specify which metrics you invoke for a particular thread. 
+
+Under the hood, Confident AI takes all the `input`s, `output`s, and any turn context you've supplied to build a list of `turn`s for a `ConversationalTestCase`. Confident AI will then use the multi-turn metrics found in your metric collection to run evals on the specified thread.
+
+<Frame caption="Conversational Test Case Architecture">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/concepts:conversational-test-case.svg" alt="Conversational Test Case Architecture"/>
+</Frame>
