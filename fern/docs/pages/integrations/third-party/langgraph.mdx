@@ -177,7 +177,7 @@ To run [end-to-end evals](/docs/llm-evaluation/end-to-end-evals), simply supply 
 <Tabs>
 <Tab title="Synchronous">
 
-```python main.py {2, 19, 22}
+```python main.py {1, 25}
 from deepeval.metrics import TaskCompletionMetric
 from deepeval.dataset import Golden, EvaluationDataset
 
@@ -209,7 +209,7 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Asynchronous">
 
-```python main.py {2, 20, 27}
+```python main.py {1, 27}
 from deepeval.metrics import TaskCompletionMetric
 from deepeval.dataset import Golden, EvaluationDataset
 from deepeval.evaluate import test_run
