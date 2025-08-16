@@ -2,3 +2,168 @@
 slug: integrations/third-party/langchain
 description: Get started with Confident AI for LLM evaluation and observability
 ---
+
+[LangChain](https://www.langchain.com/) is a framework for building LLM applications. Confident AI provides a `CallbackHandler` to trace and evaluate LangChain applications.
+
+## Quickstart
+
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval langchain langchain-openai
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure LangChain">
+
+Provide DeepEval's `CallbackHandler` to your LangChain application's invoke method.
+
+```python main.py {4, 18}
+import os
+import time
+from langchain.chat_models import init_chat_model
+from deepeval.integrations.langchain import CallbackHandler
+
+os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+deepeval.login("<your-confident-api-key>")
+
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+llm = init_chat_model("gpt-4o-mini", model_provider="openai")
+llm_with_tools = llm.bind_tools([multiply])
+
+llm_with_tools.invoke(
+    "What is 3 * 12?",
+    config = {"callbacks": [CallbackHandler()]}
+)
+```
+
+<Note>
+  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
+</Note>
+</Step>
+
+<Step title="Run LangChain">
+
+Invoke your application by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Trace attributes
+
+You can set custom trace attributes in your `CallbackHandler` for each invocation:
+
+```python main.py
+...
+
+callback_handler = CallbackHandler(
+    name="Name of Trace",
+    tags=["Tag 1", "Tag 2"],
+    metadata={"Key": "Value"},
+    thread_id="your-thread-id",
+    user_id="your-user-id",
+)
+llm_with_tools.invoke(input=input, config={"callbacks": [callback_handler]})
+```
+
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/tracing-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/tracing-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/tracing-features/thread-id).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/tracing-features/user-id).
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/tracing-features) on Confident AI.
+</Info>
+
+### Online evals
+
+To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your LangChain application, provide a metric collection name to `CallbackHandler`.
+
+```python main.py {8}
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+# Invoke your agent with the metric collection name
+llm_with_tools.invoke(
+    "What is 3 * 12?",
+    config = {"callbacks": [
+        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
+    ]}
+)
+```
+
+<ParamField path="metric_collection" type="str" required={false}>
+  The name of the metric collection. To create a metric collection, visit
+  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
+</ParamField>
+
+<Warning>
+  Your metric collection should only contain the **task completion metric**,
+  which is the only supported metric for LangChain.
+</Warning>
