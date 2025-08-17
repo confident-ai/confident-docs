@@ -72,6 +72,7 @@ navigation:
             path: docs/pages/llm-tracing/online-offline-evaluations.mdx
             icon: fa-light fa-toggle-on
           - section: Tracing Features
+            collapsed: false
             contents:
               - page: Test Cases
                 path: docs/pages/llm-tracing/tracing-features/test-cases.mdx
@@ -113,9 +114,9 @@ navigation:
           - page: Latency and Cost Tracking
             path: docs/pages/llm-tracing/latency-cost-tracking.mdx
             icon: fa-light fa-stopwatch
-          # - page: Performance Alerting
-          #   path: docs/pages/llm-tracing/performance-alerting.mdx
-          #   icon: fa-light fa-bell
+          - page: Performance Alerting
+            path: docs/pages/llm-tracing/performance-alerting.mdx
+            icon: fa-light fa-bell
       - section: Dataset Editor
         contents:
           - page: Introduction
@@ -183,7 +184,7 @@ navigation:
         contents:
           - page: Introduction
             path: docs/api-docs/introduction.mdx
-            icon: circle-info
+            icon: fa-light fa-circle-info
       - api: API Reference
         flattened: true
         skip-slug: true
