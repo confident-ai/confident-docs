@@ -201,7 +201,6 @@ You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`
 <CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import evaluate_thread
-...
 
 a_evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
@@ -219,7 +218,6 @@ You can also set the retrieval context and tools called (if any) for each assist
 ```python title="main.py" {8}
 from deepeval.test_case import ToolCall
 from deepeval.tracing import TurnContext
-...
 
 update_current_trace(
   thread_id=your_thread_id, 
@@ -304,7 +302,7 @@ This is because in this example:
 **Quick quiz:** Given the code below, will Confident AI run online evaluations on the thread using metrics in `"Collection 2"` or `"Collection 1"`?
 
 <CodeBlock>
-```python filename="main.py"
+```python title="main.py"
 from deepeval.tracing import observe, update_current_trace, evaluate_thread
 
 your_thread_id = "your-thread-id"

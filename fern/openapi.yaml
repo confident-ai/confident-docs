@@ -12,19 +12,147 @@ tags:
     description: Metric Collection API
     externalDocs:
       description: Learn about metric collection
-      url: https://documentation.confident-ai.com/api/metrics/collections
   - name: Datasets
     description: Confident AI Datasets API
     externalDocs:
       description: Learn about datasets
-      url: https://documentation.confident-ai.com/api/datasets/data-models
   - name: Evaluation
     description: Run your evals using API
     externalDocs:
       description: Learn about evaluations
-      url: https://documentation.confident-ai.com/api/evaluation/data-models
+  - name: Tracing
+    description: Run your evals using API
+    externalDocs:
+      description: Learn about tracing
 
 paths:
+  /v1/traces:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Trace Ingestion
+      operationId: createTrace
+      description: You can use this endpoint to ingest traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/CreateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTraceResponse"
+
+  /v1/traces/{uuid}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Update Trace
+      operationId: updateTrace
+      description: You can use this endpoint to udate traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/UpdateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTraceResponse"
+      
+  /v1/evaluate/threads/{id}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Thread
+      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
+      operationId: evaluateThread
+      parameters:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateThreadRequest'
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateThreadResponse"
+
+  /evaluate/traces/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Trace
+      operationId: evaluateTrace
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the trace to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateTraceRequest'
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateTraceResponse"
+              
+  /evaluate/spans/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Span
+      operationId: evaluateSpan
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the span to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateSpanRequest'
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateSpanResponse"
+
   /v1/metric-collections:
     post:
       x-fern-server-name: Confident AI
@@ -692,3 +820,273 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Turn"
+    BaseSpan:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier for the span.
+        name:
+          type: string
+        input:
+          description: Input to the span.
+        output:
+          description: Output from the span.
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+      required:
+        - uuid
+        - name
+        - startTime
+        - endTime
+
+    LlmSpan:
+      allOf:
+        - $ref: '#/components/schemas/BaseSpan'
+        - type: object
+          properties:
+            model:
+              type: string
+            costPerInputToken:
+              type: number
+              format: float
+            costPerOutputToken:
+              type: number
+              format: float
+            inputTokenCount:
+              type: integer
+            outputTokenCount:
+              type: integer
+          required:
+            - model
+
+    RetrieverSpan:
+      allOf:
+        - $ref: '#/components/schemas/BaseSpan'
+        - type: object
+          properties:
+            embedder:
+              type: string
+            topK:
+              type: integer
+            chunkSize:
+              type: integer
+          required:
+            - embedder
+
+    ToolSpan:
+      allOf:
+        - $ref: '#/components/schemas/BaseSpan'
+        - type: object
+          properties:
+            description:
+              type: string
+
+    AgentSpan:
+      allOf:
+        - $ref: '#/components/schemas/BaseSpan'
+        - type: object
+          properties:
+            availableTools:
+              type: array
+              items:
+                type: string
+            agentHandoffs:
+              type: array
+              items:
+                type: string
+
+    ToolCall:
+      type: object
+      properties:
+        name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+    
+    Trace:
+      type: object
+      required:
+        - uuid
+        - startTime
+        - endTime
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        input:
+          description: Input to the trace
+        output:
+          description: Output from the trace
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        environment:
+          type: string
+          enum: [production, development, staging, testing]
+        metadata:
+          type: object
+          additionalProperties: true
+        tags:
+          type: array
+          items:
+            type: string
+        baseSpans:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseSpan'
+        llmSpans:
+          type: array
+          items:
+            $ref: '#/components/schemas/LlmSpan'
+        retrieverSpans:
+          type: array
+          items:
+            $ref: '#/components/schemas/RetrieverSpan'
+        toolSpans:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolSpan'
+        agentSpans:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentSpan'
+        threadId:
+          type: string
+        userId:
+          type: string
+        metricCollection:
+          type: string
+        retrievalContext:
+          type: array
+          items:
+            type: string
+        context:
+          type: array
+          items:
+            type: string
+        expectedOutput:
+          type: string
+        toolsCalled:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCall'
+        expectedTools:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCall'
+
+    CreateTrace:
+      allOf:
+        - $ref: '#/components/schemas/Trace'
+    
+    CreateTraceResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+        data:
+          type: object
+          properties:
+            id: 
+              type: string
+      required:
+        - success
+        - data
+    
+    UpdateTrace:
+      type: object
+      properties:
+        output:
+          description: Updated output for the trace
+        endTime:
+          type: string
+          format: date-time
+          description: Updated end time in ISO 8601 format
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Arbitrary metadata to attach to the trace
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the trace
+        
+    UpdateTraceResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+      required:
+        - success
+  
+    EvaluateThreadRequest:
+      type: object
+      required:
+        - metricCollections
+      properties:
+        metricCollections:
+          type: string
+          description: Name of the metric collection to use for evaluation
+        chatbotRole:
+          type: string
+          description: Instructions or role prompt given to the chatbot during evaluation (e.g., system prompt)
+
+    EvaluateThreadResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+      required:
+        - success
+
+    EvaluateTraceRequest:
+      type: object
+      properties:
+        metricCollections:
+          type: string
+          description: The name of the metric collection to use
+      required:
+        - metricCollections
+    
+    EvaluateTraceResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+      required:
+        - success
+
+    EvaluateSpanRequest:
+        type: object
+        properties:
+          metricCollections:
+            type: string
+            description: The name of the metric collection to use
+        required:
+          - metricCollections
+      
+    EvaluateSpanResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+      required:
+        - success

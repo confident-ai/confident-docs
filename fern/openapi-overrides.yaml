@@ -48,6 +48,7 @@ paths:
           schema:
             type: string
           description: The unique alias of the dataset
+
   /v1/evaluate:
     post:
       parameters:
@@ -57,9 +58,84 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+
   /v1/simulate:
     post:
       parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+  
+  /v1/traces:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+  
+  /v1/traces/{uuid}:
+    put:
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+          description: The id of the metric collection you want to update
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+    
+  /v1/evaluate/threads/{id}:
+    post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The id of the metric collection you want to update
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        
+  /evaluate/traces/{uuid}:
+    post:
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+          description: The id of the metric collection you want to update
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        
+/evaluate/spans/{uuid}:
+  post:
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+          description: The id of the metric collection you want to update
         - in: header
           name: CONFIDENT_API_KEY
           required: true
