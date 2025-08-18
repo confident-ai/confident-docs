@@ -1,0 +1,130 @@
+---
+subtitle: Pull datasets to use them for evaluation
+slug: llm-evaluation/dataset-management/using-datasets
+---
+
+## Overview
+
+In the previous section, we learnt how to [curate datasets](/llm-evaluation/dataset-management/create-goldens) by manging goldens through the platform directly or via Confident's Evals API. In this section, we will learn how to:
+
+- Pull dataests for LLM testing
+- Associate dataset with test runs
+- Use the `evals_iterator` to run evals on datasets (for python users)
+
+## Pull Goldens via Evals API
+
+Datasets are either single or multi-turn, and you should know that pulling a single-turn dataset will give you single-turn goldens, and vice versa.
+
+<Note>
+  You will be responsible for mapping single-turn goldens to single-turn test
+  cases, and vice versa.
+</Note>
+
+Pulling goldens via the Evals API will only pull **finalized** goldens by default.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+<Steps>
+
+<Step title="Pull goldens">
+
+First use the `.pull()` method:
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+print(dataset.goldens) # Check it's pulled correctly
+```
+
+</Step>
+
+<Step title="Construct test cases">
+
+Then loop through your dataset of goldens to create a list of test cases:
+
+```python main.py focus={7-13}
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    test_case = LLMTestCase(
+        input=golden.input,
+        actual_output=llm_app(golden.input),
+        # map any additional fields here
+    )
+    dataset.add_test_case(test_case)
+```
+
+<Tip>
+  For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
+
+```python main.py
+from deepeval.test_case import ConversationalTestCase
+
+for golden in dataset.goldens:
+  test_case = simulate(golden) # simulate conversation
+  dataset.add_test_case(test_case)
+```
+
+</Tip>
+
+</Step>
+
+<Step title="Run an evaluation">
+
+By calling `.add_test_case()` in the previous step, each time you run evaluate Confident AI will automatically associate any created test run with your dataset:
+
+```python
+from deepeval import evaluate
+
+evaluate(test_cases=dataset.test_cases, metrics=[...])
+```
+
+</Step>
+
+</Steps>
+
+</Tab>
+<Tab title="Typescript" language="typescript">
+
+[TODO kritin]
+
+</Tab>
+<Tab title="curL" language="curl">
+
+[TODO kritin]
+
+</Tab>
+
+</Tabs>
+
+## Using Evals Iterator
+
+Typeically, you would just provide your dataset as a list of test cases for evaluatioin. However, if you're running **single-turn, end-to-end OR component-level** evaluations, and is using `deepeval` in Python, you can use the `evals_iterator()` instead:
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.evals_iterator():
+    llm_app(golden.input) # Replace with your LLM app
+
+# Async version
+# import asyncio
+#
+# for golden in dataset.evals_iterator():
+#    task = asyncio.create_task(a_llm_app(golden.input))
+#    dataset.evaluate(task)
+```
+
+You'll need to trace your LLM app to make this work. Read this section on running [single-turn end-to-end evals with tracing](/llm-evaluation/single-turn/end-to-end#llm-tracing-for-local-evals) to learn more.

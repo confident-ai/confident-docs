@@ -46,6 +46,7 @@ navigation:
             path: docs/pages/llm-evaluation/quickstart.mdx
             icon: fa-light fa-bolt
           - section: Core Concepts
+            collapsed: false
             icon: fa-light fa-brain
             contents:
               - page: Single vs Multi-Turn Evals
@@ -58,6 +59,7 @@ navigation:
                 path: docs/pages/llm-evaluation/core-concepts/llm-as-a-judge-metrics.mdx
                 icon: fa-light fa-gavel
           - section: Single-Turn Evals
+            collapsed: false
             icon: fa-light fa-arrow-turn-down-right
             contents:
               - page: End-to-End Testing
@@ -67,6 +69,7 @@ navigation:
                 path: docs/pages/llm-evaluation/single-turn/component-level.mdx
                 icon: fa-light fa-puzzle-piece
           - section: Multi-Turn Evals
+            collapsed: false
             icon: fa-light fa-comments
             contents:
               - page: Simulate User Turns
@@ -90,6 +93,16 @@ navigation:
               - page: Prompt Testing
                 path: docs/pages/llm-evaluation/prompt-optimization/prompt-testing.mdx
                 icon: fa-light fa-flask
+          - section: Dataset Management
+            collapsed: false
+            icon: fa-light fa-file-code
+            contents:
+              - page: Push, Queue, and Annotate Goldens
+                path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
+                icon: fa-light fa-pen-to-square
+              - page: Pull Datasets for Testing
+                path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
+                icon: fa-light fa-database
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
             icon: fa-light fa-pipe-valve

@@ -6,16 +6,441 @@ slug: llm-evaluation/single-turn/end-to-end
 
 ## Overview
 
-Single-turn end-to-end testing requires:
+Single-turn, end-to-end testing requires:
 
 - A dataset of goldens
 - A list of metrics you wish to evaluate with
-- Construction a test case at runtime
+- Construction of test case at runtime
 
-The test case that you construct will be an `LLMTestCase` that encapsulates the end system input and outputs.
+The test case that you construct will be an `LLMTestCase` that encapsulates the end system input and outputs. You'll need to:
 
-## How It Works
+## How Does It Work?
 
-## Run Your First E2E Test
+1. Pull your dataset from Confident AI
+2. Loop through goldens in your dataset, for each golden:
+   - Invoke your LLM app using golden inputs to generate test case parameters such as actual output, tools called, and
+   - Map golden fields to test case parameters
+   - Add test case back to your dataset
+3. Run evaluation on test cases
 
-## Debug With LLM Tracing
+<Tip title="There many ways to run evaluations in Confident AI" icon="leaf">
+  There are many ways to do step 3., For running evals locally:
+    - Using the `evaluate()` function
+    - With the `.evals_iterator()` via LLM tracing
+    - Using `deepeval test run` in CI/CD
+
+    For running evals remotely:
+        - Using the Evals API
+        - Also using the `evaluate()` function
+
+</Tip>
+
+For this section, we'll be using this mock LLM app, that is a simple RAG pipeline:
+
+```python main.py
+from openai import OpenAI
+
+def llm_app(query: str) -> str:
+    # Retriever for your vector db
+    def retriever(query: str) -> list[str]:
+        return ["List", "of", "text", "chunks"]
+    # Generator that combines retrieved context with user query
+    def generator(query: str, text_chunks: list[str]) -> str:
+        return OpenAI().chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "user", "content": query}
+            ]
+        ).choices[0].message.content
+    # Calls retriever then generator
+    return generator(query, retriever(query))
+```
+
+## Run E2E Tests Locally
+
+Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](/llm-evaluation/single-turn/end-to-end#run-e2e-tests-remotely) instead.
+
+<Steps>
+
+<Step title="Pull dataset">
+
+Pull your dataset (and [create one](/llm-evaluation/dataset-management/create-goldens) if you haven't already):
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+```
+
+</Step>
+
+<Step title="Loop through goldens to create test cases">
+
+A native for-loop calling your LLM app would do for this step:
+
+```python main.py focus={7-12}
+from deepeval.test_case import LLMTestCase
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    test_case = LLMTestCase(
+        input=golden.input,
+        actual_output=llm_app(input)
+    )
+    dataset.add_test_case(test_case)
+```
+
+<Warning>
+  You'll notice if you also want to also return other test case parameters such
+  as the `retrieval_context` you'll have to rewrite your LLM app. We'll address
+  this problem in the next section.
+</Warning>
+
+</Step>
+
+<Step title="Run evaluation using `evaluate()`">
+
+The `evaluate()` function allows you to create test runs and uploads the data to Confident AI once evaluations have completed locally.
+
+```python main.py
+from deepeval.metrics import AnswerRelevancyMetric
+# Replace with your metrics
+evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
+```
+
+Done ✅. You should see a link to your newly created sharable testing report.
+
+- The `evaluate()` function runs your test suite across all test cases and metrics
+- Each metric is applied to every test case (e.g., 10 test cases × 2 metrics = 20 evaluations)
+- A test case passes only if all metrics for it pass
+- The test run’s pass rate is the proportion of test cases that pass
+
+<Tip>
+  `deepeval` opens your browser automatically by default. To disable this
+  behavior, set `CONFIDENT_BROWSER_OPEN=NO`.
+</Tip>
+
+</Step>
+
+</Steps>
+
+The `evaluate()` function is extremely unopinionated and non-instrusive, which means it is great for teams looking for a lightweight approach for running LLM evaluations. However, it also means that:
+
+- You have to handle a lot of the ETL yourself to map test case fields, even rewriting your LLM app at times to return the correct data
+- No visibility - you will still want to be able to debug your LLM app even if it is an end-to-end evaluation
+
+In the next section, we'll show how you can avoid this ETL hellhole and bring LLM traces to end-to-end testing.
+
+## LLM Tracing for Local Evals
+
+LLM tracing solves all problems associated with constructing test cases.
+
+<Steps>
+
+<Step title="Setup LLM tracing">
+
+All you need is to add a few lines of code to your existing LLM app (we'll be using the example from above):
+
+```python main.py focus={4,7,10,13,21}
+from openai import OpenAI
+from deepeval import observe, update_current_trace
+
+@observe()
+def llm_app(query: str) -> str:
+
+    @observe()
+    def retriever(query: str) -> list[str]:
+        chunks = ["List", "of", "text", "chunks"]
+        update_current_trace(retrieval_context=chunks)
+        return chunks
+
+    @observe()
+    def generator(query: str, text_chunks: list[str]) -> str:
+        res = OpenAI().chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "user", "content": query}
+            ]
+        ).choices[0].message.content
+        update_current_trace(input=query, actual_output=res)
+        return res
+
+    return generator(query, retriever(query))
+```
+
+The example above shows how we are tracing our LLM app by simply adding a few `@observe` decorators:
+
+- Each `@observe` decorator creates a **span**, which represents **components**
+- A **trace** on the other hand is created by the top-level `@observe` decorator, and is made up of many spans/components
+- When you run end-to-end testing, you can call the `update_current_trace` function inside anywhere in your traced application to set test case parameters
+
+Don't worry too much about learning everything you can about LLM tracing for
+now. We'll go through it in in a dedicated LLM tracing section.
+
+<Tip>
+  In the next section on component-level testing, we will simply swap the
+  `update_current_trace` function with `update_current_span` to construct test
+  cases on a component-level.
+</Tip>
+
+</Step>
+
+<Step title="Pull dataset, and loop through goldens">
+
+Pull your dataset in the same way as before, and use the `.evals_iterator()` to loop through your goldens. You will use data in your goldens (most likely the `input`) to call your LLM app:
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.evals_iterator():
+    llm_app(golden.input) # Replace with your LLM app
+```
+
+Done ✅. You should see a link to your newly created sharable testing report. **This is literally all it takes to run end-to-end evaluations**, with the added benefit of a full testing report with tracing included on Confident AI.
+
+<Note>
+You can also run your for-loop asynchronously:
+
+```python focus={8-9}
+import asyncio
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(a_llm_app(golden.input))
+    dataset.evaluate(task)
+```
+
+</Note>
+
+</Step>
+
+</Steps>
+
+## Run E2E Tests Remotely
+
+Remote end-to-end evals offer no tracibility for debugging but is great because:
+
+- Team members can build metrics without going through code
+- Supported through Evals API, for any language
+
+This is possible via Confident AI's Evals API.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Go to **Project** > **Metric** > **Collections**:
+
+[video]
+
+</Step>
+
+<Step title="Pull dataset and construct test cases">
+
+Using your language of choice, you would call your LLM app to construct a list of valid `LLMTestCase` [data models](/llm-evaluation/core-concepts/test-cases-goldens-datasets#test-cases).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    test_case = LLMTestCase(input=golden.input, actual_output=llm_app(golden.input))
+    dataset.add_test_case(test_case)
+```
+
+</Tab>
+<Tab title="Typescript" language="typescript">
+
+[TODO: kritin]
+
+</Tab>
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet
+  endpoint="GET /v1/datasets"
+  example="Single-turn dataset"
+/>
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Call `/v1/evaluate` endpoint">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval import evaluate
+
+evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
+```
+
+</Tab>
+<Tab title="Typescript" language="typescript">
+
+[TODO: kritin]
+
+</Tab>
+<Tab title="curL" language="curl">
+
+[TODO: vamshi]
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+Now you've learnt how to run a single-turn, end-to-end evaluation, here are a few things you should also do.
+
+### Log prompts and models
+
+Tell Confident AI the configurations used in your LLM app during the evaluation.
+
+<Tip>
+  This will help Confident AI tell you which of your hyperparameters performed
+  better retrospectively.
+</Tip>
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+Simply add a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function:
+
+```python
+evaluate(
+    hyperparameters={
+        "Model": "YOUR-MODEL",
+        "Prompt Version": "YOUR-PROMPT-VERSION"
+    },
+    test_cases=[...],
+    metrics=[...]
+)
+```
+
+If you're keeping prompts on Confidnet AI for prompt optimization, you can also provide the prompt object directly:
+
+```python focus={1-4,8}
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+
+evaluate(
+    hyperparameters={
+        "Prompt Version": prompt, # raw prompt object
+        "Model": "YOUR-MODEL"
+    },
+    test_cases=[...],
+    metrics=[...]
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+[TODO kritin]
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+[TODO vamshi]
+
+</Tab>
+
+</Tabs>
+
+### Add identifer to test runs
+
+The identifer argument allows you to name test runs, which will come in extremely handy when you're trying to run regression tests on them on the platform.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+evaluate(
+    identifer="Any custom string",
+    test_cases=[...],
+    metrics=[...]
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+[TODO kritin]
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+[TODO vamshi]
+
+</Tab>
+
+</Tabs>
+
+### Name test cases
+
+Similar to the identifer, naming test cases allows you to search and match test cases across different test runs during regression testing.
+
+<Note>
+  By default, Confident AI will match test cases based on matching inputs, so
+  naming test cases is not strictly required for regression testing.
+</Note>
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+evaluate(
+    test_cases=[LLMTestCase(name="Any custom string", ...)],
+    metric_collection="..."
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+[TODO kritin]
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+[TODO vamshi]
+
+</Tab>
+
+</Tabs>
