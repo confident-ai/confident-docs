@@ -41,12 +41,21 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateMetricCollection"
-            example:
-              name: "Collection Name"
-              metricSettings:
-                - metric:
-                    name: Answer Relevancy
-                  threshold: 0.8
+            examples:
+              Single-Turn:
+                name: "Collection Name"
+                multiTurn: false
+                metricSettings:
+                  - metric:
+                      name: Answer Relevancy
+                    threshold: 0.8
+              Multi-Turn:
+                name: "Collection Name"
+                multiTurn: true
+                metricSettings:
+                  - metric:
+                      name: Turn Relevancy
+                    threshold: 0.8
 
       responses:
         "200":
@@ -55,11 +64,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateMetricResponse"
-              example:
-                success: true
-                data:
-                  id: "COLLECTION-ID"
-                deprecated: false
+              examples:
+                Single-Turn:
+                  success: true
+                  data:
+                    id: "COLLECTION-ID"
+                  deprecated: false
+                Multi-Turn:
+                  success: true
+                  data:
+                    id: "COLLECTION-ID"
+                  deprecated: false
 
     get:
       x-fern-server-name: Confident AI
@@ -75,20 +90,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetMetricCollectionResponse"
-              example:
-                success: true
-                data:
-                  metricCollections:
-                    - id: "COLLECTION-ID"
-                      name: "Collection Name"
-                      multiTurn: false
-                      metricSettings:
-                        - metric:
-                            name: "Faithfulness"
-                          activated: true
-                          threshold: 0.5
-                          includeReason: true
-                          strictMode: false
+              examples:
+                GetMetricCollections:
+                  success: true
+                  data:
+                    metricCollections:
+                      - id: "COLLECTION-ID"
+                        name: "Collection Name"
+                        multiTurn: false
+                        metricSettings:
+                          - metric:
+                              name: "Faithfulness"
+                            activated: true
+                            threshold: 0.5
+                            includeReason: true
+                            strictMode: false
 
   /v1/metric-collections/{id}:
     put:
@@ -106,15 +122,20 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdateMetricCollection"
             examples:
-              UpdateCollection:
-                summary: Update Metric Collection Example
-                value:
-                  name: "New Collection Name"
-                  multiTurn: false
-                  metricSettings:
-                    - metric:
-                        name: "Faithfulness"
-                      threshold: 0.5
+              Single-Turn:
+                name: "New Collection Name"
+                multiTurn: false
+                metricSettings:
+                  - metric:
+                      name: "Faithfulness"
+                    threshold: 0.5
+              Multi-Turn:
+                name: "New Collection Name"
+                multiTurn: true
+                metricSettings:
+                  - metric:
+                      name: "Role Adherence"
+                    threshold: 0.5
       responses:
         "200":
           description: ""
@@ -123,13 +144,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/UpdateMetricCollectionResponse"
               examples:
-                UpdateCollection:
-                  summary: Update Metric Collection Example
-                  value:
-                    success: true
-                    data:
-                      id: "COLLECTION-ID"
-                    deprecated: false
+                Single-Turn:
+                  success: true
+                  data:
+                    id: "COLLECTION-ID"
+                  deprecated: false
+                Multi-Turn:
+                  success: true
+                  data:
+                    id: "COLLECTION-ID"
+                  deprecated: false
 
   /v1/datasets:
     get:
@@ -146,13 +170,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetDatasetResponse"
-              example:
-                success: true
-                data:
-                  datasetId: "DATASET-ID"
-                  goldens:
-                    - input: "How's the weather like in NYC?"
-                      expectedOutput: "No idea"
+              examples:
+                Single-Turn:
+                  success: true
+                  data:
+                    datasetId: "DATASET-ID"
+                    goldens:
+                      - input: "How's the weather like in NYC?"
+                        expectedOutput: "No idea"
+                Multi-Turn:
+                  success: true
+                  data:
+                    datasetId: "DATASET-ID"
+                    conversationalGoldens:
+                      - scenario: "Booking a hotel"
+                        expectedOutcome: "Successfully booked"
+                        userDescription: "Finds hotels in NYC"
 
     post:
       x-fern-server-name: Confident AI
@@ -168,12 +201,20 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateDatasetRequestData"
-            example:
-              alias: "my-dataset-alias"
-              overwrite: true
-              goldens:
-                - input: "How is the weather like in NYC?"
-                  expectedOutput: "No idea"
+            examples:
+              Single-Turn:
+                alias: "my-dataset-alias"
+                overwrite: true
+                goldens:
+                  - input: "How is the weather like in NYC?"
+                    expectedOutput: "No idea"
+              Multi-Turn:
+                alias: "my-dataset-alias"
+                overwrite: true
+                conversationalGoldens:
+                  - scenario: "Booking a hotel"
+                    expectedOutcome: "Successfully booked"
+                    userDescription: "Finds hotels in NYC"
 
       responses:
         "200":
@@ -182,8 +223,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateOrUpdateGoldenRequestData"
-              example:
-                link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+              examples:
+                Single-Turn:
+                  link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+                Multi-Turn:
+                  link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
 
   /v1/evaluate:
     post:
@@ -200,10 +244,34 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/EvaluateRequest"
-            example:
-              metricCollection: "Collection Name"
-              testCases:
-                input: "How tall is mount everest?"
+            examples:
+              Single-Turn:
+                metricCollection: "Collection Name"
+                testCases:
+                  input: "How tall is mount everest?"
+                  actualOutput: "Not sure, pretty tall I guess?"
+              Multi-Turn:
+                metricCollection: "Collection Name"
+                testCases:
+                  - turns:
+                      - role: user
+                        content: "How tall is Mount Everest?"
+                      - role: assistant
+                        content: "Mount Everest is approximately 8,848 meters tall."
+              Logging Parameters:
+                metricCollection: "Collection Name"
+                testCases:
+                  input: "How tall is mount everest?"
+                  actualOutput: "Not sure, pretty tall I guess?"
+                hyperparameters:
+                  model: "gpt-4o-mini"
+                  prompt-version: "ai_generation_v2"
+              Logging Identifier:
+                metricCollection: "Collection Name"
+                testCases:
+                  input: "How tall is mount everest?"
+                  actualOutput: "Not sure, pretty tall I guess?"
+                identifier: "run-881-102"
       responses:
         "200":
           description: ""
@@ -211,11 +279,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EvaluateResponse"
-              example:
-                success: true
-                data:
-                  id: "TEST-RUN-ID"
-                deprecated: false
+              examples:
+                Single-Turn:
+                  success: true
+                  data:
+                    id: "TEST-RUN-ID"
+                  deprecated: false
+                Multi-Turn:
+                  success: true
+                  data:
+                    id: "TEST-RUN-ID"
+                  deprecated: false
+                Logging Parameters:
+                  success: true
+                  data:
+                    id: "TEST-RUN-ID"
+                  deprecated: false
+                Logging Identifier:
+                  success: true
+                  data:
+                    id: "TEST-RUN-ID"
+                  deprecated: false
 
   /v1/simulate:
     post:
@@ -402,6 +486,9 @@ components:
         name:
           type: string
           description: The name of the metric collection, which must be unique within your project.
+        multiTurn:
+          type: boolean
+          description: This is true if your metric collection is multi-turn, which contains only multi-turn metrics. Defaulted to `false`.
         metricSettings:
           type: array
           description: This is the list of metric settings for the collection.
