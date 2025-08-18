@@ -270,7 +270,7 @@ for golden in dataset.goldens:
 ```ts main.ts
 import { EvaluationDataset } from "deepeval-ts";
 
-const dataset = EvaluationDataset();
+const dataset = new EvaluationDataset();
 dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 for (const golden of dataset.goldens) {
