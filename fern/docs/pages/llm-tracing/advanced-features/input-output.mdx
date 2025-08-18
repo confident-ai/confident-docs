@@ -76,9 +76,9 @@ You can set the `input` and `output` on spans using the `update_current_span` fu
 
 One thing to note however, is we recommend [setting attributes](/docs/llm-tracing/tracing-features/attributes) instead of `input` and `output` directly on spans that are one of the **DEFAULT span types**, since DeepEval handles the `input` and `output` setting automatically for default span `type`s. 
 
-<Callout>
+<Note>
 For example, the `"retriever"` span `type` expects a string as the `input` and list of strings as the `output`, which you might violate if setting I/O yourself. This will decrease the chances that you run into an error.
-</Callout>
+</Note>
 
 <Tabs>
     <Tab title="Python">

@@ -6,9 +6,9 @@ description: Learn about threads in LLM Tracing
 
 A "thread" on Confident AI is a group of one or more traces. This is useful for those building AI chatrooms, conversational agents, etc., where you wish to view entire conversations on Confident AI.
 
-<Callout>
+<Info>
 It is traces that are grouped together, not spans.
-</Callout>
+</Info>
 
 ## Set Threads At Runtime
 
@@ -68,9 +68,9 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
 
 The `thread_id` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI. 
 
-<Callout>
+<Note>
 If the I/O is not provided, it will be set to the [default I/O values of the trace.](/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) 
-</Callout>
+</Note>
 
 ### Inputs/Outputs
 
@@ -132,10 +132,6 @@ update_current_trace(
 )
 ```
 </CodeBlock>
-
-<Callout>
-Learn more about the data model of `ToolCall` [here.](/docs/concepts/test-cases#llmtestcase)
-</Callout>
 
 The turn context is complimentry to the `output`, and allows you to log any additional context involved in the generation of this turn.
 

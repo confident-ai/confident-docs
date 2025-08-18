@@ -14,9 +14,9 @@ Span types are **hugely optional** but allow you to classify the most common typ
 
 This is set via the `type` argument in the `@observe` decorator. By classifying span types you can create more tailored UIs on Confident AI, and set more specific [`attribtues`](/docs/llm-tracing/tracing-features/attributes) instead of using generalized [`metadata`](/docs/llm-tracing/tracing-features/metadata).
 
-<Callout>
+<Warning>
 Anything that is **NOT** one of these four default span types are **automatically custom spans.**
-</Callout>
+</Warning>
 
 
 ## Custom span
@@ -107,10 +107,10 @@ There are **TWO** mandatory and **FOUR** optional parameters when decorating a f
 - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
 - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
 
-<Callout>
+<Note>
   If `cost_per_input_token` is not set, setting `input_token_count` will not help calculate the cost. The same applies to
   output tokens.
-</Callout>
+</Note>
 
 ## Retriever Span
 

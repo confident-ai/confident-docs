@@ -25,22 +25,16 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         Get your [Confident AI Project API](https://app.confident-ai.com) key and login.
 
         <CodeBlocks>
-          ```bash title="Export"
-          export CONFIDENT_API_KEY=YOUR-API-KEY
-          ```
-          ```bash title="Bash"
-          deepeval login
-          ```
-          ```bash title="CLI"
-          deepeval login --confident-api-key YOUR_API_KEY
-          ```
           ```python title="In code"
           import deepeval
 
           deepeval.login("YOUR_API_KEY")
           ```
-          ```bash title=".env"
-          CONFIDENT_API_KEY=YOUR-API-KEY
+          ```bash title="Set Env"
+          export CONFIDENT_API_KEY=YOUR-API-KEY
+          ```
+          ```bash title="Login through CLI"
+          deepeval login
           ```
         </CodeBlocks>
       </Step>
@@ -137,18 +131,15 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         Get your [Confident AI Project API](https://app.confident-ai.com) key and login.
 
         <CodeBlocks>
-          ```bash title="Export"
-          export CONFIDENT_API_KEY=YOUR-API-KEY
-          ```
           ```js title="In code"
-            import { traceManager } from '@deepeval-ts/tracing';
+          import { traceManager } from '@deepeval-ts/tracing';
 
-            traceManager.configure({
-                confidentApiKey: "YOUR_API_KEY"
-            })
+          traceManager.configure({
+              confidentApiKey: "YOUR_API_KEY"
+          })
           ```
-          ```bash title=".env"
-          CONFIDENT_API_KEY=YOUR-API-KEY
+          ```bash title="Set Env"
+          export CONFIDENT_API_KEY=YOUR-API-KEY
           ```
         </CodeBlocks>
       </Step>
@@ -160,7 +151,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
           ```ts title="index.ts"
           import OpenAI from 'openai';
           import { observe } from '@deepeval-ts/tracing';
-           
+            
           const llmApp = async (query: string) => {
             const openai = new OpenAI();
             const res = await openai.chat.completions.create({
@@ -169,9 +160,9 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
             });
             return res.choices[0].message.content;
           };
-           
+            
           const observedLlmApp = observe({ fn: llmApp });
-           
+            
           // Call app to send trace to Confident AI
           observedLlmApp("Write me a poem.");
           ```

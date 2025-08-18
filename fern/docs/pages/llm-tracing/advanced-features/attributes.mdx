@@ -7,9 +7,9 @@ description: Learn about attributes in LLM Tracing
 
 Attributes are like [`metadata`](/docs/llm-tracing/tracing-features/metadata) but specific to different span `type`s.
 
-<Callout>
+<Tip>
 Setting attributes will make the tracing UI easier to navigate on Confident AI, but is by no means required. You also cannot set attributes for custom [span types](/docs/llm-tracing/tracing-features/span-types).
-</Callout>
+</Tip>
 
 ## Set Attributes At Runtime
 
@@ -128,9 +128,9 @@ There are **SIX** optional parameters for `update_llm_span`:
 - [Optional] `cost_per_output_token`: The cost per output token of type `float`.
 
 
-<Callout>
+<Note>
 The model and per-token costs can be set in the `@observe` decorator, but will be overridden if set in `update_llm_span`.
-</Callout>
+</Note>
 
 ### Retriever attributes
 

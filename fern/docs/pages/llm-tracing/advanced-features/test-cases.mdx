@@ -6,9 +6,9 @@ description: Learn about test cases in LLM Tracing
 
 Confident AI allows you to [run evaluations](/docs/llm-tracing/evaluations#online-evals-for-traces) on your spans and traces, which requires you to set test case parameters in `update_current_span` and `update_current_trace`.
 
-<Callout>
+<Note>
 Each metric requires different test case parameters. For detailed information on required test case parameters for each metric, refer to the [official DeepEval documentation](https://deepeval.com/docs/metrics-introduction).
-</Callout>
+</Note>
 
 ## Test Case Parameters
 
@@ -22,9 +22,9 @@ Both `update_current_span` and `update_current_trace` accept 7 **OPTIONAL** test
 - `tools_called`: A list of `ToolCall` objects representing the tools called by your LLM app
 - `expected_tools`: A list of `ToolCall` objects representing the expected tools to be called by the LLM app
 
-<Callout>
+<Tip>
 The **input** and **output** accept `Any` type for visualization purposes, but we recommend setting them as strings for running evaluations.
-</Callout>
+</Tip>
 
 ## Set Span Test Case Parameters
 
@@ -77,9 +77,9 @@ You can set span-level test case parameters in the `update_current_span` functio
 
 You can set trace-level test case parameters in the `update_current_trace` function.
 
-<Callout type="info">
+<Info>
 `update_current_trace` can be set multiple times at any point in your code under the `observe` decorator, which is useful when a parameter is only accessible in specific parts of your code.
-</Callout>
+</Info>
 
 <Tabs>
     <Tab title="Python">
