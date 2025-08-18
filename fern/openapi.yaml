@@ -24,6 +24,10 @@ tags:
     description: Run your evals using API
     externalDocs:
       description: Learn about tracing
+  - name: Prompt
+    description: Run your evals using API
+    externalDocs:
+      description: Learn about prompts
 
 paths:
   /v1/metric-collections:
@@ -481,6 +485,82 @@ paths:
               schema:
                 $ref: "#/components/schemas/UpdateTraceResponse"
 
+  /v1/prompts:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Pull Prompts
+      operationId: getPrompt
+      description: Retrieves a prompt with `promptVersionId` and `interpolationType` from your Confident AI account.
+      responses:
+        "200":
+          description: Successfully retrieved prompt version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPromptResponse'
+              examples:
+                Text-Prompt:
+                  success: true
+                  data:
+                    promptVersionId: "prv_abc123"
+                    text: "Hello, {{name}}!"
+                    type: "TEXT"
+                    interpolationType: "FSTRING"
+                List-Prompt:
+                  success: true
+                  data:
+                    promptVersionId: "prvl_def456"
+                    messages:
+                      - role: user
+                        content: "What is the weather like in {{city}}?"
+                    type: "LIST"
+                    interpolationType: "FSTRING"
+
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Push Prompts
+      operationId: pushPrompt
+      description: Creates a new prompt on your Confident AI account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePromptRequest'
+            examples:
+              Text-Prompt:
+                alias: "Prompt Name"
+                text: "Hello, {{name}}!"
+                interpolationType: "FSTRING"
+              List-Prompt:
+                alias: "Prompt Name"
+                messages:
+                  - role: user
+                    content: "What is the weather like in {{city}}?"
+                interpolationType: "FSTRING"
+      responses:
+        '200':
+          description: Successfully created or updated a prompt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePromptResponse'
+              examples:
+                Text-Prompt:
+                  success: true
+                  data:
+                    id: "prm_xyz456"
+                  redirectUrl: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                List-Prompt:
+                  success: true
+                  data:
+                    id: "prm_xyz456"
+                  redirectUrl: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+
 components:
   schemas:
     CreateMetricCollection:
@@ -516,6 +596,7 @@ components:
           description: This is the list of metric settings for the collection.
           items:
             $ref: "#/components/schemas/MetricSetting"
+      required:
 
     MetricSetting:
       type: object
@@ -669,43 +750,53 @@ components:
           description: "This is the input to your LLM application."
         actualOutput:
           type: string
+          nullable: true
           description: "This is the actual output of your LLM application."
         expectedOutput:
           type: string
+          nullable: true
           description: "This is the expected output of your LLM application, which is the ideal actual output."
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the retrieval context of your LLM application."
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the ideal retrieval context of your LLM application."
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the tools called by your LLM application."
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the expected tools to be called by the LLM application."
         additionalMetadata:
           type: object
+          nullable: true
           description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
+          nullable: true
           description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
+          nullable: true
           description: "This is the source file from which the golden was retrieved."
         customColumnKeyValues:
           type: object
           additionalProperties:
             type: string
+          nullable: true
           description: "This is the custom column key values of the LLM application."
       required:
         - input
@@ -718,33 +809,41 @@ components:
           description: "This is a description of the conversation context."
         userDescription:
           type: string
+          nullable: true
           description: "This is the description of the user in the conversation."
         expectedOutcome:
           type: string
+          nullable: true
           description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
         turns:
           type: array
           items:
             $ref: "#/components/schemas/Turn"
+          nullable: true
           description: "This is the list of turns in the conversation."
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the context of the conversation."
         additionalMetadata:
           type: object
+          nullable: true
           description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
+          nullable: true
           description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
+          nullable: true
           description: "This is the source file from which the golden was retrieved."
         customColumnKeyValues:
           type: object
           additionalProperties:
             type: string
+          nullable: true
           description: "This is the custom column key values of the LLM application."
       required:
         - scenario
@@ -757,41 +856,51 @@ components:
           description: "This is the input to your LLM application."
         actualOutput:
           type: string
+          nullable: true
           description: "This is the actual output of your LLM application."
         expectedOutput:
           type: string
+          nullable: true
           description: "This is the expected output of your LLM application, which is the ideal actual output."
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the retrieval context of your LLM application."
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the ideal retrieval context of your LLM application."
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the tools called by your LLM application."
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the expected tools to be called by the LLM application."
         additionalMetadata:
           type: object
+          nullable: true
           description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
+          nullable: true
           description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
+          nullable: true
           description: "This is the source file from which the golden was retrieved."
         finalized:
           type: boolean
+          nullable: true
           description: "This determines whether the golden has been finalized."
       required:
         - input
@@ -804,31 +913,39 @@ components:
           description: "This is a description of the conversation context."
         userDescription:
           type: string
+          nullable: true
           description: "This is the description of the user in the conversation."
         expectedOutcome:
           type: string
+          nullable: true
           description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
         turns:
           type: array
           items:
             $ref: "#/components/schemas/Turn"
+          nullable: true
           description: "This is the list of turns in the conversation."
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the context of the conversation."
         additionalMetadata:
           type: object
+          nullable: true
           description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
+          nullable: true
           description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
+          nullable: true
           description: "This is the source file from which the golden was retrieved."
         finalized:
           type: boolean
+          nullable: true
           description: "This determines whether the golden has been finalized."
       required:
         - scenario
@@ -845,16 +962,19 @@ components:
           description: "The message content of the turn."
         userId:
           type: string
+          nullable: true
           description: "The user ID associated with the turn."
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
           description: "The contexts retrieved to generate the LLM response for this turn."
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "The tools called to generate the LLM response for this turn."
       required:
         - role
@@ -868,15 +988,20 @@ components:
           description: "This is the name of the tool."
         description:
           type: string
+          nullable: true
           description: "This is the description of the tool."
         inputParameters:
           type: object
           additionalProperties: true
+          nullable: true
           description: "This is the input parameters that are passed to the tool."
         output:
+          type: any
+          nullable: true
           description: "This is the output of the tool."
         reasoning:
           type: string
+          nullable: true
           description: "This is the reasoning your LLM provided for the tool call."
       required:
         - name
@@ -928,11 +1053,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Golden"
+          nullable: true
           description: "This is a list of single-turn goldens to push. If you are pushing a multi-turn dataset, this should be `null`."
         conversationalGoldens:
           type: array
           items:
             $ref: "#/components/schemas/ConversationalGolden"
+          nullable: true
           description: "This is a list of conversational goldens to push. If you are pushing a single-turn dataset, this should be `null`."
       required:
         - alias
@@ -955,29 +1082,35 @@ components:
           description: "This is the input to your LLM application."
         actualOutput:
           type: string
+          nullable: true
           description: "This is the actual output of your LLM application."
         expectedOutput:
           type: string
+          nullable: true
           description: "This is the expected output of your LLM application, which is the ideal actual output."
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the retrieval context of your LLM application."
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: "This is the ideal retrieval context of your LLM application."
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the tools called by your LLM application."
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: "This is the expected tools to be called by the LLM application."
       required:
         - input
@@ -990,18 +1123,22 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Turn"
+          nullable: true
           description: "This is the list of turns in the conversation."
         scenario:
           type: string
           description: "This is a description of the conversation context."
         expectedOutcome:
           type: string
+          nullable: true
           description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
         userDescription:
           type: string
+          nullable: true
           description: "This is the description of the user in the conversation."
         chatbotRole:
           type: string
+          nullable: true
           description: "This is the role of the chatbot in the conversation."
       required:
         - turns
@@ -1098,8 +1235,10 @@ components:
           type: string
           description: This is the name of the span.
         input:
+          type: any
           description: This is the input to the span.
         output:
+          type: any
           description: This is the output of the span.
         error:
           type: string
@@ -1126,6 +1265,7 @@ components:
           description: This is any additional metadata associated with the span.
         metricCollection:
           type: string
+          nullable: true
           description: This is the metric collection to be used for evaluating the span.
         type:
           type: string
@@ -1134,24 +1274,29 @@ components:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the retrieval context of your span, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the ideal retrieval context of your span, which is to be used for evaluation.
         expectedOutput:
           type: string
+          nullable: true
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the tools called by your span, which is to be used for evaluation.
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
       required:
         - uuid
@@ -1169,8 +1314,10 @@ components:
           type: string
           description: This is the name of the span.
         input:
+          type: any
           description: This is the input to the span.
         output:
+          type: any
           description: This is the output of the span.
         error:
           type: string
@@ -1197,6 +1344,7 @@ components:
           description: This is any additional metadata associated with the span.
         metricCollection:
           type: string
+          nullable: true
           description: This is the metric collection to be used for evaluating the span.
         type:
           type: string
@@ -1205,24 +1353,29 @@ components:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the retrieval context of your span, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the ideal retrieval context of your span, which is to be used for evaluation.
         expectedOutput:
           type: string
+          nullable: true
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the tools called by your span, which is to be used for evaluation.
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
         model:
           type: string
@@ -1254,8 +1407,10 @@ components:
           type: string
           description: This is the name of the span.
         input:
+          type: any
           description: This is the input to the span.
         output:
+          type: any
           description: This is the output of the span.
         error:
           type: string
@@ -1282,6 +1437,7 @@ components:
           description: This is any additional metadata associated with the span.
         metricCollection:
           type: string
+          nullable: true
           description: This is the metric collection to be used for evaluating the span.
         type:
           type: string
@@ -1290,24 +1446,29 @@ components:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the retrieval context of your span, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the ideal retrieval context of your span, which is to be used for evaluation.
         expectedOutput:
           type: string
+          nullable: true
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the tools called by your span, which is to be used for evaluation.
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
         embedder:
           type: string
@@ -1331,8 +1492,10 @@ components:
           type: string
           description: This is the name of the span.
         input:
+          type: any
           description: This is the input to the span.
         output:
+          type: any
           description: This is the output of the span.
         error:
           type: string
@@ -1359,6 +1522,7 @@ components:
           description: This is any additional metadata associated with the span.
         metricCollection:
           type: string
+          nullable: true
           description: This is the metric collection to be used for evaluating the span.
         type:
           type: string
@@ -1367,24 +1531,29 @@ components:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the retrieval context of your span, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the ideal retrieval context of your span, which is to be used for evaluation.
         expectedOutput:
           type: string
+          nullable: true
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the tools called by your span, which is to be used for evaluation.
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
         description:
           type: string
@@ -1400,8 +1569,10 @@ components:
           type: string
           description: This is the name of the span.
         input:
+          type: any
           description: This is the input to the span.
         output:
+          type: any
           description: This is the output of the span.
         error:
           type: string
@@ -1428,6 +1599,7 @@ components:
           description: This is any additional metadata associated with the span.
         metricCollection:
           type: string
+          nullable: true
           description: This is the metric collection to be used for evaluating the span.
         type:
           type: string
@@ -1436,24 +1608,29 @@ components:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the retrieval context of your span, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          nullable: true
           description: This is the ideal retrieval context of your span, which is to be used for evaluation.
         expectedOutput:
           type: string
+          nullable: true
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the tools called by your span, which is to be used for evaluation.
         expectedTools:
           type: array
           items:
             $ref: "#/components/schemas/ToolCallData"
+          nullable: true
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
         availableTools:
           type: array
@@ -1480,8 +1657,10 @@ components:
           type: string
           description: This is the name of the trace.
         input:
+          type: any
           description: This is the input to the trace.
         output:
+          type: any
           description: This is the output of the trace.
         startTime:
           type: string
@@ -1591,8 +1770,10 @@ components:
       type: object
       properties:
         input:
+          type: any
           description: This is the input to the trace.
         output:
+          type: any
           description: This is the output of the trace.
         endTime:
           type: string
@@ -1749,3 +1930,81 @@ components:
         - success
         - data
         - deprecated
+
+    CreatePromptRequest:
+      type: object
+      properties:
+        alias:
+          type: string
+        text:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromptMessage'
+        interpolationType:
+          type: string
+          enum: [FSTRING, HANDLEBARS]
+          default: FSTRING
+      required:
+        - alias
+
+    PromptMessage:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+      required:
+        - role
+        - content
+
+    GetPromptResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            promptVersionId:
+              type: string
+            text:
+              type: string
+            messages:
+              type: array
+              items:
+                $ref: '#/components/schemas/PromptMessage'
+            type:
+              type: string
+              enum: [TEXT, LIST]
+            interpolationType:
+              type: string
+              enum: [FSTRING, HANDLEBARS]
+          required:
+            - promptVersionId
+            - type
+            - interpolationType
+      required: 
+        - success
+        - data
+
+    CreatePromptResponse:
+      type: object
+      properties:
+        success: 
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+        redirectUrl:
+              type: string
+      required:
+        - success
+        - data
+        - redirectUrl
