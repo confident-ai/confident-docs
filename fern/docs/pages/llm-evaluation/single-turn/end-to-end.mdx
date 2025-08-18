@@ -267,7 +267,20 @@ for golden in dataset.goldens:
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-[TODO: kritin]
+```ts main.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+for (const golden of dataset.goldens) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: llmApp(golden.input),
+  });
+  dataset.addTestCase(testCase);
+}
+```
 
 </Tab>
 <Tab title="curL" language="curl">
@@ -298,7 +311,14 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-[TODO: kritin]
+```ts main.ts
+import { evaluate } from "deepeval-ts";
+
+evaluate({
+  testCases: dataset.testCases,
+  metricCollection: "YOUR-COLLECTION-NAME",
+});
+```
 
 </Tab>
 <Tab title="curL" language="curl">
@@ -346,15 +366,10 @@ evaluate(
 If you're keeping prompts on Confidnet AI for prompt optimization, you can also provide the prompt object directly:
 
 ```python focus={1-4,8}
-from deepeval.prompt import Prompt
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull()
-
 evaluate(
     hyperparameters={
-        "Prompt Version": prompt, # raw prompt object
-        "Model": "YOUR-MODEL"
+        "Model": "YOUR-MODEL",
+        "Prompt Version": "YOUR-PROMPT-VERSION"
     },
     test_cases=[...],
     metrics=[...]
@@ -365,7 +380,31 @@ evaluate(
 
 <Tab title="Typescript" language="typescript">
 
-[TODO kritin]
+Simply add a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function:
+
+```ts
+evaluate({
+  hyperparameters: {
+    Model: "YOUR-MODEL",
+    "Prompt Version": "YOUR-PROMPT-VERSION",
+  },
+  testCases: [...],
+  metrics: [...]
+});
+```
+
+If you're keeping prompts on Confidnet AI for prompt optimization, you can also provide the prompt object directly:
+
+```ts focus={1-4,8}
+evaluate({
+  hyperparameters: {
+    Model: "YOUR-MODEL",
+    "Prompt Version": prompt,
+  },
+  testCases: [...],
+  metrics: [...]
+});
+```
 
 </Tab>
 
@@ -397,7 +436,13 @@ evaluate(
 
 <Tab title="Typescript" language="typescript">
 
-[TODO kritin]
+```ts
+evaluate({
+  identifer: "Any custom string",
+  testCases: [...],
+  metrics: [...]
+});
+```
 
 </Tab>
 
@@ -433,7 +478,12 @@ evaluate(
 
 <Tab title="Typescript" language="typescript">
 
-[TODO kritin]
+```ts
+evaluate({
+  testCases: [new LLMTestCase({ name: "Any custom string", ... })],
+  metricCollection: "..."
+});
+```
 
 </Tab>
 
