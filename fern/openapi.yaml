@@ -263,6 +263,93 @@ paths:
                         - role: "user"
                           content: "I'd like my refund please."
 
+  /v1/evaluate/spans/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Evaluate Span
+      operationId: evaluateSpan
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateSpanRequest"
+            example:
+              metricCollection: "Collection Name"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateSpanResponse"
+              example:
+                success: true
+                data:
+                  id: "SPAN-ID"
+                deprecated: false
+
+  /v1/evaluate/traces/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Evaluate Trace
+      operationId: evaluateTrace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateTraceRequest"
+            example:
+              metricCollection: "Collection Name"
+      responses:
+        "200":
+          description: Successful response from evaluate trace API
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateTraceResponse"
+              example:
+                success: true
+                data:
+                  id: "TRACE-ID"
+                deprecated: false
+
+  /v1/evaluate/threads/{id}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Evaluate Thread
+      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
+      operationId: evaluateThread
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateThreadRequest"
+            example:
+              metricCollection: "Collection Name"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateThreadResponse"
+              example:
+                success: true
+                data:
+                  id: "THREAD-ID"
+                deprecated: false
+
   /v1/traces:
     post:
       x-fern-server-name: Confident AI
@@ -310,70 +397,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateTraceResponse"
-
-  /v1/evaluate/threads/{id}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Thread
-      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
-      operationId: evaluateThread
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EvaluateThreadRequest"
-      responses:
-        "200":
-          description: Successful response from evaluate thread API
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateThreadResponse"
-
-  /evaluate/traces/{uuid}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Trace
-      operationId: evaluateTrace
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EvaluateTraceRequest"
-      responses:
-        "200":
-          description: Successful response from evaluate trace API
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateTraceResponse"
-
-  /evaluate/spans/{uuid}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Span
-      operationId: evaluateSpan
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EvaluateSpanRequest"
-      responses:
-        "200":
-          description: Successful response from evaluate span API
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateSpanResponse"
 
 components:
   schemas:
@@ -1253,56 +1276,89 @@ components:
     EvaluateThreadRequest:
       type: object
       required:
-        - metricCollections
+        - metricCollection
       properties:
-        metricCollections:
+        metricCollection:
           type: string
-          description: Name of the metric collection to use for evaluation
+          description: This is the name of the multi-turn metric collection to evaluate the thread.
         chatbotRole:
           type: string
-          description: Instructions or role prompt given to the chatbot during evaluation (e.g., system prompt)
+          description: The role or purpose of the chatbot in the thread.
 
     EvaluateThreadResponse:
       type: object
       properties:
         success:
           type: boolean
-          description: A boolean indicating the success or failure of the API call
+          description: This is true if the thread was successfully evaluated.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: This is the id of the thread generated by Confident AI, not to be confused with the thread id you supplied.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
+        - data
+        - deprecated
 
     EvaluateTraceRequest:
       type: object
       properties:
-        metricCollections:
+        metricCollection:
           type: string
-          description: The name of the metric collection to use
+          description: The name of the single-turn metric collection to evaluate the trace.
       required:
-        - metricCollections
+        - metricCollection
 
     EvaluateTraceResponse:
       type: object
       properties:
         success:
           type: boolean
-          description: A boolean indicating the success or failure of the API call
+          description: This is true if the trace was successfully evaluated.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: This is the id of the trace, not to be confused with the UUID of the trace.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
+        - data
+        - deprecated
 
     EvaluateSpanRequest:
       type: object
       properties:
-        metricCollections:
+        metricCollection:
           type: string
-          description: The name of the metric collection to use
+          description: The name of the single-turn metric collection to evaluate the span.
       required:
-        - metricCollections
+        - metricCollection
 
     EvaluateSpanResponse:
       type: object
       properties:
         success:
           type: boolean
-          description: A boolean indicating the success or failure of the API call
+          description: This is true if the span was successfully evaluated.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: This is the id of the span, not to be confused with the UUID of the trace.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
+        - data
+        - deprecated
