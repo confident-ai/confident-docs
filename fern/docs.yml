@@ -78,6 +78,16 @@ navigation:
               - page: End-to-End Testing
                 path: docs/pages/llm-evaluation/multi-turn/end-to-end.mdx
                 icon: fa-light fa-route
+          - section: Dataset Management
+            collapsed: false
+            icon: fa-light fa-file-code
+            contents:
+              - page: Push, Queue, and Annotate Goldens
+                path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
+                icon: fa-light fa-pen-to-square
+              - page: Pull Datasets for Testing
+                path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
+                icon: fa-light fa-database
           - section: Prompt Optimization
             icon: fa-light fa-sliders
             contents:
@@ -90,25 +100,9 @@ navigation:
               - page: Prompt Usage
                 path: docs/pages/llm-evaluation/prompt-optimization/prompt-usage.mdx
                 icon: fa-light fa-circle-play
-              - page: Prompt Testing
-                path: docs/pages/llm-evaluation/prompt-optimization/prompt-testing.mdx
-                icon: fa-light fa-flask
-          - section: Dataset Management
-            collapsed: false
-            icon: fa-light fa-file-code
-            contents:
-              - page: Push, Queue, and Annotate Goldens
-                path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
-                icon: fa-light fa-pen-to-square
-              - page: Pull Datasets for Testing
-                path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
-                icon: fa-light fa-database
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
             icon: fa-light fa-pipe-valve
-          - page: Evaluation Features
-            path: docs/pages/llm-evaluation/evaluation-features.mdx
-            icon: fa-light fa-star
       - section: LLM Tracing
         contents:
           - page: Introduction

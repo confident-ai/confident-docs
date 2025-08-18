@@ -4,11 +4,13 @@ slug: llm-tracing/evaluations
 description: Learn about online and offline evaluation modes
 ---
 
+## Overview
+
 You can run evaluations during LLM tracing, by running metrics on individual:
 
 1. Spans,
 2. Traces, and
-3. Threads 
+3. Threads
 
 For online evaluations, you can do this by providing the name of the **metric collection** you've created on Confident AI in the `@obesrve` decorators during tracing. For offline evaluations, you can call the `evaluate_thread` function to manually trigger an evaluation.
 
@@ -24,6 +26,7 @@ If you're planning to run offline evals on threads, create a multi-turn metric c
 Only **referenceless** metric you've enabled inside the metric collection runnable upon tracing. For non-referenceless metrics, Confident AI will simply ignore them.
 
 To recap, [referenceless metrics](/docs/concepts/metrics#referenceless-metrics) section, referenceless metrics are a special type of metric that can evaluate your LLM's performance without requiring reference data (like `expected_output` or `expected_tools`).
+
 </Callout>
 
 ## Online Evaluations
@@ -32,7 +35,7 @@ Online evaluations refer to evals that are ran in real-time, as traces are inges
 
 ### Spans
 
-Simply provide the name of the metric collection to tell Confident AI the specify set of referenceless metrics you wish to run in the `@observe` decorator. 
+Simply provide the name of the metric collection to tell Confident AI the specify set of referenceless metrics you wish to run in the `@observe` decorator.
 
 You'll also need to use `update_current_span` with an `LLMTestCase` at runtime to actually trigger an online evaluation on the server-side:
 
@@ -73,7 +76,7 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
     })
     return "LLM response";
     }
-    
+
     const observedGenerate = observe(
         type="llm",
         model: "gpt-4",
@@ -83,9 +86,10 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
     ```
     </CodeBlock>
     </Tab>
+
 </Tabs>
 
-The `metricCollection` argument is an optional strings that determines which metrics in your online metric collection will be ran for this current span. 
+The `metricCollection` argument is an optional strings that determines which metrics in your online metric collection will be ran for this current span.
 
 <Callout>
   Supplying a metric name in `metrics` that doesn't exist or isn't activated on
@@ -94,14 +98,14 @@ The `metricCollection` argument is an optional strings that determines which met
   trailing spaces!)
 </Callout>
 
-If you specify a  `metricCollection` list but don't update your current span with the sufficient test case parameters for metric execution, it will simply show up as an error on Confident AI, and won't block or cause issues in your code.
+If you specify a `metricCollection` list but don't update your current span with the sufficient test case parameters for metric execution, it will simply show up as an error on Confident AI, and won't block or cause issues in your code.
 
 ### Traces
 
 Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals), where you disregard the performance of individual spans within the trace and treat your application as a black-box.
 
 <Callout>
-You can run online evals on both traces and spans at the same time.
+  You can run online evals on both traces and spans at the same time.
 </Callout>
 
 Similar to evals for spans, you would also provide a `metricCollection` name, but this time call the `update_current_trace()` function instead:
@@ -143,7 +147,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
     })
     return "LLM response";
     }
-    
+
     const observedGenerate = observe(
         type="llm",
         model: "gpt-4",
@@ -153,17 +157,18 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
     ```
     </CodeBlock>
     </Tab>
+
 </Tabs>
 
 Also note that unlike evals on spans, the `metricCollection` **MUST BE DEFINED** at the top-level/root span level. You can call `update_current_trace` anywhere in your observed application though.
 
 ## Offline Evaluations
 
-Offline evaluations refer to evals that are ran **retrospectively**, after traces are ingested into Confident AI. 
+Offline evaluations refer to evals that are ran **retrospectively**, after traces are ingested into Confident AI.
 
 ### Threads
 
-All threads are offline evaluations because you should only run evals on threads once a multi-turn interaction has completed. 
+All threads are offline evaluations because you should only run evals on threads once a multi-turn interaction has completed.
 
 Since it is impossible for Confident AI to automatically know whether a multi-turn conversation has completed or not, you'll have to trigger an offline evaluation using the `evaluate_thread()` method **ONLY AFTER** once you're certain a conversation has completed:
 
@@ -177,23 +182,24 @@ your_thread_id = "your-thread-id"
 
 @observe()
 def llm_app(query: str):
-    res = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": query}
-        ]
-    ).choices[0].message.content
+res = client.chat.completions.create(
+model="gpt-4o",
+messages=[
+{"role": "user", "content": query}
+]
+).choices[0].message.content
 
     update_current_trace(thread_id=your_thread_id, input=query, output=res)
     return res
 
-if __name__ == "__main__":
-    user_query = input("💬 Enter your prompt: ")
-    response = llm_app(user_query, true)
-    print(f"\n🤖 Response:\n{response}")
+if **name** == "**main**":
+user_query = input("💬 Enter your prompt: ")
+response = llm_app(user_query, true)
+print(f"\n🤖 Response:\n{response}")
 
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
-```
+
+````
 </CodeBlock>
 
 You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`:
@@ -203,13 +209,15 @@ You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`
 from deepeval.tracing import evaluate_thread
 
 a_evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
-```
+````
+
 </CodeBlock>
 
 You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input-output) of individual traces in a thread for multi-turn evaluations to work. To recap, DeepEval uses the `input` of a trace as the `"user"` role content and the `output` of a trace as the `"assistant"` role content as turns in your thread.
 
 <Callout type="warning">
-If you don't set the `input` and/or `output`, Confident AI will have nothing in your thread to evaluate.
+  If you don't set the `input` and/or `output`, Confident AI will have nothing
+  in your thread to evaluate.
 </Callout>
 
 You can also set the retrieval context and tools called (if any) for each assistant/AI turn as part of the `output` setting, which would allow you to see the context of which an LLM generation was invoked in:
@@ -220,14 +228,15 @@ from deepeval.test_case import ToolCall
 from deepeval.tracing import TurnContext
 
 update_current_trace(
-  thread_id=your_thread_id, 
-  output=res,
-  turnContext=TurnContext(
-    retrieval_context=["..."], # optional list of strings
-    tools_called=[ToolCall(...)] # optional list of tools called
-  )
+thread_id=your_thread_id,
+output=res,
+turnContext=TurnContext(
+retrieval_context=["..."], # optional list of strings
+tools_called=[ToolCall(...)] # optional list of tools called
 )
-```
+)
+
+````
 </CodeBlock>
 
 To learn more, visit the [threads section.](/docs/llm-tracing/tracing-features/threads)
@@ -241,11 +250,12 @@ Although less common since you can run online evals on traces, you can also run 
 from deepeval.tracing import evaluate_trace
 
 evaluate_trace(trace_uuid=<your-trace-uuid>, metric_collection="Collection Name")
-```
+````
+
 </CodeBlock>
 
 <Callout>
-The asynchronous version, `a_evaluate_trace` is also available for traces.
+  The asynchronous version, `a_evaluate_trace` is also available for traces.
 </Callout>
 
 Note that your trace **must already contain** the necessary test case parameters as you cannot update the test case parameters using the `evaluate_trace` function.
@@ -259,14 +269,15 @@ The same offline evals can also be ran in the same say for spans:
 from deepeval.tracing import evaluate_span
 
 evaluate_span(span_uuid=<your-span-uuid>, metric_collection="Collection Name")
-```
+
+````
 </CodeBlock>
 
 <Callout>
 The asynchronous version, `a_evaluate_span` is also available for spans.
 </Callout>
 
-Remember, the metric collection you provide must be a **single-turn** one. 
+Remember, the metric collection you provide must be a **single-turn** one.
 
 ## Examples
 
@@ -285,7 +296,8 @@ def outer_function():
     def inner_function():
         update_current_span(test_case=...)
         update_current_trace(test_case=...)
-```
+````
+
 </CodeBlock>
 
 **Answer:** This will run `"Collection 1"` for traces, and `"Collection 2"` for spans.
@@ -309,14 +321,16 @@ your_thread_id = "your-thread-id"
 
 @observe(metric_collection="Collection 1")
 def outer_function():
-    update_current_trace(thread_id=your_thread_id, test_case=...)
+update_current_trace(thread_id=your_thread_id, test_case=...)
 
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
+
 ```
 </CodeBlock>
 
-**Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection. 
+**Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection.
 
 <Callout type="warning">
 Note that setting the `test_case` for a trace has no bearing on the `input` and `output`.
 </Callout>
+```

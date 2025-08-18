@@ -1,0 +1,197 @@
+---
+title: Multi-Turn, E2E Testing
+subtitle: Learn how to run end-to-end testing for multi-turn use cases
+slug: llm-evaluation/multi-turn/end-to-end
+---
+
+## Overview
+
+Multi-turn, end-to-end testing requires:
+
+- A multi-turn dataset of goldens
+- A list of multi-turn metrics you wish to evaluate with
+- A way to generate turns for multi-turn test cases at runtime
+
+<Tip>
+  The best way to generate turns if you don't have human testers, is to use
+  Confident AI's [conversation
+  simulator](/llm-evaluation/multi-turn/simulate-user-turns) to simulate user
+  interactions.
+</Tip>
+
+## How It Works
+
+1. Pull your dataset from Confident AI
+2. Loop through goldens in your dataset, for each golden:
+   - Simulate turns from each golden
+   - Map golden fields to test case parameters
+   - Add test case back to your dataset
+3. Run evaluation on test cases
+
+In this example, we'll be using this mock LLM app for our callback for turns simulation:
+
+```python callback.py
+from deepeval.test_case import Turn
+
+def model_callback() -> Turn:
+    pass
+```
+
+## Run E2E Tests Locally
+
+Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](#run-e2e-tests-remotely) instead.
+
+<Steps>
+
+<Step title="Pull dataset">
+
+Pull your dataset (and [create one](/llm-evaluation/dataset-management/create-goldens) if you haven't already):
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+```
+
+</Step>
+
+<Step title="Loop through goldens and simulate turns">
+
+Loop through multi-turn goldens and simulate turns for test cases, before adding them back to your dataset:
+
+```python main.py focus={8-15}
+from deepeval.test_case import ConversationalTestCase
+from deepeval.simulate import ConversationSimulator
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+simulator = ConversationSimulator(model_callback=chatbot_callback)
+for golden in dataset.goldens:
+    test_case = simulator.simulator(golden)
+    dataset.add_test_case(test_case)
+```
+
+<Note>
+  Although a bit unconventional, you can also use any other means necessary to
+  generate `turns` in a `ConversationalTestCase` and map golden properties
+  manually for this step.
+</Note>
+
+</Step>
+
+<Step title="Run evaluation using `evaluate()`">
+
+The `evaluate()` function allows you to create test runs and uploads the data to Confident AI once evaluations have completed locally.
+
+```python main.py
+from deepeval.metrics import TurnRelevancyMetric
+# Replace with your metrics
+evaluate(test_cases=dataset.test_cases, metrics=[TurnRelevancyMetric()])
+```
+
+Done ✅. You should see a link to your newly created sharable testing report.
+
+- The `evaluate()` function runs your test suite across all test cases and metrics
+- Each metric is applied to every test case (e.g., 10 test cases × 2 metrics = 20 evaluations)
+- A test case passes only if all metrics for it pass
+- The test run’s pass rate is the proportion of test cases that pass
+
+<Tip>
+  `deepeval` opens your browser automatically by default. To disable this
+  behavior, set `CONFIDENT_BROWSER_OPEN=NO`.
+</Tip>
+
+[video]
+
+</Step>
+
+</Steps>
+
+## Run E2E Tests Remotely
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Go to **Project** > **Metric** > **Collections**:
+
+[video]
+
+<Warning>Don't forget to create a multi-turn collection.</Warning>
+
+</Step>
+
+<Step title="Pull dataset and simulate conversations">
+
+Using your language of choice, you would call your LLM app to construct a list of valid `ConversationalTestCase` [data models](/llm-evaluation/core-concepts/test-cases-goldens-datasets#test-cases).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py focus={8-15}
+from deepeval.test_case import ConversationalTestCase
+from deepeval.simulate import ConversationSimulator
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+simulator = ConversationSimulator(model_callback=chatbot_callback)
+for golden in dataset.goldens:
+    test_case = simulator.simulator(golden)
+    dataset.add_test_case(test_case)
+```
+
+</Tab>
+<Tab title="Typescript" language="typescript">
+
+[TODO: kritin]
+
+</Tab>
+<Tab title="curL" language="curl">
+
+[TODO: vamshi]
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Call `/v1/evaluate` endpoint">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval import evaluate
+
+evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
+```
+
+</Tab>
+<Tab title="Typescript" language="typescript">
+
+[TODO: kritin]
+
+</Tab>
+<Tab title="curL" language="curl">
+
+[TODO: vamshi]
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+This section is a repetition of the one for single-turn end-to-end testing, so please [click here](/llm-evaluation/single-turn/end-to-end#advanced-usage) to learn more.

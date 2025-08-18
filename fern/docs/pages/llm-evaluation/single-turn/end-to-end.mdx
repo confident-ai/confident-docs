@@ -1,5 +1,5 @@
 ---
-title: Single-Turn E2E Testing
+title: Single-Turn, E2E Testing
 subtitle: Learn how to run end-to-end testing for single-turn use cases
 slug: llm-evaluation/single-turn/end-to-end
 ---
@@ -12,9 +12,9 @@ Single-turn, end-to-end testing requires:
 - A list of metrics you wish to evaluate with
 - Construction of test case at runtime
 
-The test case that you construct will be an `LLMTestCase` that encapsulates the end system input and outputs. You'll need to:
+The test case that you construct will be an `LLMTestCase` that encapsulates the end system input and outputs.
 
-## How Does It Work?
+## How It Works
 
 1. Pull your dataset from Confident AI
 2. Loop through goldens in your dataset, for each golden:
@@ -58,7 +58,7 @@ def llm_app(query: str) -> str:
 
 ## Run E2E Tests Locally
 
-Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](/llm-evaluation/single-turn/end-to-end#run-e2e-tests-remotely) instead.
+Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](#run-e2e-tests-remotely) instead.
 
 <Steps>
 
@@ -124,6 +124,8 @@ Done ✅. You should see a link to your newly created sharable testing report.
   behavior, set `CONFIDENT_BROWSER_OPEN=NO`.
 </Tip>
 
+[video]
+
 </Step>
 
 </Steps>
@@ -135,7 +137,7 @@ The `evaluate()` function is extremely unopinionated and non-instrusive, which m
 
 In the next section, we'll show how you can avoid this ETL hellhole and bring LLM traces to end-to-end testing.
 
-## LLM Tracing for Local Evals
+## LLM Tracing for Local E2E Testing
 
 LLM tracing solves all problems associated with constructing test cases.
 
@@ -145,7 +147,7 @@ LLM tracing solves all problems associated with constructing test cases.
 
 All you need is to add a few lines of code to your existing LLM app (we'll be using the example from above):
 
-```python main.py focus={4,7,10,13,21}
+```python main.py focus={4,7,10,13,17}
 from openai import OpenAI
 from deepeval import observe, update_current_trace
 
@@ -160,11 +162,7 @@ def llm_app(query: str) -> str:
 
     @observe()
     def generator(query: str, text_chunks: list[str]) -> str:
-        res = OpenAI().chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": query}
-            ]
+        res = OpenAI().chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
         ).choices[0].message.content
         update_current_trace(input=query, actual_output=res)
         return res
@@ -204,6 +202,8 @@ for golden in dataset.evals_iterator():
 ```
 
 Done ✅. You should see a link to your newly created sharable testing report. **This is literally all it takes to run end-to-end evaluations**, with the added benefit of a full testing report with tracing included on Confident AI.
+
+[video]
 
 <Note>
 You can also run your for-loop asynchronously:
