@@ -218,6 +218,13 @@ paths:
                   - scenario: "Booking a hotel"
                     expectedOutcome: "Successfully booked"
                     userDescription: "Finds hotels in NYC"
+              Custom-Columns:
+                alias: "my-dataset-with-columns"
+                overwrite: false
+                goldens:
+                  - input: "What is 2 + 2?"
+                    customColumnKeyValues:
+                      key: "value"
       responses:
         "200":
           description: ""
@@ -229,6 +236,8 @@ paths:
                 Single-Turn:
                   link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
                 Multi-Turn:
+                  link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+                Custom-Columns:
                   link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
 
   /v1/evaluate:
@@ -277,6 +286,7 @@ paths:
                 testCases:
                   input: "How tall is mount everest?"
                   actualOutput: "No clue, pretty tall I guess?"
+                  name: "Your Test Case Name"
                 identifier: "run-399-102"
       responses:
         "200":
@@ -902,6 +912,11 @@ components:
           type: boolean
           nullable: true
           description: "This determines whether the golden has been finalized."
+        customColumnKeyValues:
+          type: object
+          additionalProperties:
+            type: string
+          description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
       required:
         - input
 
@@ -947,6 +962,11 @@ components:
           type: boolean
           nullable: true
           description: "This determines whether the golden has been finalized."
+        customColumnKeyValues:
+          type: object
+          additionalProperties:
+            type: string
+          description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
       required:
         - scenario
 
@@ -1084,6 +1104,9 @@ components:
           type: string
           nullable: true
           description: "This is the actual output of your LLM application."
+        name:
+          type: string
+          description: "This is the name of your test case, it allows you to search and match test cases across different test runs."
         expectedOutput:
           type: string
           nullable: true
@@ -1128,6 +1151,9 @@ components:
         scenario:
           type: string
           description: "This is a description of the conversation context."
+        name:
+          type: string
+          description: "This is the name of your test case, it allows you to search and match test cases across different test runs."
         expectedOutcome:
           type: string
           nullable: true
