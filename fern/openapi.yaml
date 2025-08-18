@@ -26,6 +26,133 @@ tags:
       description: Learn about tracing
 
 paths:
+  /v1/traces:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Trace Ingestion
+      operationId: createTrace
+      description: You can use this endpoint to ingest traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/CreateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTraceResponse"
+
+  /v1/traces/{uuid}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Update Trace
+      operationId: updateTrace
+      description: You can use this endpoint to udate traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/UpdateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTraceResponse"
+
+  /v1/evaluate/threads/{id}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Thread
+      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
+      operationId: evaluateThread
+      parameters:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateThreadRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateThreadResponse"
+
+  /evaluate/traces/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Trace
+      operationId: evaluateTrace
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the trace to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateTraceRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateTraceResponse"
+
+  /evaluate/spans/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Span
+      operationId: evaluateSpan
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the span to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateSpanRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateSpanResponse"
+
   /v1/metric-collections:
     post:
       x-fern-server-name: Confident AI
@@ -245,33 +372,45 @@ paths:
             schema:
               $ref: "#/components/schemas/EvaluateRequest"
             examples:
-              Single-Turn:
-                metricCollection: "Collection Name"
-                testCases:
-                  input: "How tall is mount everest?"
-                  actualOutput: "Not sure, pretty tall I guess?"
-              Multi-Turn:
-                metricCollection: "Collection Name"
-                testCases:
-                  - turns:
-                      - role: user
-                        content: "How tall is Mount Everest?"
-                      - role: assistant
-                        content: "Mount Everest is approximately 8,848 meters tall."
-              Logging Parameters:
-                metricCollection: "Collection Name"
-                testCases:
-                  input: "How tall is mount everest?"
-                  actualOutput: "Not sure, pretty tall I guess?"
-                hyperparameters:
-                  model: "gpt-4o-mini"
-                  prompt-version: "ai_generation_v2"
-              Logging Identifier:
-                metricCollection: "Collection Name"
-                testCases:
-                  input: "How tall is mount everest?"
-                  actualOutput: "Not sure, pretty tall I guess?"
-                identifier: "run-881-102"
+              SingleTurn:
+                summary: Single-Turn
+                value:
+                  metricCollection: "Collection Name"
+                  testCases:
+                    input: "How tall is mount everest?"
+                    actualOutput: "No clue, pretty tall I guess?"
+              MultiTurn:
+                summary: Multi-Turn
+                value:
+                  metricCollection: "Multi-Turn Collection Name"
+                  testCases:
+                    - turns:
+                        - role: user
+                          content: "How tall is Mount Everest?"
+                        - role: assistant
+                          content: "Mount Everest is approximately 8,848 meters tall."
+                        - role: user
+                          content: "Wow, that is really high! Has that changed recently?"
+                        - role: assistant
+                          content: "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
+              LogParameters:
+                summary: Logging Parameters
+                value:
+                  metricCollection: "Collection Name"
+                  testCases:
+                    input: "How tall is mount everest?"
+                    actualOutput: "No clue, pretty tall I guess?"
+                  hyperparameters:
+                    model: "gpt-40-mini"
+                    prompt-version: "ai_generation_v2"
+              LogIdentifier:
+                summary: Logging Identifier
+                value:
+                  metricCollection: "Collection Name"
+                  testCases:
+                    input: "How tall is mount everest?"
+                    actualOutput: "No clue, pretty tall I guess?"
+                  identifier: "run-399-102"
       responses:
         "200":
           description: ""
@@ -280,26 +419,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/EvaluateResponse"
               examples:
-                Single-Turn:
-                  success: true
-                  data:
-                    id: "TEST-RUN-ID"
-                  deprecated: false
-                Multi-Turn:
-                  success: true
-                  data:
-                    id: "TEST-RUN-ID"
-                  deprecated: false
-                Logging Parameters:
-                  success: true
-                  data:
-                    id: "TEST-RUN-ID"
-                  deprecated: false
-                Logging Identifier:
-                  success: true
-                  data:
-                    id: "TEST-RUN-ID"
-                  deprecated: false
+                SingleTurn:
+                  summary: Single-Turn
+                  value:
+                    success: true
+                    data:
+                      id: "TEST-RUN-ID"
+                MultiTurn:
+                  summary: Multi-Turn
+                  value:
+                    success: true
+                    data:
+                      id: "TEST-RUN-ID"
+                LogParameters:
+                  summary: Logging Parameters
+                  value:
+                    success: true
+                    data:
+                      id: "TEST-RUN-ID"
+                LogIdentifier:
+                  summary: Logging Identifier
+                  value:
+                    success: true
+                    data:
+                      id: "TEST-RUN-ID"
 
   /v1/simulate:
     post:
@@ -934,24 +1077,29 @@ components:
           type: boolean
           description: "This is true if the dataset was successfully pulled."
         data:
-          type: object
-          properties:
-            datasetId:
-              type: string
-            goldens:
-              type: array
-              description: "This is a List of `Goldens` if you are pulling a single-turn dataset, and `null` otherwise."
-              nullable: true
-              items:
-                $ref: "#/components/schemas/RetrievedGolden"
-            conversationalGoldens:
-              type: array
-              description: "This is a List of `ConversationalGoldens` if you are pulling a multi-turn dataset, and `null` otherwise."
-              nullable: true
-              items:
-                $ref: "#/components/schemas/RetrievedConversationalGolden"
-          required:
-            - datasetId
+          oneOf:
+            - type: object
+              properties:
+                datasetId:
+                  type: string
+                goldens:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Golden"
+              required:
+                - datasetId
+                - goldens
+            - type: object
+              properties:
+                datasetId:
+                  type: string
+                conversationalGoldens:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ConversationalGolden"
+              required:
+                - datasetId
+                - conversationalGoldens
       required:
         - success
         - data
@@ -1797,7 +1945,7 @@ components:
           type: string
           description: The name of the single-turn metric collection to evaluate the trace.
       required:
-        - metricCollection
+        - metricCollections
 
     EvaluateTraceResponse:
       type: object
@@ -1822,11 +1970,11 @@ components:
     EvaluateSpanRequest:
       type: object
       properties:
-        metricCollection:
+        metricCollections:
           type: string
-          description: The name of the single-turn metric collection to evaluate the span.
+          description: The name of the metric collection to use
       required:
-        - metricCollection
+        - metricCollections
 
     EvaluateSpanResponse:
       type: object
