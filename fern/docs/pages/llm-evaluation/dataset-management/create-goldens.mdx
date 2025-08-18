@@ -64,7 +64,17 @@ dataset.push(alias="YOUR-DATASET-ALIAS")
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-[TODO kritin]
+ 
+ For **single-turn** datasets, push single-turn goldens:
+
+```ts main.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+const goldens = [Golden({ input: "How tall is Mr. Everest?" })];
+const dataset = new EvaluationDataset({ goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS" });
+```
 
 </Tab>
 
@@ -85,7 +95,7 @@ For **multi-turn** datasets, push multi-turn goldens:
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
-goldens = [ConversationalGolden(scenario="Angry user asking for a refund.")]
+goldens = [ConversationalGolden(scenario="User asking for a refund.")]
 dataset = EvaluationDataset(goldens=goldens)
 
 dataset.push(alias="YOUR-DATASET-ALIAS")
@@ -94,7 +104,15 @@ dataset.push(alias="YOUR-DATASET-ALIAS")
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-[TODO kritin]
+
+```ts main.ts
+import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+
+const goldens = [ConversationalGolden({ scenario: "User asking for refund." })];
+const dataset = new EvaluationDataset({ goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS" });
+```
 
 </Tab>
 
@@ -128,7 +146,17 @@ dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-[TODO kritin]
+
+For **single-turn** datasets, queue single-turn goldens:
+
+```ts main.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+const goldens = [Golden({ input: "How tall is Mr. Everest?" })];
+const dataset = new EvaluationDataset();
+
+dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
+```
 
 </Tab>
 
@@ -149,7 +177,7 @@ For **multi-turn** datasets, queue multi-turn goldens:
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
-goldens = [ConversationalGolden(scenario="Angry user asking for a refund.")]
+goldens = [ConversationalGolden(scenario="User asking for a refund.")]
 dataset = EvaluationDataset()
 
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
@@ -158,7 +186,15 @@ dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-[TODO kritin]
+
+```ts main.ts
+import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+
+const goldens = [ConversationalGolden({ scenario: "User asking for refund." })];
+const dataset = new EvaluationDataset();
+
+dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
+```
 
 </Tab>
 
@@ -180,18 +216,27 @@ You can also do it through the Evals API when pushing or queueing goldens by inc
 
 <Tabs>
 
-<Tab title="Python" language="python"></Tab>
+<Tab title="Python" language="python">
 
-```python
+```python main.py
 from deepeval.dataset import Golden, ConversationalGolden
 
 golden = Golden(custom_column_key_values={"Key": "Value"}, ...)
 multiturn_golden = ConversationalGolden(custom_column_key_values={"Key": "Value"}, ...)
 ```
 
+</Tab>
+
 <Tab title="Typescript" language="typescript">
 
-[TODO kritin]
+```ts main.ts
+import { Golden, ConversationalGolden } from "deepeval-ts";
+
+const golden = Golden({ customColumnKeyValues: { Key: "Value" }, ... });
+const multiturnGolden = ConversationalGolden({
+  customColumnKeyValues: { Key: "Value" }, ...
+});
+```
 
 </Tab>
 
