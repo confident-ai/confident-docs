@@ -441,18 +441,18 @@ paths:
         - Tracing
       summary: Trace Ingestion
       operationId: createTrace
-      description: Adds a new trace to Confident AI with all the information your provide.
+      description: Creates a new trace on Confident AI.
       requestBody:
-        description: Create a trace ingestion
+        description: ""
         required: true
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/CreateTrace"
+              $ref: "#components/schemas/Trace"
 
       responses:
         "200":
-          description: Successful response from create trace API
+          description: ""
           content:
             application/json:
               schema:
@@ -465,9 +465,9 @@ paths:
         - Tracing
       summary: Update Trace
       operationId: updateTrace
-      description: Updates a trace with the information your provide.
+      description: Updates an existing trace on Confident AI.
       requestBody:
-        description: Create a trace ingestion
+        description: ""
         required: true
         content:
           application/json:
@@ -476,7 +476,7 @@ paths:
 
       responses:
         "200":
-          description: Successful response from update trace API
+          description: ""
           content:
             application/json:
               schema:
@@ -1140,25 +1140,81 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Turn"
+
     BaseSpan:
       type: object
       properties:
         uuid:
           type: string
-          format: uuid
-          description: Unique identifier for the span.
+          description: This is the unique identifier of the span.
         name:
           type: string
+          description: This is the name of the span.
         input:
-          description: Input to the span.
+          type: any
+          description: This is the input to the span.
         output:
-          description: Output from the span.
+          type: any
+          description: This is the output of the span.
+        error:
+          type: string
+          description: This is the error message, if an error occurred inside the span.
+        status:
+          type: enum
+          enum: [SUCCESS, ERRORED]
+          description: This represents the error status of the span.
         startTime:
           type: string
           format: date-time
+          description: This is the time the span started.
         endTime:
           type: string
           format: date-time
+          description: This is the time the span ended.
+        parentUuid:
+          type: string
+          format: uuid
+          description: This is the unique identifier of the span's parent span.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is any additional metadata associated with the span.
+        metricCollection:
+          type: string
+          nullable: true
+          description: This is the metric collection to be used for evaluating the span.
+        type:
+          type: string
+          description: This is a string that represents the type of span.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the retrieval context of your span, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the ideal retrieval context of your span, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          nullable: true
+          description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the tools called by your span, which is to be used for evaluation.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the expected tools to be called by the span, which is to be used for evaluation.
+
       required:
         - uuid
         - name
@@ -1166,69 +1222,343 @@ components:
         - endTime
 
     LlmSpan:
-      allOf:
-        - $ref: "#/components/schemas/BaseSpan"
-        - type: object
-          properties:
-            model:
-              type: string
-            costPerInputToken:
-              type: number
-              format: float
-            costPerOutputToken:
-              type: number
-              format: float
-            inputTokenCount:
-              type: integer
-            outputTokenCount:
-              type: integer
-          required:
-            - model
-
-    RetrieverSpan:
-      allOf:
-        - $ref: "#/components/schemas/BaseSpan"
-        - type: object
-          properties:
-            embedder:
-              type: string
-            topK:
-              type: integer
-            chunkSize:
-              type: integer
-          required:
-            - embedder
-
-    ToolSpan:
-      allOf:
-        - $ref: "#/components/schemas/BaseSpan"
-        - type: object
-          properties:
-            description:
-              type: string
-
-    AgentSpan:
-      allOf:
-        - $ref: "#/components/schemas/BaseSpan"
-        - type: object
-          properties:
-            availableTools:
-              type: array
-              items:
-                type: string
-            agentHandoffs:
-              type: array
-              items:
-                type: string
-
-    ToolCall:
       type: object
       properties:
+        uuid:
+          type: string
+          description: This is the unique identifier of the span.
         name:
           type: string
-        parameters:
+          description: This is the name of the span.
+        input:
+          type: any
+          description: This is the input to the span.
+        output:
+          type: any
+          description: This is the output of the span.
+        error:
+          type: string
+          description: This is the error message, if an error occurred inside the span.
+        status:
+          type: enum
+          enum: [SUCCESS, ERRORED]
+          description: This represents the error status of the span.
+        startTime:
+          type: string
+          format: date-time
+          description: This is the time the span started.
+        endTime:
+          type: string
+          format: date-time
+          description: This is the time the span ended.
+        parentUuid:
+          type: string
+          format: uuid
+          description: This is the unique identifier of the span's parent span.
+        metadata:
           type: object
           additionalProperties: true
+          description: This is any additional metadata associated with the span.
+        metricCollection:
+          type: string
+          nullable: true
+          description: This is the metric collection to be used for evaluating the span.
+        type:
+          type: string
+          description: This is a string that represents the type of span.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the retrieval context of your span, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the ideal retrieval context of your span, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          nullable: true
+          description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the tools called by your span, which is to be used for evaluation.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the expected tools to be called by the span, which is to be used for evaluation.
+        model:
+          type: string
+          description: This is the LLM model used in the span.
+        costPerInputToken:
+          type: number
+          format: float
+          description: This is the cost per input token of the LLM model.
+        costPerOutputToken:
+          type: number
+          format: float
+          description: This is the cost per output token of the LLM model.
+        inputTokenCount:
+          type: integer
+          description: This is the number of input tokens passed to the LLM model.
+        outputTokenCount:
+          type: integer
+          description: This is the number of output tokens generated by the LLM model.
+      required:
+        - model
+
+    RetrieverSpan:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: This is the unique identifier of the span.
+        name:
+          type: string
+          description: This is the name of the span.
+        input:
+          type: any
+          description: This is the input to the span.
+        output:
+          type: any
+          description: This is the output of the span.
+        error:
+          type: string
+          description: This is the error message, if an error occurred inside the span.
+        status:
+          type: enum
+          enum: [SUCCESS, ERRORED]
+          description: This represents the error status of the span.
+        startTime:
+          type: string
+          format: date-time
+          description: This is the time the span started.
+        endTime:
+          type: string
+          format: date-time
+          description: This is the time the span ended.
+        parentUuid:
+          type: string
+          format: uuid
+          description: This is the unique identifier of the span's parent span.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is any additional metadata associated with the span.
+        metricCollection:
+          type: string
+          nullable: true
+          description: This is the metric collection to be used for evaluating the span.
+        type:
+          type: string
+          description: This is a string that represents the type of span.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the retrieval context of your span, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the ideal retrieval context of your span, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          nullable: true
+          description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the tools called by your span, which is to be used for evaluation.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the expected tools to be called by the span, which is to be used for evaluation.
+        embedder:
+          type: string
+          description: This is the embedder model used in the span.
+        topK:
+          type: integer
+          description: This is the top K chunks retrieved from your knowledge base.
+        chunkSize:
+          type: integer
+          description: This is the chunk size of each retrieved context.
+      required:
+        - embedder
+
+    ToolSpan:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: This is the unique identifier of the span.
+        name:
+          type: string
+          description: This is the name of the span.
+        input:
+          type: any
+          description: This is the input to the span.
+        output:
+          type: any
+          description: This is the output of the span.
+        error:
+          type: string
+          description: This is the error message, if an error occurred inside the span.
+        status:
+          type: enum
+          enum: [SUCCESS, ERRORED]
+          description: This represents the error status of the span.
+        startTime:
+          type: string
+          format: date-time
+          description: This is the time the span started.
+        endTime:
+          type: string
+          format: date-time
+          description: This is the time the span ended.
+        parentUuid:
+          type: string
+          format: uuid
+          description: This is the unique identifier of the span's parent span.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is any additional metadata associated with the span.
+        metricCollection:
+          type: string
+          nullable: true
+          description: This is the metric collection to be used for evaluating the span.
+        type:
+          type: string
+          description: This is a string that represents the type of span.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the retrieval context of your span, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the ideal retrieval context of your span, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          nullable: true
+          description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the tools called by your span, which is to be used for evaluation.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the expected tools to be called by the span, which is to be used for evaluation.
+        description:
+          type: string
+          description: This is the description of the tool used in the span.
+
+    AgentSpan:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: This is the unique identifier of the span.
+        name:
+          type: string
+          description: This is the name of the span.
+        input:
+          type: any
+          description: This is the input to the span.
+        output:
+          type: any
+          description: This is the output of the span.
+        error:
+          type: string
+          description: This is the error message, if an error occurred inside the span.
+        status:
+          type: enum
+          enum: [SUCCESS, ERRORED]
+          description: This represents the error status of the span.
+        startTime:
+          type: string
+          format: date-time
+          description: This is the time the span started.
+        endTime:
+          type: string
+          format: date-time
+          description: This is the time the span ended.
+        parentUuid:
+          type: string
+          format: uuid
+          description: This is the unique identifier of the span's parent span.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is any additional metadata associated with the span.
+        metricCollection:
+          type: string
+          nullable: true
+          description: This is the metric collection to be used for evaluating the span.
+        type:
+          type: string
+          description: This is a string that represents the type of span.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the retrieval context of your span, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: This is the ideal retrieval context of your span, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          nullable: true
+          description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the tools called by your span, which is to be used for evaluation.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: This is the expected tools to be called by the span, which is to be used for evaluation.
+        availableTools:
+          type: array
+          description: This is the list of names of available tools to be used in the span.
+          items:
+            type: string
+        agentHandoffs:
+          type: array
+          description: This is the list of potential agent handoffs in the span.
+          items:
+            type: string
 
     Trace:
       type: object
@@ -1239,85 +1569,176 @@ components:
       properties:
         uuid:
           type: string
-          format: uuid
-          description: The unique indentifier of the trace
+          description: This is the unique indentifier of the trace.
         name:
           type: string
+          description: This is the name of the trace.
         input:
-          description: Input to the trace
+          type: any
+          description: This is the input to the trace.
         output:
-          description: Output from the trace
+          type: any
+          description: This is the output of the trace.
         startTime:
           type: string
           format: date-time
-          description: Start time of the trace
+          description: This is the time the trace started.
         endTime:
           type: string
           format: date-time
-          description: End time of the trace
+          description: This is the time the trace ended.
         environment:
           type: string
           enum: [production, development, staging, testing]
-          description: The environment of where your trace is from (helps with debugging)
+          description: This is the environment where your trace was posted, which helps with separating and debugging traces from different environments on the Confident AI platform.
         metadata:
           type: object
           additionalProperties: true
-          description: Additional data of your trace
+          description: This is any additional metadata associated with the trace.
         tags:
           type: array
           items:
             type: string
-          description: Tags of your trace
+          description: This is any tags associated with the trace, which helps with grouping traces and filtering them on the Confident AI platform.
         baseSpans:
           type: array
+          description: This is the list of base spans associated with the trace.
           items:
             $ref: "#/components/schemas/BaseSpan"
         llmSpans:
           type: array
+          description: This is the list of LLM spans associated with the trace.
           items:
             $ref: "#/components/schemas/LlmSpan"
         retrieverSpans:
           type: array
+          description: This is the list of retriever spans associated with the trace.
           items:
             $ref: "#/components/schemas/RetrieverSpan"
         toolSpans:
           type: array
+          description: This is the list of tool spans associated with the trace.
           items:
             $ref: "#/components/schemas/ToolSpan"
         agentSpans:
           type: array
+          description: This is the list of agent spans associated with the trace.
           items:
             $ref: "#/components/schemas/AgentSpan"
         threadId:
           type: string
+          description: This is the unique identifier of the thread associated with the trace.
         userId:
           type: string
+          description: This is the unique identifier for your end user for the trace.
         metricCollection:
           type: string
+          description: This is the metric collection you wish to use to evaluate the trace.
         retrievalContext:
           type: array
           items:
             type: string
+          description: This is the retrieval context of your trace, which is to be used for evaluation.
         context:
           type: array
           items:
             type: string
+          description: This is the ideal retrieval context of your trace, which is to be used for evaluation.
         expectedOutput:
           type: string
+          description: This is the expected output of your trace, which is the ideal actual output and to be used for evaluation.
         toolsCalled:
           type: array
+          description: This is the tools called by your trace, which is to be used for evaluation.
           items:
-            $ref: "#/components/schemas/ToolCall"
+            $ref: "#/components/schemas/ToolCallData"
         expectedTools:
           type: array
+          description: This is the expected tools to be called by the trace, which is to be used for evaluation.
           items:
-            $ref: "#/components/schemas/ToolCall"
-
-    CreateTrace:
-      allOf:
-        - $ref: "#/components/schemas/Trace"
+            $ref: "#/components/schemas/ToolCallData"
 
     CreateTraceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+        data:
+          type: object
+          description: This maps to the trace id.
+          properties:
+            id:
+              type: string
+              description: This is the uuid of the trace.
+        link:
+          type: string
+          description: This is the URL to the trace on the Confident AI platform.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+        - link
+
+    UpdateTrace:
+      type: object
+      properties:
+        input:
+          type: any
+          description: This is the input to the trace.
+        output:
+          type: any
+          description: This is the output of the trace.
+        endTime:
+          type: string
+          format: date-time
+          description: This is the time the trace ended.
+        name:
+          type: string
+          description: This is the name of the trace.
+        environment:
+          type: string
+          enum: [production, development, staging, testing]
+          description: This is the environment where your trace was posted, which helps with separating and debugging traces from different environments on the Confident AI platform.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is any additional metadata associated with the trace.
+        tags:
+          type: array
+          items:
+            type: string
+          description: This is any tags associated with the trace, which helps with grouping traces and filtering them on the Confident AI platform.
+        baseSpans:
+          type: array
+          description: This is the list of base spans associated with the trace.
+          items:
+            $ref: "#/components/schemas/BaseSpan"
+        llmSpans:
+          type: array
+          description: This is the list of LLM spans associated with the trace.
+          items:
+            $ref: "#/components/schemas/LlmSpan"
+        retrieverSpans:
+          type: array
+          description: This is the list of retriever spans associated with the trace.
+          items:
+            $ref: "#/components/schemas/RetrieverSpan"
+        toolSpans:
+          type: array
+          description: This is the list of tool spans associated with the trace.
+          items:
+            $ref: "#/components/schemas/ToolSpan"
+        agentSpans:
+          type: array
+          description: This is the list of agent spans associated with the trace.
+          items:
+            $ref: "#/components/schemas/AgentSpan"
+
+    UpdateTraceResponse:
       type: object
       properties:
         success:
@@ -1328,37 +1749,14 @@ components:
           properties:
             id:
               type: string
+              description: This is the uuid of the trace.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
         - data
-
-    UpdateTrace:
-      type: object
-      properties:
-        output:
-          description: Updated output for the trace
-        endTime:
-          type: string
-          format: date-time
-          description: Updated end time in ISO 8601 format
-        metadata:
-          type: object
-          additionalProperties: true
-          description: Arbitrary metadata to attach to the trace
-        tags:
-          type: array
-          items:
-            type: string
-          description: Tags associated with the trace
-
-    UpdateTraceResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: A boolean indicating the success or failure of the API call
-      required:
-        - success
+        - deprecated
 
     EvaluateThreadRequest:
       type: object
