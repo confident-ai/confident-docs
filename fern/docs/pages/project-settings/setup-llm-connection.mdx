@@ -11,9 +11,7 @@ At a high level, you would have to provide Confident AI with the mappings to tes
 ## Video Demo
 
 <Frame caption="How to Setup an LLM Connection">
-<video style={{ aspectRatio: '16 / 9', width: '100%' }} controls>
-  <source src="https://confident-docs.s3.us-east-1.amazonaws.com/project-configuration:setup-llm-connection.mp4" type="video/mp4" />
-</video>
+<video src="https://confident-docs.s3.us-east-1.amazonaws.com/project-configuration:setup-llm-connection.mp4" autoPlay />
 </Frame>
 
 
@@ -24,7 +22,7 @@ In order for Confident AI to reach your LLM application, you'll need to expose y
 1. Accepts a `POST` request over HTTPS.
 2. Returns a JSON response and MUST contain the actual_output value somewhere in the returned Json object. Whether or not to supply a `retrieval_context` or `tools_called` value in your returned Json is optional, and this depends on whether the metrics you have enabled for your experiment requires these parameters.
 
-<Callout title="Warning" icon="warning">
+<Error title="Warning">
 
 When Confident AI calls your LLM endpoint, it makes a `POST` request with a data structure of this type:
 
@@ -44,7 +42,8 @@ So, it is imperative that your LLM endpoint:
 2. Returns the actual_output and any other LLMTestCase parameters in the JSON response with their correct respective type.
 
 For those that want a recap of what types each test case parameter is of, visit the test cases section.
-</Callout>
+
+</Error>
 
 ## Connect Your LLM Endpoint
 
@@ -57,10 +56,10 @@ You'll have to provide:
 
 In order for evaluation to work, you MUST set the json key path for the `actual_output` parameter. Remember, the `actual_output` of your LLM application is always required for evaluation, while the `retrieval_context` and `tools_called` parameters are optional depending on the metrics you've enabled.
 
-<Callout>
+<Info>
   The json key path tells Confident AI where to look in your Json response for
   the respective test case parameter values.
-</Callout>
+</Info>
 
 For instance, if you set the key path of the `actual_output` parameter to `["response", "actual output"]`, the correct Json response to return from your LLM endpoint is as follows:
 
@@ -76,9 +75,9 @@ For instance, if you set the key path of the `actual_output` parameter to `["res
 
 That's not to say you can't include other things to return in your Json response, but the key path will determine the variables Confident AI will be using to populate LLMTestCases at evaluation time.
 
-<Callout>
+<Note>
 If you're wondering why `expected_output`, `context`, and `expected_tools` is not required in setting up your json key path, it is because it is expected that these variables are static, just like the `input`, and should therefore come from your dataset instead.
-</Callout>
+</Note>
 
 ## Test Your LLM Connection
 
