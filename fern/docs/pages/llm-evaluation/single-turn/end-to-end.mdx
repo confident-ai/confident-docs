@@ -389,20 +389,7 @@ evaluate({
     "Prompt Version": "YOUR-PROMPT-VERSION",
   },
   testCases: [...],
-  metrics: [...]
-});
-```
-
-If you're keeping prompts on Confidnet AI for prompt optimization, you can also provide the prompt object directly:
-
-```ts focus={1-4,8}
-evaluate({
-  hyperparameters: {
-    Model: "YOUR-MODEL",
-    "Prompt Version": prompt,
-  },
-  testCases: [...],
-  metrics: [...]
+  metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
 
@@ -440,7 +427,7 @@ evaluate(
 evaluate({
   identifer: "Any custom string",
   testCases: [...],
-  metrics: [...]
+  metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
 
