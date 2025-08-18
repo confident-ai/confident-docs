@@ -4,7 +4,9 @@ slug: llm-tracing/advanced-features/sampling
 description: Learn about sampling in LLM Tracing
 ---
 
-Sampling allows you to control what percentage of traces are sent to Confident's observatory. 
+## Overview
+
+Sampling allows you to control what percentage of traces are sent to Confident's observatory.
 
 <Info>
 This is useful for high-volume applications where you may want to reduce the amount of data being sent while still maintaining visibility into your system's performance. 
@@ -12,13 +14,9 @@ This is useful for high-volume applications where you may want to reduce the amo
 
 ## Configure Sample Rate
 
-Configure the sampling rate by setting the `CONFIDENT_SAMPLE_RATE` environment variable, which represents the proportion of traces that will be sent to the observatory. 
+Configure the sampling rate by setting the `CONFIDENT_SAMPLE_RATE` environment variable, which represents the proportion of traces that will be sent to the observatory.
 
-<CodeBlock>
-```bash
-export CONFIDENT_SAMPLE_RATE=0.5 
-```
-</CodeBlock>
+<CodeBlock>```bash export CONFIDENT_SAMPLE_RATE=0.5 ```</CodeBlock>
 
 Alternatively, you can set the sampling rate directly in code:
 
@@ -69,6 +67,7 @@ Alternatively, you can set the sampling rate directly in code:
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 <Note>

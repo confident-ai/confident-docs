@@ -1,19 +1,20 @@
 ---
-subtitle: Connecting your projects to LLM providers
+subtitle: REach your LLM app through the internet via a RESTFUL LLM connection
 slug: project-settings/setup-llm-connection
 description: Learn about setting up LLM connections
 ---
 
-You can also setup an LLM endpoint that accepts a `POST` request over HTTPS to enable users to run evaluations directly on the platform without having to code, and start an evaluation through a click of a button instead.
+## Overview
+
+You can setup an LLM endpoint that accepts a `POST` request over HTTPS to enable users to run evaluations directly on the platform without having to code, and start an evaluation through a click of a button instead.
+
+## Understanding LLM Connection
 
 At a high level, you would have to provide Confident AI with the mappings to test case parameters such as the `actual_output`, `retrieval_context`, etc., and at evaluation time Confident AI will use the dataset and metrics settings you've specified for your experiment to unit test your LLM application.
-
-## Video Demo
 
 <Frame caption="How to Setup an LLM Connection">
 <video src="https://confident-docs.s3.us-east-1.amazonaws.com/project-configuration:setup-llm-connection.mp4" autoPlay />
 </Frame>
-
 
 ## Create an LLM Endpoint
 
@@ -82,7 +83,6 @@ If you're wondering why `expected_output`, `context`, and `expected_tools` is no
 ## Test Your LLM Connection
 
 Click on the **Ping Endpoint** button, and see if you're getting a `200` status response. If not, fix the problem based on the error on the screen.
-
 
 ## A Note on Security
 

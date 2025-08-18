@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/test-cases
 description: Learn about test cases in LLM Tracing
 ---
 
+## Overview
+
 Confident AI allows you to [run evaluations](/docs/llm-tracing/evaluations#online-evals-for-traces) on your spans and traces, which requires you to set test case parameters in `update_current_span` and `update_current_trace`.
 
 <Note>
@@ -45,7 +47,7 @@ You can set span-level test case parameters in the `update_current_span` functio
                     tools_called=[ToolCall(name="web_search", input_parameters={"query": query})],
                 )
                 return "Agent response"
-            
+
             tool_calling_agent("What is weather in San Francisco?")
             ```
         </CodeBlock>
@@ -71,6 +73,7 @@ You can set span-level test case parameters in the `update_current_span` functio
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 ## Set Trace Test Case Parameters
@@ -95,7 +98,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
                 retrieved_chunks = ["chunk1", "chunk2"]
                 update_current_trace(retrieval_context=retrieved_chunks)
                 return "\n".join(retrieved_chunks)
-            
+
             @observe()
             def llm_app(query: str):
                 retrieval_context = retriever(query)
@@ -105,7 +108,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
                 ).choices[0].message.content
                 update_current_trace(input=query, output=res)
                 return res
-            
+
             llm_app("What is weather typically like in San Francisco?")
             ```
         </CodeBlock>
@@ -142,4 +145,5 @@ You can set trace-level test case parameters in the `update_current_trace` funct
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>

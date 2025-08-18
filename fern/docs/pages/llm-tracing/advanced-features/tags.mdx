@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/tags
 description: Learn about tags in LLM Tracing
 ---
 
+## Overview
+
 Unlike `metadata`, which can contain complex structured data, tags are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
 
 <Info>
@@ -44,7 +46,7 @@ Tags are applied at the trace level, making them visible for all spans within th
 
             const llmApp = (query: string) => {
             updateCurrentTrace({ tags: ["Causal Chit-Chat"] });
-                
+
             const openai = new OpenAI();
             const response = openai.chat.completions.create({
                 model: "gpt-4o",
@@ -62,4 +64,5 @@ Tags are applied at the trace level, making them visible for all spans within th
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>

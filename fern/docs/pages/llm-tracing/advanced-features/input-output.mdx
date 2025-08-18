@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/input-output
 description: Learn about input and output in LLM Tracing
 ---
 
+## Overview
+
 Both traces and spans have inputs and outputs, which you can set dynamically within your application using the `update_current_span` and `update_current_trace` function respectively.
 
 ## Set Trace I/O At Runtime
@@ -58,23 +60,22 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
             ```
         </CodeBlock>
     </Tab>
-</Tabs>
 
+</Tabs>
 
 The `input` and `output` can be **ANY TYPE**, and is useful for visualization on the UI (even more so if you're using [conversation threads](/docs/llm-tracing/tracing-features/threads)).
 
 ### Big disclaimer for threads
 
-**HOWEVER**, if you are planning to [create a thread](/docs/llm-tracing/tracing-features/threads) from the traces (for chatbots, conversations, etc. multi-turn use cases), it is highly recommended that you provide **strings** instead, where the `input` will represent the user input, and `output` representing the LLM generated output. You can also leave out any `input` or `output` for consecutive user/LLM behaviors. 
+**HOWEVER**, if you are planning to [create a thread](/docs/llm-tracing/tracing-features/threads) from the traces (for chatbots, conversations, etc. multi-turn use cases), it is highly recommended that you provide **strings** instead, where the `input` will represent the user input, and `output` representing the LLM generated output. You can also leave out any `input` or `output` for consecutive user/LLM behaviors.
 
 You will also need the `input` and `output` to run [online evaluations on a thread](/docs/llm-tracing/evaluations#online-evals-for-threads), as these will be used as the turns for a conversational test case.
 
 ## Set Span I/O At Runtime
 
-
 You can set the `input` and `output` on spans using the `update_current_span` function.
 
-One thing to note however, is we recommend [setting attributes](/docs/llm-tracing/tracing-features/attributes) instead of `input` and `output` directly on spans that are one of the **DEFAULT span types**, since DeepEval handles the `input` and `output` setting automatically for default span `type`s. 
+One thing to note however, is we recommend [setting attributes](/docs/llm-tracing/tracing-features/attributes) instead of `input` and `output` directly on spans that are one of the **DEFAULT span types**, since DeepEval handles the `input` and `output` setting automatically for default span `type`s.
 
 <Note>
 For example, the `"retriever"` span `type` expects a string as the `input` and list of strings as the `output`, which you might violate if setting I/O yourself. This will decrease the chances that you run into an error.
@@ -110,7 +111,7 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
             import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
 
             const openai = new OpenAI();
-                
+
             const llmApp = async (query: string) => {
             const res = await openai.chat.completions.create({
                 model: "gpt-4o",
@@ -128,6 +129,7 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 This example is the same as the one for tracing except for the `update_current_trace`, and that's not a mistake. You can set `input` and `output`s the same way as you do for traces, and if a trace's I/O is not set it defaults to the I/O of the root span.

@@ -4,33 +4,39 @@ slug: llm-evaluation/prompt-optimization/prompt-versioning
 description: Learn about prompt versioning
 ---
 
-Prompt versioning refers to the process of curating and developing different prompt templates in a managed and versionable way, and enables you to better test, compare, and evaluate the performance of different prompts. This is done on Confident AI's **Prompt Studio**.
+## Overview
 
-## Video Demo
+Confident AI's **Prompt Studio** allows you to create and version different versions of your prompts. This allows you to:
 
-<Frame caption="How to create and version a prompt">
-<div>Video here</div>
-</Frame>
+1. Collaborate and centralize where prompt is stored and edited, even for non-technical team members
+2. Use it within your LLM application
+3. Pinpoint which version, or even combination of your prompt versions, performs best
+
+There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping on prompts on Confident AI can you fully leverage Confident AI's evaluation features.
+
+<Note>
+  Prompts are a type of hyperparameter on Confident AI. Other
+  [hyperparameters](/docs/concepts/hyperparameters) include things like models,
+  embedders, top-K, and max tokens. By running evaluations using the same
+  prompts that kept on Confident AI, we can tell you which version performs
+  best, and later automatically optimize it for you.
+</Note>
 
 ## Two Types of Prompts
 
 There are two types of prompts you can create:
 
-- **[(Single) Text Prompt](/docs/prompt-management/prompt-versioning#create-a-text-prompt)**: Use this when you need a straightforward, one-off prompt for simple completions.
-- **[Prompt Message List](/docs/prompt-management/prompt-versioning#create-a-prompt-message-list)**: Use this when you need to define multiple messages with specific roles (system, user, assistant) in a conversation. This format is ideal for few-shot prompting, where you can start with a system message that sets the context, followed by several example pairs of user questions and assistant responses, and end with your actual user message. This structured approach helps guide the LLM to provide more accurate and consistent responses.
-
-<Frame caption="TODO">
-Image of two types of prompts
-</Frame>
+- **(Single) Text Prompt**: Use this when you need a straightforward, one-off prompt for simple completions.
+- **Prompt Message List**: Use this when you need to define multiple messages with specific roles (system, user, assistant) in an OpenAI messages format. This format is ideal for few-shot prompting, where you can start with a system message that sets the context.
 
 <Tip>
   If you ever see a prompt being mentioned without any mention of "message" or
   "list", assume it is a single prompt we're talking about.
 </Tip>
 
-## Create a Text Prompt
+## Prompts vs Prompt Versions
 
-To create your first prompt, navigate to the **Prompt Studio** page in your project space. Click on the button that says **Create Prompt**, and you will be required to name your first prompt by providing it with an alias, as well as a toggle to create the prompt as a message list. **DO NOT** toggle this on, we'll do this in the next section.
+## Create a Prompt Text
 
 <Info>
   Similar to datasets, the alias will be used to identify which prompt will be
@@ -64,7 +70,6 @@ For example, the `{variable}` interpolation type must follow these rules:
 
 For example:
 
-<CodeBlock>
 ```python
 # ✅ Correct usage:
 "Hi, my name is {name}."
@@ -72,14 +77,13 @@ For example:
 "User input: {user_input}"
 
 # ❌ Incorrect usage:
-"Hi, my name is {variable name}."  # Spaces in variable name
+
+"Hi, my name is {variable name}." # Spaces in variable name
 "Hi, my name is {variable_name }." # Extra spaces around variable name
+
 ```
-</CodeBlock>
 
 You can select which variable interpolation type you wish to use in the **Prompt Editor**.
-
-## Create a Prompt Message List
 
 This is exactly the same as creating a prompt in the [previous step](/docs/prompt-management/prompt-versioning#create-a-text-prompt), but this time toggle **ON** the "message list" option to create a prompt as a list of messages.
 

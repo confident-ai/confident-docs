@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/users
 description: Learn about users in LLM Tracing
 ---
 
+## Overview
+
 You can track user interactions with your LLM app by setting the `user_id` in a trace. This allows you to track things such as how much tokens each user is costing you, who interacted with your LLM app the most, etc.
 
 ## Set Users At Runtime
@@ -44,7 +46,7 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             const res = await openai.chat.completions.create({
                 model: "gpt-4o",
                 messages: [{ role: "user", content: query }]
-            })      
+            })
             updateCurrentTrace({ userId: "your-user-id" });
             return res.choices[0].message.content;
             };
@@ -55,6 +57,7 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 The `user_id` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.

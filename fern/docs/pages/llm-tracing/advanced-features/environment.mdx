@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/environment
 description: Learn about environments in LLM Tracing
 ---
 
+## Overview
+
 The environment feature allows you to specify which environment your traces are coming from. This is useful for separating traces from different environments in `"development"`, `"staging"`, `"production"`, or `"testing"`.
 
 <Tip>
@@ -12,13 +14,9 @@ Traces from [component-level evals](/docs/llm-evaluation/component-level-evals) 
 
 ## Configure Environment
 
-You can configure the environment with the `CONFIDENT_TRACE_ENVIRONMENT` environment variable. 
+You can configure the environment with the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
 
-<CodeBlock>
-```bash
-export CONFIDENT_TRACE_ENVIRONMENT="staging"
-```
-</CodeBlock>
+<CodeBlock>```bash export CONFIDENT_TRACE_ENVIRONMENT="staging" ```</CodeBlock>
 
 Alternatively, you can set the environment directly in code:
 
@@ -70,6 +68,7 @@ Alternatively, you can set the environment directly in code:
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 The `environment` can be either `"production"`, `"staging"`, or `"development"`, and helps you identify where your traces are coming from.

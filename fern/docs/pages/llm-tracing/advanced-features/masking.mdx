@@ -4,6 +4,8 @@ slug: llm-tracing/advanced-features/masking
 description: Learn about masking in LLM Tracing
 ---
 
+## Overview
+
 Masking allows you to automatically redact or transform sensitive data in your traces before they're sent to the observatory. Masking is essential for several reasons:
 
 - **Security**: Prevent exposure of credentials or sensitive business data
@@ -63,6 +65,7 @@ To implement masking, you need to define a masking function and configure the tr
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 The masking function is automatically applied to:

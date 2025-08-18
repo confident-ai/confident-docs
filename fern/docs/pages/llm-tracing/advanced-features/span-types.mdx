@@ -4,6 +4,7 @@ slug: llm-tracing/advanced-features/span-types
 description: Learn about span types in LLM Tracing
 ---
 
+## Overview
 
 Span types are **hugely optional** but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
 
@@ -18,26 +19,22 @@ This is set via the `type` argument in the `@observe` decorator. By classifying 
 Anything that is **NOT** one of these four default span types are **automatically custom spans.**
 </Warning>
 
-
 ## Custom span
 
 The most flexible `type` out of all (and the default type if `type` is not provided), custom spans are essential for creating hierarchical structures or grouping related spans together. They provide flexibility in organizing your tracing data.
 
 <Tabs>
     <Tab title="Python">
-        <CodeBlock>
-            ```python
+          ```python
             from deepeval.tracing import observe
             
             @observe(name="RAG Pipeline")
             def rag_pipeline(query: str) -> str:
                 pass
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="Js/TypeScript">
-        <CodeBlock>
-            ```typescript
+         ```typescript
             import { observe } from '@deepeval-ts/tracing';
             
             const ragPipeline = (query: string): string => {
@@ -50,7 +47,6 @@ The most flexible `type` out of all (and the default type if `type` is not provi
                 fn: ragPipeline
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -68,19 +64,16 @@ An LLM span represents a call to a language model. It tracks the input, output, 
 
 <Tabs>
     <Tab title="Python">
-        <CodeBlock>
-            ```python title="main.py"
+       ```python title="main.py"
             from deepeval.tracing import observe
             
             @observe(type="llm", model="gpt-4")
             def generate_response(prompt: str) -> str:
                 pass
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="Js/TypeScript">
-        <CodeBlock>
-            ```typescript title="index.ts"
+        ```typescript title="index.ts"
             import { observe } from '@deepeval-ts/tracing';
             
             const generateResponse = (prompt: string): string => {
@@ -94,7 +87,6 @@ An LLM span represents a call to a language model. It tracks the input, output, 
                 fn: generateResponse
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -118,7 +110,6 @@ A Retriever span represents a component that fetches relevant information from a
 
 <Tabs>
     <Tab title="Python">
-        <CodeBlock>
             ```python title="main.py"
             from deepeval.tracing import observe
             from typing import List
@@ -127,10 +118,8 @@ A Retriever span represents a component that fetches relevant information from a
             def retrieve_documents(query: str) -> List[str]:
                 pass
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="Js/TypeScript">
-        <CodeBlock>
             ```typescript title="index.ts"
             import { observe } from '@deepeval-ts/tracing';
             
@@ -145,7 +134,6 @@ A Retriever span represents a component that fetches relevant information from a
                 fn: retrieveDocuments
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -162,7 +150,6 @@ A Tool span represents a function that an agent can call to perform a specific t
 
 <Tabs>
     <Tab title="Python">
-        <CodeBlock>
             ```python title="main.py"
             from deepeval.tracing import observe
             
@@ -170,10 +157,8 @@ A Tool span represents a function that an agent can call to perform a specific t
             def web_search(query: str) -> str:
                 pass
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="Js/TypeScript">
-        <CodeBlock>
             ```typescript title="index.ts"
             import { observe } from '@deepeval-ts/tracing';
             
@@ -187,7 +172,6 @@ A Tool span represents a function that an agent can call to perform a specific t
                 fn: webSearch
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -204,7 +188,6 @@ An Agent span represents an autonomous entity that can make decisions and intera
 
 <Tabs>
     <Tab title="Python">
-        <CodeBlock>
             ```python title="main.py"
             from deepeval.tracing import observe
             
@@ -216,10 +199,8 @@ An Agent span represents an autonomous entity that can make decisions and intera
             def supervisor_agent(query: str) -> str:
                 pass
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="Js/TypeScript">
-        <CodeBlock>
             ```typescript title="index.ts"
             import { observe } from '@deepeval-ts/tracing';
             
@@ -235,7 +216,6 @@ An Agent span represents an autonomous entity that can make decisions and intera
             fn: supervisorAgent
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -248,97 +228,3 @@ There are **ONE** mandatory and **FOUR** optional parameters when decorating a f
 - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
 
 Agents can be nested within other agents, which is useful for implementing hierarchical agent architectures. For instance, a "supervisor" agent might coordinate communication between specialized agents.
-
-## Full Example
-
-Consider this LLM app/agentic workflow:
-
-<div className='flex items-center justify-center'>
-```mermaid
-graph TD
-    A[Research Agent] --> B[RAG Pipeline]
-    A --> C[Web Search Tool]
-    B --> D[Retriever]
-    B --> E[LLM]
-    A --> E
-```
-</div>
-
-<CodeBlock>
-```python title="main.py" {10, 17, 34, 44, 56}
-from typing import List
-from deepeval.tracing import (
-    observe,
-    update_current_span,
-    update_llm_span,
-)
-
-
-# Tool
-@observe(type="tool")
-def web_search(query: str) -> str:
-    # <--Include implementation to search web here-->
-    return "Latest search results for: " + query
-
-
-# Retriever
-@observe(type="retriever", embedder="text-embedding-ada-002")
-def retrieve_documents(query: str) -> List[str]:
-    # <--Include implementation to fetch from vector database here-->
-    fetched_documents = [
-        "Document 1: This is relevant information about the query.",
-        "Document 2: More relevant information here.",
-        "Document 3: Additional context that might be useful.",
-    ]
-
-    update_current_span(
-        input=query,
-        retrieval_context=fetched_documents,
-    )
-    return fetched_documents
-
-
-# LLM
-@observe(type="llm", model="gpt-4")
-def generate_response(input: str) -> str:
-    # <--Include format prompts and call your LLM provider here-->
-    output = "Generated response based on the prompt: " + input
-
-    update_llm_span(input=input, output=output)
-    return output
-
-
-# Custom span wrapping the RAG pipeline
-@observe(type="custom", name="RAG Pipeline")
-def rag_pipeline(query: str) -> str:
-    # Retrieve
-    docs = retrieve_documents(query)
-    context = "\n".join(docs)
-
-    # Generate
-    response = generate_response(f"Context: {context}\nQuery: {query}")
-    return response
-
-
-# Agent that does RAG + tool calling
-@observe(type="agent", available_tools=["web_search"])
-def research_agent(query: str) -> str:
-    # Call RAG pipeline
-    initial_response = rag_pipeline(query)
-
-    # Use web search tool on the results
-    search_results = web_search(initial_response)
-
-    # Generate final response incorporating both RAG and search results
-    final_response = generate_response(
-        f"Initial response: {initial_response}\n"
-        f"Additional search results: {search_results}\n"
-        f"Query: {query}"
-    )
-    return final_response
-
-
-# Calling the agent will create traces on Confident AI
-research_agent("What is the weather like in San Francisco?")
-```
-</CodeBlock>

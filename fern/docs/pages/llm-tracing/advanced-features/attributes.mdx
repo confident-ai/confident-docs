@@ -4,6 +4,7 @@ slug: llm-tracing/advanced-features/attributes
 description: Learn about attributes in LLM Tracing
 ---
 
+## Overview
 
 Attributes are like [`metadata`](/docs/llm-tracing/tracing-features/metadata) but specific to different span `type`s.
 
@@ -49,7 +50,7 @@ These functions update the attributes for the **CURRENT** span of the component 
             fn: () => {
 
                 const observedInnerFunction = observe({
-                type: "retriever", 
+                type: "retriever",
                 embedder: "text-embedding-ada-002",
                 fn: () => {
 
@@ -64,10 +65,14 @@ These functions update the attributes for the **CURRENT** span of the component 
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 <Accordion title="How attributes update asynchronously">
-The current span is determined using Python's context manager, which automatically track the active span based on the execution context.  This means you don't need to manually pass span references around - the system knows which span you're currently executing within, even in asynchronous contexts.
+  The current span is determined using Python's context manager, which
+  automatically track the active span based on the execution context. This means
+  you don't need to manually pass span references around - the system knows
+  which span you're currently executing within, even in asynchronous contexts.
 </Accordion>
 
 ### LLM attributes
@@ -117,6 +122,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 There are **SIX** optional parameters for `update_llm_span`:

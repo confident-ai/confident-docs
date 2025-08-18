@@ -91,14 +91,11 @@ navigation:
           - section: Prompt Optimization
             icon: fa-light fa-sliders
             contents:
-              - page: Introduction
-                path: docs/pages/llm-evaluation/prompt-optimization/introduction.mdx
-                icon: fa-light fa-info-circle
               - page: Prompt Versioning
                 path: docs/pages/llm-evaluation/prompt-optimization/prompt-versioning.mdx
                 icon: fa-light fa-code-branch
-              - page: Prompt Usage
-                path: docs/pages/llm-evaluation/prompt-optimization/prompt-usage.mdx
+              - page: Working with Prompts
+                path: docs/pages/llm-evaluation/prompt-optimization/using-prompts.mdx
                 icon: fa-light fa-circle-play
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
@@ -157,17 +154,6 @@ navigation:
                 path: docs/pages/llm-tracing/advanced-features/users.mdx
                 icon: fa-light fa-user
             icon: fa-light fa-layer-group
-      - section: Human-in-the-Loop
-        contents:
-          - page: Overview
-            path: docs/pages/human-in-the-loop/overview.mdx
-            icon: fa-light fa-eye
-          - page: Collection User Feedback
-            path: docs/pages/human-in-the-loop/collection-user-feedback.mdx
-            icon: fa-light fa-comment-dots
-          - page: Collection Internal Feedback
-            path: docs/pages/human-in-the-loop/collection-internal-feedback.mdx
-            icon: fa-light fa-comments
       - section: Project Settings
         contents:
           - page: Invite Team Members
@@ -179,19 +165,19 @@ navigation:
           - page: Setup LLM Connection
             path: docs/pages/project-settings/setup-llm-connection.mdx
             icon: fa-light fa-plug
-      - section: Appendix Resources
+      - section: Resources
         contents:
           - page: Why Confident AI
-            path: docs/pages/appendix/why-confident-ai.mdx
+            path: docs/pages/resources/why-confident-ai.mdx
             icon: fa-light fa-question
           - page: LLM Use Cases
-            path: docs/pages/appendix/llm-use-cases.mdx
+            path: docs/pages/resources/llm-use-cases.mdx
             icon: fa-light fa-list-check
           - page: Data Handling
-            path: docs/pages/appendix/data-handling.mdx
+            path: docs/pages/resources/data-handling.mdx
             icon: fa-light fa-shield-check
           - page: On-Prem Hosting
-            path: docs/pages/appendix/on-prem-hosting.mdx
+            path: docs/pages/resources/on-prem-hosting.mdx
             icon: fa-light fa-server
   - tab: api-reference
     layout:
@@ -209,35 +195,37 @@ navigation:
       - page: Integrations
         path: docs/pages/integrations/integrations.mdx
         icon: fa-light fa-plug
-      - section: Third-Party Integrations
+      - section: Native Integrations
         contents:
           - page: OpenTelemetry
-            path: docs/pages/integrations/opentelemetry.mdx
+            path: docs/pages/integrations/native/opentelemetry.mdx
             icon: fa-light fa-satellite-dish
-          - page: Crew AI
-            path: docs/pages/integrations/third-party/crew-ai.mdx
-            icon: fa-light fa-user-group
-          - page: LangChain
-            path: docs/pages/integrations/third-party/langchain.mdx
-            icon: fa-light fa-chain
-          - page: LangGraph
-            path: docs/pages/integrations/third-party/langgraph.mdx
-            icon: fa-light fa-chart-network
-          - page: LiteLLM
-            path: docs/pages/integrations/third-party/litellm.mdx
-            icon: fa-light fa-train
-          - page: LlamaIndex
-            path: docs/pages/integrations/third-party/llama-index.mdx
-            icon: fa-light fa-horse-head
-          - page: OpenAI Agents
-            path: docs/pages/integrations/third-party/openai-agents.mdx
-            icon: fa-light fa-robot
+      - section: Third-Party Integrations
+        contents:
           - page: OpenAI
             path: docs/pages/integrations/third-party/openai.mdx
             icon: fa-light fa-brain
+          - page: LangChain
+            path: docs/pages/integrations/third-party/langchain.mdx
+            icon: fa-light fa-chain
           - page: Pydantic AI
             path: docs/pages/integrations/third-party/pydantic-ai.mdx
             icon: fa-light fa-chart-pyramid
+          - page: LangGraph
+            path: docs/pages/integrations/third-party/langgraph.mdx
+            icon: fa-light fa-chart-network
+          - page: OpenAI Agents
+            path: docs/pages/integrations/third-party/openai-agents.mdx
+            icon: fa-light fa-robot
+          - page: LlamaIndex
+            path: docs/pages/integrations/third-party/llama-index.mdx
+            icon: fa-light fa-horse-head
+          - page: LiteLLM
+            path: docs/pages/integrations/third-party/litellm.mdx
+            icon: fa-light fa-train
+          - page: Crew AI
+            path: docs/pages/integrations/third-party/crew-ai.mdx
+            icon: fa-light fa-user-group
 
 navbar-links:
   - type: secondary
