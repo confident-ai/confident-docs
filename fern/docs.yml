@@ -209,19 +209,11 @@ navigation:
       - page: Integrations
         path: docs/pages/integrations/integrations.mdx
         icon: fa-light fa-plug
-      - section: Native Integrations
+      - section: Third-Party Integrations
         contents:
           - page: OpenTelemetry
             path: docs/pages/integrations/opentelemetry.mdx
             icon: fa-light fa-satellite-dish
-          - page: Python
-            path: docs/pages/integrations/native/python.mdx
-            icon: brands python
-          - page: Typescript
-            path: docs/pages/integrations/native/typescript.mdx
-            icon: fa-light fa-code
-      - section: Third-Party Integrations
-        contents:
           - page: Crew AI
             path: docs/pages/integrations/third-party/crew-ai.mdx
             icon: fa-light fa-user-group
