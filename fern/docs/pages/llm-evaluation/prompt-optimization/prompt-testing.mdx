@@ -1,0 +1,147 @@
+---
+subtitle: Testing your prompts
+slug: llm-evaluation/prompt-optimization/prompt-testing
+description: Learn about prompt testing
+---
+
+To test prompts in Confident AI, all you have to do is include them as hyperparameters when running evaluations. This allows you to track which prompt versions were used for each test run of your LLM application and compare their performance.
+
+<Callout>
+  In reality, you'll likely be using and logging a combination or prompts
+  instead when running an evaluation, but in this example we'll just be showing
+  one prompt being logged.
+</Callout>
+
+## Code Summary
+
+<CodeBlock>
+
+```python {6-7, 12-13, 19}
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.prompt import Prompt
+from deepeval import evaluate
+
+prompt = Prompt(alias="System Prompt")
+prompt.pull()
+
+# Hardcoded input, should replace with a dataset
+input = "Hey!"
+
+prompt_to_llm = prompt.interpolate(input=input)
+test_case = LLMTestCase(input=input, actual_output=your_llm_app(prompt_to_llm))
+
+# Run an evaluation
+evaluate(
+    test_cases=[test_case],
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={"System Prompt": prompt}
+)
+```
+</CodeBlock>
+
+## Include `Prompt` as a Hyperparameter
+
+Prompts are a type of hyperparameter, and in Confident AI to test a prompt version all you have to do is to include it as a `hyperparameter` when running an evaluation. This can be done either through the `evaluate()` method:
+
+<CodeBlock>
+```python {6}
+from deepeval import evaluate
+
+evaluate(
+    test_cases=[...],
+    metrics=[...],
+    hyperparameters={"System Prompt": prompt}
+)
+```
+</CodeBlock>
+
+Or in [CI/CD pipelines if you're unit testing](/docs/llm-evaluation/evaluation-features/unit-testing-in-cicd-in-cicd) using DeepEval's Pytest integration:
+
+<CodeBlock>
+```python title="test_llm.py" {10, 12}
+import pytest
+import deepeval
+from deepeval.metrics import AnswerRelevancyMetric
+
+@pytest.mark.parametrize("test_case", dataset)
+def test_llm_app(test_case: LLMTestCase):
+    assert_test(test_case, [AnswerRelevancyMetric()])
+
+@deepeval.log_hyperparameters(model="gpt-4o")
+def hyperparameters():
+    return {"System Prompt": prompt}
+```
+</CodeBlock>
+
+Since hyperparameters are stored as key-value pairs in a dictionary (`Dict[str, Prompt]`), the [type of a hyperparameter](/docs/concepts/hyperparameters#types-of-hyperparameters) is determined by its first initial value logged:
+
+1. If you first log a `Prompt` object for a hyperparameter key, that key will be treated as a prompt type hyperparameter.
+2. If you later log string values for the same key for whatever reason, the hyperparameter will remain a prompt type.
+3. Any new string values logged for this key will be treated as potential new prompt versions, allowing you to create and track different versions of your prompt on Confident AI.
+
+This behavior ensures consistent prompt versioning and tracking throughout your evaluation process.
+
+<Callout>
+If you're not sure what a hyperparameter is or what are the two hyperparameter
+types, [click here](/docs/concepts/hyperparameters) to quickly learn about it.
+</Callout>
+
+### Example: System Prompt Versions
+
+Here's a practical example of how the [hyperparameter type](/docs/concepts/hyperparameters#types-of-hyperparameters) is determined and how string values can be converted to prompt versions:
+
+<CodeBlock>
+```python {13, 23}
+from deepeval.prompt import Prompt
+from deepeval import evaluate
+
+# First time logging - using a Prompt object
+# This establishes "System Prompt" as a prompt-type hyperparameter
+prompt_v1 = Prompt(alias="your-alias")
+prompt_v1.pull()
+
+evaluate(
+    test_cases=[test_case],
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={"System Prompt": prompt_v1}
+)
+
+# Later, logging a string value
+# Since "System Prompt" is already a prompt-type hyperparameter,
+# this string will be treated as a potential new prompt version
+evaluate(
+    test_cases=[test_case],
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={"System Prompt": "You are a helpful AI assistant. Be detailed and thorough in your responses."}
+)
+```
+</CodeBlock>
+
+In this example:
+
+1. The first evaluation establishes "System Prompt" as a prompt-type hyperparameter because we used a `Prompt` object
+2. In the second evaluation, even though we pass a string, it will be treated as a potential new prompt version
+3. On the Confident AI platform, you'll have the option to create a new prompt version from this string
+
+This behavior allows for flexible prompt versioning while maintaining type consistency in your hyperparameters.
+
+### About the `Prompt` class
+
+The `Prompt` class stores your prompt or prompt messages in either the `template` or `message_templates` class variable upon the `pull()` method, which contains the raw, pre-interpolated template(s).
+
+It is the interpolated version that you **ALWAYS** want to provide to your LLM, even if there are no dynamic variables to interpolate. This is because it is always safer to create a copy out of your prompt version instead of referencing it directly in your application, which may can unexpected modifications.
+
+## Avoid This Mistake At All Cost
+
+You should **NEVER** log anything except for the `Prompt` instance itself if your intention is to test different versions of your prompt.
+
+The **worst mistake you can make** is logging the interpolated version of your prompt template, as this will severely impact your ability to analyze prompt performance. When you log interpolated prompts, each one becomes a unique version due to the different variables being dynamically filled in, which floods your hyperparameters data with millions of distinct prompt templates instead of organized versions that you can meaningfully compare and draw insights from.
+
+Doing this will make life extremely difficult for you and your team.
+
+## View Prompts in Test Runs
+
+All prompts that you associate with test runs can be viewed on individual [testing reports on Confident AI](/docs/llm-evaluation/evaluation-features/testing-reports) by clicking the **View Hyperparameters** button on a test run's **Overview** page. If you logged a string for a hyperparameter that is marked as a prompt type, you'll have the opportunity to create a new prompt version out of this prompt you've logged.
+
+You can also filter for test runs that are associated with certain prompts on the **Evaluations** page under your project space.

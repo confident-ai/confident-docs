@@ -75,6 +75,21 @@ navigation:
               - page: End-to-End Testing
                 path: docs/pages/llm-evaluation/multi-turn/end-to-end.mdx
                 icon: fa-light fa-route
+          - section: Prompt Optimization
+            icon: fa-light fa-sliders
+            contents:
+              - page: Introduction
+                path: docs/pages/llm-evaluation/prompt-optimization/introduction.mdx
+                icon: fa-light fa-info-circle
+              - page: Prompt Versioning
+                path: docs/pages/llm-evaluation/prompt-optimization/prompt-versioning.mdx
+                icon: fa-light fa-code-branch
+              - page: Prompt Usage
+                path: docs/pages/llm-evaluation/prompt-optimization/prompt-usage.mdx
+                icon: fa-light fa-circle-play
+              - page: Prompt Testing
+                path: docs/pages/llm-evaluation/prompt-optimization/prompt-testing.mdx
+                icon: fa-light fa-flask
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
             icon: fa-light fa-pipe-valve
@@ -135,23 +150,6 @@ navigation:
                 path: docs/pages/llm-tracing/advanced-features/users.mdx
                 icon: fa-light fa-user
             icon: fa-light fa-layer-group
-      - section: Prompt Management
-        contents:
-          - page: Introduction
-            path: docs/pages/prompt-management/introduction.mdx
-            icon: fa-light fa-info-circle
-          - page: Prompt Versioning
-            path: docs/pages/prompt-management/prompt-versioning.mdx
-            icon: fa-light fa-code-branch
-          - page: Prompt Usage
-            path: docs/pages/prompt-management/prompt-usage.mdx
-            icon: fa-light fa-circle-play
-          - page: Prompt Testing
-            path: docs/pages/prompt-management/prompt-testing.mdx
-            icon: fa-light fa-flask
-          - page: Prompt Suggestions
-            path: docs/pages/prompt-management/prompt-suggestions.mdx
-            icon: fa-light fa-wand-magic-sparkles
       - section: Human-in-the-Loop
         contents:
           - page: Overview
