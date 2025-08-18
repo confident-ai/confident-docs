@@ -5,7 +5,7 @@ description: Get started with Confident AI for LLM evaluation and observability
 
 [CrewAI](https://www.crew.ai) is a lean, lightning-fast Python framework for creating autonomous AI agents tailored to any scenario. Confident AI allows you to trace and evaluate CrewAI workflows with just a single line of code.
 
-## Quickstart
+## Tracing Quickstart
 
 <Steps>
 
@@ -63,11 +63,35 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-## Advanced Usage
+## Evals Usage
 
 ### Online evals
 
-To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your CrewAI agent, replace your CrewAI `Agent` with DeepEval’s, and provide a metric collection name as an argument to the `Agent`.
+You can run [online evals](/docs/llm-tracing/evaluations) on your CrewAI agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your CrewAI agent.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+  />
+</Frame>
+
+<Warning>
+  Your CrewAI metric collection cannot contain metrics that require
+  `retrieval_context`, `context`, or `expected_tools`.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Replace your CrewAI `Agent` with DeepEval’s, and provide a metric collection name as an argument to the `Agent`.
 
 ```python main.py {1, 8}
 from deepeval.integrations.crewai.agent import Agent
@@ -85,54 +109,95 @@ coder = Agent(
 result = crew.kickoff({"input": "What are the LLMs?"})
 ```
 
-<ParamField path="metric_collection" type="str" required={false}>
-  The name of the metric collection. To create a metric collection, visit
-  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
-</ParamField>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 
-<Warning>
-  Your metric collection cannot contain metrics that require the
-  `retrieval_context`, `context`, or `expected_tools`.
-</Warning>
+</Step>
+</Steps>
 
 ### End-to-end evals
 
-To run [end-to-end evals](https://documentation.confident-ai.com/docs/llm-evaluation/end-to-end-evals) on your CrewAI agent, supply `metrics` to DeepEval's `Agent` and use the dataset's `evals_iterator` to invoke your agent for each golden.
+Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your CrewAI agent evaluates the agent locally, and is the recommended approach if your agent is in a development or testing environment.
 
-```python main.py {2, 11}
-from deepeval.integrations.crewai.agent import Agent
+<Steps>
+
+<Step title="Create metric">
+
+```python
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.dataset import EvaluationDataset, Golden
-...
 
-# Create a metric
-coder = Agent(
-    role="Consultant",
-    goal="Write clear, concise explanation.",
-    backstory="An expert consultant with a keen eye for software trends.",
-    metrics=[AnswerRelevancyMetric()],
+answer_relevancy = AnswerRelevancyMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
 )
-...
+```
 
-# Create goldens
-goldens = [
-    Golden(input="What are Transformers in AI?"),
-    Golden(input="What is the biggest open source database?"),
-    Golden(input="What are LLMs?"),
-]
-dataset = EvaluationDataset(goldens=goldens)
+<Warning>
+  Similar to online evals, you can only run evals on CrewAI using metrics that require the `retrieval_context`, `context`, or `expected_tools`.
+</Warning>
+</Step>
+
+<Step title="Run evals">
+
+Replace your CrewAI Agent with DeepEval’s, and provide `metrics` to DeepEval's `Agent`. Then use the dataset's `evals_iterator` to invoke your agent for each golden.
+
+<Tabs>
+<Tab title="Synchronous">
+
+```python main.py {11, 15}
+from deepeval.integrations.crewai.agent import Agent
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+coder = Agent(
+    role='Consultant',
+    goal='Write clear, concise explanation.',
+    backstory='An expert consultant with a keen eye for software trends.',
+    metrics=[answer_relevancy]
+)
 
 # Run evaluation for each golden
 for golden in dataset.evals_iterator():
     result = crew.kickoff(inputs={"input": golden.input})
 ```
 
-<ParamField path="metrics" type="List[BaseMetric]" required={false}>
-  The metrics to evaluate your CrewAI trace. Does not include metrics requiring
-  `retrieval_context`, `context`, or `expected_tools`.
-</ParamField>
+</Tab>
+<Tab title="Asynchronous">
 
-<Note>
-This will automatically create a generate a test run with evaluated traces.
+```python main.py {12, 16}
+from deepeval.integrations.crewai.agent import Agent
+from deepeval.dataset import EvaluationDataset, Golden
+import asyncio
 
-</Note>
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+coder = Agent(
+    role='Consultant',
+    goal='Write clear, concise explanation.',
+    backstory='An expert consultant with a keen eye for software trends.',
+    metrics=[answer_relevancy]
+)
+
+# Run evaluation for each golden
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(crew.kickoff_async(inputs={"input": golden.input}))
+    dataset.evaluate(task)
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  This will automatically generate a test run with evaluated traces using inputs
+  from your dataset.
+</Success>
+
+</Step>
+</Steps>
+```

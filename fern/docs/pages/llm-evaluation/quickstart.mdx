@@ -1,10 +1,216 @@
 ---
-title: LLM Evaluation Quickstart
-subtitle: Quick start guide for LLM evaluation
-slug: llm-evaluation-quickstart
+subtitle: 5 min quickstart guide for LLM evaluation
+slug: llm-evaluation/quickstart
 description: Get started with LLM evaluation in minutes
 ---
 
-# LLM Evaluation Quickstart
+## Overview
 
-Content coming soon...
+Confident AI offers a variety of features for you to test LLM apps in development for a pre-deployment workflow, offering a wide range of features for:
+
+- **End-to-end testing:** Treats your LLM app as a black box. Best for simple architectures such as calling raw model endpoints or lightweight RAG pipelines.
+- **Component-level testing:** Built for agentic use cases—debug each agent step and component (planner, tools, memory, retriever, prompts) with granular assertions.
+- **Multi-turn evaluation:** Validate full conversations for consistency, state/memory retention, etc.
+
+LLM-as-a-Judge metrics from `deepeval` will be used throughout the platform to auto-score outputs (with or without references) for all of these use cases.
+
+<Success>You don't always need code to run evals.</Success>
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card
+    title="A|B Regression Testing"
+    icon="arrows-split-up-and-left"
+>
+
+    Compare different versions and catch regressions
+
+  </Card>
+  <Card
+    title="Sharable Testing Reports"
+    icon="file-text"
+  >
+    Comprehensive reports for all your evaluations
+  </Card>
+  <Card
+    title="Prompt and Model Insights"
+    icon="gear"
+  >
+    Find the best prompts, models, and parameters
+  </Card>
+  <Card
+    title="Unit-Testing in CI/CD"
+    icon="code"
+  >
+    Integrate evaluations into your development workflow
+  </Card>
+</CardGroup>
+
+## Run Your First Eval
+
+This examples goes through a **single-turn**, **end-to-end** evaluation example in code.
+
+<Warning>
+  You'll need to get your API key as shown in the [setup and
+  installation](/docs/setup-and-installation) section before continuing.
+</Warning>
+
+<Tabs>
+
+<Tab title="Local Evals">
+
+Running evals locally executes metrics on your machine and uploads results to Confident AI. This gives full control over custom metrics but always requires code, making it less friendly for non-technical users.
+
+<Steps>
+
+  <Step title="Create a dataset">
+
+It is mandatory to create a dataset for a proper evaluation workflow.
+
+<Note>
+  If a dataset is not possible for your team at this point, setup LLM tracing to
+  run ad-hoc evaluations without a dataset instead. Confident AI will generate
+  datasets for you automatically this way.
+</Note>
+
+<Tabs>
+
+<Tab title="On the platform">
+You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
+
+<Frame caption="Create Dataset on Confident AI" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:create-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+</Tab>
+
+<Tab title="Using DeepEval">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset, Golden
+# goldens are what makes up your dataset
+goldens = [Golden(input="What's the weather like in SF?")]
+# create dataset
+dataset = EvaluationDataset(goldens=goldens)
+# save to Confident AI
+dataset.push(alias="YOUR-DATASET-ALIAS")
+```
+
+Done ✅. You should now see your dataset on the platform.
+
+</Tab>
+
+</Tabs>
+
+  </Step>
+
+<Step title="Create a metric">
+
+Create a metric locally in `deepeval`. Here, we're using the `AnswerRelevancyMetric()` for demo purposes.
+
+```python main.py
+from deepeval.metrics import AnswerRelevancyMetric
+
+relevancy = AnswerRelevancyMetric() # Using this for the sake of simplicity
+```
+
+</Step>
+<Step title="Configure evaluation model">
+
+Since all metrics in `deepeval` uses LLM-as-a-Judge, you will also need to configure your LLM judge provider. To use OpenAI for evals:
+
+```bash
+export OPENAI_API_KEY="sk-..."
+```
+
+<Tip>
+  You can also **ANY** model providers since `deepeval` integrates with [all of
+  them.](TODO)
+</Tip>
+
+</Step>
+
+  <Step title="Create a test run">
+  
+A test run is a benchmark/snapshot of your LLM app's performance at any point in time. You'll need to:
+
+- Convert all goldens in your dataset into test cases, then
+- Use the metric you've created to evaluate each test case
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import evaluate
+
+# Pull from Confident AI
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+# Create test cases
+for golden in dataset.goldens:
+    test_case = LLMTestCase(
+        input=golden.input,
+        actual_output=llm_app(golden.input) # Replace with your LLM app
+    )
+    dataset.add_test_case(test_case)
+
+# Run an evaluation
+evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
+```
+
+Lastly, run `main.py` to run your first single-turn, end-to-end evaluation:
+
+```bash
+python main.py
+```
+
+✅ Done. You just created a first test run with a sharable testing report auto-generated on Confident AI.
+
+      </Step>
+
+  </Steps>
+
+</Tab>
+
+<Tab title="Remote Evals">
+
+</Tab>
+
+</Tabs>
+
+  <Frame caption="Testing Report on Confident AI" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+There are two main pages in a testing report:
+
+- **Overview** - Shows metadata of your test run such as the dataset that was used for testing, average, median, and distribution of each of the metric(s)
+- **Test Cases** - Shows all the test cases in your test run, including AI generated summaries of your test bench, and metric data for in-depth debugging and analysis.
+
+When you have two or more test runs, you can also start running A|B regression tests.
+
+## Next Steps
+
+Now that you've run your first **single-turn, end-to-end evaluation**, we'll dive into these core evaluation concepts and techniques:
+
+- **Core Concepts** - Learn what are goldens, test cases and how they form the foundation of end-to-end, component-level, and multi-turn evals.
+- **Use Cases** - Understand when to use each evaluation type for agents, AI workflows, RAG, and chatbots.
+- **LLM-as-a-Judge Metrics** - Discover 40+ available metrics for different use cases, and how to select them.

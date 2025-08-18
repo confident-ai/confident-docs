@@ -1,0 +1,292 @@
+---
+subtitle: Understanding everything you need to know about LLM-as-a-Judge
+description: Get started with LLM evaluation in minutes
+slug: llm-evaluation/core-concepts/llm-as-a-judge
+---
+
+## Overview
+
+LLM-as-a-Judge refers to using large language models (LLMs) to evaluate the outputs of other LLM systems. This approach enables scalable, cost-effective, and human-like assessment. It is:
+
+- **More effective** than traditional metrics such as BLEU or ROUGE
+- **Faster than manual** human evaluation
+- **More reliable** and consistent than human annotators
+
+This technique works by crafting a rubric or evaluation prompt, feeding it alongside the input and output to a secondary LLM (“judge”), and having it return a quality score or decision.
+
+<Note>
+  Almost all metrics in `deepeval` are LLM-as-a-Judge, which means all metrics
+  you'll use on Confident AI is also LLM-as-a-Judge.
+
+In fact, all custom metrics you create on Confident AI are powered by `deepeval`'s G-Eval metric, which you'll learn more about later.
+
+</Note>
+
+## What is LLM-as-a-Judge?
+
+LLM-as-a-Judge uses a dedicated LLM to grade or assess generated LLM outputs. You define a scoring criterion via an evaluation prompt, then the judge examines the input and output to assign a score or label based on that rubric.
+
+**Evaluation Prompt**:
+
+```plaintext
+You are an expert judge. Your task is to rate how relevant the following response is based on the provided input. Rate on a scale from 1 to 5, where:
+
+1 = Completely irrelevant
+2 = Mostly irrelevant
+3 = Somewhat relevant but with noticeable issues
+4 = Mostly relevant with minor issues
+5 = Fully correct and accurate
+
+Input:
+{input}
+
+LLM Response:
+{output}
+
+Please return only the numeric score (1 to 5) and no explanation.
+
+Score:
+```
+
+<Tip>
+  You'll notice that the parameters - `{input}` and `{output}`, look
+  conincidentally alike the parameters we had from test cases in the [previous
+  section.](/llm-evaluation/core-concepts/test-cases-goldens-datasets)
+</Tip>
+
+This technique, when done correctly, has shown to exhibit a higher alignment rate than humans (81%) as shown in the ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685) paper, which was also the first paper that introduced LLM-as-a-Judge.
+
+## Two Types of Judges
+
+In the section above, we actually saw a system prompt for evaluating single-turn LLM interactions. However, LLM-as-a-judge has two main types:
+
+<CardGroup cols={2}>
+  <Card
+    title="Single-Output"
+    icon="gauge"
+    iconType="solid"
+  >
+
+    - Evaluates LLM output based on a single interaction
+    - Outputs numerical scores (e.g., 1-5 scale) for quantitative analysis
+    - Can be referenceless (no expected output) or reference-based
+    - Perfect for regression testing and production online evaluations
+
+    **Suitable for:** Most evaluation scenarios, especially when you need quantitative scores
+
+  </Card>
+  <Card
+    title="Pairwise Comparison"
+    icon="balance-scale"
+    iconType="solid"
+  >
+
+    - Compares two responses to determine which is better
+    - Outputs qualitative decisions (A, B, or Tie) rather than scores
+    - Requires multiple LLM versions to run simultaneously
+    - Less common due to complexity and lack of quantitative output
+
+    **Suitable for:** A/B testing scenarios where direct comparison is needed
+
+  </Card>
+</CardGroup>
+
+<Note>
+  The example evaluation prompt we saw earlier is a single-output,
+  referenceless, single-turn LLM-as-a-judge.
+</Note>
+
+### Single-output
+
+Single-output LLM-as-a-judge refers to evaluating an LLM output based solely on a single interaction at hand, which are represented in your evaluation prompt template. These can either be referenceless or reference-based.
+
+<Tip>
+  Often times when you run regression tests on LLM apps, you would run two
+  instances of evaluations using single-output LLM-as-a-judge, before comparing
+  the two scores to work out if there are any regressions or not.
+</Tip>
+
+#### Refernceless
+
+Referenceless single-output judges simply means there are no labelled, expected output/outcome for your LLM judge to anchor as the ideal output. This is perfect for those that:
+
+- Don't have access to expected output/outcomes, such as in production environments where you wish to run online evals
+- Have trouble curating expected outputs/outcomes
+
+#### Reference-based
+
+Reference-based single-output judging gives better reliability, and also helps teams anchor towards what an ideal output/outcome should look like. Often times the only addition to the evaluation prompt is an additional expected output variable:
+
+```plaintext
+You are an expert judge. Your task is to rate how relevant the following response is based on the provided input. Rate on a scale from 1 to 5, where:
+
+1 = Completely irrelevant
+2 = Mostly irrelevant
+3 = Somewhat relevant but with noticeable issues
+4 = Mostly relevant with minor issues
+5 = Fully correct and accurate
+
+Input:
+{input}
+
+Expected Output:
+{expected_output}
+
+LLM Response:
+{output}
+
+Please return only the numeric score (1 to 5) and no explanation.
+
+Score:
+```
+
+<Warning>
+  One major drawback of reference-based LLM-as-a-judge is it is impossible to
+  use them in production for online evals.
+</Warning>
+
+### Pairwise comparison
+
+Unlike single-output, pairwise LLM-as-a-judge is much less common because they:
+
+- Don't output a score, meaning are less quantitative for score analysis
+- Require multiple versions of your LLM to run at once, which can be challenging
+
+Essentially, instead of outputting a score pairwise comparison aims to pick the best output/outcome based on a custom rubric at hand. The prompt template looks something more like this:
+
+```plaintext
+You are an expert judge. Your task is to compare two responses to the same input and decide which one is better based on relevance and accuracy.
+
+Guidelines:
+
+Choose Response A if it is clearly better.
+
+Choose Response B if it is clearly better.
+
+If both are equally good (or equally poor), choose Tie.
+
+Input:
+{input}
+
+Expected Output (reference, if helpful):
+{expected_output}
+
+Response A:
+{output_a}
+
+Response B:
+{output_b}
+
+Please return only one of the following:
+
+- A
+- B
+- Tie
+
+Decision:
+```
+
+In Confident AI, out of the 40+ LLM evaluation metrics, only the Arena G-Eval metric uses pairwise comparison. However, an internal benchmarking of `deepeval`'s Arena G-Eval metric shows nearly identical performance to reference-less single-output LLM-as-a-judge:
+
+[image]
+
+## Single vs Multi-turn
+
+Scoring single-turn LLM apps are straightforward, as we saw in the previous section. For single-output, simply provide the test case parameters as dynamic variables in your evaluation prompt, and out you get a score.
+
+[image single turn lm as ajudge]
+
+However for multi-turn evals, you'll need a prompt that:
+
+- Takes into account entire conversations
+- Calculates a score based on portions of a conversation
+- Consider any tool calling and retrieval context within turns
+
+In fact, often times a conversation can get length and the best way to evaluate it is to partition it into several list of turns instead:
+
+[image of multi turn llma ajudge]
+
+Despite how different single and mult-turn LLM-as-a-judge may look, they both actually fall under the **single-output** LLM-as-a-judge category. For pairwise comparison, we generally **don't** do it for multi-turn since that would overload the LLM judge with too much context, hence it doesn't work as well compared to single-turn pairwise comparisons.
+
+<Tip title="Confident AI Has You Covered" icon="leaf">
+  Confident AI already takes care of all LLM-as-a-judge implementation via
+  `deepeval`, so don't worry if this all looks too complicated to implement.
+</Tip>
+
+## Techniques and Algorithms for LLM Judge Scoring
+
+LLM-as-a-judge, at least for the implementations shown in above sections, can suffer from several problems:
+
+- **Reliability** – Scores may vary across runs due to randomness or prompt sensitivity.
+- **Bias** – Judges can show position bias (favoring the first or last response), or favor outputs generated by the same model family as the judge itself.
+- **Verbosity preference** – Judges often reward longer, more detailed answers even when they are less accurate or less useful.
+- **Accuracy** – Judges may misinterpret the rubric, overlook factual mistakes, or hallucinate justifications for a score.
+
+These limitations means we need better techniques and algorithms, as is implemented in Confident AI.
+
+### G-Eval
+
+G-Eval is a **SOTA, research-backed framework** that uses LLM-as-a-judge to evaluate LLM outputs on any custom criteria using everyday language. It's evaluation algorithm is as follows:
+
+- Generate a series of CoTs (chain of thoughts) based on an initial criteria
+- Use these CoTs as evaluation steps in your evaluation prompt
+- Dynamically include test case arguments in the evaluation prompt as well
+
+[image]
+
+G-Eval makes great LLM evaluation metrics for **subjective criteria** because it is accurate, easily tunable, and surprisingly consistent across runs. Here's how you would use it in `deepeval` for running local evals:
+
+```python main.py
+from deepeval.metrics import GEval
+from deepeval.test_case import LLMTestCaseParams
+
+correctness_metric = GEval(
+    name="Correctness",
+    criteria="Determine whether the actual output is factually correct based on the expected output.",
+    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.EXPECTED_OUTPUT],
+)
+```
+
+In fact, **all custom metrics you create on the platform** is also powered by G-Eval. Confident AI now supports both single and multi-turn G-Eval:
+
+```python main.py
+from deepeval.test_case import ConversationalTestCase
+from deepeval.metrics import ConversationalGEval
+
+metric = ConversationalGEval(
+    name="Professionalism",
+    criteria="Determine whether the assistant has acted professionally based on the content."
+)
+```
+
+More information on G-Eval can be found [here.](https://www.confident-ai.com/blog/g-eval-the-definitive-guide)
+
+<Note>
+  G-Eval, first introduced in the paper “NLG Evaluation using GPT-4 with Better
+  Human Alignment”, was designed as a stronger alternative to traditional
+  reference-based metrics such as BLEU and ROUGE, which often fall short on
+  subjective or open-ended tasks that demand creativity, nuance, and semantic
+  understanding.
+</Note>
+
+### DAG
+
+### QAG
+
+### LLM arena
+
+## Using LLM Judges for Evaluation Metrics
+
+## Application-Based Metrics
+
+### RAG
+
+### Agents
+
+### Chatbots
+
+## Use Case-Specific Metrics
+
+## Safety Metrics
+
+## Using Metrics Tactically

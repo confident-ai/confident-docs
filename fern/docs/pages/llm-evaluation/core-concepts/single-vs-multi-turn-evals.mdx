@@ -1,0 +1,119 @@
+---
+subtitle: Get to know the main modes of LLM evaluation
+description: Get started with LLM evaluation in minutes
+slug: llm-evaluation/core-concepts/single-vs-multi-turn-evals
+---
+
+## Overview
+
+At the very high-level, every evaluation can be classified as either single-turn or multi-turn evaluations. Each type of evaluation requires different:
+
+- **Metrics** - Multi-turn metrics takes into account previous context in a conversation
+- **Test cases** - Multi-turn test cases contains historical turns
+- **Goldens and datasets** - Multi-turn goldens and datasets benchmarks on scenarios, instead of individual inputs
+
+Hence, it is important to understand their differences and which bucket your use case falls into.
+
+## Single-Turn Evals
+
+Single-turn are for everything non-conversational. While multi-step agents can be considered multi-turn, they are often times not. In fact, most use cases are single-turn:
+
+- Summarizers
+- RAG QA
+- Autonomous agents
+- etc.
+
+Single-turn testing requires single-turn **datasets**, which are made up of single-turn **goldens**. During evaluation, as seen in the previous section's quickstart, these goldens are converted to single-turn **test cases**, which will create a single-turn **test run**.
+
+<Tip>
+  Notice how a single-turn workflow will always use single-turn primitives in
+  `deepeval` throughout evaluation.
+</Tip>
+
+There are two modes of single-turn testing:
+
+<CardGroup cols={2}>
+  <Card
+    title="Single-Turn E2E Testing"
+    icon="route"
+    iconType="solid"
+    href="/quickstart/phone"
+  >
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    <br/>
+
+    - Treats your LLM app as a black box, only system inputs and outputs are considered
+    - Visibility into components are still available through LLM tracing
+
+    **Suitable for:** Those building with raw LLM APIs, simplistic RAG or application architectures
+
+  </Card>
+  <Card
+    title="Single-Turn Component-Level Testing"
+    icon="code-branch"
+    iconType="solid"
+    href="/quickstart/web"
+  >
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+      <br/>
+
+    - Assert retrievers, LLMs, and tool calls individually
+    - Evaluate more than just end system inputs and outputs
+
+    **Suitable for:** Those building agentic workflows, complicated application architectures
+
+  </Card>
+</CardGroup>
+
+## Multi-Turn Evals
+
+Multi-turn use cases are for everything conversational. This includes:
+
+- Conversational agents
+- Voice AI agents
+- LLM Chatbots
+
+Evaluating conversations is more complex than single-turn tasks because each response depends on the full dialogue history, not just the most recent input. Multi-turn evaluations account for this by measuring how well the LLM app:
+
+- Maintains context
+- Handles retrieval context and tool calling across turns
+- Drives the conversation forward
+
+In this setting, we benchmark based on **scenarios in multi-turn goldens** rather than individual inputs in single-turn ones. Scenarios matter because success can only be judged over the entire interaction, not by looking at any single turn in isolation.
+
+<Note>
+
+A scenario represents the end-to-end situation the conversation is meant to resolve (e.g., troubleshooting an issue, booking a flight, or returning a product).
+
+</Note>
+
+Only end-to-end testing is available for multi-turn:
+
+  <Card
+    title="Multi-Turn E2E Testing"
+    icon="route"
+    iconType="solid"
+    href="/quickstart/web"
+  >
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+      <br/>
+
+    - Assert retrievers, LLMs, and tool calls individually
+    - Evaluate more than just end system inputs and outputs
+
+    **Suitable for:** Those building agentic workflows, complicated application architectures
+
+  </Card>
+
+## Next Steps
+
+Next up, you should learn everything about test cases, goldens, datasets. These concepts will help you understand how your LLM app is actually represented within Confident AI's ecosystem, and make your life much easier when working with various metrics down the road.

@@ -38,16 +38,25 @@ navigation:
             path: docs/pages/docs.mdx
             icon: fa-light fa-info-circle
           - page: Setup and Installation
-            path: docs/pages/getting-started.mdx
+            path: docs/pages/setup-and-installation.mdx
             icon: fa-light fa-play
       - section: LLM Evaluation
         contents:
-          - page: Introduction
-            path: docs/pages/llm-evaluation/introduction.mdx
-            icon: fa-light fa-info-circle
           - page: Quickstart
             path: docs/pages/llm-evaluation/quickstart.mdx
             icon: fa-light fa-bolt
+          - section: Core Concepts
+            icon: fa-light fa-brain
+            contents:
+              - page: Single vs Multi-Turn Evals
+                path: docs/pages/llm-evaluation/core-concepts/single-vs-multi-turn-evals.mdx
+                icon: fa-light fa-comments
+              - page: Test Cases, Goldens, and Datasets
+                path: docs/pages/llm-evaluation/core-concepts/test-cases-goldens-datasets.mdx
+                icon: fa-light fa-file-code
+              - page: LLM-as-a-Judge Metrics
+                path: docs/pages/llm-evaluation/core-concepts/llm-as-a-judge-metrics.mdx
+                icon: fa-light fa-gavel
           - page: End-to-End Evals
             path: docs/pages/llm-evaluation/end-to-end-evals.mdx
             icon: fa-light fa-route
@@ -216,7 +225,7 @@ navigation:
           - page: LangGraph
             path: docs/pages/integrations/third-party/langgraph.mdx
             icon: fa-light fa-chart-network
-          - page: Litellm
+          - page: LiteLLM
             path: docs/pages/integrations/third-party/litellm.mdx
             icon: fa-light fa-train
           - page: LlamaIndex

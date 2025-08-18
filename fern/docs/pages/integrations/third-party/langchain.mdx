@@ -5,7 +5,7 @@ description: Get started with Confident AI for LLM evaluation and observability
 
 [LangChain](https://www.langchain.com/) is a framework for building LLM applications. Confident AI provides a `CallbackHandler` to trace and evaluate LangChain applications.
 
-## Quickstart
+## Tracing Quickstart
 
 <Steps>
 
@@ -93,11 +93,9 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-## Advanced Usage
-
 ### Trace attributes
 
-You can set custom trace attributes in your `CallbackHandler` for each invocation:
+You can also set custom trace attributes in your `CallbackHandler` for each invocation:
 
 ```python main.py
 ...
@@ -112,6 +110,7 @@ callback_handler = CallbackHandler(
 llm_with_tools.invoke(input=input, config={"callbacks": [callback_handler]})
 ```
 
+<Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
 </ParamField>
@@ -140,14 +139,40 @@ llm_with_tools.invoke(input=input, config={"callbacks": [callback_handler]})
   Each attribute is **optional**, and works the same way as the [native tracing
   features](/docs/llm-tracing/tracing-features) on Confident AI.
 </Info>
+</Accordion>
+
+## Evals Usage
 
 ### Online evals
 
-To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your LangChain application, provide a metric collection name to `CallbackHandler`.
+You can run [online evals](/docs/llm-tracing/evaluations) on your LangGraph agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
 
-```python main.py {8}
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+  />
+</Frame>
+
+<Warning>
+  Your metric collection should only contain the **task completion metric**,
+  which is the only supported metric for LangChain.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Provide your metric collection name to `CallbackHandler`.
+
+```python main.py {7}
 from deepeval.integrations.langchain import CallbackHandler
-...
 
 # Invoke your agent with the metric collection name
 llm_with_tools.invoke(
@@ -158,12 +183,10 @@ llm_with_tools.invoke(
 )
 ```
 
-<ParamField path="metric_collection" type="str" required={false}>
-  The name of the metric collection. To create a metric collection, visit
-  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
-</ParamField>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 
-<Warning>
-  Your metric collection should only contain the **task completion metric**,
-  which is the only supported metric for LangChain.
-</Warning>
+</Step>
+</Steps>

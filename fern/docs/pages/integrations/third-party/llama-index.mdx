@@ -5,7 +5,7 @@ description: Get started with Confident AI for LLM evaluation and observability
 
 [LlamaIndex](https://www.llamaindex.ai/) is an LLM framework that makes it easy to build knowledge agents from complex data. Confident AI allows you to trace and evaluate LlamaIndex agents in just a few lines of code.
 
-## Quickstart
+## Tracing Quickstart
 
 <Steps>
 
@@ -52,7 +52,7 @@ deepeval.login("<your-confident-api-key>")
 
 Instrument LlamaIndex using `instrument_llama_index` to enable Confident AI's `LlamaIndexSpanHandler`.
 
-```python main.py {5, 8}
+```python main.py {8}
 import os
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.openai import OpenAI
@@ -74,8 +74,8 @@ agent = FunctionAgent(
 ```
 
 <Note>
-  Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex spans as
-  traces and publish them to Confident AI.
+  Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex traces and
+  publish them to Confident AI.
 </Note>
 
 </Step>
@@ -106,11 +106,35 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-## Advanced Usage
+## Evals Usage
 
 ### Online evals
 
-Confident AI supports [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. To enable online evals, replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
+You can run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LlamaIndex agent.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+  />
+</Frame>
+
+<Warning>
+  Your metric collection should only contain metrics that don't require
+  `retrieval_context`, `context`, `expected_output`, or `expected_tools` for
+  evaluation.
+</Warning>
+</Step>
+
+<Step title="Run evals">
+
+Confident AI supports [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
 
 ```python main.py {1, 9}
 from deepeval.integrations.llama_index import FunctionAgent
@@ -132,13 +156,10 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-<ParamField path="metric_collection" type="str" required={false}>
-  The name of the metric collection. To create a metric collection, visit
-  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
-</ParamField>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 
-<Warning>
-  Your metric collection should only contain metrics that don't require
-  `retrieval_context`, `context`, `expected_output`, or `expected_tools` for
-  evaluation.
-</Warning>
+</Step>
+</Steps>
