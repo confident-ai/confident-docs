@@ -82,7 +82,7 @@ prompt_to_llm = prompt.interpolate(name="Joe")
 And if you don't have any variables, you should still use the `interpolate()` method to create a copy of your prompt template to be used in your LLM application.
 
 <Error title="Warning">
-Referencing the `template` variable in a `Prompt` class is extremely bad practice and should be **avoided at all cost**. Always use the `interpolate()` method before supply prompt templates to your LLM application.
+Referencing the `template` variable in a `Prompt` class is extremely bad practice and should be **avoided at all cost**. Always use the `interpolate()` method before supplying prompt templates to your LLM application.
 </Error>
 
 ## Pull a List of Prompt Messages

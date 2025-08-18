@@ -270,7 +270,7 @@ paths:
         - Tracing
       summary: Trace Ingestion
       operationId: createTrace
-      description: You can use this endpoint to ingest traces manually.
+      description: Adds a new trace to Confident AI with all the information your provide.
       requestBody:
         description: Create a trace ingestion
         required: true
@@ -281,7 +281,7 @@ paths:
 
       responses:
         "200":
-          description: Response of a create trace API call when it succeeds
+          description: Successful response from create trace API
           content:
             application/json:
               schema:
@@ -294,7 +294,7 @@ paths:
         - Tracing
       summary: Update Trace
       operationId: updateTrace
-      description: You can use this endpoint to udate traces manually.
+      description: Updates a trace with the information your provide.
       requestBody:
         description: Create a trace ingestion
         required: true
@@ -305,7 +305,7 @@ paths:
 
       responses:
         "200":
-          description: Response of a create trace API call when it succeeds
+          description: Successful response from update trace API
           content:
             application/json:
               schema:
@@ -319,7 +319,6 @@ paths:
       summary: Evaluate Thread
       description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
       operationId: evaluateThread
-      parameters:
       requestBody:
         required: true
         content:
@@ -328,7 +327,7 @@ paths:
               $ref: "#/components/schemas/EvaluateThreadRequest"
       responses:
         "200":
-          description: Response of a create trace API call when it succeeds
+          description: Successful response from evaluate thread API
           content:
             application/json:
               schema:
@@ -341,13 +340,6 @@ paths:
         - Tracing
       summary: Evaluate Trace
       operationId: evaluateTrace
-      parameters:
-        - name: uuid
-          in: path
-          required: true
-          description: The UUID of the trace to evaluate
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -356,7 +348,7 @@ paths:
               $ref: "#/components/schemas/EvaluateTraceRequest"
       responses:
         "200":
-          description: Response of a create trace API call when it succeeds
+          description: Successful response from evaluate trace API
           content:
             application/json:
               schema:
@@ -369,13 +361,6 @@ paths:
         - Tracing
       summary: Evaluate Span
       operationId: evaluateSpan
-      parameters:
-        - name: uuid
-          in: path
-          required: true
-          description: The UUID of the span to evaluate
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -384,7 +369,7 @@ paths:
               $ref: "#/components/schemas/EvaluateSpanRequest"
       responses:
         "200":
-          description: Response of a create trace API call when it succeeds
+          description: Successful response from evaluate span API
           content:
             application/json:
               schema:
@@ -1145,6 +1130,7 @@ components:
         uuid:
           type: string
           format: uuid
+          description: The unique indentifier of the trace
         name:
           type: string
         input:
@@ -1154,19 +1140,24 @@ components:
         startTime:
           type: string
           format: date-time
+          description: Start time of the trace
         endTime:
           type: string
           format: date-time
+          description: End time of the trace
         environment:
           type: string
           enum: [production, development, staging, testing]
+          description: The environment of where your trace is from (helps with debugging)
         metadata:
           type: object
           additionalProperties: true
+          description: Additional data of your trace
         tags:
           type: array
           items:
             type: string
+          description: Tags of your trace
         baseSpans:
           type: array
           items:
