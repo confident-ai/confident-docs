@@ -2,3 +2,141 @@
 slug: integrations/third-party/openai-agents
 description: Get started with Confident AI for LLM evaluation and observability
 ---
+
+[OpenAI Agents](https://github.com/openai/openai-agents-python) is a lightweight framework for creating agentic workflows using agent swarms, handoffs, and tool use. Confident AI also allows you to trace OpenAI Agent workflows with one line of code.
+
+## Tracing Quickstart
+
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval openai-agents
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure OpenAI Agents">
+
+Add DeepEval's trace processor to OpenAI Agents.
+
+```python main.py {4}
+from agents import Agent, Runner, add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+# Replace with your agent code
+agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+```
+
+<Note>
+Now whenever you use OpenAI Agents, DeepEval will collect OpenAI Agents traces and publish them to Confident AI.
+</Note>
+</Step>
+
+<Step title="Run OpenAI Agents">
+
+Invoke your agent by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Streaming Responses
+
+Confident AI handles both asynchronous workflows and streamed responses. The following example shows how to trace streamed responses with OpenAI Agents.
+
+```python main.py {6}
+from deepeval.openai_agents import DeepEvalTracingProcessor
+from openai.types.responses import ResponseTextDeltaEvent
+from agents import Agent, Runner, add_trace_processor
+import asyncio
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+async def streaming_agent():
+    agent = Agent(
+        name="Joker",
+        instructions="You are a helpful assistant.",
+    )
+    result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
+    async for event in result.stream_events():
+        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            print(event.data.delta, end="", flush=True)
+
+async def main():
+    tasks = [streaming_agent() for _ in range(5)]
+    await asyncio.gather(*tasks)
+
+asyncio.run(main())
+```
+
+### Logging Threads
+
+Chat threads are also automatically logged to Confident AI when a `group_id` is provided in your OpenAI Agent workflow.
+
+```python main.py {4, 11}
+from agents import Agent, Runner, trace, add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+thread_id = "unique_thread_id"
+
+async def main():
+    agent = Agent(name="Assistant", instructions="Reply very concisely.")
+
+    with trace(workflow_name="Conversation", group_id=thread_id):
+        # First turn
+        result = await Runner.run(agent, "What city is the Golden Gate Bridge in?")
+        print(result.final_output)
+        # San Francisco
+
+        # Second turn
+        new_input = result.to_input_list() + [{"role": "user", "content": "What state is it in?"}]
+        result = await Runner.run(agent, new_input)
+        print(result.final_output)
+        # California
+```

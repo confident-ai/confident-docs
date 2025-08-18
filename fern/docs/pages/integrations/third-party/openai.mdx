@@ -2,3 +2,478 @@
 slug: integrations/third-party/openai
 description: Get started with Confident AI for LLM evaluation and observability
 ---
+
+Confident AI lets you trace and evaluate OpenAI calls, whether standalone or used as a component within a larger application.
+
+## Tracing Quickstart
+
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval openai
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure OpenAI">
+
+To begin tracing your OpenAI calls as a component in your application, import OpenAI from DeepEval instead.
+
+<Tabs>
+  <Tab title="Chat Completions">
+
+```python main.py {2, 7}
+import time
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = OpenAI()
+
+@observe()
+def generate_response(input: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+    )
+    return response
+
+response = generate_response("What is the weather in Tokyo?")
+```
+
+</Tab>
+<Tab title="Responses">
+
+```python main.py {2, 7}
+import time
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = OpenAI()
+
+@observe()
+def generate_response(input: str) -> str:
+    response = client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+    )
+    return response
+
+response = generate_response("What is the weather in Tokyo?")
+```
+
+</Tab>
+<Tab title="Async Chat Completions">
+
+```python main.py {3, 8}
+import time
+import asyncio
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = AsyncOpenAI()
+
+@observe()
+async def generate_response(input: str) -> str:
+    response = await client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+    )
+    return response
+
+response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+```
+
+</Tab>
+<Tab title="Async Responses">
+
+```python main.py {3, 8}
+import time
+import asyncio
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+
+client = AsyncOpenAI()
+
+@observe()
+async def generate_response(input: str) -> str:
+    response = await client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+    )
+    return response
+
+response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+```
+
+</Tab>
+</Tabs>
+
+<Note>
+  DeepEval's OpenAI client traces `chat.completions.create`, `beta.chat.completions.parse`, and `responses.create` methods.
+</Note>
+</Step>
+
+<Step title="Run OpenAI">
+
+Invoke your agent by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Evals Usage
+
+### End-to-end evals
+
+Confident AI allows you to run [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your OpenAI client to evaluate your OpenAI calls directly. This is recommended if you are testing your OpenAI calls in isolation.
+
+<Steps>
+
+<Step title="Create metric">
+
+```python
+from deepeval.metrics import AnswerRelevancyMetric
+
+task_completion = AnswerRelevancyMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+```
+
+<Warning>
+  You can only run end-to-end evals on OpenAI using metrics that evaluate
+  `input`, `output`, or `tools_called`.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_iterator` to invoke your OpenAI client for each golden.
+
+<Tabs>
+<Tab title="Chat Completions">
+
+```python main.py {1,18}
+from deepeval.openai import OpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = OpenAI()
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    # run OpenAI client
+    client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": golden.input}
+        ],
+        metrics=[AnswerRelevancyMetric(), BiasMetric()]
+    )
+```
+
+</Tab>
+<Tab title="Responses">
+
+```python main.py {1,16}
+from deepeval.openai import OpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = OpenAI()
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    # run OpenAI client
+    client.responses.create(
+        model="gpt-4o",
+        instructions="You are a helpful assistant.",
+        input=golden.input,
+        metrics=[AnswerRelevancyMetric(), BiasMetric()]
+    )
+```
+
+</Tab>
+<Tab title="Async Chat Completions">
+
+```python main.py {1,20}
+from deepeval.openai import AsyncOpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset, Golden
+import asyncio
+
+client = AsyncOpenAI()
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    # add OpenAI client task
+    task = asyncio.create_task(
+        client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": golden.input}
+            ],
+            metrics=[AnswerRelevancyMetric(), BiasMetric()]
+        )
+    )
+    dataset.evaluate(task)
+```
+
+</Tab>
+<Tab title="Async Responses">
+
+```python main.py {1,18}
+from deepeval.openai import AsyncOpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset, Golden
+import asyncio
+
+client = AsyncOpenAI()
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    # add OpenAI client task
+    task = asyncio.create_task(
+        client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=golden.input,
+            metrics=[AnswerRelevancyMetric(), BiasMetric()]
+        )
+    )
+    dataset.evaluate(task)
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  This will automatically generate a test run with evaluated OpenAI traces using
+  inputs from your dataset.
+</Success>
+
+</Step>
+</Steps>
+
+### Using OpenAI in component-level evals
+
+You can also evaluate OpenAI calls through component-level evals. This approach is recommended if you are testing your OpenAI calls as a component in a larger application system.
+
+<Steps>
+
+<Step title="Create metric">
+
+```python
+from deepeval.metrics import AnswerRelevancyMetric
+
+task_completion = AnswerRelevancyMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+```
+
+<Warning>
+  As with end-to-end evals, you can only use metrics that evaluate `input`,
+  `output`, or `tools_called`.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_iterator` to invoke your LLM application for each golden.
+
+<Note>
+  Make sure that each function or method in your LLM application is decorated
+  with `@observe`.
+</Note>
+
+<Tabs>
+  <Tab title="Chat Completions">
+
+```python showLineNumbers copy {1, 24}
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = OpenAI()
+
+@observe()
+def generate_response(input: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+        metrics=[answer_relevancy]
+    )
+    return response
+
+# Create dataset
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+# Run component-level evaluation
+for golden in dataset.evals_iterator():
+    generate_response(golden.input)
+```
+
+</Tab>
+<Tab title="Responses">
+
+```python showLineNumbers copy {1, 22}
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = OpenAI()
+
+@observe()
+def generate_response(input: str) -> str:
+    response = client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+        metrics=[answer_relevancy]
+    )
+    return response
+
+# Create dataset
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+# Run component-level evaluation
+for golden in dataset.evals_iterator():
+    generate_response(golden.input)
+```
+
+</Tab>
+<Tab title="Async Chat Completions">
+
+```python showLineNumbers copy {2, 25}
+import asyncio
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = AsyncOpenAI()
+
+@observe()
+async def generate_response(input: str) -> str:
+    response = await client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input},
+        ],
+        metrics=[answer_relevancy]
+    )
+    return response
+
+# Create dataset
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+# Run component-level evaluation
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(generate_response(golden.input))
+    dataset.evaluate(task)
+```
+
+</Tab>
+<Tab title="Async Responses">
+
+```python showLineNumbers copy {2, 23}
+import asyncio
+from deepeval.openai import AsyncOpenAI
+from deepeval.tracing import observe, trace_manager
+from deepeval.dataset import EvaluationDataset, Golden
+
+client = AsyncOpenAI()
+
+@observe()
+async def generate_response(input: str) -> str:
+    response = await client.responses.create(
+        model="gpt-4.1",
+        instructions="You are a helpful assistant.",
+        input=input,
+        metrics=[answer_relevancy]
+    )
+    return response
+
+# Create dataset
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+# Run component-level evaluation
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(generate_response(golden.input))
+    dataset.evaluate(task)
+```
+
+</Tab>
+</Tabs>
+
+</Step>
+</Steps>

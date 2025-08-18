@@ -5,7 +5,7 @@ description: Get started with Confident AI for LLM evaluation and observability
 
 [Pydantic AI](https://ai.pydantic.dev/) is a python-native LLM agent framework built on the foundations of pydantic validation. Confident AI allows you to trace and evaluate Pydantic AI agents in just a few lines of code.
 
-## Quickstart
+## Tracing Quickstart
 
 <Steps>
 
@@ -57,13 +57,11 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-## Advanced Usage
-
 ### Trace attributes
 
-To set custom trace attributes in your agent, replace your Pydantic `Agent` with DeepEval’s and provide `trace_attributes` as an argument to `Agent`.
+To set trace attributes for Pydantic, replace your `Agent` with DeepEval's, and supply `trace_attributes` to `Agent`.
 
-```python main.py {1, 4}
+```python main.py {1}
 from deepeval.integrations.pydantic_ai import Agent
 ...
 
@@ -80,6 +78,7 @@ agent = Agent(
 )
 ```
 
+<Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
 </ParamField>
@@ -108,14 +107,38 @@ agent = Agent(
   Each attribute is **optional**, and works the same way as the [native tracing
   features](/docs/llm-tracing/tracing-features) on Confident AI.
 </Info>
+</Accordion>
+
+## Evals Usage
 
 ### Online evals
 
-To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your Pydantic AI agent, replace your Pydantic AI `Agent` with DeepEval’s, and provide a metric collection as an argument to `Agent`.
+You can run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your Pydantic agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
 
-```python main.py {1, 7}
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your Pydantic agent.
+
+<video
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Acreate-metric-collection.mp4"
+  controls
+/>
+
+<Warning>
+  Your metric collection must only contain metrics that only evaluate the input
+  and actual output of your Pydantic agent.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent`.
+
+```python main.py {1, 6}
 from deepeval.integrations.pydantic_ai import Agent
-...
 
 agent = Agent(
     'openai:gpt-4o-mini',
@@ -124,12 +147,10 @@ agent = Agent(
 )
 ```
 
-<ParamField path="metric_collection" type="str" required={false}>
-  The name of the metric collection. To create a metric collection, visit
-  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
-</ParamField>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 
-<Warning>
-  Your metric collection must only contain metrics that only evaluate the input
-  and actual output of your Pydantic agent.
-</Warning>
+</Step>
+</Steps>

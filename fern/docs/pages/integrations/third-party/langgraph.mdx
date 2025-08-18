@@ -5,7 +5,7 @@ description: Get started with Confident AI for LLM evaluation and observability
 
 [LangGraph](https://www.langchain.com/langgraph) is a framework for building reactive, multi-agent systems. Confident AI provides a `CallbackHandler` to trace and evaluate LangGraph agents.
 
-## Quickstart
+## Tracing Quickstart
 
 <Steps>
 
@@ -52,7 +52,7 @@ deepeval.login("<your-confident-api-key>")
 
 Provide DeepEval's `CallbackHandler` to your LangGraph agent's invoke method.
 
-```python main.py {4, 20}
+```python main.py {20}
 import os
 import time
 from langgraph.prebuilt import create_react_agent
@@ -95,11 +95,9 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-## Advanced Usage
-
 ### Trace attributes
 
-You can set custom trace attributes in your `CallbackHandler` for each agent invocation:
+You can also set custom trace attributes in your `CallbackHandler` for each agent invocation:
 
 ```python main.py
 ...
@@ -114,6 +112,7 @@ callback_handler = CallbackHandler(
 agent.invoke(input=input, config={"callbacks": [callback_handler]})
 ```
 
+<Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
 </ParamField>
@@ -142,10 +141,35 @@ agent.invoke(input=input, config={"callbacks": [callback_handler]})
   Each attribute is **optional**, and works the same way as the [native tracing
   features](/docs/llm-tracing/tracing-features) on Confident AI.
 </Info>
+</Accordion>
+
+## Evals Usage
 
 ### Online evals
 
-To run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your LangGraph agent, provide a metric collection name to `CallbackHandler`.
+You can run [online evals](/docs/llm-tracing/evaluations) on your LangGraph agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent.
+
+<video
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Acreate-metric-collection.mp4"
+  controls
+/>
+
+<Warning>
+  Your metric collection should only contain the **task completion metric**,
+  which is the only supported metric for LangGraph.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Provide your metric collection name to `CallbackHandler`.
 
 ```python main.py {8}
 from deepeval.integrations.langchain import CallbackHandler
@@ -160,43 +184,51 @@ agent.invoke(
 )
 ```
 
-<ParamField path="metric_collection" type="str" required={false}>
-  The name of the metric collection. To create a metric collection, visit
-  [here](/docs/llm-evaluation/metrics/create-on-the-cloud).
-</ParamField>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 
-<Warning>
-  Your metric collection should only contain the **task completion metric**,
-  which is the only supported metric for LangGraph.
-</Warning>
+</Step>
+</Steps>
 
 ### End-to-end evals
 
-To run [end-to-end evals](/docs/llm-evaluation/end-to-end-evals), simply supply `metrics` to the `CallbackHandler`. Then, use the dataset's `evals_iterator` to invoke your LangGraph agent for each golden.
+Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your LangGraph agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
 
-<Tabs>
-<Tab title="Synchronous">
+<Steps>
 
-```python main.py {1, 25}
+<Step title="Create metric">
+
+```python
 from deepeval.metrics import TaskCompletionMetric
-from deepeval.dataset import Golden, EvaluationDataset
 
-...
-
-# Create a metric
 task_completion = TaskCompletionMetric(
     threshold=0.7,
     model="gpt-4o-mini",
     include_reason=True
 )
+```
 
-# Create goldens
-goldens = [
-    Golden(input="What is the weather in Bogotá, Colombia?"),
-    Golden(input="What is the weather in Paris, France?"),
-]
+</Step>
 
-dataset = EvaluationDataset(goldens=goldens)
+<Warning>
+  Similar to online evals, you can only run end-to-end evals on LangGraph using
+  `TaskCompletionMetric`.
+</Warning>
+
+<Step title="Run evals">
+
+Provide your metrics to the `CallbackHandler`. Then, use the dataset's `evals_iterator` to invoke your LangGraph agent for each golden.
+
+<Tabs>
+<Tab title="Synchronous">
+
+```python main.py {7}
+from deepeval.dataset import Golden, EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
 
 # Run evaluation for each golden
 for golden in dataset.evals_iterator():
@@ -209,27 +241,12 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Asynchronous">
 
-```python main.py {1, 27}
-from deepeval.metrics import TaskCompletionMetric
+```python main.py {8}
 from deepeval.dataset import Golden, EvaluationDataset
-from deepeval.evaluate import test_run
+import asyncio
 
-...
-
-# Create a metric
-task_completion = TaskCompletionMetric(
-    threshold=0.7,
-    model="gpt-4o-mini",
-    include_reason=True
-)
-
-# Create goldens
-goldens = [
-    Golden(input="What is the weather in Bogotá, Colombia?"),
-    Golden(input="What is the weather in Paris, France?"),
-]
-
-dataset = EvaluationDataset(goldens=goldens)
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
 
 # Run evaluation for each golden
 for golden in dataset.evals_iterator():
@@ -239,19 +256,17 @@ for golden in dataset.evals_iterator():
             config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
         )
     )
-    test_run.append(task)
+    dataset.evaluate(task)
 
 ```
 
 </Tab>
 </Tabs>
 
-<ParamField path="metrics" type="List[BaseMetric]" required={false}>
-  The metrics to evaluate your LangGraph trace. Only `TaskCompletionMetric` is
-  supported currently.
-</ParamField>
+<Success>
+  This will automatically generate a test run with evaluated traces using inputs
+  from your dataset.
+</Success>
 
-<Note>
-This will automatically create a generate a test run with evaluated traces.
-
-</Note>
+</Step>
+</Steps>
