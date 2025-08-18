@@ -4,10 +4,14 @@ slug: llm-tracing/advanced-features/test-cases
 description: Learn about test cases in LLM Tracing
 ---
 
+## Overview
+
 Confident AI allows you to [run evaluations](/docs/llm-tracing/evaluations#online-evals-for-traces) on your spans and traces, which requires you to set test case parameters in `update_current_span` and `update_current_trace`.
 
 <Callout>
-Each metric requires different test case parameters. For detailed information on required test case parameters for each metric, refer to the [official DeepEval documentation](https://deepeval.com/docs/metrics-introduction).
+  Each metric requires different test case parameters. For detailed information
+  on required test case parameters for each metric, refer to the [official
+  DeepEval documentation](https://deepeval.com/docs/metrics-introduction).
 </Callout>
 
 ## Test Case Parameters
@@ -23,7 +27,8 @@ Both `update_current_span` and `update_current_trace` accept 7 **OPTIONAL** test
 - `expected_tools`: A list of `ToolCall` objects representing the expected tools to be called by the LLM app
 
 <Callout>
-The **input** and **output** accept `Any` type for visualization purposes, but we recommend setting them as strings for running evaluations.
+  The **input** and **output** accept `Any` type for visualization purposes, but
+  we recommend setting them as strings for running evaluations.
 </Callout>
 
 ## Set Span Test Case Parameters
@@ -45,7 +50,7 @@ You can set span-level test case parameters in the `update_current_span` functio
                     tools_called=[ToolCall(name="web_search", input_parameters={"query": query})],
                 )
                 return "Agent response"
-            
+
             tool_calling_agent("What is weather in San Francisco?")
             ```
         </CodeBlock>
@@ -71,6 +76,7 @@ You can set span-level test case parameters in the `update_current_span` functio
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>
 
 ## Set Trace Test Case Parameters
@@ -78,7 +84,9 @@ You can set span-level test case parameters in the `update_current_span` functio
 You can set trace-level test case parameters in the `update_current_trace` function.
 
 <Callout type="info">
-`update_current_trace` can be set multiple times at any point in your code under the `observe` decorator, which is useful when a parameter is only accessible in specific parts of your code.
+  `update_current_trace` can be set multiple times at any point in your code
+  under the `observe` decorator, which is useful when a parameter is only
+  accessible in specific parts of your code.
 </Callout>
 
 <Tabs>
@@ -95,7 +103,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
                 retrieved_chunks = ["chunk1", "chunk2"]
                 update_current_trace(retrieval_context=retrieved_chunks)
                 return "\n".join(retrieved_chunks)
-            
+
             @observe()
             def llm_app(query: str):
                 retrieval_context = retriever(query)
@@ -105,7 +113,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
                 ).choices[0].message.content
                 update_current_trace(input=query, output=res)
                 return res
-            
+
             llm_app("What is weather typically like in San Francisco?")
             ```
         </CodeBlock>
@@ -142,4 +150,5 @@ You can set trace-level test case parameters in the `update_current_trace` funct
             ```
         </CodeBlock>
     </Tab>
+
 </Tabs>

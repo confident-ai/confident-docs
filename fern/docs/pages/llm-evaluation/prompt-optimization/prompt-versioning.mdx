@@ -4,51 +4,43 @@ slug: llm-evaluation/prompt-optimization/prompt-versioning
 description: Learn about prompt versioning
 ---
 
-Prompt versioning refers to the process of curating and developing different prompt templates in a managed and versionable way, and enables you to better test, compare, and evaluate the performance of different prompts. This is done on Confident AI's **Prompt Studio**.
+## Overview
 
-## Video Demo
+Confident AI's **Prompt Studio** allows you to create and version different versions of your prompts. This allows you to:
 
-<Frame caption="How to create and version a prompt">
-<div>Video here</div>
-</Frame>
+1. Collaborate and centralize where prompt is stored and edited, even for non-technical team members
+2. Use it within your LLM application
+3. Pinpoint which version, or even combination of your prompt versions, performs best
+
+There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping on prompts on Confident AI can you fully leverage Confident AI's evaluation features.
+
+<Note>
+  Prompts are a type of hyperparameter on Confident AI. Other
+  [hyperparameters](/docs/concepts/hyperparameters) include things like models,
+  embedders, top-K, and max tokens. By running evaluations using the same
+  prompts that kept on Confident AI, we can tell you which version performs
+  best, and later automatically optimize it for you.
+</Note>
 
 ## Two Types of Prompts
 
 There are two types of prompts you can create:
 
-- **[(Single) Text Prompt](/docs/prompt-management/prompt-versioning#create-a-text-prompt)**: Use this when you need a straightforward, one-off prompt for simple completions.
-- **[Prompt Message List](/docs/prompt-management/prompt-versioning#create-a-prompt-message-list)**: Use this when you need to define multiple messages with specific roles (system, user, assistant) in a conversation. This format is ideal for few-shot prompting, where you can start with a system message that sets the context, followed by several example pairs of user questions and assistant responses, and end with your actual user message. This structured approach helps guide the LLM to provide more accurate and consistent responses.
+- **(Single) Text Prompt**: Use this when you need a straightforward, one-off prompt for simple completions.
+- **Prompt Message List**: Use this when you need to define multiple messages with specific roles (system, user, assistant) in an OpenAI messages format. This format is ideal for few-shot prompting, where you can start with a system message that sets the context.
 
-<Frame caption="TODO">
-Image of two types of prompts
-</Frame>
-
-<Callout>
+<Tip>
   If you ever see a prompt being mentioned without any mention of "message" or
   "list", assume it is a single prompt we're talking about.
-</Callout>
+</Tip>
 
-## Create a Text Prompt
+## Prompts vs Prompt Versions
 
-To create your first prompt, navigate to the **Prompt Studio** page in your project space. Click on the button that says **Create Prompt**, and you will be required to name your first prompt by providing it with an alias, as well as a toggle to create the prompt as a message list. **DO NOT** toggle this on, we'll do this in the next section.
+## Create a Prompt Text
 
-<Callout>
-  Similar to datasets, the alias will be used to identify which prompt will be
-  used in your LLM application later on.
-</Callout>
+## Create Prompt Messages
 
-### Commit a Prompt Version
-
-Now that you've created a prompt, you can create the first version of your prompt using the **Prompt Editor** within the **Prompt Studio**. Once you're done writing the prompt template, enter a commit message, and click **Commit new version**.
-
-Committing a new version is similar to how you would commit changes on GitHub, and allows you to create a new version of your prompt template. In the future, you can also **Update** a current version instead of committing a new one, but this is only possible if you haven't used the version before.
-
-<Callout>
-  You can simply paste in the prompt you have in your codebase/wherever for this
-  step.
-</Callout>
-
-### Include Dynamic Variables
+## Using Dynamic Variables
 
 You can include variables that can be interpolated dynamically in your LLM application later on. There are four ways currently for you to include variables:
 
@@ -64,7 +56,6 @@ For example, the `{variable}` interpolation type must follow these rules:
 
 For example:
 
-<CodeBlock>
 ```python
 # ✅ Correct usage:
 "Hi, my name is {name}."
@@ -72,54 +63,14 @@ For example:
 "User input: {user_input}"
 
 # ❌ Incorrect usage:
-"Hi, my name is {variable name}."  # Spaces in variable name
+
+"Hi, my name is {variable name}." # Spaces in variable name
 "Hi, my name is {variable_name }." # Extra spaces around variable name
+
 ```
-</CodeBlock>
 
 You can select which variable interpolation type you wish to use in the **Prompt Editor**.
 
-## Create a Prompt Message List
+```
 
-This is exactly the same as creating a prompt in the [previous step](/docs/prompt-management/prompt-versioning#create-a-text-prompt), but this time toggle **ON** the "message list" option to create a prompt as a list of messages.
-
-### Commit a Prompt Version
-
-A prompt version for a prompt message list, is a **list of prompt messages**, not individual prompts. Each prompt message has:
-
-- `"role"` - either "system", "user", "assistant", or "developer"
-- `"content"` - same as a single prompt version
-
-When you create a new version, you're creating a list of prompts. To add a new message, click on the **New Message** button at the end of the list, and edit your prompt message accordingly. When you're done, click **Commit new version**.
-
-Committing a new version is similar to how you would commit changes on GitHub, and allows you to create a new version of your prompt template. In the future, you can also **Update** a current version instead of committing a new one, but this is only possible if you haven't used the version before.
-
-<Callout>
-  Need more prompt roles? Drop support@confident-ai.com a quick message and
-  we'll include it.
-</Callout>
-
-### Include Dynamic Variables
-
-Dynamic variables can be included in the prompt template of each prompt message the same way as how you would include a variable in for a single text prompt, which you can learn about [in more detail above.](/docs/prompt-management/prompt-versioning#include-dynamic-variables)
-
-One thing to note is, whatever variable you include in one promtp message will be interpolated the same way as all other messages in the same prompt version.
-
-<Callout>
-  Remember, a prompt version in a prompt message list is a list of prompt
-  messages, not individual prompt templates.
-</Callout>
-
-## Preview Prompts
-
-You can also click on the **Preview** button to preview each prompt template in markdown mode.
-
-## Quick Disclaimer
-
-Once a prompt version has been used in an evaluation, it becomes immutable - meaning you cannot update it anymore. This is a deliberate design choice in Confident AI to maintain data integrity and ensure evaluation results remain tied to the exact prompt version that generated them. The immutability of evaluated prompts helps in:
-
-1. Maintaining a clear audit trail of which prompt version produced which results
-2. Enabling reliable comparison between different prompt versions
-3. Preventing accidental modifications that could invalidate evaluation data
-
-If you need to make changes to an evaluated prompt version, you'll need to commit a new version. This approach ensures you can iterate on your prompts while preserving the history and integrity of your evaluation results.
+```

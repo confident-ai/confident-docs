@@ -4,11 +4,13 @@ slug: llm-tracing/advanced-features/metadata
 description: Learn about masking in LLM Tracing
 ---
 
+## Overview
+
 With Confident AI, you can attach additional metadata to both traces and spans. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
 
 ## Add Metadata
 
-Use `update_current_span` and `update_current_trace` to add **span-level** and **trace-level** metadata. 
+Use `update_current_span` and `update_current_trace` to add **span-level** and **trace-level** metadata.
 
 Each metadata argument is a dictionary whose keys are strings and whose values are any JSON-serializable type.
 
