@@ -95,12 +95,176 @@ evaluate(test_cases=dataset.test_cases, metrics=[...])
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-[TODO kritin]
+<Steps>
+
+<Step title="Pull goldens">
+
+First use the `.pull()` method:
+
+```ts main.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+console.log(dataset.goldens);
+```
+
+</Step>
+
+<Step title="Construct test cases">
+
+Then loop through your dataset of goldens to create a list of test cases:
+
+```ts main.ts focus={7-13}
+import { EvaluationDataset } from "deepeval-ts";
+import { LLMTestCase } from "deepeval-ts";
+
+dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+for (const golden of dataset.goldens) {
+  const testCase = new LLMTestCase({
+    input: golden.input,
+    actualOutput: llmApp(golden.input),
+    // map any additional fields here
+  });
+  dataset.addTestCase(testCase);
+}
+```
+
+<Tip>
+  For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
+
+```ts main.ts
+import { ConversationalTestCase } from "deepeval-ts";
+
+for (const golden of dataset.goldens) {
+  const testCase = simulate(golden); // simulate conversation
+  dataset.addTestCase(testCase);
+}
+```
+
+</Tip>
+
+</Step>
+
+<Step title="Run an evaluation">
+
+By calling `.addTestCase()` in the previous step, each time you run evaluate Confident AI will automatically associate any created test run with your dataset:
+
+```ts
+import { evaluate } from "deepeval-ts";
+
+evaluate({ testCases: dataset.testCases, metrics: [...]});
+```
+
+</Step>
+
+</Steps>
 
 </Tab>
 <Tab title="curL" language="curl">
 
-[TODO kritin]
+<Steps>
+
+<Step title="Pull goldens">
+
+First, pull goldens using the `/v1/datasets` endpoint.
+
+```curl
+curl -G https://api.confident-ai.com/v1/datasets \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d alias=alias
+```
+
+</Step>
+
+<Step title="Construct test cases">
+
+Construct a JSON array of test cases from the goldens you pulled, preserving the golden fields.
+
+```json
+[
+  {
+    "input": "How tall is Mount Everest?",
+    "datasetId": "YOUR-DATASET-ID",
+    "datasetAlias": "YOUR-DATASET-ALIAS",
+    // Replace with your LLM app output
+    "actualOutput": "Mount Everest is 9K meters tall."
+  }
+]
+```
+
+<Tip>
+  For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
+```json
+[
+  {
+    "scenario": "User asking about Mount Everest height.",
+    "datasetId": "YOUR-DATASET-ID",
+    "datasetAlias": "YOUR-DATASET-ALIAS"
+    // Replace with your LLM app outputs
+    "turns": [
+      { "role": "user", "content": "How tall is Mount Everest?" },
+      { "role": "assistant", "content": "Mount Everest is 9K meters tall." }
+    ],
+  }
+]
+```
+
+</Tip>
+
+</Step>
+
+<Step title="Create metric collection">
+
+Create a metric collection through `v1/metric-collections`.
+
+```curl
+curl -X POST https://api.confident-ai.com/v1/metric-collections \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "name": "Collection Name",
+  "multiTurn": false,
+  "metricSettings": [
+    {
+      "metric": {
+        "name": "Answer Relevancy"
+      },
+      "threshold": 0.8
+    }
+  ]
+}'
+```
+
+</Step>
+
+<Step title="Run an evaluation">
+
+Run an evaluation using the test cases you constructed and metric collection you created using `/v1/evaluate`.
+
+```curl
+curl -X POST https://api.confident-ai.com/v1/evaluate \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "metricCollection": "Collection Name",
+  "testCases": [
+    {
+      "input": "How tall is Mount Everest?",
+      "datasetId": "YOUR-DATASET-ID",
+      "datasetAlias": "YOUR-DATASET-ALIAS",
+      "actualOutput": "Mount Everest is 9K meters tall."
+    }
+  ]
+}'
+```
+
+</Step>
+
+</Steps>
 
 </Tab>
 
