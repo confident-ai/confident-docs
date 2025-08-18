@@ -26,133 +26,6 @@ tags:
       description: Learn about tracing
 
 paths:
-  /v1/traces:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Trace Ingestion
-      operationId: createTrace
-      description: You can use this endpoint to ingest traces manually.
-      requestBody:
-        description: Create a trace ingestion
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#components/schemas/CreateTrace"
-
-      responses:
-        "200":
-          description: Response of a create trace API call when it succeeds
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreateTraceResponse"
-
-  /v1/traces/{uuid}:
-    put:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Update Trace
-      operationId: updateTrace
-      description: You can use this endpoint to udate traces manually.
-      requestBody:
-        description: Create a trace ingestion
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#components/schemas/UpdateTrace"
-
-      responses:
-        "200":
-          description: Response of a create trace API call when it succeeds
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateTraceResponse"
-      
-  /v1/evaluate/threads/{id}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Thread
-      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
-      operationId: evaluateThread
-      parameters:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvaluateThreadRequest'
-      responses:
-        "200":
-          description: Response of a create trace API call when it succeeds
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateThreadResponse"
-
-  /evaluate/traces/{uuid}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Trace
-      operationId: evaluateTrace
-      parameters:
-        - name: uuid
-          in: path
-          required: true
-          description: The UUID of the trace to evaluate
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvaluateTraceRequest'
-      responses:
-        "200":
-          description: Response of a create trace API call when it succeeds
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateTraceResponse"
-              
-  /evaluate/spans/{uuid}:
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Evaluate Span
-      operationId: evaluateSpan
-      parameters:
-        - name: uuid
-          in: path
-          required: true
-          description: The UUID of the span to evaluate
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EvaluateSpanRequest'
-      responses:
-        "200":
-          description: Response of a create trace API call when it succeeds
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluateSpanResponse"
-
   /v1/metric-collections:
     post:
       x-fern-server-name: Confident AI
@@ -162,88 +35,60 @@ paths:
       operationId: createMetricCollection
       description: Creates a metric collection with the `name` and the `metricSettings` you specified.
       requestBody:
-        description: Create a metric collection
+        description: ""
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateMetricCollection"
-            examples:
-              SingleTurn:
-                summary: Single-Turn Collection
-                value:
-                  name: "Collection Name"
-                  multiTurn: false
-              MultiTurn:
-                summary: Multi-Turn Collection
-                value:
-                  name: "Collection Name"
-                  multiTurn: true
-              MetricSettings:
-                summary: With Metric Settings
-                value:
-                  name: "Collection Name"
-                  multiTurn: false
-                  metricSettings:
-                    - metric:
-                        name: Answer Relevancy
-                        threshold: 0.8
+            example:
+              name: "Collection Name"
+              metricSettings:
+                - metric:
+                    name: Answer Relevancy
+                  threshold: 0.8
 
       responses:
         "200":
-          description: Metric Collection successfully added
+          description: ""
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateMetricResponse"
-              examples:
-                SingleTurn:
-                  summary: Single-Turn Collection
-                  value:
-                    success: true
-                    data:
-                      id: METRIC-COLLECTION-ID
-                MultiTurn:
-                  summary: Multi-Turn Collection
-                  value:
-                    success: true
-                    data:
-                      id: METRIC-COLLECTION-ID
-                MetricSettings:
-                  summary: With Metric Settings
-                  value:
-                    success: true
+              example:
+                success: true
+                data:
+                  id: "COLLECTION-ID"
+                deprecated: false
+
     get:
       x-fern-server-name: Confident AI
       tags:
         - Metric Collections
       summary: List Metric Collections
       operationId: listMetricCollections
-      description: Lists all the metric collections available in your Confident AI account.
+      description: Lists all the available metric collections in your Confident AI project.
       responses:
         "200":
-          description: Metric Collections retrieved successfully
+          description: ""
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetMetricCollectionResponse"
-              examples:
-                example1:
-                  summary: Get all Metric Collections
-                  value:
-                    success: true
-                    data:
-                      metricCollections:
-                        - id: "COLLECTION-ID"
-                          name: "New Collection Name"
-                          multiTurn: false
-                          metricSettings:
-                            - metric:
-                                name: "Faithfulness"
-                              activated: true
-                              threshold: 0.5
-                              includeReason: true
-                              strictMode: false
+              example:
+                success: true
+                data:
+                  metricCollections:
+                    - id: "COLLECTION-ID"
+                      name: "Collection Name"
+                      multiTurn: false
+                      metricSettings:
+                        - metric:
+                            name: "Faithfulness"
+                          activated: true
+                          threshold: 0.5
+                          includeReason: true
+                          strictMode: false
 
   /v1/metric-collections/{id}:
     put:
@@ -252,14 +97,14 @@ paths:
         - Metric Collections
       summary: Update Collection
       operationId: updateMetricCollection
-      description: Updates a metric collection with the `name` and `metricSettings` you provide for metric collection bearing the `id` you give.
+      description: Updates a metric collection's `name` and `metricSettings`.
       requestBody:
-        description: Update a metric collection
+        description: ""
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateMetricCollection"
+              $ref: "#/components/schemas/UpdateMetricCollection"
             examples:
               UpdateCollection:
                 summary: Update Metric Collection Example
@@ -272,7 +117,7 @@ paths:
                       threshold: 0.5
       responses:
         "200":
-          description: Metric Collection successfully updated
+          description: ""
           content:
             application/json:
               schema:
@@ -282,6 +127,10 @@ paths:
                   summary: Update Metric Collection Example
                   value:
                     success: true
+                    data:
+                      id: "COLLECTION-ID"
+                    deprecated: false
+
   /v1/datasets:
     get:
       x-fern-server-name: Confident AI
@@ -289,34 +138,53 @@ paths:
         - Datasets
       summary: Pull Datasets
       operationId: getDatasetByAlias
-      description: Returns a dataset by its alias. The dataset may include either single-turn `goldens` or multi-turn `conversationalGoldens`.
+      description: Retrieves a list of `Golden`s or `ConversationalGolden`s from your dataset.
       responses:
         "200":
-          description: Dataset retrieved successfully
+          description: ""
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetDatasetResponse"
-              examples:
-                SingleTurn:
-                  summary: Single-turn dataset
-                  value:
-                    success: true
-                    data:
-                      datasetId: "DATASET-ID"
-                      goldens:
-                        - input: "How's the weather like in NYC?"
-                          expectedOutput: "No idea"
-                MultiTurn:
-                  summary: Multi-turn dataset
-                  value:
-                    success: true
-                    data:
-                      datasetId: "DATASET-ID"
-                      conversationalGoldens:
-                        - scenario: "Booking a hotel"
-                          expectedOutcome: "Successfully booked"
-                          userDescription: "Finds hotels in NYC"
+              example:
+                success: true
+                data:
+                  datasetId: "DATASET-ID"
+                  goldens:
+                    - input: "How's the weather like in NYC?"
+                      expectedOutput: "No idea"
+
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Push Dataset
+      operationId: pushDataset
+      description: Pushes a list of `Golden`s or `ConversationalGolden`s to your dataset.
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDatasetRequestData"
+            example:
+              alias: "my-dataset-alias"
+              overwrite: true
+              goldens:
+                - input: "How is the weather like in NYC?"
+                  expectedOutput: "No idea"
+
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrUpdateGoldenRequestData"
+              example:
+                link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+
   /v1/evaluate:
     post:
       x-fern-server-name: Confident AI
@@ -327,82 +195,27 @@ paths:
       description: Run online evals for your test cases using the metrics in `metricCollection`.
       requestBody:
         required: true
+        description: ""
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/EvaluateRequest"
-            examples:
-                SingleTurn:
-                  summary: Single-Turn
-                  value:
-                    metricCollection: "Collection Name"
-                    testCases: 
-                      input: "How tall is mount everest?"
-                      actualOutput: "No clue, pretty tall I guess?"
-                MultiTurn:
-                  summary: Multi-Turn
-                  value:
-                    metricCollection: "Multi-Turn Collection Name"
-                    testCases:
-                      - turns:
-                          - role: user
-                            content: "How tall is Mount Everest?"
-                          - role: assistant
-                            content: "Mount Everest is approximately 8,848 meters tall."
-                          - role: user
-                            content: "Wow, that is really high! Has that changed recently?"
-                          - role: assistant
-                            content: "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
-                LogParameters:
-                  summary: Logging Parameters
-                  value:
-                    metricCollection: "Collection Name"
-                    testCases: 
-                      input: "How tall is mount everest?"
-                      actualOutput: "No clue, pretty tall I guess?"
-                    hyperparameters:
-                      model: "gpt-40-mini"
-                      prompt-version: "ai_generation_v2"
-                LogIdentifier:
-                  summary: Logging Identifier
-                  value:
-                    metricCollection: "Collection Name"
-                    testCases: 
-                      input: "How tall is mount everest?"
-                      actualOutput: "No clue, pretty tall I guess?"
-                    identifier: "run-399-102"
+            example:
+              metricCollection: "Collection Name"
+              testCases:
+                input: "How tall is mount everest?"
       responses:
         "200":
-          description: Successful Evaluation
+          description: ""
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/EvaluateResponse"
-              examples:
-                SingleTurn:
-                  summary: Single-Turn
-                  value:
-                    success: true
-                    data:
-                      id: "TEST-RUN-ID"
-                MultiTurn:
-                  summary: Multi-Turn
-                  value:
-                    success: true
-                    data:
-                      id: "MULTITURN-TEST-RUN-ID"
-                LogParameters:
-                  summary: Logging Parameters
-                  value:
-                    success: true
-                    data:
-                      id: "MULTITURN-TEST-RUN-ID"
-                LogIdentifier:
-                  summary: Logging Identifier
-                  value:
-                    success: true
-                    data:
-                      id: "MULTITURN-TEST-RUN-ID"
+              example:
+                success: true
+                data:
+                  id: "TEST-RUN-ID"
+                deprecated: false
 
   /v1/simulate:
     post:
@@ -450,6 +263,133 @@ paths:
                         - role: "user"
                           content: "I'd like my refund please."
 
+  /v1/traces:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Trace Ingestion
+      operationId: createTrace
+      description: You can use this endpoint to ingest traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/CreateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTraceResponse"
+
+  /v1/traces/{uuid}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Update Trace
+      operationId: updateTrace
+      description: You can use this endpoint to udate traces manually.
+      requestBody:
+        description: Create a trace ingestion
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/UpdateTrace"
+
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTraceResponse"
+
+  /v1/evaluate/threads/{id}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Thread
+      description: Triggers evaluation of a thread using a specified metric collection and optional chatbot role instructions.
+      operationId: evaluateThread
+      parameters:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateThreadRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateThreadResponse"
+
+  /evaluate/traces/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Trace
+      operationId: evaluateTrace
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the trace to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateTraceRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateTraceResponse"
+
+  /evaluate/spans/{uuid}:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Evaluate Span
+      operationId: evaluateSpan
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the span to evaluate
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateSpanRequest"
+      responses:
+        "200":
+          description: Response of a create trace API call when it succeeds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateSpanResponse"
+
 components:
   schemas:
     CreateMetricCollection:
@@ -458,106 +398,159 @@ components:
       properties:
         name:
           type: string
-          description: Name of the metric collection
+          description: This is the unique name of the metric collection you wish to create.
         multiTurn:
           type: boolean
+          description: This is true if your metric collection is multi-turn, which contains only multi-turn metrics. Defaulted to `false`.
         metricSettings:
           type: array
-          description: List of metric settings for the collection
+          description: This is the list of metric settings for the collection.
           items:
-            type: object
-            properties:
-              metric:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  criteria:
-                    type: string
-                  evaluationSteps:
-                    type: string
-                  evaluationParams:
-                    type: array
-                  multiTurn:
-                    type: boolean
-                required:
-                  - name
-              activated:
-                type: boolean
-              threshold:
-                type: number
-              includeReason:
-                type: boolean
-              strictMode:
-                type: boolean
-            required:
-              - metric
+            $ref: "#/components/schemas/MetricSetting"
       required:
         - name
-        - multiTurn
+
+    UpdateMetricCollection:
+      type: object
+      description: Request schema to create or update a metric collection
+      properties:
+        name:
+          type: string
+          description: The name of the metric collection, which must be unique within your project.
+        metricSettings:
+          type: array
+          description: This is the list of metric settings for the collection.
+          items:
+            $ref: "#/components/schemas/MetricSetting"
+      required:
+
+    MetricSetting:
+      type: object
+      properties:
+        metric:
+          type: object
+          description: This is a metric object, which contains the metric name.
+          properties:
+            name:
+              type: string
+              description: This is the name of the metric.
+          required:
+            - name
+        activated:
+          type: boolean
+          description: "This determines if the metric is activated. Only activated metrics are used for evaluations. Non-activated metrics are skipped."
+        threshold:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: "This determines the threshold for the metric which determines if the metric passes or fails depending on if the metric score is above or below the threshold."
+        includeReason:
+          type: boolean
+          description: "This determines if the reason for the metric score should be generated during evaluations."
+        strictMode:
+          type: boolean
+          description: "This determines if the metric is in strict mode. Metrics in strict mode output a binary score of 0 or 1, indicating pass or fail, as opposed to a continuous score from 0 to 1."
+    required:
+      - metric
 
     CreateMetricResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the metric collection was created successfully."
         data:
           type: object
+          description: "This maps to the id of the metric collection."
           properties:
             id:
+              description: "This is the id of the metric collection."
               type: string
           required:
             - id
+        deprecated:
+          type: boolean
+          description: "This is true if this metric collection endpoint is deprecated."
       required:
         - success
+        - data
+        - deprecated
 
     UpdateMetricCollectionResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the metric collection was updated successfully."
+        data:
+          type: object
+          description: "This maps to the id of the metric collection."
+          properties:
+            id:
+              description: "This is the id of the metric collection."
+              type: string
+          required:
+            - id
+        deprecated:
+          type: boolean
+          description: "This is true if this metric collection endpoint is deprecated."
       required:
         - success
+        - data
+        - deprecated
 
     GetMetricCollectionResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the list of metric collections was retrieved successfully."
         data:
           type: object
+          description: "This maps to a list of metric collections, which can be used to [run evals](/api-reference/evaluation/evaluate-llm) remotely."
           properties:
             metricCollections:
               type: array
+              description: "This is a list of metric collection objects."
               items:
                 type: object
                 properties:
                   id:
                     type: string
+                    description: "This is the id of the metric collection."
                   name:
                     type: string
+                    description: "This is the name of the metric collection, which should be supplied to the [evals API](/api-reference/evaluation/evaluate-llm) to run evaluations remotely."
                   multiTurn:
                     type: boolean
+                    description: "This is true if the metric collection is a multi-turn collection, which only contains multi-turn metrics for multi-turn evaluations."
                   metricSettings:
                     type: array
+                    description: "This is a list of settings for each metric in the collection, which can be configured on [Confident AI's](https://confidentai.com) metric collection page."
                     items:
                       type: object
                       properties:
                         metric:
                           type: object
+                          description: "This is a metric object, which contains the metric name."
                           properties:
                             name:
                               type: string
+                              description: "This is the name of the metric."
                         activated:
                           type: boolean
+                          description: "This is true if the metric is activated. Only activated metrics are used for evaluations. Non-activated metrics are skipped."
                         threshold:
                           type: number
                           minimum: 0
                           maximum: 1
+                          description: "This is the threshold for the metric, which determines if the metric passes or fails depending on if the metric score is above or below the threshold."
                         includeReason:
                           type: boolean
+                          description: "This is true if a metric's `include_reason` setting is toggled on the Confident platform. If true, the reason for the metric score will be generated during evaluations."
                         strictMode:
                           type: boolean
+                          description: "This is true if the metric is in strict mode. Metrics in strict mode output a binary score of 0 or 1, indicating pass or fail, as opposed to a continuous score from 0 to 1."
                       required:
                         - metric
                         - activated
@@ -575,163 +568,374 @@ components:
         - success
         - data
 
-    Golden:
+    RetrievedGolden:
       type: object
       properties:
         input:
           type: string
-        expectedOutput:
-          type: string
-          nullable: true
+          description: "This is the input to your LLM application."
         actualOutput:
           type: string
           nullable: true
-        context:
-          type: array
-          items:
-            type: string
+          description: "This is the actual output of your LLM application."
+        expectedOutput:
+          type: string
           nullable: true
+          description: "This is the expected output of your LLM application, which is the ideal actual output."
         retrievalContext:
           type: array
           items:
             type: string
           nullable: true
-        expectedTools:
+          description: "This is the retrieval context of your LLM application."
+        context:
           type: array
           items:
             type: string
           nullable: true
+          description: "This is the ideal retrieval context of your LLM application."
         toolsCalled:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/ToolCallData"
           nullable: true
+          description: "This is the tools called by your LLM application."
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "This is the expected tools to be called by the LLM application."
         additionalMetadata:
           type: object
           nullable: true
+          description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
           nullable: true
+          description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
           nullable: true
+          description: "This is the source file from which the golden was retrieved."
         customColumnKeyValues:
           type: object
           additionalProperties:
             type: string
+          nullable: true
+          description: "This is the custom column key values of the LLM application."
       required:
         - input
 
+    RetrievedConversationalGolden:
+      type: object
+      properties:
+        scenario:
+          type: string
+          description: "This is a description of the conversation context."
+        userDescription:
+          type: string
+          nullable: true
+          description: "This is the description of the user in the conversation."
+        expectedOutcome:
+          type: string
+          nullable: true
+          description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
+        turns:
+          type: array
+          items:
+            $ref: "#/components/schemas/Turn"
+          nullable: true
+          description: "This is the list of turns in the conversation."
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: "This is the context of the conversation."
+        additionalMetadata:
+          type: object
+          nullable: true
+          description: "This is any additional metadata you wish to associate with the golden."
+        comments:
+          type: string
+          nullable: true
+          description: "This is any comments you wish to associate with the golden."
+        sourceFile:
+          type: string
+          nullable: true
+          description: "This is the source file from which the golden was retrieved."
+        customColumnKeyValues:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+          description: "This is the custom column key values of the LLM application."
+      required:
+        - scenario
+
+    Golden:
+      type: object
+      properties:
+        input:
+          type: string
+          description: "This is the input to your LLM application."
+        actualOutput:
+          type: string
+          nullable: true
+          description: "This is the actual output of your LLM application."
+        expectedOutput:
+          type: string
+          nullable: true
+          description: "This is the expected output of your LLM application, which is the ideal actual output."
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: "This is the retrieval context of your LLM application."
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: "This is the ideal retrieval context of your LLM application."
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "This is the tools called by your LLM application."
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "This is the expected tools to be called by the LLM application."
+        additionalMetadata:
+          type: object
+          nullable: true
+          description: "This is any additional metadata you wish to associate with the golden."
+        comments:
+          type: string
+          nullable: true
+          description: "This is any comments you wish to associate with the golden."
+        sourceFile:
+          type: string
+          nullable: true
+          description: "This is the source file from which the golden was retrieved."
+        finalized:
+          type: boolean
+          nullable: true
+          description: "This determines whether the golden has been finalized."
+      required:
+        - input
 
     ConversationalGolden:
       type: object
       properties:
         scenario:
           type: string
+          description: "This is a description of the conversation context."
         userDescription:
           type: string
           nullable: true
+          description: "This is the description of the user in the conversation."
         expectedOutcome:
           type: string
           nullable: true
+          description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
         turns:
           type: array
           items:
-            type: object
+            $ref: "#/components/schemas/Turn"
           nullable: true
+          description: "This is the list of turns in the conversation."
         context:
           type: array
           items:
             type: string
           nullable: true
+          description: "This is the context of the conversation."
         additionalMetadata:
           type: object
           nullable: true
+          description: "This is any additional metadata you wish to associate with the golden."
         comments:
           type: string
           nullable: true
+          description: "This is any comments you wish to associate with the golden."
         sourceFile:
           type: string
           nullable: true
-        customColumnKeyValues:
-          type: object
-          additionalProperties:
-            type: string
+          description: "This is the source file from which the golden was retrieved."
+        finalized:
+          type: boolean
+          nullable: true
+          description: "This determines whether the golden has been finalized."
       required:
         - scenario
-
-    GetDatasetResponse:
-      type: object
-      properties:
-        success: 
-          type: boolean
-        data:
-          oneOf:
-            - type: object
-              properties:
-                datasetId:
-                  type: string
-                goldens:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Golden'
-              required:
-                - datasetId
-                - goldens
-            - type: object
-              properties:
-                datasetId:
-                  type: string
-                conversationalGoldens:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/ConversationalGolden'
-              required:
-                - datasetId
-                - conversationalGoldens
-      required:
-        - success
-        - data
-
-
-    LLMTestCase:
-      type: object
-      properties:
-        input:
-          type: string
-        actualOutput:
-          type: string
-        expectedOutput:
-          type: string
-        retrievalContext:
-          type: array
-          items:
-            type: string
-        toolsCalled:
-          type: array
-        expectedTools:
-          type: array
-      required:
-        - input
-        - actualOutput
 
     Turn:
       type: object
       properties:
         role:
           type: string
-          enum: [user, assistant]
+          enum: ["user", "assistant"]
+          description: "The role of the turn, either user or assistant."
         content:
           type: string
+          description: "The message content of the turn."
+        userId:
+          type: string
+          nullable: true
+          description: "The user ID associated with the turn."
         retrievalContext:
           type: array
           items:
             type: string
+          nullable: true
+          description: "The contexts retrieved to generate the LLM response for this turn."
         toolsCalled:
           type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "The tools called to generate the LLM response for this turn."
       required:
         - role
         - content
+
+    ToolCallData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "This is the name of the tool."
+        description:
+          type: string
+          nullable: true
+          description: "This is the description of the tool."
+        inputParameters:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: "This is the input parameters that are passed to the tool."
+        output:
+          type: any
+          nullable: true
+          description: "This is the output of the tool."
+        reasoning:
+          type: string
+          nullable: true
+          description: "This is the reasoning your LLM provided for the tool call."
+      required:
+        - name
+
+    GetDatasetResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the dataset was successfully pulled."
+        data:
+          type: object
+          properties:
+            datasetId:
+              type: string
+            goldens:
+              type: array
+              description: "This is a List of `Goldens` if you are pulling a single-turn dataset, and `null` otherwise."
+              nullable: true
+              items:
+                $ref: "#/components/schemas/RetrievedGolden"
+            conversationalGoldens:
+              type: array
+              description: "This is a List of `ConversationalGoldens` if you are pulling a multi-turn dataset, and `null` otherwise."
+              nullable: true
+              items:
+                $ref: "#/components/schemas/RetrievedConversationalGolden"
+          required:
+            - datasetId
+      required:
+        - success
+        - data
+
+    CreateDatasetRequestData:
+      type: object
+      properties:
+        alias:
+          type: string
+          description: "This is the unique name of the dataset you want to push."
+        overwrite:
+          type: boolean
+          description: "This determines whether to overwrite the existing dataset. If `false`, the goldens will be appended to the existing dataset, otherwise the existing dataset will be overwritten."
+        goldens:
+          type: array
+          items:
+            $ref: "#/components/schemas/Golden"
+          nullable: true
+          description: "This is a list of single-turn goldens to push. If you are pushing a multi-turn dataset, this should be `null`."
+        conversationalGoldens:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationalGolden"
+          nullable: true
+          description: "This is a list of conversational goldens to push. If you are pushing a single-turn dataset, this should be `null`."
+      required:
+        - alias
+        - overwrite
+
+    CreateOrUpdateGoldenRequestData:
+      type: object
+      properties:
+        link:
+          type: string
+          description: "This is the URL to the dataset you updated."
+      required:
+        - link
+
+    LLMTestCase:
+      type: object
+      properties:
+        input:
+          type: string
+          description: "This is the input to your LLM application."
+        actualOutput:
+          type: string
+          nullable: true
+          description: "This is the actual output of your LLM application."
+        expectedOutput:
+          type: string
+          nullable: true
+          description: "This is the expected output of your LLM application, which is the ideal actual output."
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: "This is the retrieval context of your LLM application."
+        context:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: "This is the ideal retrieval context of your LLM application."
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "This is the tools called by your LLM application."
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          nullable: true
+          description: "This is the expected tools to be called by the LLM application."
+      required:
+        - input
+        - actualOutput
 
     ConversationalTestCase:
       type: object
@@ -740,14 +944,23 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Turn"
+          nullable: true
+          description: "This is the list of turns in the conversation."
         scenario:
           type: string
+          description: "This is a description of the conversation context."
         expectedOutcome:
           type: string
+          nullable: true
+          description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
         userDescription:
           type: string
+          nullable: true
+          description: "This is the description of the user in the conversation."
         chatbotRole:
           type: string
+          nullable: true
+          description: "This is the role of the chatbot in the conversation."
       required:
         - turns
 
@@ -756,6 +969,7 @@ components:
       properties:
         metricCollection:
           type: string
+          description: "The name of the metric collection you wish to use for evaluation."
         testCases:
           type: array
           items:
@@ -764,9 +978,11 @@ components:
               - $ref: "#/components/schemas/ConversationalTestCase"
         hyperparameters:
           type: object
+          description: "This is any hyperparameters like model or prompt you wish to associate with the test run."
           additionalProperties: true
         identifier:
           type: string
+          description: "A unique identifier for the test run."
       required:
         - metricCollection
         - testCases
@@ -776,11 +992,20 @@ components:
       properties:
         success:
           type: boolean
+          description: "This is true if the test cases were successfully evaluated."
         data:
           type: object
           properties:
             id:
               type: string
+              description: "This is the unique ID for the test run. This ID is generated by Confident AI and is not to be confused with the identifier provided by the user."
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
 
     SimulateRequest:
       type: object
@@ -847,7 +1072,7 @@ components:
 
     LlmSpan:
       allOf:
-        - $ref: '#/components/schemas/BaseSpan'
+        - $ref: "#/components/schemas/BaseSpan"
         - type: object
           properties:
             model:
@@ -867,7 +1092,7 @@ components:
 
     RetrieverSpan:
       allOf:
-        - $ref: '#/components/schemas/BaseSpan'
+        - $ref: "#/components/schemas/BaseSpan"
         - type: object
           properties:
             embedder:
@@ -881,7 +1106,7 @@ components:
 
     ToolSpan:
       allOf:
-        - $ref: '#/components/schemas/BaseSpan'
+        - $ref: "#/components/schemas/BaseSpan"
         - type: object
           properties:
             description:
@@ -889,7 +1114,7 @@ components:
 
     AgentSpan:
       allOf:
-        - $ref: '#/components/schemas/BaseSpan'
+        - $ref: "#/components/schemas/BaseSpan"
         - type: object
           properties:
             availableTools:
@@ -909,7 +1134,7 @@ components:
         parameters:
           type: object
           additionalProperties: true
-    
+
     Trace:
       type: object
       required:
@@ -945,23 +1170,23 @@ components:
         baseSpans:
           type: array
           items:
-            $ref: '#/components/schemas/BaseSpan'
+            $ref: "#/components/schemas/BaseSpan"
         llmSpans:
           type: array
           items:
-            $ref: '#/components/schemas/LlmSpan'
+            $ref: "#/components/schemas/LlmSpan"
         retrieverSpans:
           type: array
           items:
-            $ref: '#/components/schemas/RetrieverSpan'
+            $ref: "#/components/schemas/RetrieverSpan"
         toolSpans:
           type: array
           items:
-            $ref: '#/components/schemas/ToolSpan'
+            $ref: "#/components/schemas/ToolSpan"
         agentSpans:
           type: array
           items:
-            $ref: '#/components/schemas/AgentSpan'
+            $ref: "#/components/schemas/AgentSpan"
         threadId:
           type: string
         userId:
@@ -981,31 +1206,31 @@ components:
         toolsCalled:
           type: array
           items:
-            $ref: '#/components/schemas/ToolCall'
+            $ref: "#/components/schemas/ToolCall"
         expectedTools:
           type: array
           items:
-            $ref: '#/components/schemas/ToolCall'
+            $ref: "#/components/schemas/ToolCall"
 
     CreateTrace:
       allOf:
-        - $ref: '#/components/schemas/Trace'
-    
+        - $ref: "#/components/schemas/Trace"
+
     CreateTraceResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
           description: A boolean indicating the success or failure of the API call
         data:
           type: object
           properties:
-            id: 
+            id:
               type: string
       required:
         - success
         - data
-    
+
     UpdateTrace:
       type: object
       properties:
@@ -1024,16 +1249,16 @@ components:
           items:
             type: string
           description: Tags associated with the trace
-        
+
     UpdateTraceResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
           description: A boolean indicating the success or failure of the API call
       required:
         - success
-  
+
     EvaluateThreadRequest:
       type: object
       required:
@@ -1049,7 +1274,7 @@ components:
     EvaluateThreadResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
           description: A boolean indicating the success or failure of the API call
       required:
@@ -1063,29 +1288,29 @@ components:
           description: The name of the metric collection to use
       required:
         - metricCollections
-    
+
     EvaluateTraceResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
           description: A boolean indicating the success or failure of the API call
       required:
         - success
 
     EvaluateSpanRequest:
-        type: object
-        properties:
-          metricCollections:
-            type: string
-            description: The name of the metric collection to use
-        required:
-          - metricCollections
-      
+      type: object
+      properties:
+        metricCollections:
+          type: string
+          description: The name of the metric collection to use
+      required:
+        - metricCollections
+
     EvaluateSpanResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
           description: A boolean indicating the success or failure of the API call
       required:
