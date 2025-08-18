@@ -57,15 +57,27 @@ navigation:
               - page: LLM-as-a-Judge Metrics
                 path: docs/pages/llm-evaluation/core-concepts/llm-as-a-judge-metrics.mdx
                 icon: fa-light fa-gavel
-          - page: End-to-End Evals
-            path: docs/pages/llm-evaluation/end-to-end-evals.mdx
-            icon: fa-light fa-route
-          - page: Component-Level Evals
-            path: docs/pages/llm-evaluation/component-level-evals.mdx
-            icon: fa-light fa-puzzle-piece
-          - page: Metrics
-            path: docs/pages/llm-evaluation/metrics.mdx
-            icon: fa-light fa-chart-bar
+          - section: Single-Turn Evals
+            icon: fa-light fa-arrow-turn-down-right
+            contents:
+              - page: End-to-End Testing
+                path: docs/pages/llm-evaluation/single-turn/end-to-end.mdx
+                icon: fa-light fa-route
+              - page: Component-Level Testing
+                path: docs/pages/llm-evaluation/single-turn/component-level.mdx
+                icon: fa-light fa-puzzle-piece
+          - section: Multi-Turn Evals
+            icon: fa-light fa-comments
+            contents:
+              - page: Simulate User Turns
+                path: docs/pages/llm-evaluation/multi-turn/simulate-user-turns.mdx
+                icon: fa-light fa-user-plus
+              - page: End-to-End Testing
+                path: docs/pages/llm-evaluation/multi-turn/end-to-end.mdx
+                icon: fa-light fa-route
+          - page: Unit-Testing in CI/CD
+            path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
+            icon: fa-light fa-pipe-valve
           - page: Evaluation Features
             path: docs/pages/llm-evaluation/evaluation-features.mdx
             icon: fa-light fa-star
@@ -80,60 +92,49 @@ navigation:
           - page: Online & Offline Evaluations
             path: docs/pages/llm-tracing/online-offline-evaluations.mdx
             icon: fa-light fa-toggle-on
-          - section: Tracing Features
-            collapsed: false
-            contents:
-              - page: Test Cases
-                path: docs/pages/llm-tracing/tracing-features/test-cases.mdx
-                icon: fa-light fa-hashtag
-              - page: Attributes
-                path: docs/pages/llm-tracing/tracing-features/attributes.mdx
-                icon: fa-light fa-table-cells
-              - page: Environment
-                path: docs/pages/llm-tracing/tracing-features/environment.mdx
-                icon: fa-light fa-globe
-              - page: Input/Output
-                path: docs/pages/llm-tracing/tracing-features/input-output.mdx
-                icon: fa-light fa-i-cursor
-              - page: Masking
-                path: docs/pages/llm-tracing/tracing-features/masking.mdx
-                icon: fa-light fa-eye-slash
-              - page: Metadata
-                path: docs/pages/llm-tracing/tracing-features/metadata.mdx
-                icon: fa-light fa-brackets-curly
-              - page: Name
-                path: docs/pages/llm-tracing/tracing-features/name.mdx
-                icon: fa-light fa-signature
-              - page: Sampling
-                path: docs/pages/llm-tracing/tracing-features/sampling.mdx
-                icon: fa-light fa-percent
-              - page: Span Types
-                path: docs/pages/llm-tracing/tracing-features/span-types.mdx
-                icon: fa-light fa-gear
-              - page: Tags
-                path: docs/pages/llm-tracing/tracing-features/tags.mdx
-                icon: fa-light fa-tag
-              - page: Threads
-                path: docs/pages/llm-tracing/tracing-features/threads.mdx
-                icon: fa-light fa-message-dots
-              - page: Users
-                path: docs/pages/llm-tracing/tracing-features/users.mdx
-                icon: fa-light fa-user
-            icon: fa-light fa-layer-group
-          - page: Latency and Cost Tracking
+          - page: Latency, Cost, and Error Tracking
             path: docs/pages/llm-tracing/latency-cost-tracking.mdx
             icon: fa-light fa-stopwatch
-          - page: Performance Alerting
-            path: docs/pages/llm-tracing/performance-alerting.mdx
-            icon: fa-light fa-bell
-      - section: Dataset Editor
-        contents:
-          - page: Introduction
-            path: docs/pages/dataset-editor/introduction.mdx
-            icon: fa-light fa-info-circle
-          - page: Dataset Features
-            path: docs/pages/dataset-editor/dataset-features.mdx
-            icon: fa-light fa-table
+          - section: Advanced Features
+            collapsed: false
+            contents:
+              - page: Attributes
+                path: docs/pages/llm-tracing/advanced-features/attributes.mdx
+                icon: fa-light fa-table-cells
+              - page: Environment
+                path: docs/pages/llm-tracing/advanced-features/environment.mdx
+                icon: fa-light fa-globe
+              - page: Input/Output
+                path: docs/pages/llm-tracing/advanced-features/input-output.mdx
+                icon: fa-light fa-i-cursor
+              - page: Masking
+                path: docs/pages/llm-tracing/advanced-features/masking.mdx
+                icon: fa-light fa-eye-slash
+              - page: Metadata
+                path: docs/pages/llm-tracing/advanced-features/metadata.mdx
+                icon: fa-light fa-brackets-curly
+              - page: Name
+                path: docs/pages/llm-tracing/advanced-features/name.mdx
+                icon: fa-light fa-signature
+              - page: Sampling
+                path: docs/pages/llm-tracing/advanced-features/sampling.mdx
+                icon: fa-light fa-percent
+              - page: Span Types
+                path: docs/pages/llm-tracing/advanced-features/span-types.mdx
+                icon: fa-light fa-gear
+              - page: Tags
+                path: docs/pages/llm-tracing/advanced-features/tags.mdx
+                icon: fa-light fa-tag
+              - page: Threads
+                path: docs/pages/llm-tracing/advanced-features/threads.mdx
+                icon: fa-light fa-message-dots
+              - page: Test Cases
+                path: docs/pages/llm-tracing/advanced-features/test-cases.mdx
+                icon: fa-light fa-hashtag
+              - page: Users
+                path: docs/pages/llm-tracing/advanced-features/users.mdx
+                icon: fa-light fa-user
+            icon: fa-light fa-layer-group
       - section: Prompt Management
         contents:
           - page: Introduction

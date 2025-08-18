@@ -1,4 +1,5 @@
 ---
+title: Introduction to LLM Tracing
 subtitle: Trace your LLM applications and evaluate them on a component level.
 slug: llm-tracing-introduction
 description: Learn about LLM tracing with Confident AI
@@ -6,35 +7,47 @@ description: Learn about LLM tracing with Confident AI
 
 Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps, but with an additional suite of 30+ evaluation metrics to track continuous performance over time.
 
-Any component in an LLM application can be grouped into its own **span**, which is an arbitrary scope that you can define anywhere to suit your evaluation and debugging needs. A complete execution of your LLM application creates a **trace**, which contains one or more spans.
-
-<Frame>
-  <img src="https://deepeval-docs.s3.amazonaws.com/docs:llm-trace.png" alt="LLM Trace"/>
-</Frame>
-
 <Tabs>
   <Tab title="Traces">
-    You can log a **single-turn LLM interaction** through LLM tracing. Traces are a single execution of your LLM app, and running evals on traces is akin to the [end-to-end evals](/llm-evaluation-end-to-end-evals) for LLM evaluation in development.
+    You can log a **single-turn LLM interaction** through LLM tracing. Traces
+    are a single execution of your LLM app, and running evals on traces is akin
+    to the [end-to-end evals](/llm-evaluation-end-to-end-evals) for LLM
+    evaluation in development.
     <Frame caption="LLM Tracing: Traces with Evals">
-        <video style={{ aspectRatio: '16 / 9', width: '100%' }} controls>
-            <source src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:traces.mp4" type="video/mp4" />
-        </video>
+      <video style={{ aspectRatio: "16 / 9", width: "100%" }} controls>
+        <source
+          src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:traces.mp4"
+          type="video/mp4"
+        />
+      </video>
     </Frame>
   </Tab>
   <Tab title="Spans">
-    Spans are **individual components** such as LLM calls, agents, retrieveres, tools, etc. that make up a trace. Running evals on spans is akin to the [component-level evals](/llm-evaluation-component-level-evals) for LLM evaluation in development.
+    Spans are **individual components** such as LLM calls, agents, retrieveres,
+    tools, etc. that make up a trace. Running evals on spans is akin to the
+    [component-level evals](/llm-evaluation-component-level-evals) for LLM
+    evaluation in development.
     <Frame caption="LLM Tracing: Spans with Evals">
-        <video style={{ aspectRatio: '16 / 9', width: '100%' }} controls>
-            <source src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:spans.mp4" type="video/mp4" />
-        </video>
+      <video style={{ aspectRatio: "16 / 9", width: "100%" }} controls>
+        <source
+          src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:spans.mp4"
+          type="video/mp4"
+        />
+      </video>
     </Frame>
   </Tab>
   <Tab title="Threads">
-    Threads are **a group of traces**, grouped together via a `thread_id` that you provide during tracing. It represents a **multi-turn LLM interaction**, and running evals on threads require **multi-turn** metrics, akin to running evals on `ConversationalTestCase`s in development.
+    Threads are **a group of traces**, grouped together via a `thread_id` that
+    you provide during tracing. It represents a **multi-turn LLM interaction**,
+    and running evals on threads require **multi-turn** metrics, akin to running
+    evals on `ConversationalTestCase`s in development.
     <Frame caption="LLM Tracing: Threads with Evals">
-        <video style={{ aspectRatio: '16 / 9', width: '100%' }} controls>
-            <source src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:threads.mp4" type="video/mp4" />
-        </video>
+      <video style={{ aspectRatio: "16 / 9", width: "100%" }} controls>
+        <source
+          src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:threads.mp4"
+          type="video/mp4"
+        />
+      </video>
     </Frame>
   </Tab>
 </Tabs>
@@ -102,77 +115,89 @@ You can configure tracing on Confident AI in virtually any way you wish:
     Set different trace environments for your app.
   </Card>
 
-  <Card
-    title="Sampling Rate"
-    icon="fa-light fa-percent"
-    iconType="solid"
-    href="/llm-tracing-features-sampling"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Configure the trace sampling rate.
-  </Card>
+{" "}
 
-  <Card
-    title="Any Metadata"
-    icon="fa-light fa-brackets-curly"
-    iconType="solid"
-    href="/llm-tracing-features-metadata"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Log any custom metadata with your traces.
-  </Card>
+<Card
+  title="Sampling Rate"
+  icon="fa-light fa-percent"
+  iconType="solid"
+  href="/llm-tracing-features-sampling"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Configure the trace sampling rate.
+</Card>
 
-  <Card
-    title="Tags"
-    icon="fa-light fa-tag"
-    iconType="solid"
-    href="/llm-tracing-features-tags"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Log any tags for better trace organization.
-  </Card>
+{" "}
 
-  <Card
-    title="Threads/Conversations"
-    icon="fa-light fa-message-lines"
-    iconType="solid"
-    href="/llm-tracing-features-threads"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Log entire conversations (threads) for multi-turn tracing.
-  </Card>
+<Card
+  title="Any Metadata"
+  icon="fa-light fa-brackets-curly"
+  iconType="solid"
+  href="/llm-tracing-features-metadata"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Log any custom metadata with your traces.
+</Card>
 
-  <Card
-    title="Mask PII"
-    icon="fa-light fa-eye-slash"
-    iconType="solid"
-    href="/llm-tracing-features-masking"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Mask PII for traces to protect sensitive data.
-  </Card>
+{" "}
 
-  <Card
-    title="User Tracking"
-    icon="fa-light fa-user"
-    iconType="solid"
-    href="/llm-tracing-features-users"
-  >
-    <div className='absolute top-4 right-4'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Track user identities or sessions for trace attribution.
-  </Card>
+<Card
+  title="Tags"
+  icon="fa-light fa-tag"
+  iconType="solid"
+  href="/llm-tracing-features-tags"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Log any tags for better trace organization.
+</Card>
+
+{" "}
+
+<Card
+  title="Threads/Conversations"
+  icon="fa-light fa-message-lines"
+  iconType="solid"
+  href="/llm-tracing-features-threads"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Log entire conversations (threads) for multi-turn tracing.
+</Card>
+
+{" "}
+
+<Card
+  title="Mask PII"
+  icon="fa-light fa-eye-slash"
+  iconType="solid"
+  href="/llm-tracing-features-masking"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Mask PII for traces to protect sensitive data.
+</Card>
+
+{" "}
+
+<Card
+  title="User Tracking"
+  icon="fa-light fa-user"
+  iconType="solid"
+  href="/llm-tracing-features-users"
+>
+  <div className="absolute top-4 right-4">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Track user identities or sessions for trace attribution.
+</Card>
 
   <Card
     title="Custom Span Types"

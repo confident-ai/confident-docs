@@ -226,7 +226,7 @@ These limitations means we need better techniques and algorithms, as is implemen
 
 ### G-Eval
 
-G-Eval is a **SOTA, research-backed framework** that uses LLM-as-a-judge to evaluate LLM outputs on any custom criteria using everyday language. It's evaluation algorithm is as follows:
+G-Eval is a **SOTA, research-backed framework** that uses **single-output** LLM-as-a-judge to evaluate LLM outputs on any custom criteria using everyday language. It's evaluation algorithm is as follows:
 
 - Generate a series of CoTs (chain of thoughts) based on an initial criteria
 - Use these CoTs as evaluation steps in your evaluation prompt
@@ -271,22 +271,215 @@ More information on G-Eval can be found [here.](https://www.confident-ai.com/blo
 
 ### DAG
 
+Deep Acyclic Graph (DAG) is a decision-tree based, deterministic, **single-output** LLM-as-a-judge metric. Each node in the DAG is a verdict, while each node contains the logic for which the LLM judge has to work through. In the end, the leaf nodes will return the score and reason.
+
+[image]
+
+The DAG metric is currently not yet available on the platform, but you can run it through `deepeval` for local evals:
+
+```python main.py
+from deepeval.test_case import LLMTestCase, LLMTestCaseParams
+from deepeval.metrics.dag import (
+    DeepAcyclicGraph,
+    TaskNode,
+    BinaryJudgementNode,
+    NonBinaryJudgementNode,
+    VerdictNode,
+)
+from deepeval.metrics import DAGMetric, GEval
+
+geval_metric = GEval(
+    name="Persuasiveness",
+    criteria="Determine how persuasive the `actual output` is to getting a user booking in a call.",
+    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
+)
+
+conciseness_node = BinaryJudgementNode(
+    criteria="Does the actual output contain less than or equal to 4 sentences?",
+    children=[
+        VerdictNode(verdict=False, score=0),
+        VerdictNode(verdict=True, child=geval_metric),
+    ],
+)
+
+# create the DAG
+dag = DeepAcyclicGraph(root_nodes=[conciseness_node])
+metric = DAGMetric(dag=dag)
+```
+
+Notice that you can include G-Eval as the leaf node as well. This will allow you apply LLM-as-a-judge for more decision based filtering, while still allowing a subjective scoring at the end.
+
+<Info>
+  The DAG metric is better than G-Eval that has hard criteria to work through.
+</Info>
+
 ### QAG
+
+Question-answer-generation (QAG) is a **single-output** LLM-as-a-judge technique to compute LLM metric scores **according to some sort of mathematical question**. Instead of asking an LLM to come up with a score based on some criteria like G-Eval, QAG works by:
+
+- Breaking test case arguments down into more fine grained "units"
+- Applying LLM-as-a-judge to each fine grained "unit'
+- Aggregate the verdicts of each LLM judge to compute a score and reason
+
+Here's a tangible example with the answer relevancy metric:
+
+- Break the actual output down into "statements", which is defined as coherent groups of text (e.g., sentences, paragraphs, etc.)
+- For each statement, determine whether it is relevant to the input
+- The final score is the proportion of relevant statements found in the actual output
+
+On Confident AI, this is all handled by `deepeval`:
+
+```python main.py
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+
+test_case = LLMTestCase(input="...", actual_output="...")
+metric = AnswerRelevancyMetric()
+metric.measure(test_case)
+print(metric.score, metric.reason) # QAG score reason here
+```
+
+The reason why it is called QAG, is because this technique leverages closed-ended questions to confine LLM outputs to something that can be aggregated. In this example, instead of asking the LLM judge to do everything in a one-shot fashion, our algorithm only allowed the LLM judge to output a `"yes"` or `"no"` as verdicts to whether each statement is relevant. This makes it possible to confine a score to a mathematical formula.
+
+<Tip>
+
+All of the RAG metrics are QAG-based metrics.
+
+</Tip>
 
 ### LLM arena
 
-## Using LLM Judges for Evaluation Metrics
+LLM arena is traditionally an elo voting system to select the best performing LLM, but in this case we are applying **pairwise** LLM-as-a-judge to automate the voting process.
+
+In Confident AI, this is done using the `ArenaGEval` metric, and only supports single-output:
+
+```python main.py
+from deepeval.test_case import ArenaTestCase, LLMTestCase, LLMTestCaseParams
+from deepeval.metrics import ArenaGEval
+
+a_test_case = ArenaTestCase(
+    contestants={
+        "GPT-4": LLMTestCase(
+            input="What is the capital of France?",
+            actual_output="Paris",
+        ),
+        "Claude-4": LLMTestCase(
+            input="What is the capital of France?",
+            actual_output="Paris is the capital of France.",
+        ),
+    },
+)
+metric = ArenaGEval(
+    name="Friendly",
+    criteria="Choose the winner of the more friendly contestant based on the input and actual output",
+    evaluation_params=[
+        LLMTestCaseParams.INPUT,
+        LLMTestCaseParams.ACTUAL_OUTPUT,
+    ],
+)
+
+```
+
+The `ArenaGEval` metric is currently only available for local evals in development (same as DAG).
+
+## Using LLM Judges for Metrics
+
+If LLM judges are the core evaluation engine, metrics are the scaffolding around it. A metric determines the:
+
+- Evaluation criteria/rubric
+- Evaluation algorithm
+- Passing threshold
+- Which test case parameters should be used
+
+<Note>A test case passes only if all metrics have passed.</Note>
+
+In Confident AI, we generally won't refer to LLM-as-a-judge directly going forward, because metrics encapsulates more information about how evals should be ran.
 
 ## Application-Based Metrics
 
+Every LLM use case that you're building should have 1-3 application-based metrics. These metrics are based entirely on the way your LLM app is built and is use case agnostic.
+
 ### RAG
+
+In a RAG context, there are 5 **single-turn** metrics that evaluates the retriever and generator as separate components:
+
+- **Answer Relevancy:** Measures how relevant the LLM’s response is to the user’s query
+- **Faithfulness:** Evaluates whether the LLM’s response is supported by the retrieved context
+- **Contextual Relevancy:** Assesses how relevant the retrieved context is to the query
+- **Contextual Recall:** Measures the precision of the retrieved context
+- **Contextual Precision:** Evaluates the recall of the retrieved context
 
 ### Agents
 
+For agents, there are 3 main single-turn metics centered around task completion and tool calling:
+
+- **Task Completion:** Evaluates whether the agent successfully completed the assigned task
+- **Tool Correctness:** Measures whether the agent used the correct tools for a given task
+- **Arugment Correctness:** Measures whether the agent passed in the correct arguments for a given tool call
+
+The task completion metirc is an extremely unique one that evalutes **not on test cases**, but on entire traces.
+
 ### Chatbots
+
+For chatbots, these will be multi-turn metrics:
+
+- **Turn Relevancy:** Evaluates how relevant each response is to the ongoing conversation
+- **Turn Faithfulness:** Evaluates how relevant each response is to the ongoing conversation
+- **Conversation Completeness:** Measures whether the conversation addresses all aspects of the user’s request
+- **Role Adherence:** Evaluates how well the LLM adheres to its assigned role
+- **Knowledge Retention:** Measures how well the LLM retains information across conversation turns
+
+You'll notice Confident AI's multi-turn metrics also takes RAG into account.
 
 ## Use Case-Specific Metrics
 
-## Safety Metrics
+Use case specific metrics, in contrary to the previous section, are application agnostic. and we recommend having 1-2 custom metrics in your evaluation suite.
 
-## Using Metrics Tactically
+You'll need to create custom metrics for use case specific metrics:
+
+- **G-Eval:** A general-purpose evaluation metric for LLM outputs
+- **DAG:** A decision-tree based LLM-evaluated metric
+- **Conversational G-Eval**: A multi-turn general-purpose evaluation metric for LLM conversations
+
+Currently, only G-Eval is supported on Confident AI platform. However, you can still leverage DAG in development by creating it locally.
+
+<Note>
+
+Custom metrics are typically different based on your use case, while application-specific metrics (like RAG or agent metrics) remain consistent across similar LLM applications. For example, two conversational agents - one for medical advice and another for legal consultation - would use the same agent metrics like tool correctness but have different `GEval` metrics tailored to their respective industry-specific success criteria.
+
+</Note>
+
+## Create Custom Metrics
+
+You can create metrics either locally or remotely on the platform.
+
+<CardGroup cols={2}>
+  <Card
+    title="Local Evals"
+    icon="laptop"
+    iconType="solid"
+  >
+
+    - Run evaluations locally using `deepeval` with full control over metrics
+    - Support for custom metrics, DAG, and advanced evaluation algorithms
+
+    **Suitable for:** Python users, development, and pre-deployment workflows
+
+  </Card>
+  <Card
+    title="Remote Evals"
+    icon="cloud"
+    iconType="solid"
+  >
+
+    - Run evaluations on Confident AI platform with pre-built metrics
+    - Integrated with monitoring, datasets, and team collaboration features
+
+    **Suitable for:** Non-python users, online + offline evals for tracing in prod
+
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+You now have everything you need to know to start running evaluations. Choose which best suits you to begin:
