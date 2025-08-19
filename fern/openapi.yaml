@@ -509,7 +509,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPromptResponse'
+                $ref: "#/components/schemas/GetPromptResponse"
               examples:
                 Text-Prompt:
                   success: true
@@ -540,7 +540,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePromptRequest'
+              $ref: "#/components/schemas/CreatePromptRequest"
             examples:
               Text-Prompt:
                 alias: "Prompt Name"
@@ -553,12 +553,12 @@ paths:
                     content: "What is the weather like in {{city}}?"
                 interpolationType: "FSTRING"
       responses:
-        '200':
+        "200":
           description: Successfully created or updated a prompt
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatePromptResponse'
+                $ref: "#/components/schemas/CreatePromptResponse"
               examples:
                 Text-Prompt:
                   success: true
@@ -976,7 +976,6 @@ components:
           description: "This is the input parameters that are passed to the tool."
         output:
           type: string
-          nullable: tru
           description: "This is the output of the tool."
         reasoning:
           type: string
@@ -1883,7 +1882,7 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/PromptMessage'
+            $ref: "#/components/schemas/PromptMessage"
         interpolationType:
           type: string
           enum: [FSTRING, HANDLEBARS]
@@ -1917,7 +1916,7 @@ components:
             messages:
               type: array
               items:
-                $ref: '#/components/schemas/PromptMessage'
+                $ref: "#/components/schemas/PromptMessage"
             type:
               type: string
               enum: [TEXT, LIST]
@@ -1928,14 +1927,14 @@ components:
             - promptVersionId
             - type
             - interpolationType
-      required: 
+      required:
         - success
         - data
 
     CreatePromptResponse:
       type: object
       properties:
-        success: 
+        success:
           type: boolean
         data:
           type: object
@@ -1945,7 +1944,7 @@ components:
           required:
             - id
         redirectUrl:
-              type: string
+          type: string
       required:
         - success
         - data

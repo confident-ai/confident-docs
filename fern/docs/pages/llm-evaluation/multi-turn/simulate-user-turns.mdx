@@ -4,4 +4,213 @@ subtitle: Mock user interactions with your multi-turn use cases
 slug: llm-evaluation/multi-turn/simulate-user-turns
 ---
 
-[TODO kritin]
+## Overview
+
+Simulating user turns require:
+
+- A multi-turn dataset of conversational goldens
+- A callback function that wraps around your chatbot to generate conversation turns
+
+<Note>
+  Each conversational golden should have a `scenario` and `user_description`.
+</Note>
+
+## How it works
+
+1. Pull your [multi-turn dataset](/llm-evaluation/dataset-management/create-goldens) from Confident AI
+2. Define a callback that invokes your chatbot
+3. Run simulation for each golden in your dataset
+
+## Run Simulations Locally
+
+<Steps>
+<Step title="Pull dataset">
+
+Pull your multi-turn dataset (and [create one](/llm-evaluation/dataset-management/create-goldens) if you haven’t already):
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+```
+
+</Step>
+<Step title="Define callback">
+
+Define a callback that wraps around your chatbot and generates the next conversation turn.
+
+```python callback.py
+from deepeval.test_case import Turn
+from typing import List
+
+def chatbot_callback(input: str, turns: List[Turn] = [], thread_id: str) -> Turn:
+    messages = [{"role": turn.role, "content": turn.content} for turn in turns]
+    messages.append({"role": "user", "content": input})
+    response = your_chatbot(messages) # Replace with your chatbot
+    return Turn(role="assistant", content=response)
+```
+
+<Info>
+  The callback should accept an input, and optionally a list of `Turn`s and the
+  thread id. It should return the next `Turn` in the conversation.
+</Info>
+
+</Step>
+<Step title="Run simulation">
+
+Create a [simulator](https://deepeval.com/docs/conversation-simulator) with your callback and run simulations for the goldens in your dataset.
+
+```python main.py
+from deepeval.simulator import ConversationSimulator
+
+simulator = ConversationSimulator(model_callback=chatbot_callback)
+conversational_test_cases = simulator.simulate(conversational_goldens=dataset.conversational_goldens)
+```
+
+<Success>
+  The `conversational_test_cases` now contain test cases with simulated
+  conversation turns for each golden in your dataset.
+</Success>
+
+</Step>
+
+</Steps>
+
+## Run Simulations Remotely
+
+<Steps>
+<Step title="Pull dataset">
+
+Pull your dataset using `v1/datasets` endpoint.
+
+```curl
+curl -G https://api.confident-ai.com/v1/datasets \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -d alias="YOUR-DATASET-ALIAS"
+```
+
+</Step>
+
+<Step title="Create callback and run simulations">
+
+Create an endpoint for your chatbot callback, then call `/v1/simulate` with the goldens you pulled and the endpoint URL.
+
+<Note>
+  As with the local callback, the remote callback should accept an input, and
+  optionally a list of `Turn`s and the thread id, and return the next `Turn` in
+  the conversation.
+</Note>
+
+```curl
+mcurl -X POST https://api.confident-ai.com/v1/simulate \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "golden": [{
+    "scenario": "A frustrated user asking for a refund.",
+    "userDescription": "A white male who is a customer for over 2 years."
+  }],
+  "callback": "https://your-callback-endpoint.com/simulate"
+}'
+```
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Early stopping
+
+To stop a simulation early, you can provide the `expected_outcome` for each golden, which will end the conversation automatically after the expected outcome has been reached.
+
+<CodeBlocks>
+
+<CodeBlock language="python">
+
+```python
+from deepeval.dataset import ConversationalGolden
+
+conversation_golden = ConversationalGolden(
+    scenario="Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+    expected_outcome="Successful purchase of a ticket.",
+    user_description="Andy Byron is the CEO of Astronomer.",
+)
+```
+
+</CodeBlock>
+
+<CodeBlock language="CURL">
+
+```curl
+mcurl -X POST https://api.confident-ai.com/v1/simulate \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "golden": [{
+    "scenario": "Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+    "userDescription": "Andy Byron is the CEO of Astronomer.",
+    "expectedOutcome": "Successful purchase of a ticket."
+  }],
+  "callback": "https://your-callback-endpoint.com/simulate"
+}'
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+<Note>
+  If `expected_outcome` is unavalaible, the `max_user_simulations` parameter in
+  the `simluate` method will stop simulation after a certain number of user
+  turns, which is defaulted to 10.
+</Note>
+
+### Extending existing conversations
+
+You can extend existing conversations by providing existing `Turn`s to each golden in your dataset. The simulator will automatically detect and continue simulating from the existing turns.
+
+<CodeBlocks>
+
+<CodeBlock language="python">
+
+```python
+from deepeval.dataset import ConversationalGolden
+from deepeval.turns import Turn
+
+conversation_golden = ConversationalGolden(
+    scenario="Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+    user_description="Andy Byron is the CEO of Astronomer.",
+    turns=[
+        Turn(role="user", content="Hi"),
+        Turn(role="assistant", content="Hello! How can I help you today?"),
+        Turn(role="user", content="I want to purchase a VIP ticket to a cold play concert."),
+    ]
+)
+```
+
+</CodeBlock>
+
+<CodeBlock language="CURL">
+
+```curl
+mcurl -X POST https://api.confident-ai.com/v1/simulate \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "golden": [{
+    "scenario": "Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+    "userDescription": "Andy Byron is the CEO of Astronomer.",
+    "turns": [
+      {"role": "user", "content": "Hi"},
+      {"role": "assistant", "content": "Hello! How can I help you today?"},
+      {"role": "user", "content": "I want to purchase a VIP ticket to a cold play concert."}
+    ]
+  }],
+  "callback": "https://your-callback-endpoint.com/simulate"
+}'
+```
+
+</CodeBlock>
+
+</CodeBlocks>
