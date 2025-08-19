@@ -73,10 +73,13 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     span.set_attribute("confident.llm.model", "gpt-4o")
                     span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
                     span.set_attribute("confident.llm.attributes.output", "Paris")
+                
+                trace.get_tracer_provider().force_flush()
+                print(f"Traces posted successfully to {OTLP_ENDPOINT}")
                 ```
             </Tab>
 
-            <Tab title="JavaScript">
+            <Tab title="TypeScript">
                 Install Node.js dependencies
 
                 ```bash
@@ -147,7 +150,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
 
                     // Shut down the provider to ensure traces are flushed before the script exits
                     await provider.shutdown();
-                    console.log('Traces flushed successfully.');
+                    console.log(`Trace posted successfully to ${OTLP_ENDPOINT}.`);
                 }
 
                 main().catch((error) => {
@@ -186,7 +189,6 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 ```bash
                 export OTLP_ENDPOINT="otel.confident-ai.com"
                 export CONFIDENT_API_KEY="<your-confident-api-key>"
-                export OPENAI_API_KEY="<your-openai-api-key>"
                 ```
 
                 Initialize Go Module:
@@ -195,108 +197,57 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 go mod init go-example
                 ```
 
-                Create `setup.go` file. This file contains the code for initializing the OpenTelemetry tracer with the exporter which will be sending traces to the Confident AI OTEL server.
-
-                ```go title="setup.go"
-                package main
-                
-                import (
-                    "context"
-                    "log"
-                
-                    "go.opentelemetry.io/otel"
-                    "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-                    sdktrace "go.opentelemetry.io/otel/sdk/trace"
-                    "go.opentelemetry.io/otel/propagation"
-                )
-                
-                func InitTracer(endpoint string, confidentApiKey string) func(context.Context) error {
-                    
-                    // prepare exporter with api key and endpoint
-                    headers := map[string]string{"x-confident-api-key": confidentApiKey}
-                    exporter, err := otlptracehttp.New(
-                        context.Background(),
-                        otlptracehttp.WithEndpoint(endpoint),
-                        otlptracehttp.WithHeaders(headers), 
-                    )
-                    if err != nil {
-                        log.Fatalf("failed to create OTLP exporter: %v", err)
-                    }
-                
-                    // Check if there's an existing trace provider
-                    existingTp := otel.GetTracerProvider()
-                    if sdkTp, ok := existingTp.(*sdktrace.TracerProvider); ok {
-                        
-                        // Add the new exporter to the existing trace provider
-                        sdkTp.RegisterSpanProcessor(sdktrace.NewBatchSpanProcessor(exporter))
-                        log.Println("Added exporter to existing trace provider")
-                        return func(context.Context) error { return nil } // No shutdown needed
-                    }
-                
-                    // If no existing trace provider, create a new one
-                    tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exporter))
-                    otel.SetTracerProvider(tp)
-                    otel.SetTextMapPropagator(propagation.TraceContext{})
-                
-                    return tp.Shutdown
-                }
-                ```
-
-                Create `main.go` file. This file contains the code for creating an LLM span.
+                Create `main.go` file.
 
                 ```go title="main.go"
                 package main
-                
+
                 import (
                     "context"
                     "fmt"
                     "log"
                     "os"
-                
-                    "github.com/openai/openai-go"
-                    "github.com/openai/openai-go/option"
+
                     "go.opentelemetry.io/otel"
                     "go.opentelemetry.io/otel/attribute"
+                    "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+                    "go.opentelemetry.io/otel/propagation"
+                    sdktrace "go.opentelemetry.io/otel/sdk/trace"
                 )
-                
+
                 func main() {
                     endpoint := os.Getenv("OTLP_ENDPOINT")
                     confidentApiKey := os.Getenv("CONFIDENT_API_KEY")
-                    apiKey := os.Getenv("OPENAI_API_KEY")
-                
-                    // Initialize OTel tracer
-                    shutdown := InitTracer(endpoint, confidentApiKey)
-                    defer func() { _ = shutdown(context.Background()) }()
-                
-                    // Initialize OpenAI client with default HTTP client
-                    client := openai.NewClient(option.WithAPIKey(apiKey))
-                
-                    // Start a root span for this operation
-                    ctx, span := otel.Tracer("example.com/otel-openai").Start(context.Background(), "chat gpt-4o")
-                    defer span.End()
-                
-                    // Build chat completion request
-                    params := openai.ChatCompletionNewParams{
-                        Model: openai.ChatModelGPT4o,
-                        Messages: []openai.ChatCompletionMessageParamUnion{
-                            openai.UserMessage("Hello, how are you today?"),
-                        },
-                    }
-                
-                    // Invoke OpenAI API
-                    resp, err := client.Chat.Completions.New(ctx, params)
+
+                    exporter, err := otlptracehttp.New(context.Background(),
+                        otlptracehttp.WithEndpoint(endpoint),
+                        otlptracehttp.WithHeaders(map[string]string{"x-confident-api-key": confidentApiKey}),
+                    )
                     if err != nil {
-                        log.Fatalf("Chat completion error: %v", err)
+                        log.Fatalf("failed to create OTLP exporter: %v", err)
                     }
-                
-                    // Record response and end span
+
+                    tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exporter))
+                    otel.SetTracerProvider(tp)
+                    otel.SetTextMapPropagator(propagation.TraceContext{})
+                    defer func() { 
+                        fmt.Println("Shutting down tracer provider...")
+                        _ = tp.Shutdown(context.Background()) 
+                    }()
+
+                    _, span := otel.Tracer("example.com/otel-openai").Start(context.Background(), "chat gpt-4o")
+                    defer func() {
+                        span.End()
+                        fmt.Println("Span ended - Trace posted successfully to:", endpoint)
+                    }()
+
                     span.SetAttributes(
                         attribute.String("confident.span.type", "llm"),
                         attribute.String("confident.llm.model", "gpt-4o"),
-                        attribute.String("confident.llm.attributes.input", "Hello, how are you today?"),
-                        attribute.String("confident.llm.attributes.output", resp.Choices[0].Message.Content),
+                        attribute.String("confident.span.input", "input"),
+                        attribute.String("confident.span.output", "output"),
                     )
-                    fmt.Println("Assistant:", resp.Choices[0].Message.Content)
+                    
                 }
                 ```
 
@@ -309,7 +260,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 Run the code:
 
                 ```bash
-                go run .
+                go run main.go
                 ```
             </Tab>
 
@@ -364,6 +315,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
 
             # Flush and allow time for HTTP export
             OpenTelemetry.tracer_provider.shutdown
+            puts "Traces posted successfully to #{OTLP_ENDPOINT}."
             sleep 2
             ```
 
@@ -374,7 +326,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
             ```
             </Tab>
 
-            <Tab title="Dotnet">
+            <Tab title="C#">
             
             Create a New Console App
 
@@ -442,12 +394,11 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     Console.WriteLine("Span ended. Flushing traces...");
                     
                     // Force flush traces before exiting
-                    var flushResult = tracerProvider.ForceFlush();
-                    Console.WriteLine($"Flush result: {flushResult}");
+                    tracerProvider.ForceFlush();
                     
                     // Wait a bit to ensure traces are sent
                     await Task.Delay(2000);
-                    Console.WriteLine("Traces flushed successfully.");
+                    Console.WriteLine($"Trace posted successfully to {otlpEndpoint}.");
                 }
             }
             ```
@@ -465,6 +416,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
     </Step>
 
 </Steps>
+
+🎉 Congratulations! You have successfully sent traces. Go to the the Observatory section on Confident AI to check it out.
 
 <Accordion title="Click to see native python implementation using DeepEval">
 DeepEval provides a native `ConfidentSpanExporter` that directly exports traces to Confident AI **observatory**.
