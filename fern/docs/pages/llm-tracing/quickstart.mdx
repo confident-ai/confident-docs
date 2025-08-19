@@ -24,11 +24,18 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
       <Step title="Login to Confident AI">
         Get your [Confident AI Project API](https://app.confident-ai.com) key and login.
 
+        <Warning>
+          You'll need to get your API key as shown in the [setup and
+          installation](/docs/setup-and-installation) section before continuing.
+        </Warning>
+
         <CodeBlocks>
           ```python title="In code"
-          import deepeval
+          from deepeval.tracing import trace_manager
 
-          deepeval.login("YOUR_API_KEY")
+          trace_manager.configure(
+              confident_api_key="YOUR-API-KEY"
+          )
           ```
           ```bash title="Set Env"
           export CONFIDENT_API_KEY=YOUR-API-KEY
@@ -135,7 +142,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
           import { traceManager } from '@deepeval-ts/tracing';
 
           traceManager.configure({
-              confidentApiKey: "YOUR_API_KEY"
+              confidentApiKey: "YOUR-API-KEY"
           })
           ```
           ```bash title="Set Env"
