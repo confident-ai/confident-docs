@@ -680,3 +680,35 @@ LLM test case attributes mapping:
 - [Optional] `"confident.trace.llm_test_case.tools_called"` (of type `str`) used for updating test case tools called
 - [Optional] `"confident.trace.llm_test_case.expected_tools"` (of type `str`) used for updating test case expected tools
 
+### Tags
+
+[Tags](/docs/llm-tracing/tracing-features/tags) are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
+
+- `"confident.trace.tags"` (of type `list[str]`) used for updating trace tags
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.tags", ["tag1", "tag2"])
+```
+
+```typescript
+span.setAttributes({"confident.trace.tags": ["tag1", "tag2"]});
+```
+
+```go
+span.SetAttributes(
+    attribute.StringSlice("confident.trace.tags", []string{"tag1", "tag2"}),
+)
+```
+
+```ruby
+span.set_attribute('confident.trace.tags', ['tag1', 'tag2'])
+```
+
+```csharp
+currentSpan.SetAttribute("confident.trace.tags", new[] { "tag1", "tag2" });
+```
+
+</CodeBlocks>
