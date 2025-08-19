@@ -100,6 +100,49 @@ navigation:
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
             icon: fa-light fa-pipe-valve
+      - section: Metrics
+        contents:
+          - page: All Metrics
+            path: docs/pages/metrics/all-metrics.mdx
+            icon: fa-light fa-list
+          - section: Single Turn
+            collapsed: false
+            icon: fa-light fa-comment
+            contents:
+              - page: Answer Relevancy
+                path: docs/pages/metrics/single-turn/answer-relevancy.mdx
+              - page: Bias
+                path: docs/pages/metrics/single-turn/bias.mdx
+              - page: Contextual Precision
+                path: docs/pages/metrics/single-turn/contextual-precision.mdx
+              - page: Contextual Recall
+                path: docs/pages/metrics/single-turn/contextual-recall.mdx
+              - page: Contextual Relevancy
+                path: docs/pages/metrics/single-turn/contextual-relevancy.mdx
+              - page: Faithfulness
+                path: docs/pages/metrics/single-turn/faithfulness.mdx
+              - page: Hallucination
+                path: docs/pages/metrics/single-turn/hallucination.mdx
+              - page: Summarization
+                path: docs/pages/metrics/single-turn/summarization.mdx
+              - page: Task Completion
+                path: docs/pages/metrics/single-turn/task-completion.mdx
+              - page: Tool Correctness
+                path: docs/pages/metrics/single-turn/tool-correctness.mdx
+              - page: Toxicity
+                path: docs/pages/metrics/single-turn/toxicity.mdx
+          - section: Multi Turn
+            collapsed: false
+            icon: fa-light fa-comments
+            contents:
+              - page: Conversation Completeness
+                path: docs/pages/metrics/multi-turn/conversation-completeness.mdx
+              - page: Knowledge Retention
+                path: docs/pages/metrics/multi-turn/knowledge-retention.mdx
+              - page: Role Adherence
+                path: docs/pages/metrics/multi-turn/role-adherence.mdx
+              - page: Turn Relevancy
+                path: docs/pages/metrics/multi-turn/turn-relevancy.mdx
       - section: LLM Tracing
         contents:
           - page: Introduction
