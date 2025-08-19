@@ -615,3 +615,68 @@ span.SetAttribute("confident.trace.output", output);
 ```
 
 </CodeBlocks>
+
+### Test Case
+
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in the span as **trace level attributes** using the `confident.trace.llm_test_case.*` namespace.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
+    
+    span.set_attribute('confident.trace.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.trace.llm_test_case.input', input)
+    span.set_attribute('confident.trace.llm_test_case.actual_output', output)
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+    "confident.trace.llm_test_case.input": input,
+    "confident.trace.llm_test_case.actual_output": output,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.metric_collection", "<your_metric_collection>"),
+    attribute.String("confident.trace.llm_test_case.input", input),
+    attribute.String("confident.trace.llm_test_case.actual_output", output),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+    "confident.trace.llm_test_case.input": input,
+    "confident.trace.llm_test_case.actual_output": output,
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>");
+span.SetAttribute("confident.trace.llm_test_case.input", input);
+span.SetAttribute("confident.trace.llm_test_case.actual_output", output);
+```
+
+</CodeBlocks>
+
+<Info>
+Make sure you have [metric collection](https://documentation.confident-ai.com/docs/llm-evaluation/metrics/create-on-the-cloud) created on the platform for running online evaluation on this test case.
+</Info>
+
+LLM test case attributes mapping:
+
+- `"confident.trace.llm_test_case.input"` (of type `str`) used for updating test case input
+- `"confident.trace.llm_test_case.actual_output"` (of type `str`) used for updating test case actual output
+- [Optional] `"confident.trace.llm_test_case.expected_output"` (of type `str`) used for updating test case expected output
+- [Optional] `"confident.trace.llm_test_case.context"` (of type `list[str]`) used for updating test case context
+- [Optional] `"confident.trace.llm_test_case.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
+- [Optional] `"confident.trace.llm_test_case.tools_called"` (of type `str`) used for updating test case tools called
+- [Optional] `"confident.trace.llm_test_case.expected_tools"` (of type `str`) used for updating test case expected tools
+
