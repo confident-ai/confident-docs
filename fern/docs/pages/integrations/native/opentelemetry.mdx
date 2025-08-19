@@ -1131,8 +1131,8 @@ span.setAttributes({
     "confident.span.type": "llm",
     "confident.llm.model": "gpt-3.5-turbo",
     "confident.llm.attributes.input": [
-        `{"role": "system", "content": "You are a helpful assistant."}`,
-        `{"role": "user", "content": "What is the capital of France?"}`
+        JSON.stringify({ role: "system", content: "You are a helpful assistant." }),
+        JSON.stringify({ role: "user", content: "What is the capital of France?" })
     ],
     "confident.llm.attributes.output": "Hello world",
 });
@@ -1170,6 +1170,76 @@ span.SetAttribute("confident.llm.attributes.input", [
     `{"role": "user", "content": "What is the capital of France?"}`
 ]);
 span.SetAttribute("confident.llm.attributes.output", "Hello world");
+```
+
+</CodeBlocks>
+
+#### **Agent**
+
+To create a Agent span, set the `confident.span.type` to `agent`. After that refer to the table below for more [Agent span attributes](/docs/llm-tracing/tracing-features/span-types#agent-span).
+
+
+- `"confident.agent.name"` (of type `str`) used for updating Agent span name
+- [Optional] `"confident.agent.available_tools"` (of type `list[str]`) used for updating Agent span available tools
+- [Optional] `"confident.agent.agent_handoffs"` (of type `list[str]`) used for updating Agent span agent handoffs
+- `"confident.agent.attributes.input"` (of type `Any`) used for updating Agent span input
+- `"confident.agent.attributes.output"` (of type `Any`) used for updating Agent span output
+
+Given below is the sample code for setting attributes for Agent span type.
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("agent_span") as span:
+    span.set_attribute("confident.span.type", "agent")
+    span.set_attribute("confident.agent.name", "agent_span")
+    span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
+    span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
+    
+    span.set_attribute("confident.agent.attributes.input", json.dumps({"input": "input"}))
+    span.set_attribute("confident.agent.attributes.output", json.dumps({"output": "output"}))
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.type": "agent",
+    "confident.agent.name": "agent_span",
+    "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.attributes.input": `{"input": input}`,
+    "confident.agent.attributes.output": `{"output": input}`,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.agent.name", "agent_span"),
+    attribute.String("confident.agent.available_tools", []string{"llm_agent", "retriever_span", "tool_span"}),
+    attribute.String("confident.agent.agent_handoffs", []string{"llm_agent", "retriever_span", "tool_span"}),
+    attribute.String("confident.agent.attributes.input", `{"input": "input"}`),
+    attribute.String("confident.agent.attributes.output", `{"output": "output"}`),
+    attribute.String("confident.span.type", "agent"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.type": "agent",
+    "confident.agent.name": "agent_span",
+    "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
+    "confident.agent.attributes.input": `{"input": "input"}`,
+    "confident.agent.attributes.output": `{"output": "output"}`,
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.type", "agent");
+span.SetAttribute("confident.agent.name", "agent_span");
+span.SetAttribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"]);
+span.SetAttribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"]);
+span.SetAttribute("confident.agent.attributes.input", `{"input": "input"}`);
+span.SetAttribute("confident.agent.attributes.output", `{"output": "output"}`);
 ```
 
 </CodeBlocks>
