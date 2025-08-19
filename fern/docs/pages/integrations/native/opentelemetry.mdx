@@ -712,3 +712,42 @@ currentSpan.SetAttribute("confident.trace.tags", new[] { "tag1", "tag2" });
 ```
 
 </CodeBlocks>
+
+### Metadata
+
+Attach [metadata](/docs/llm-tracing/tracing-features/metadata) to the trace. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+
+- `"confident.trace.metadata"` (of type `str`) used for updating trace metadata
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<CodeBlocks>
+
+```python
+import json
+
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.metadata", json.dumps({"key": "value"}))
+```
+
+```typescript
+span.setAttributes({
+    'confident.trace.metadata': JSON.stringify({ key: "value" }),
+});
+```
+
+```go
+attribute.String("confident.trace.metadata", `{"key": "value"}`)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.metadata": `{"key": "value"}`,
+});
+```
+
+```csharp
+span.set_attribute('confident.trace.metadata', '{"key": "value"}');
+```
+
+</CodeBlocks>
