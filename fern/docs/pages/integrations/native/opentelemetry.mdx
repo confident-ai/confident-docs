@@ -907,3 +907,40 @@ span.SetAttribute("confident.span.output", output);
 ```
 
 </CodeBlocks>
+
+### Metric Collection
+
+[Metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud) allows you to run metrics on cloud and publish results to the observatory.
+
+- `"confident.span.metric_collection"` (of type `str`) update the name of the metric collection for the span
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.span.metric_collection", "<your_metric_collection>")
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
+```
+
+</CodeBlocks>
