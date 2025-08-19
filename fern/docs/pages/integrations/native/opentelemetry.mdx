@@ -373,6 +373,92 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
             ruby example.rb
             ```
             </Tab>
+
+            <Tab title="Dotnet">
+            
+            Create a New Console App
+
+            ```bash
+            dotnet new console -n ConfidentLLMExample
+            cd ConfidentLLMExample
+            ```
+
+            Add Required NuGet Packages
+
+            ```bash
+            dotnet add package OpenTelemetry
+            dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
+            ```
+
+            Create `Program.cs` file. This file contains the code for creating an LLM span.
+
+            ```csharp title="Program.cs"
+            using System;
+            using OpenTelemetry;
+            using OpenTelemetry.Trace;
+            using OpenTelemetry.Resources;
+            using OpenTelemetry.Exporter;
+            using System.Threading.Tasks;
+
+            class Program
+            {
+                static async Task Main(string[] args)
+                {
+                    var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                    var confidentApiKey = Environment.GetEnvironmentVariable("CONFIDENT_API_KEY");
+
+                    Console.WriteLine($"OTLP Endpoint: {otlpEndpoint}");
+                    Console.WriteLine($"API Key configured: {!string.IsNullOrEmpty(confidentApiKey)}");
+
+                    using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                            .AddService("ConfidentLLMService"))
+                        .AddSource("ConfidentLLMTracer")
+                        .AddOtlpExporter(options =>
+                        {
+                            options.Endpoint = new Uri($"{otlpEndpoint}/v1/traces");
+                            options.Headers = $"x-confident-api-key={confidentApiKey}";
+                            options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                            // Add timeout and retry configuration
+                            options.TimeoutMilliseconds = 30000;
+                        })
+                        .Build();
+
+                    var tracer = tracerProvider.GetTracer("ConfidentLLMTracer");
+
+                    Console.WriteLine("Starting span...");
+                    using (var currentSpan = tracer.StartActiveSpan("confident-llm-span-csharp"))
+                    {
+                        currentSpan.SetAttribute("confident.trace.name", "example-trace");
+                        currentSpan.SetAttribute("confident.span.type", "llm");
+                        currentSpan.SetAttribute("confident.llm.model", "gpt-4o");
+                        currentSpan.SetAttribute("confident.llm.attributes.input", "What is the capital of France?");
+                        currentSpan.SetAttribute("confident.llm.attributes.output", "Paris");
+
+                        Console.WriteLine("Span created with attributes. It will end after 5 seconds.");
+                        await Task.Delay(5000);
+                    }
+
+                    Console.WriteLine("Span ended. Flushing traces...");
+                    
+                    // Force flush traces before exiting
+                    var flushResult = tracerProvider.ForceFlush();
+                    Console.WriteLine($"Flush result: {flushResult}");
+                    
+                    // Wait a bit to ensure traces are sent
+                    await Task.Delay(2000);
+                    Console.WriteLine("Traces flushed successfully.");
+                }
+            }
+            ```
+
+            Build and Run
+
+            ```bash
+            dotnet run
+            ```
+            
+            </Tab>
             
         </Tabs>
 
