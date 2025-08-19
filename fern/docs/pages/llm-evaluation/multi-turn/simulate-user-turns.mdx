@@ -9,17 +9,19 @@ slug: llm-evaluation/multi-turn/simulate-user-turns
 Simulating user turns require:
 
 - A multi-turn dataset of conversational goldens
-- A callback function that wraps around your chatbot to generate conversation turns
+- A callback function that wraps around your chatbot to the next conversation turn
 
 <Note>
-  Each conversational golden should have a `scenario` and `user_description`.
+  Each conversational golden must have a `scenario` before you can simulate user
+  turns. It is also highly recommended to provide a **user description** for
+  higher quality simulations.
 </Note>
 
 ## How it works
 
 1. Pull your [multi-turn dataset](/llm-evaluation/dataset-management/create-goldens) from Confident AI
-2. Define a callback that invokes your chatbot
-3. Run simulation for each golden in your dataset
+2. Define a callback that invokes your chatbot to generate the next conversation turn
+3. Run a simulation for each golden in your dataset
 
 ## Run Simulations Locally
 
@@ -68,7 +70,7 @@ conversational_test_cases = simulator.simulate(conversational_goldens=dataset.co
 ```
 
 <Success>
-  The `conversational_test_cases` now contain test cases with simulated
+  The conversational test cases should now contain test cases with simulated
   conversation turns for each golden in your dataset.
 </Success>
 
@@ -91,15 +93,9 @@ curl -G https://api.confident-ai.com/v1/datasets \
 
 </Step>
 
-<Step title="Create callback and run simulations">
+<Step title="Simulate first user turn">
 
-Create an endpoint for your chatbot callback, then call `/v1/simulate` with the goldens you pulled and the endpoint URL.
-
-<Note>
-  As with the local callback, the remote callback should accept an input, and
-  optionally a list of `Turn`s and the thread id, and return the next `Turn` in
-  the conversation.
-</Note>
+Use `/v1/simulate` to generate the first user turn for each golden.
 
 ```curl
 mcurl -X POST https://api.confident-ai.com/v1/simulate \
@@ -110,9 +106,44 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
     "scenario": "A frustrated user asking for a refund.",
     "userDescription": "A white male who is a customer for over 2 years."
   }],
-  "callback": "https://your-callback-endpoint.com/simulate"
 }'
 ```
+
+</Step>
+
+<Step title="Simulate remaining turns">
+
+Continue calling `/v1/simulate` until you’ve simulated the desired number of turns.
+
+<Note>
+  {" "}
+  The `/v1/simulate` endpoint returns the **next user turn**. You should add this
+  turn to your golden, append the chatbot’s response, and then call the endpoint
+  again.{" "}
+</Note>
+
+```curl
+mcurl -X POST https://api.confident-ai.com/v1/simulate \
+     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "golden": [{
+    "scenario": "A frustrated user asking for a refund.",
+    "userDescription": "A white male who is a customer for over 2 years.",
+    "turns": [
+      {"role": "user", "content": "Hi"},
+      {"role": "assistant", "content": "Hello! How can I help you today?"}
+    ]
+  }],
+
+}'
+
+```
+
+<Warning>
+  `/v1/simulate` will fail if the role of the last turn is not `assistant`, if
+  turns is provided.
+</Warning>
 
 </Step>
 
@@ -122,11 +153,11 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
 
 ### Early stopping
 
-To stop a simulation early, you can provide the `expected_outcome` for each golden, which will end the conversation automatically after the expected outcome has been reached.
+To stop a simulation naturally before it reaches the maximum number of turns, you can provide the `expected_outcome` for each golden, which will end the conversation automatically after the expected outcome has been reached.
 
-<CodeBlocks>
+<Tabs>
 
-<CodeBlock language="python">
+<Tab title="Python">
 
 ```python
 from deepeval.dataset import ConversationalGolden
@@ -138,9 +169,18 @@ conversation_golden = ConversationalGolden(
 )
 ```
 
-</CodeBlock>
+<Note>
+  If `expected_outcome` is unavalaible, the `max_user_simulations` parameter in
+  the `simluate` method will stop simulation after a certain number of user
+  turns, which is defaulted to 10.
+</Note>
 
-<CodeBlock language="CURL">
+</Tab>
+
+<Tab title="cURL">
+
+If the expected outcome is provided and reached during simulation, the
+conversation will be marked as complete in the response to `/v1/simulate`.
 
 ```curl
 mcurl -X POST https://api.confident-ai.com/v1/simulate \
@@ -156,23 +196,17 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
 }'
 ```
 
-</CodeBlock>
+</Tab>
 
-</CodeBlocks>
-
-<Note>
-  If `expected_outcome` is unavalaible, the `max_user_simulations` parameter in
-  the `simluate` method will stop simulation after a certain number of user
-  turns, which is defaulted to 10.
-</Note>
+</Tabs>
 
 ### Extending existing conversations
 
 You can extend existing conversations by providing existing `Turn`s to each golden in your dataset. The simulator will automatically detect and continue simulating from the existing turns.
 
-<CodeBlocks>
+<Tabs>
 
-<CodeBlock language="python">
+<Tab title="Python">
 
 ```python
 from deepeval.dataset import ConversationalGolden
@@ -189,9 +223,9 @@ conversation_golden = ConversationalGolden(
 )
 ```
 
-</CodeBlock>
+</Tab>
 
-<CodeBlock language="CURL">
+<Tab title="cURL">
 
 ```curl
 mcurl -X POST https://api.confident-ai.com/v1/simulate \
@@ -204,13 +238,11 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
     "turns": [
       {"role": "user", "content": "Hi"},
       {"role": "assistant", "content": "Hello! How can I help you today?"},
-      {"role": "user", "content": "I want to purchase a VIP ticket to a cold play concert."}
     ]
   }],
-  "callback": "https://your-callback-endpoint.com/simulate"
 }'
 ```
 
-</CodeBlock>
+</Tab>
 
-</CodeBlocks>
+</Tabs>
