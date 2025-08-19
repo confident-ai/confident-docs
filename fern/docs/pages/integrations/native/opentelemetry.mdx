@@ -499,5 +499,119 @@ with tracer.start_as_current_span("confident-llm-span") as span:
 ```
 </Accordion>
 
+## Understanding OTEL with Confident AI
+
+In this section, we will mainly discuss:
+
+- `gen_ai` attribute and event conventions
+- Confident AI specific conventions
+- Advanced configurations
+
+### OTEL endpoints
+
+Confident AI offers the `https://otel.confident-ai.com` endpoint that accepts OpenTelemetry traces in the [OTLP format](https://opentelemetry.io/docs/specs/otlp/#otlphttp). Please note that Confident AI does **not support** gRPC for the OpenTelemetry endpoint. Please use HTTP instead.
+
+### Attributes
+
+**Confident AI** adheres to the [GenAI semantic convention](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and adds an extra layer on top of it to capture additional data about the LLM applications. Confident AI uses `confident.*` namespace to map specific attributes with [llm tracing](https://documentation.confident-ai.com/docs/llm-tracing/introduction) data model. These specific attributes always take precedence over `gen_ai.*` conventions and are recommended for all users that are manually instrumenting their applications.
+
+<Warning>
+The **GenAI semantic conventions** are still under development and are subject to change.
+</Warning>
+
+### Advanced configurations
+
+The [enviornment](/docs/llm-tracing/tracing-features/environment) allows you to configure where your trace belongs on Confident AI (defaulted to `"development"`). You can configure the enviornment and sampling rate of traces by setting the following two enviornment variables:
+
+```bash
+OTEL_RESOURCE_ATTRIBUTES="confident.trace.environment=production"
+```
+## Trace-Level Attribute Mappings
+
+These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
+
+<Callout>
+It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+</Callout>
+
+### Name
+
+The trace name is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
+
+- `"confident.trace.name"` (of type `str`) used for updating trace [name](/docs/llm-tracing/tracing-features/name)
 
 
+<CodeBlocks>
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.name", "test_trace")
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.name", "example-trace"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.name": "example-trace",
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.name", "example-trace");
+```
+
+</CodeBlocks>
+
+### Input/Output
+
+You can set [trace input and output](/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) at runtime using the following attributes:
+
+- `"confident.trace.input"` (of type `Any`) used for updating trace input
+- `"confident.trace.output"` (of type `Any`) used for updating trace output
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    # your code
+    span.set_attribute("confident.trace.input", input)
+    span.set_attribute("confident.trace.output", output)
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.input", input),
+    attribute.String("confident.trace.output", output),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.input", input);
+span.SetAttribute("confident.trace.output", output);
+```
+
+</CodeBlocks>
