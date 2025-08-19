@@ -944,3 +944,57 @@ span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>"
 ```
 
 </CodeBlocks>
+
+### Test Case
+
+[LLM Test Case](https://deepeval.com/docs/evaluation-test-cases#llm-test-case) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+
+Given below is the example of running [online evaluation](https://documentation.confident-ai.com/docs/llm-tracing/evaluations#online-evaluations) for a span.
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("confident_evaluation") as span:
+    input = "What is the capital of France?"
+    output = my_llm_app(input) # your LLM application
+    
+    span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
+    span.set_attribute('confident.span.llm_test_case.input', input)
+    span.set_attribute('confident.span.llm_test_case.actual_output', output)
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+    "confident.span.llm_test_case.input": input,
+    "confident.span.llm_test_case.actual_output": output,
+});
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
+    attribute.String("confident.span.llm_test_case.input", input),
+    attribute.String("confident.span.llm_test_case.actual_output", output),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.metric_collection": "<your_metric_collection>",
+    "confident.span.llm_test_case.input": input,
+    "confident.span.llm_test_case.actual_output": output,
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
+span.SetAttribute("confident.span.llm_test_case.input", input);
+span.SetAttribute("confident.span.llm_test_case.actual_output", output);
+```
+
+</CodeBlocks>
