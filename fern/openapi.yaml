@@ -796,8 +796,7 @@ components:
           description: "This is the source file from which the golden was retrieved."
         customColumnKeyValues:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: true
           description: "This is the custom column key values of the LLM application."
       required:
         - input
@@ -836,8 +835,7 @@ components:
           description: "This is the source file from which the golden was retrieved."
         customColumnKeyValues:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: true
           description: "This is the custom column key values of the LLM application."
       required:
         - scenario
@@ -889,8 +887,7 @@ components:
           description: "This determines whether the golden has been finalized."
         customColumnKeyValues:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: true
           description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
       required:
         - input
@@ -932,8 +929,7 @@ components:
           description: "This determines whether the golden has been finalized."
         customColumnKeyValues:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: true
           description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
       required:
         - scenario
@@ -1133,8 +1129,8 @@ components:
               - $ref: "#/components/schemas/ConversationalTestCase"
         hyperparameters:
           type: object
-          description: "This is any hyperparameters like model or prompt you wish to associate with the test run."
           additionalProperties: true
+          description: "This is any hyperparameters like model or prompt you wish to associate with the test run."
         identifier:
           type: string
           description: "A unique identifier for the test run."
