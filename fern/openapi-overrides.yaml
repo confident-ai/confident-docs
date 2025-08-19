@@ -244,3 +244,14 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+
+  /v1/annotation:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"

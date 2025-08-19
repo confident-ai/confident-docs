@@ -694,6 +694,71 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
+  /v1/annotation:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Create Annotation
+      operationId: createAnnotation
+      description: Dummy create annotation endpoint to surface in docs.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnnotation"
+            examples:
+              Thumbs Rating:
+                traceUuid: "<TRACE-UUID>"
+                rating: 1
+                type: "THUMBS_RATING"
+                expectedOutput: "Provide a clear, step-by-step password reset flow."
+                explanation: "Response acknowledges issue and guides the user through reset steps."
+              Five Star Rating:
+                spanUuid: "<SPAN-UUID>"
+                rating: 5
+                type: "FIVE_STAR_RATING"
+                expectedOutput: "Include verification, link to reset page, and confirmation messaging."
+                explanation: "High-quality answer with actionable steps and safety considerations."
+              Thread Annotation:
+                threadId: "<THREAD-ID>"
+                rating: 1
+                type: "THUMBS_RATING"
+                expectedOutcome: "Agent confirms identity and successfully walks the user through a reset."
+                explanation: "User should be guided to reset their password successfully, which did "
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateAnnotationResponse"
+              examples:
+                Thumbs Rating:
+                  success: true
+                  data:
+                    id: "ANNOTATION-ID"
+                  deprecated: false
+                Five Star Rating:
+                  success: true
+                  data:
+                    id: "ANNOTATION-ID"
+                  deprecated: false
+                Thread Annotation:
+                  success: true
+                  data:
+                    id: "ANNOTATION-ID"
+                  deprecated: false
+
 components:
   schemas:
     CreateMetricCollection:
@@ -2147,6 +2212,62 @@ components:
         - created_at
         - flagged
         - projectId
+
+    CreateAnnotation:
+      type: object
+      description: Request schema to create an annotation for a trace, span, or thread.
+      properties:
+        traceUuid:
+          type: string
+          description: This is the trace UUID to annotate. Exactly one of traceUuid, spanUuid, or threadId must be provided.
+        spanUuid:
+          type: string
+          description: This is the span UUID to annotate. Exactly one of traceUuid, spanUuid, or threadId must be provided.
+        threadId:
+          type: string
+          description: This is the thread ID to annotate. Exactly one of traceUuid, spanUuid, or threadId must be provided.
+        rating:
+          type: number
+          description: This is the annotated rating score, which must be 0 or 1 if the annotation is a thumb rating and an integer from 1 to 5 if the annotation is a five star rating.
+        type:
+          type: string
+          enum: [THUMBS_RATING, FIVE_STAR_RATING]
+          default: THUMBS_RATING
+          description: This is the annotation typem which defaults to THUMBS_RATING.
+        expectedOutput:
+          type: string
+          description: This is the expected output for trace/span annotations, which mustn't be provided when annotating a thread.
+        expectedOutcome:
+          type: string
+          description: This is the expected outcome for thread annotations, which mustn't be provided when annotating a trace or span.
+        explanation:
+          type: string
+          description: This is an explanation for the annotation.
+      required:
+        - rating
+
+    CreateAnnotationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the annotation was successfully created.
+        data:
+          type: object
+          description: This maps to the id of the created annotation.
+          properties:
+            id:
+              type: string
+              description: This is the id of the created annotation.
+          required:
+            - id
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
 
     GetTraceResponse:
       type: object
