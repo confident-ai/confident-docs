@@ -864,3 +864,46 @@ span.SetAttribute("confident.span.name", "custom_span");
 ```
 
 </CodeBlocks>
+
+### Input/Output
+
+You can set span [input and output](/docs/llm-tracing/tracing-features/input-output#set-span-io-at-runtime) at runtime using the following attributes:
+
+- `"confident.span.input"` (of type `Any`) used for updating span input
+- `"confident.span.output"` (of type `Any`) used for updating span output
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.span.input", input)
+    span.set_attribute("confident.span.output", output)
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.input": input,
+    "confident.span.output": output,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.input", input),
+    attribute.String("confident.span.output", output),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.input": input,
+    "confident.span.output": output,
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.input", input);
+span.SetAttribute("confident.span.output", output);
+```
+
+</CodeBlocks>
