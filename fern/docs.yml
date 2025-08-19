@@ -97,6 +97,22 @@ navigation:
               - page: Working with Prompts
                 path: docs/pages/llm-evaluation/prompt-optimization/using-prompts.mdx
                 icon: fa-light fa-circle-play
+          - section: Dashboards
+            collapsed: false
+            icon: fa-light fa-chart-line
+            contents:
+              - page: Testing Reports
+                path: docs/pages/llm-evaluation/dashboards/testing-reports.mdx
+                icon: fa-light fa-file-chart-column
+              - page: A|B Regression Testing
+                path: docs/pages/llm-evaluation/dashboards/ab-regression-testing.mdx
+                icon: fa-light fa-scale-balanced
+              - page: Model and Prompt Insights
+                path: docs/pages/llm-evaluation/dashboards/model-and-prompt-insights.mdx
+                icon: fa-light fa-lightbulb
+          - page: Unit-Testing in CI/CD
+            path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
+            icon: fa-light fa-gear-complex
           - section: Metrics
             icon: fa-light fa-list-check
             contents:
@@ -143,9 +159,6 @@ navigation:
                         path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/role-adherence.mdx
                       - page: Turn Relevancy
                         path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/turn-relevancy.mdx
-          - page: Unit-Testing in CI/CD
-            path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
-            icon: fa-light fa-pipe-valve
       - section: LLM Tracing
         contents:
           - page: Introduction

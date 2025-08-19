@@ -1,0 +1,93 @@
+---
+title: A|B Regression Testing
+subtitle: Learn how to regression test for different versions of your LLM app
+slug: llm-evaluation/dashboards/ab-regression-testing
+---
+
+<Warning>
+  You must have already ran at least **TWO** test runs for this feature to work.
+</Warning>
+
+<Frame caption="Testing Reports on Confident AI">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:ab-regression-testing.mp4"
+    autoPlay
+  />
+</Frame>
+
+## Select a Previous Test Run
+
+Go to the **Compare Test Results** page in a test run/testing report, and click on the **Select Test Run to Compare Against** button. There will be a dropdown of test runs for you to choose from - select the one you wish to compare against. If you only have one test run in your project, there won't be any test runs available, and in this case you'll have to run another test run to continue.
+
+<Callout>
+It is difficult to know which test run is the one you wish to compare against, but there is where the `identifier` comes in handy when using the `evaluate()` function, as the `identifier` will be displayed alongside the generated test run ID that you're seeing in the dropdown:
+
+```python
+...
+evaluate(identifier="My first test run", ...)
+```
+
+Or in `deepeval test run`:
+
+```bash
+deepeval test run test_llm_app.py -id "My first test run"
+```
+
+</Callout>
+
+## Overview Comparison
+
+Selecting a test run would automatically open up the **Comparison Overview**, which shows:
+
+- The difference in passing test cases
+- The difference in metric score distributions per metric
+
+The comparison displays data from your current test run on the left side and data from the selected comparison test run on the right side. This side-by-side view makes it easy to spot differences between the two runs.
+
+## Side-by-Side Test Case Comparer
+
+The **Test Results Comparer** also offers a side-by-side test case comparer. The left hand side displays test cases from the current test run, while the right hand side displays test cases from the test run you are comparing against.
+
+The test case comparer matches test cases from both test runs using a test case
+`name`s by default.
+
+<Callout type="info">
+  If you assign names to your test cases (for example, to incorporate external
+  IDs from Snowflake or other data sources), you can match test cases between
+  runs more easily. If you don't have an "ID" to assign to test cases, you can
+  either keep your test cases in order by [avoiding this common
+  mistake](/docs/dataset-editor/using-datasets#avoid-this-common-mistake), or
+  match by **Input** instead.
+</Callout>
+
+A test case highlighted in red indicates a regression - where at least one metric that previously passed in the comparison test run (right side) is now failing in the current test run (left side).
+
+### Match by Input Instead
+
+To match by **Input** instead, toggle the "Match By" pill from **Name** to **Input**
+
+> [!IMPORTANT]
+>
+> When you have duplicate inputs or names, the filters might not work as expected. It is important that you don't duplicate inputs and names in a test run.
+
+You can also watch the [video demo](#video-demo) above for more details.
+
+### Filter for Regressions
+
+When dealing with a large number of test cases, you can easily identify regressions and improvements using the filtering options. To find cases where a metric's status changed from passing to failing:
+
+1. Click on the **Metric Status** filter
+2. Select the specific metric you want to analyze
+3. Choose **has changed from** in the dropdown
+4. Set the change from **Passed** to **Failed**
+
+This will show you all test cases where performance degraded (labelled in red) between runs. Watch the [video demo](#video-demo) above for more details.
+
+### Filter for Metric scores
+
+You can also filter test cases based on changes in their metric scores. For example, to identify test case pairs where a metric's score has significantly decreased (by more than 0.3):
+
+1. Click on the **Metric Score** filter
+2. Select the specific metric you want to analyze
+3. Choose **has decreased by more than** in the dropdown
+4. Set the change to 0.3

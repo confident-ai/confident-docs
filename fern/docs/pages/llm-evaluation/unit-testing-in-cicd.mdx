@@ -1,0 +1,292 @@
+---
+title: Unit-Testing in CI/CD
+subtitle: Setup an automated pre-deployment workflow in CI/CD
+slug: llm-evaluation/unit-testing-cicd
+---
+
+## Overview
+
+For Python users specifically, you can leverage `deepeval`'s native integration with `pytest` to run unit-tests on your LLM app in CI/CD pipelines
+
+<Note>
+  Currently, only **end-to-end testing** is supported in CI/CD. Evals **must**
+  be ran locally.
+</Note>
+
+## Setup CI Environment
+
+<Steps>
+
+<Step title="Create test file">
+
+Create a `test_[name].py` file and paste in the following code:
+
+<Tabs>
+
+<Tab title="Single-turn E2E">
+
+```python test_llm_app.py
+import pytest
+from deepeval.test_case import LLMTestCase
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import assert_test
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    test_case = LLMTestCase(input=golden.input, actual_output=llm_app(input))
+    dataset.add_test_case(test_case)
+
+# Loop through test cases using pytest
+@pytest.mark.parametrize("test_case", dataset.test_cases)
+def test_llm_app(test_case: LLMTestCase):
+    assert_test(test_case, metrics=[AnswerRelevancyMetric()]) # Replace with your metrics
+```
+
+<Tip>
+  If you haven't already, you can learn how to run single-turn end-to-end evals
+  locally
+  [here.](/docs/llm-evaluation/single-turn/end-to-end#run-e2e-tests-locally)
+</Tip>
+
+</Tab>
+
+<Tab title="Multi-turn E2E">
+
+```python test_llm_app.py
+from deepeval.test_case import ConversationalTestCase
+from deepeval.simulator import ConversationSimulator
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import TurnRelevancyMetric
+from deepeval import assert_test
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+simulator = ConversationSimulator(model_callback=chatbot_callback)
+for golden in dataset.goldens:
+    test_case = simulator.simulator(golden)
+    dataset.add_test_case(test_case)
+
+# Loop through test cases using pytest
+@pytest.mark.parametrize("test_case", dataset.test_cases)
+def test_llm_app(test_case: ConversationalTestCase):
+    assert_test(test_case, metrics=[TurnRelevancyMetric()]) # Replace with your metrics
+```
+
+<Tip>
+  If you haven't already, you can learn how to run multi-turn end-to-end evals
+  locally
+  [here.](/docs/llm-evaluation/multi-turn/end-to-end#run-e2e-tests-locally)
+</Tip>
+
+</Tab>
+
+</Tabs>
+
+In the test file we've created, we need at least one test function (function that starts with `test_` that calls `assert_test()`). Do **NOT** call `evalaute()` like how you've learnt in previous sections, as this is not part of the `pytest` integration suite.
+
+To make sure everything works, run `deepeval test run` in your terminal to trigger the test file:
+
+```bash
+deepeval test run test_llm_app.py
+```
+
+Done ✅. The `deepeval test run` command integrates natively with `pytest` and **creates one test run only**.
+
+</Step>
+
+<Step title="Setup `.yml` file">
+
+Create a YAML file to execute your test file automatically in CI/CD pipelines. Here's an example that uses `poetry` for installation, `OPENAI_API_KEY` as your LLM judge to run evals locally, and `CONFIDENT_API_KEY` to send results to Confident AI:
+
+```yaml unit-testing.yml focus={40-45} maxLines=45
+name: Unit-Testing LLM App
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --only main
+
+      - name: Install project
+        run: poetry install --no-interaction --only main
+
+      - name: Run tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CONFIDENT_API_KEY: ${{ secrets.CONFIDENT_API_KEY }}
+        run: |
+          poetry run pytest tests/test_core/ --ignore=tests/test_core/test_synthesizer/
+```
+
+<Warning>
+  Remember to provide your `CONFIDENT_API_KEY`, otherwise you won't have access
+  to your datasets and create test runs on Confident AI upon completing
+  evaluation.
+</Warning>
+
+</Step>
+
+<Step title="Include in GitHub Workflows">
+
+Last step is to automate everything:
+
+1. Create a `.github/workflows` directory in your repository if you don't already have one
+2. Place your `unit-testing.yml` file in this directory
+3. Make sure to set up your Confident AI API Key as a [secret](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) in your GitHub repository
+
+Now, whenever you make a commit and push changes, GitHub Actions will
+automatically execute your tests based on the specified triggers
+
+</Step>
+
+</Steps>
+
+## Log Prompts and Models
+
+Similar to how you can log prompts, models, and other parameters using `evalaute()`, you can also do so with a test file:
+
+```python test_llm_app.py focus={20-28} maxLines=28
+import pytest
+from deepeval.test_case import LLMTestCase
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import assert_test
+import deepeval
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    test_case = LLMTestCase(input=golden.input, actual_output=llm_app(input))
+    dataset.add_test_case(test_case)
+
+# Loop through test cases using pytest
+@pytest.mark.parametrize("test_case", dataset.test_cases)
+def test_llm_app(test_case: LLMTestCase):
+    assert_test(test_case, metrics=[AnswerRelevancyMetric()]) # Replace with your metrics
+
+# Log configs used in LLM app at this point in time
+@deepeval.log_hyperparameters()
+def hyperparameters() -> dict[str, Union[str, int, float]]:
+    # Return an empty Dict if there's nothing to log
+    return {
+        "Model": "gpt-4o",
+        "Temperature": 1,
+        "Chunk Size": 500
+    }
+```
+
+When you run `deepeval test run`, Confident AI will automatically associate your hyperparameters with the test run you've created.
+
+## Flag Configs
+
+The `deepeval test run` is a powerful command that allows you to run unit tests as if you're using `pytest`. There are a dozens of flags for you to customize `deepeval test run`, including improving number of parallel processes, error handling, etc.
+
+### Parallelization
+
+Provide a number to the `-n` flag to specify how many processes to use.
+
+```
+deepeval test run test_example.py -n 4
+```
+
+In this case, `-n 4` means `deepeval` will spin up 4 processes and evaluate 4 test cases at once.
+
+### Cache
+
+Provide the `-c` flag (with no arguments) to read from the local `deepeval` cache instead of re-evaluating test cases on the same metrics.
+
+```
+deepeval test run test_example.py -c
+```
+
+<Tip>
+  This is extremely useful if you're running large amounts of test cases. For
+  example, lets say you're running 1000 test cases using `deepeval test run`,
+  but you encounter an error on the 999th test case. The cache functionality
+  would allow you to skip all the previously evaluated 999 test cases, and just
+  evaluate the remaining one.
+</Tip>
+
+### Ignore Errors
+
+The `-i` flag (with no arguments) allows you to ignore errors for metrics executions during a test run.
+
+```
+deepeval test run test_example.py -i
+```
+
+<Note>
+You can combine different flags, such as the `-i`, `-c`, and `-n` flag to execute any uncached test cases in parallel while ignoring any errors along the way:
+
+```python
+deepeval test run test_example.py -i -c -n 2
+```
+
+</Note>
+
+### Verbose Mode
+
+The `-v` flag (with no arguments) allows you to turn on `verbose_mode` for all metrics ran using `deepeval test run`. Not supplying the `-v` flag will default each metric's `verbose_mode` to its value at instantiation.
+
+```python
+deepeval test run test_example.py -v
+```
+
+When a metric's `verbose_mode` is `True`, it prints the intermediate steps used to calculate said metric to the console during evaluation.
+
+### Skip Test Cases
+
+The `-s` flag (with no arguments) allows you to skip metric executions where the test case has missing/insufficient parameters (such as `retrieval_context`) that is required for evaluation. An example of where this is helpful is if you're using a metric such as the `ContextualPrecisionMetric` but don't want to apply it when the `retrieval_context` is `None`.
+
+```
+deepeval test run test_example.py -s
+```
+
+### Identifier
+
+The `-id` flag followed by a string allows you to name test runs and better identify them in testing reports and when regression testing.
+
+```
+deepeval test run test_example.py -id "My Latest Test Run"
+```
+
+### Repeats
+
+Repeat each test case by providing a number to the `-r` flag to specify how many times to rerun each test case.
+
+```
+deepeval test run test_example.py -r 2
+```

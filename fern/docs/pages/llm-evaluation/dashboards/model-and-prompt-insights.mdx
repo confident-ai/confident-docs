@@ -1,0 +1,94 @@
+---
+title: Model and Prompt Insights
+subtitle: Learn how to find the best models, prompts, etc. for your LLM app
+slug: llm-evaluation/dashboards/model-and-prompt-insights
+---
+
+When running evaluations, it's important to log hyperparameters to track which configurations were used for each test run. This allows you to compare different versions of prompts, models, and other settings to make data-driven decisions about your LLM application.
+
+<Callout type="warning">
+  This is currently only supported for [end-to-end
+  evaluation](/docs/llm-evaluation/end-to-end-evals).
+</Callout>
+
+If you're unsure what are hyperparameters or the types of hyperparameters available, [click here.](/docs/concepts/hyperparameters)
+
+<Frame caption="Prompt and Model Insights">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:parameter-insights.mp4"
+    autoPlay
+    controls
+  />
+</Frame>
+
+## Prompts
+
+Prompts are a **type** of hyperparameter, and in Confident AI, you can include them as hyperparameters to [test each prompt's performance](/docs/prompt-management/prompt-testing) when running an evaluation:
+
+```python
+from deepeval.prompt import Prompt
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import evaluate
+...
+
+# Pull your prompt version
+prompt = Prompt(alias="your-prompt-alias")
+prompt.pull()
+
+# Run an evaluation with the prompt as a hyperparameter
+evaluate(
+    test_cases=dataset.test_cases,
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={"System Prompt": prompt}
+)
+```
+
+Since hyperparameters are stored as key-value pairs in a dictionary (`Dict[str, Prompt]`), the type of a hyperparameter is determined by its first initial value logged:
+
+1. If you first log a `Prompt` object for a hyperparameter key, that key will be treated as a prompt type hyperparameter.
+2. If you later log string values for the same key, the hyperparameter will remain a prompt type.
+3. Any new string values logged for this key will be treated as potential new prompt versions.
+
+<Callout type="warning">
+  You should **NEVER** log the interpolated version of your prompt template.
+  This will create a unique version for each variable substitution, making it
+  impossible to meaningfully compare prompt performance. Always log the `Prompt`
+  instance itself.
+</Callout>
+
+## Models
+
+You can also log model information as hyperparameters to track which model versions or configurations were used:
+
+```python
+...
+
+evaluate(
+    test_cases=dataset.test_cases,
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={
+        "Model": "gpt-4",
+    }
+)
+```
+
+## Others
+
+You can log any other hyperparameters that has good influence over your LLM app's performance:
+
+```python
+...
+
+evaluate(
+    test_cases=dataset.test_cases,
+    metrics=[AnswerRelevancyMetric()],
+    hyperparameters={
+        "System Prompt": prompt,
+        "Model": "gpt-4",
+        "Temperature": 0.7,
+        "Max Tokens": 1000,
+    }
+)
+```
+
+All hyperparameters that you associate with test runs can be viewed on individual [testing reports](/docs/llm-evaluation/evaluation-features/testing-reports) on Confident AI by clicking the **View Hyperparameters** button on a test run's **Overview** page. You can also filter for test runs that are associated with certain hyperparameters on the **Evaluations** page under your project space.

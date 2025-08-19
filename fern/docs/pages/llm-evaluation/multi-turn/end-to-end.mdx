@@ -62,7 +62,7 @@ Loop through multi-turn goldens and simulate turns for test cases, before adding
 
 ```python main.py focus={8-15}
 from deepeval.test_case import ConversationalTestCase
-from deepeval.simulate import ConversationSimulator
+from deepeval.simulator import ConversationSimulator
 from deepeval.dataset import EvaluationDataset
 
 dataset = EvaluationDataset()
@@ -134,7 +134,7 @@ Using your language of choice, you would call your LLM app to construct a list o
 
 ```python main.py focus={8-15}
 from deepeval.test_case import ConversationalTestCase
-from deepeval.simulate import ConversationSimulator
+from deepeval.simulator import ConversationSimulator
 from deepeval.dataset import EvaluationDataset
 
 dataset = EvaluationDataset()
@@ -154,9 +154,7 @@ for golden in dataset.goldens:
 </Tab>
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet
-  endpoint="GET /v1/datasets"
-/>
+<EndpointRequestSnippet endpoint="GET /v1/datasets" />
 
 </Tab>
 
@@ -184,10 +182,7 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 </Tab>
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet
-  endpoint="POST /v1/evaluate"
-  example="Multi-Turn"
-/>
+<EndpointRequestSnippet endpoint="POST /v1/evaluate" example="Multi-Turn" />
 
 </Tab>
 

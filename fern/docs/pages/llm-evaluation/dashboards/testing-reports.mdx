@@ -1,0 +1,38 @@
+---
+title: Testing Reports
+subtitle: Get familiar with how to use the dashboard to answer key questions about your model’s performance.
+slug: llm-evaluation/dashboards/testing-reports
+---
+
+## Overview
+
+Test runs are displayed as testing reports on Confident AI and represents a snapshot of your LLM application's performance. This is what your organization will be using to assess whether the latest iteration of your LLM application is up to standard.
+
+<Note>
+  It is not uncommon for testing reports to drive deployment decisions within an
+  engineering team.
+</Note>
+
+You can create a test runs by running an evaluation, including those ran in [CI/CD piplines](/docs/llm-evaluation/evaluation-features/unit-testing-in-cicd-in-cicd).
+
+## Using Testing Reports
+
+### Is my LLM app ready to deploy?
+
+Show overall pass/fail metrics and average scores.
+
+Explain that this is the “at-a-glance” check for whether a new model run is good enough.
+
+### What should I fix first?
+
+Point to metric breakdowns (by category, scenario, or tag).
+
+Suggest sorting/filtering to see which areas are weakest.
+
+[image] (bar chart of categories/tags)
+
+### How do I debug a failure?
+
+Show how to click into a test case and see actual outputs, reasoning, and logs.
+
+[video] (short screen recording of opening a failed test case and inspecting details)
