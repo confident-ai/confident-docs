@@ -823,3 +823,44 @@ span.SetAttribute("confident.trace.user_id", "123");
 ```
 
 </CodeBlocks>
+
+## Span-Level Attribute Mappings
+
+These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/tracing-features/attributes). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
+
+### Name
+
+The [name](/docs/llm-tracing/tracing-features/name) of the span is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
+
+- `"confident.span.name"` (of type `str`) used for updating span name
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.span.name", "custom_span")
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.name": "custom_span",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.name", "custom_span"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.name": "custom_span",
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.name", "custom_span");
+```
+
+</CodeBlocks>
