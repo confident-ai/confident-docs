@@ -971,10 +971,6 @@ span.setAttributes({
 });
 ```
 
-</Tabs.Tab>
-
-<Tabs.Tab>
-
 ```go
 span.SetAttributes(
     attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
@@ -995,6 +991,56 @@ span.setAttributes({
 span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
 span.SetAttribute("confident.span.llm_test_case.input", input);
 span.SetAttribute("confident.span.llm_test_case.actual_output", output);
+```
+
+</CodeBlocks>
+
+LLM test case attributes mapping:
+
+- `"confident.span.llm_test_case.input"` (of type `str`) used for updating test case input
+- `"confident.span.llm_test_case.actual_output"` (of type `str`) used for updating test case actual output
+- [Optional] `"confident.span.llm_test_case.expected_output"` (of type `str`) used for updating test case expected output
+- [Optional] `"confident.span.llm_test_case.context"` (of type `list[str]`) used for updating test case context
+- [Optional] `"confident.span.llm_test_case.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
+- [Optional] `"confident.span.llm_test_case.tools_called"` (of type `str`) used for updating test case tools called
+- [Optional] `"confident.span.llm_test_case.expected_tools"` (of type `str`) used for updating test case expected tools
+
+### Metadata
+
+[Metadata](/docs/llm-tracing/tracing-features/metadata) can be attached to the span. This information can be used for filtering, grouping, and analyzing your spans in the observatory.
+
+- `"confident.span.metadata"` (of type `str`) used for updating span metadata
+
+This attribute is a JSON string which is parsed into a dictionary.
+
+<CodeBlocks>
+
+```python
+import json
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.span.metadata", json.dumps({"key": "value"}))
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.metadata": JSON.stringify({ key: "value" }),
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.metadata", `{"key": "value"}`),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.metadata": `{"key": "value"}`,
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.metadata", "{\"key\": \"value\"}");
 ```
 
 </CodeBlocks>
