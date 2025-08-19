@@ -1,6 +1,324 @@
 ---
 slug: integrations/opentelemetry
-subtitle: Use OpenTelemetry for LLM observability and evals on Confident AI
 ---
 
+[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
+
 ## Overview
+
+**Confident AI** can recieve traces on `https://otel.confident-ai.com`. To export traces using the OpenTelemetry SDK, you can configure your Collector with the official open-telemetry library.
+
+<Note>
+If your configration requires signal specific environment variable, set the trace endpoint to `https://otel.confident-ai.com/v1/traces`.
+</Note>
+
+## Quickstart
+
+Given below is the quickstart for exporting traces to Confident AI OTLP endpoint (which will then published to **observatory**) for different languages.
+
+<Steps>
+
+    <Step title="Set Environment Variables">
+        First set your `CONFIDENT_API_KEY` and `OTEL_EXPORTER_OTLP_ENDPOINT` as an enviornment variable:
+
+        ```bash title="Bash"
+        export CONFIDENT_API_KEY="confident_us..."
+        export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.confident-ai.com"
+        ```
+    </Step>
+
+    <Step title="Trace your first LLM application">
+
+        <Tabs>
+
+            <Tab title="Python">
+                Install opentelemetry dependencies:
+
+                ```bash title="Bash"
+                pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
+                ```
+
+                Run the following code:
+
+                ```python
+                import os
+
+                from opentelemetry import trace
+                from opentelemetry.sdk.trace import TracerProvider
+                from opentelemetry.sdk.trace.export import BatchSpanProcessor
+                from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+                OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+                CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
+
+                # Set up the tracer provider
+                trace.set_tracer_provider(TracerProvider(
+                    active_span_processor=BatchSpanProcessor(
+                        OTLPSpanExporter(
+                            endpoint=OTLP_ENDPOINT + "/v1/traces",
+                            headers={"x-confident-api-key": CONFIDENT_API_KEY}
+                        )
+                    )
+                ))
+
+                # Create a tracer
+                tracer = trace.get_tracer(__name__)
+
+                # Start a span
+                with tracer.start_as_current_span("confident-llm-span") as span:
+                    
+                    # Set attributes
+                    span.set_attribute("confident.trace.name", "example-trace")
+                    span.set_attribute("confident.span.type", "llm")
+                    span.set_attribute("confident.llm.model", "gpt-4o")
+                    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+                    span.set_attribute("confident.llm.attributes.output", "Paris")
+                ```
+            </Tab>
+
+            <Tab title="JavaScript">
+                Install Node.js dependencies
+
+                ```bash
+                npm init -y
+                npm install @opentelemetry/api @opentelemetry/sdk-trace-node @opentelemetry/sdk-trace-base @opentelemetry/exporter-trace-otlp-proto dotenv
+                ```
+
+                Install TypeScript and ts-node
+
+                ```bash
+                npm install -D typescript ts-node @types/node
+                ```
+
+                Create `index.ts` file. This file contains the code for creating an LLM span.
+
+                ```typescript title="index.ts"
+                import * as opentelemetry from '@opentelemetry/api';
+                import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+                import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+                import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+
+                // Environment variables (similar to Python's os.getenv)
+                const OTLP_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+                const CONFIDENT_API_KEY = process.env.CONFIDENT_API_KEY;
+
+                // Add validation for required environment variables
+                if (!OTLP_ENDPOINT) {
+                    throw new Error('OTEL_EXPORTER_OTLP_ENDPOINT environment variable is required');
+                }
+
+                // Create OTLP exporter with HTTPS support
+                const otlpExporter = new OTLPTraceExporter({
+                    url: `${OTLP_ENDPOINT}/v1/traces`,
+                    headers: {
+                        'x-confident-api-key': CONFIDENT_API_KEY || ''
+                    },
+                });
+
+                // Set up the tracer provider with the batch span processor
+                const provider = new NodeTracerProvider({
+                    spanProcessors: [new BatchSpanProcessor(otlpExporter)]
+                });
+
+                // Register the provider globally
+                opentelemetry.trace.setGlobalTracerProvider(provider);
+
+                // Create a tracer
+                const tracer = opentelemetry.trace.getTracer('confident-llm-tracer');
+
+                async function main() {
+                    // Start a span
+                    tracer.startActiveSpan('confident-llm-span-typescript', (span) => {
+                        // Set attributes
+                        span.setAttributes({
+                            'confident.trace.name': 'example-trace',
+                            'confident.span.type': 'llm',
+                            'confident.llm.model': 'gpt-4o',
+                            'confident.llm.attributes.input': 'What is the capital of France?',
+                            'confident.llm.attributes.output': 'Paris'
+                        });
+
+                        // Simulate some work here
+                        console.log('Processing LLM request...');
+
+                        // End the span
+                        span.end();
+                    });
+
+                    // Shut down the provider to ensure traces are flushed before the script exits
+                    await provider.shutdown();
+                    console.log('Traces flushed successfully.');
+                }
+
+                main().catch((error) => {
+                    console.error('Error sending traces:', error);
+                    process.exit(1);
+                });
+                ```
+
+                Create a basic `tsconfig.json` file:
+
+                ```json title="tsconfig.json"
+                {
+                    "compilerOptions": {
+                        "target": "ES2020",
+                        "module": "commonjs",
+                        "esModuleInterop": true,
+                        "skipLibCheck": true,
+                        "forceConsistentCasingInFileNames": true,
+                        "outDir": "./dist"
+                    }
+                }
+                ```
+
+                Run the code:
+
+                ```bash
+                npx ts-node index.ts
+                ```
+            </Tab>
+
+            <Tab title="Go">
+                Install Go (version 1.19 or later recommended):
+
+                Set up environment variables:
+
+                ```bash
+                export OTLP_ENDPOINT="otel.confident-ai.com"
+                export CONFIDENT_API_KEY="<your-confident-api-key>"
+                export OPENAI_API_KEY="<your-openai-api-key>"
+                ```
+
+                Initialize Go Module:
+
+                ```bash
+                go mod init go-example
+                ```
+
+                Create `setup.go` file. This file contains the code for initializing the OpenTelemetry tracer with the exporter which will be sending traces to the Confident AI OTEL server.
+
+                ```go title="setup.go"
+                package main
+                
+                import (
+                    "context"
+                    "log"
+                
+                    "go.opentelemetry.io/otel"
+                    "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+                    sdktrace "go.opentelemetry.io/otel/sdk/trace"
+                    "go.opentelemetry.io/otel/propagation"
+                )
+                
+                func InitTracer(endpoint string, confidentApiKey string) func(context.Context) error {
+                    
+                    // prepare exporter with api key and endpoint
+                    headers := map[string]string{"x-confident-api-key": confidentApiKey}
+                    exporter, err := otlptracehttp.New(
+                        context.Background(),
+                        otlptracehttp.WithEndpoint(endpoint),
+                        otlptracehttp.WithHeaders(headers), 
+                    )
+                    if err != nil {
+                        log.Fatalf("failed to create OTLP exporter: %v", err)
+                    }
+                
+                    // Check if there's an existing trace provider
+                    existingTp := otel.GetTracerProvider()
+                    if sdkTp, ok := existingTp.(*sdktrace.TracerProvider); ok {
+                        
+                        // Add the new exporter to the existing trace provider
+                        sdkTp.RegisterSpanProcessor(sdktrace.NewBatchSpanProcessor(exporter))
+                        log.Println("Added exporter to existing trace provider")
+                        return func(context.Context) error { return nil } // No shutdown needed
+                    }
+                
+                    // If no existing trace provider, create a new one
+                    tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exporter))
+                    otel.SetTracerProvider(tp)
+                    otel.SetTextMapPropagator(propagation.TraceContext{})
+                
+                    return tp.Shutdown
+                }
+                ```
+
+                Create `main.go` file. This file contains the code for creating an LLM span.
+
+                ```go title="main.go"
+                package main
+                
+                import (
+                    "context"
+                    "fmt"
+                    "log"
+                    "os"
+                
+                    "github.com/openai/openai-go"
+                    "github.com/openai/openai-go/option"
+                    "go.opentelemetry.io/otel"
+                    "go.opentelemetry.io/otel/attribute"
+                )
+                
+                func main() {
+                    endpoint := os.Getenv("OTLP_ENDPOINT")
+                    confidentApiKey := os.Getenv("CONFIDENT_API_KEY")
+                    apiKey := os.Getenv("OPENAI_API_KEY")
+                
+                    // Initialize OTel tracer
+                    shutdown := InitTracer(endpoint, confidentApiKey)
+                    defer func() { _ = shutdown(context.Background()) }()
+                
+                    // Initialize OpenAI client with default HTTP client
+                    client := openai.NewClient(option.WithAPIKey(apiKey))
+                
+                    // Start a root span for this operation
+                    ctx, span := otel.Tracer("example.com/otel-openai").Start(context.Background(), "chat gpt-4o")
+                    defer span.End()
+                
+                    // Build chat completion request
+                    params := openai.ChatCompletionNewParams{
+                        Model: openai.ChatModelGPT4o,
+                        Messages: []openai.ChatCompletionMessageParamUnion{
+                            openai.UserMessage("Hello, how are you today?"),
+                        },
+                    }
+                
+                    // Invoke OpenAI API
+                    resp, err := client.Chat.Completions.New(ctx, params)
+                    if err != nil {
+                        log.Fatalf("Chat completion error: %v", err)
+                    }
+                
+                    // Record response and end span
+                    span.SetAttributes(
+                        attribute.String("confident.span.type", "llm"),
+                        attribute.String("confident.llm.model", "gpt-4o"),
+                        attribute.String("confident.llm.attributes.input", "Hello, how are you today?"),
+                        attribute.String("confident.llm.attributes.output", resp.Choices[0].Message.Content),
+                    )
+                    fmt.Println("Assistant:", resp.Choices[0].Message.Content)
+                }
+                ```
+
+                Install dependencies:
+
+                ```bash
+                go mod tidy
+                ```
+
+                Run the code:
+
+                ```bash
+                go run .
+                ```
+            </Tab>
+
+        </Tabs>
+
+    </Step>
+
+</Steps>
+
+
+
+
