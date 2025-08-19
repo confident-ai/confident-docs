@@ -102,14 +102,13 @@ You can also set custom trace attributes in your `CallbackHandler` for each invo
 ```python main.py
 ...
 
-callback_handler = CallbackHandler(
+llm_with_tools.invoke(input=input, config={"callbacks": [CallbackHandler(
     name="Name of Trace",
     tags=["Tag 1", "Tag 2"],
     metadata={"Key": "Value"},
     thread_id="your-thread-id",
     user_id="your-user-id",
-)
-llm_with_tools.invoke(input=input, config={"callbacks": [callback_handler]})
+)]})
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -173,10 +172,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Provide your metric collection name to `CallbackHandler`.
 
-```python main.py {7}
-from deepeval.integrations.langchain import CallbackHandler
+```python main.py {4}
 
-# Invoke your agent with the metric collection name
 llm_with_tools.invoke(
     "What is 3 * 12?",
     config = {"callbacks": [

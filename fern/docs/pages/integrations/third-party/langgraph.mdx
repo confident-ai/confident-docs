@@ -104,14 +104,13 @@ You can also set custom trace attributes in your `CallbackHandler` for each agen
 ```python main.py
 ...
 
-callback_handler = CallbackHandler(
+agent.invoke(input=input, config={"callbacks": [CallbackHandler(
     name="Name of Trace",
     tags=["Tag 1", "Tag 2"],
     metadata={"Key": "Value"},
     thread_id="your-thread-id",
     user_id="your-user-id",
-)
-agent.invoke(input=input, config={"callbacks": [callback_handler]})
+)]})
 ```
 
 <Accordion title='View Trace Attributes'>
