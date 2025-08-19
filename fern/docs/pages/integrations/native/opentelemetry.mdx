@@ -544,7 +544,6 @@ The trace name is displayed in the UI. You can customize it based on your liking
 <CodeBlocks>
 ```python
 with tracer.start_as_current_span("custom_span") as span:
-    # your code
     span.set_attribute("confident.trace.name", "test_trace")
 ```
 
@@ -583,7 +582,6 @@ You can set [trace input and output](/docs/llm-tracing/tracing-features/input-ou
 
 ```python
 with tracer.start_as_current_span("custom_span") as span:
-    # your code
     span.set_attribute("confident.trace.input", input)
     span.set_attribute("confident.trace.output", output)
 ```
@@ -627,7 +625,7 @@ Given below is the example of running [online evaluation](https://documentation.
 ```python
 with tracer.start_as_current_span("confident_evaluation") as span:
     input = "What is the capital of France?"
-    output = my_llm_app(input) # your LLM application
+    output = my_llm_app(input)
     
     span.set_attribute('confident.trace.metric_collection', "<your_metric_collection>")
     span.set_attribute('confident.trace.llm_test_case.input', input)
@@ -748,6 +746,43 @@ span.setAttributes({
 
 ```csharp
 span.set_attribute('confident.trace.metadata', '{"key": "value"}');
+```
+
+</CodeBlocks>
+
+### Thread id
+
+A [thread](/docs/llm-tracing/tracing-features/threads) on Confident AI is a collection of one or more traces, letting you view full conversations — perfect for chat apps, agents, or any multi-turn interactions.
+
+- `"confident.trace.thread_id"` (of type `str`) used for updating trace **thread id**
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.thread_id", "123")
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.thread_id": "123",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.thread_id", "123"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.thread_id": "123",
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.thread_id", "123");
 ```
 
 </CodeBlocks>
