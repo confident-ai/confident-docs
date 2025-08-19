@@ -467,6 +467,62 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Trace"
+            examples:
+              Base-Span:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
+              LLM-Span:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                llmSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "OpenAI Call"
+                    model: "gpt-4o"
+                    input: "What is the capital of France?"
+                    output: "The capital of France is Paris."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
+              Thread-Id:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                threadId: "<THREAD-ID>"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
+              User-Id:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                userId: "<USER-ID>"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
       responses:
         "200":
           description: ""
@@ -474,12 +530,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateTraceResponse"
-              example:
-                success: true
-                data:
-                  id: "TRACE-ID"
-                link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
-                deprecated: false
+              examples:
+                Base-Span:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
+                LLM-Span:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
+                Thread-Id:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
+                User-Id:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
 
   /v1/traces/{uuid}:
     put:
@@ -496,6 +571,14 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateTrace"
+            examples:
+              example1:
+                output: "The capital of France is Rome"
+                endTime: "2025-01-16T10:30:05Z"
+                metadata:
+                  ip_address: "127.0.0.1"
+                tags: 
+                  - "General QA"
 
       responses:
         "200":
@@ -504,11 +587,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateTraceResponse"
-              example:
-                success: true
-                data:
-                  id: "TRACE-ID"
-                deprecated: false
+              examples:
+                example1:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  deprecated: false
 
   /v1/prompts:
     get:
