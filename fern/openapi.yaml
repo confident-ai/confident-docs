@@ -323,9 +323,10 @@ paths:
         - Evaluation
       summary: Simulate Conversation
       operationId: simulateConversation
-      description: Simulate conversations for your `goldens` along with existing turns.
+      description: Simulate the next conversation turn from a conversational golden.
       requestBody:
         required: true
+        description: ""
         content:
           application/json:
             schema:
@@ -335,12 +336,9 @@ paths:
                 golden:
                   scenario: "A frustrated user asking for a refund."
                   userDescription: "A white male who is a customer for over 2 years."
-                existingTurns:
-                  - role: "assistant"
-                    content: "Hey, how can I help you today?"
       responses:
         "200":
-          description: Successful Simulation
+          description: ""
           content:
             application/json:
               schema:
@@ -357,6 +355,7 @@ paths:
                         content: "Hey, how can I help you today?"
                       - role: "user"
                         content: "I'd like my refund please."
+                  deprecated: false
 
   /v1/evaluate/spans/{uuid}:
     post:
@@ -1122,6 +1121,45 @@ components:
       required:
         - scenario
 
+    SimulationConversationalGolden:
+      type: object
+      properties:
+        scenario:
+          type: string
+          description: "This is a description of the conversation context."
+        userDescription:
+          type: string
+          description: "This is the description of the user in the conversation."
+        expectedOutcome:
+          type: string
+          description: "This describes the expected outcome, or ideal conversation flow, of the conversation."
+        turns:
+          type: array
+          items:
+            $ref: "#/components/schemas/Turn"
+          description: "This is the list of turns in the conversation."
+        context:
+          type: array
+          items:
+            type: string
+          description: "This is the context of the conversation."
+        additionalMetadata:
+          type: object
+          additionalProperties: true
+          description: "This is any additional metadata you wish to associate with the golden."
+        comments:
+          type: string
+          description: "This is any comments you wish to associate with the golden."
+        name:
+          type: string
+          description: "This is the name of the golden."
+        customColumnKeyValues:
+          type: object
+          additionalProperties: true
+          description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
+      required:
+        - scenario
+
     Turn:
       type: object
       properties:
@@ -1349,40 +1387,40 @@ components:
       type: object
       properties:
         golden:
-          type: object
-          properties:
-            scenario:
-              type: string
-            userDescription:
-              type: string
-          required:
-            - scenario
-        existingTurns:
-          type: array
-          items:
-            $ref: "#/components/schemas/Turn"
+          $ref: "#/components/schemas/ConversationalGolden"
       required:
         - golden
-        - existingTurns
 
     SimulateResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the next turn in the conversation was successfully simulated."
         data:
           type: object
           properties:
             simulationId:
               type: string
+              description: "This is the unique ID for the simulation."
             completed:
               type: boolean
+              description: "This is true if the conversation is complete, which means the expected outcome has been reached."
             userResponse:
               type: string
+              description: "This is the simulated user response of the last turn in the conversation."
             turns:
               type: array
               items:
                 $ref: "#/components/schemas/Turn"
+              description: "This is the list of all the turns in the conversation."
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
 
     BaseSpan:
       type: object
