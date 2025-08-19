@@ -313,6 +313,67 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 ```
             </Tab>
 
+            <Tab title="Ruby">
+            Create `Gemfile` file. This file contains the dependencies for the Ruby application.
+
+            ```ruby title="Gemfile"
+            source 'https://rubygems.org'
+
+            gem 'opentelemetry-sdk'
+            gem 'opentelemetry-exporter-otlp'
+            ```
+
+            Install dependencies:
+
+            ```bash
+            bundle install
+            ```
+
+            Create `example.rb` file. This file contains the code for creating an LLM span.
+
+            ```ruby title="example.rb"
+            require 'opentelemetry/sdk'
+            require 'opentelemetry/exporter/otlp'
+
+            # Ensure OTLP endpoint and API key are set
+            OTLP_ENDPOINT    = ENV.fetch('OTEL_EXPORTER_OTLP_ENDPOINT') { abort 'Set OTEL_EXPORTER_OTLP_ENDPOINT' }
+            CONFIDENT_API_KEY = ENV.fetch('CONFIDENT_API_KEY')       { abort 'Set CONFIDENT_API_KEY' }
+
+            OpenTelemetry::SDK.configure do |c|
+            c.add_span_processor(
+                OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(
+                OpenTelemetry::Exporter::OTLP::Exporter.new(
+                    endpoint: "#{OTLP_ENDPOINT}/v1/traces",
+                    headers:  { 'x-confident-api-key' => CONFIDENT_API_KEY },
+                )
+                )
+            )
+            end
+
+            tracer = OpenTelemetry.tracer_provider.tracer(__FILE__)
+
+            tracer.in_span('confident-llm-span-ruby') do |span|
+            span.set_attribute('confident.trace.name', 'example-trace')
+            span.set_attribute('confident.span.type', 'llm')
+            span.set_attribute('confident.llm.model', 'gpt-4o')
+            span.set_attribute('confident.llm.attributes.input', 'What is the capital of France?')
+            span.set_attribute('confident.llm.attributes.output', 'Paris')
+
+            puts 'Span created successfully!'
+            end
+
+            # Flush and allow time for HTTP export
+            OpenTelemetry.tracer_provider.shutdown
+            sleep 2
+            ```
+
+            Run the code:
+
+            ```bash
+            ruby example.rb
+            ```
+            </Tab>
+            
         </Tabs>
 
     </Step>
