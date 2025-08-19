@@ -786,3 +786,40 @@ span.SetAttribute("confident.trace.thread_id", "123");
 ```
 
 </CodeBlocks>
+
+### User Id
+
+Track user interactions by setting [user id](/docs/llm-tracing/tracing-features/users) in a trace — useful for monitoring token usage, identifying top users, and managing costs.
+
+- `"confident.trace.user_id"` (of type `str`) used for updating trace user id
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.user_id", "123")
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.user_id": "123",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.user_id", "123"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.user_id": "123",
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.user_id", "123");
+```
+
+</CodeBlocks>
