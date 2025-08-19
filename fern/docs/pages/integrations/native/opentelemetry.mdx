@@ -1306,3 +1306,70 @@ span.SetAttribute("confident.tool.attributes.output", `{"output": "output"}`);
 ```
 
 </CodeBlocks>
+
+#### **Retriever**
+
+To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/tracing-features/span-types#retriever-span).
+
+- `"confident.retriever.embedder"` (of type `str`) used for updating Retrieval span embedder model
+- `"confident.retriever.attributes.embedding_input"` (of type `str`) used for updating Retrieval span embedding input
+- `"confident.retriever.attributes.retrieval_context"` (of type `list[str]`) used for updating Retrieval span retrieval context
+- [Optional] `"confident.retriever.attributes.top_k"` (of type `int`) used for updating Retrieval span top k
+- [Optional] `"confident.retriever.attributes.chunk_size"` (of type `int`) used for updating Retrieval span chunk size
+
+Given below is the sample code for setting attributes for Retriever span type.
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("retriever_span") as span:
+    span.set_attribute("confident.span.type", "retriever")
+    span.set_attribute("confident.retriever.embedder", "embedder")
+
+    span.set_attribute("confident.retriever.attributes.embedding_input", input)
+    span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
+    span.set_attribute("confident.retriever.attributes.top_k", 10)
+    span.set_attribute("confident.retriever.attributes.chunk_size", 10)
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.type": "retriever",
+    "confident.retriever.embedder": "embedder",
+    "confident.retriever.attributes.embedding_input": input,
+    "confident.retriever.attributes.retrieval_context": ["asd", "asd"],
+    "confident.retriever.attributes.top_k": 10,
+    "confident.retriever.attributes.chunk_size": 10,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.retriever.embedder", "embedder"),
+    attribute.String("confident.retriever.attributes.embedding_input", input),
+    attribute.StringSlice("confident.retriever.attributes.retrieval_context", []string{"asd", "asd"}),
+    attribute.Int("confident.retriever.attributes.top_k", 10),
+    attribute.Int("confident.retriever.attributes.chunk_size", 10),
+    attribute.String("confident.span.type", "retriever"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.type": "retriever",
+    "confident.retriever.embedder": "embedder",
+    "confident.retriever.attributes.embedding_input": input,
+    "confident.retriever.attributes.retrieval_context": new string[] { "asd", "asd" },
+    "confident.retriever.attributes.top_k": 10,
+    "confident.retriever.attributes.chunk_size": 10,
+});
+```
+
+```csharp
+span.SetAttribute("confident.retriever.embedder", "embedder");
+span.SetAttribute("confident.retriever.attributes.embedding_input", input);
+span.SetAttribute("confident.retriever.attributes.retrieval_context", new string[] { "asd", "asd" });
+span.SetAttribute("confident.retriever.attributes.top_k", 10);
+span.SetAttribute("confident.retriever.attributes.chunk_size", 10);
+```
+</CodeBlocks>
