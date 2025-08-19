@@ -299,18 +299,22 @@ paths:
                   success: true
                   data:
                     id: "TEST-RUN-ID"
+                  deprecated: false
                 Multi-Turn:
                   success: true
                   data:
                     id: "TEST-RUN-ID"
+                  deprecated: false
                 Logging Parameters:
                   success: true
                   data:
                     id: "TEST-RUN-ID"
+                  deprecated: false
                 Logging Identifier:
                   success: true
                   data:
                     id: "TEST-RUN-ID"
+                  deprecated: false
 
   /v1/simulate:
     post:
@@ -470,6 +474,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateTraceResponse"
+              example:
+                success: true
+                data:
+                  id: "TRACE-ID"
+                link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                deprecated: false
 
   /v1/traces/{uuid}:
     put:
@@ -494,6 +504,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateTraceResponse"
+              example:
+                success: true
+                data:
+                  id: "TRACE-ID"
+                deprecated: false
 
   /v1/prompts:
     get:
@@ -505,7 +520,7 @@ paths:
       description: Retrieves a prompt with `promptVersionId` and `interpolationType` from your Confident AI account.
       responses:
         "200":
-          description: Successfully retrieved prompt version
+          description: ""
           content:
             application/json:
               schema:
@@ -518,6 +533,7 @@ paths:
                     text: "Hello, {{name}}!"
                     type: "TEXT"
                     interpolationType: "FSTRING"
+                  deprecated: false
                 List-Prompt:
                   success: true
                   data:
@@ -527,16 +543,17 @@ paths:
                         content: "What is the weather like in {{city}}?"
                     type: "LIST"
                     interpolationType: "FSTRING"
-
+                  deprecated: false
     post:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
       summary: Push Prompts
       operationId: pushPrompt
-      description: Creates a new prompt on your Confident AI account.
+      description: Creates a new prompt on your Confident AI project.
       requestBody:
         required: true
+        description: ""
         content:
           application/json:
             schema:
@@ -554,7 +571,7 @@ paths:
                 interpolationType: "FSTRING"
       responses:
         "200":
-          description: Successfully created or updated a prompt
+          description: ""
           content:
             application/json:
               schema:
@@ -564,12 +581,14 @@ paths:
                   success: true
                   data:
                     id: "prm_xyz456"
-                  redirectUrl: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                  deprecated: false
                 List-Prompt:
                   success: true
                   data:
                     id: "prm_xyz456"
-                  redirectUrl: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                  deprecated: false
 
 components:
   schemas:
@@ -1877,16 +1896,20 @@ components:
       properties:
         alias:
           type: string
+          description: The unique alias of the prompt.
         text:
           type: string
+          description: The text content of the prompt. Supply this only if you are creating a text-based prompt.
         messages:
           type: array
           items:
             $ref: "#/components/schemas/PromptMessage"
+          description: The list of messages that make up the prompt. Supply this only if you are creating a list-based prompt.
         interpolationType:
           type: string
           enum: [FSTRING, HANDLEBARS]
           default: FSTRING
+          description: The type of interpolation format used in the prompt to insert dynamic variables, which can be either f-string or handlebars.
       required:
         - alias
 
@@ -1895,8 +1918,10 @@ components:
       properties:
         role:
           type: string
+          description: The role of the message, which can be user, assistant, system, or developer.
         content:
           type: string
+          description: The text content of the message.
       required:
         - role
         - content
@@ -1906,46 +1931,64 @@ components:
       properties:
         success:
           type: boolean
+          description: This is true if the prompt was successfully retrieved.
         data:
           type: object
           properties:
             promptVersionId:
+              description: This is the id of the prompt version generated by Confident AI, not to be confused with the alias you supplied or version number.
               type: string
             text:
+              description: This is the text content of the prompt, which is null if the prompt is a list prompt.
               type: string
             messages:
+              description: This is the list of messages associated with the prompt, which is null if the prompt is a text prompt.
               type: array
               items:
                 $ref: "#/components/schemas/PromptMessage"
             type:
+              description: This is the type of the prompt, which can be either simple text or a list of messages.
               type: string
               enum: [TEXT, LIST]
             interpolationType:
+              description: This is the type of interpolation format used in the prompt to insert dynamic variables, which can be either f-string or handlebars.
               type: string
               enum: [FSTRING, HANDLEBARS]
           required:
             - promptVersionId
             - type
             - interpolationType
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
         - data
+        - deprecated
 
     CreatePromptResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: This is true if the prompt was successfully created.
         data:
           type: object
+          description: This maps to the prompt version id.
           properties:
             id:
               type: string
+              description: This is the id of the prompt version generated by Confident AI, not to be confused with the alias you supplied or version number.
           required:
             - id
-        redirectUrl:
+        link:
           type: string
+          description: This is the URL to redirect to after the prompt is created.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
       required:
         - success
         - data
-        - redirectUrl
+        - link
+        - deprecated
