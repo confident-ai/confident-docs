@@ -1044,3 +1044,48 @@ span.SetAttribute("confident.span.metadata", "{\"key\": \"value\"}");
 ```
 
 </CodeBlocks>
+
+### Type specific attributes
+
+[Span types](/docs/llm-tracing/tracing-features/span-types) are optional but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
+
+- `llm`
+- `agent`
+- `retriever`
+- `tool`
+
+You can set the span type using the following attribute:
+
+- `"confident.span.type"` (of type `str`) used for updating span type
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.span.type", "llm")
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.type": "llm",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.span.type", "llm"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.type": "llm",
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.type", "llm");
+```
+
+</CodeBlocks>
+
