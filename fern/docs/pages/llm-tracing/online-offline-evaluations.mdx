@@ -65,7 +65,7 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
     </CodeBlock>
     </Tab>
 
-    <Tab title="Js/TypeScript" language="typescript">
+    <Tab title="TypeScript" language="typescript">
     <CodeBlock>
     ```typescript title="index.ts" {1,5,13}
     import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
@@ -113,7 +113,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 <Tabs>
     <Tab title="Python" language="python">
     <CodeBlock>
-    ```python title="main.py" {7, 16}
+    ```python title="main.py" {2,7,16}
     from deepeval.test_case import LLMTestCase
     from deepeval.tracing import observe, update_current_trace
     from openai import OpenAI
@@ -137,7 +137,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
     </CodeBlock>
     </Tab>
 
-    <Tab title="Js/TypeScript" language="typescript">
+    <Tab title="TypeScript" language="typescript">
     <CodeBlock>
     ```typescript title="index.ts" {5,13}
     import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
@@ -174,7 +174,7 @@ All threads are offline evaluations because you should only run evals on threads
 Since it is impossible for Confident AI to automatically know whether a multi-turn conversation has completed or not, you'll have to trigger an offline evaluation using the `evaluate_thread()` method **ONLY AFTER** once you're certain a conversation has completed:
 
 <CodeBlock>
-```python title="main.py" {16, 24}
+```python title="main.py" {2,15,22}
 from openai import OpenAI
 from deepeval.tracing import observe, update_current_trace, evaluate_thread
 
@@ -183,22 +183,20 @@ your_thread_id = "your-thread-id"
 
 @observe()
 def llm_app(query: str):
-res = client.chat.completions.create(
-model="gpt-4o",
-messages=[
-{"role": "user", "content": query}
-]
-).choices[0].message.content
-
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
     update_current_trace(thread_id=your_thread_id, input=query, output=res)
     return res
 
-if **name** == "**main**":
-user_query = input("💬 Enter your prompt: ")
-response = llm_app(user_query, true)
-print(f"\n🤖 Response:\n{response}")
-
-evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
+if __name__ == "__main__":
+    user_query = input("💬 Enter your prompt: ")
+    response = llm_app(user_query, true)
+    print(f"\n🤖 Response:\n{response}")
+    evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
 </CodeBlock>
 
@@ -227,12 +225,12 @@ from deepeval.test_case import ToolCall
 from deepeval.tracing import TurnContext
 
 update_current_trace(
-thread_id=your_thread_id,
-output=res,
-turnContext=TurnContext(
-retrieval_context=["..."], # optional list of strings
-tools_called=[ToolCall(...)] # optional list of tools called
-)
+    thread_id=your_thread_id,
+    output=res,
+    turnContext=TurnContext(
+        retrieval_context=["..."], # optional list of strings
+        tools_called=[ToolCall(...)] # optional list of tools called
+    )
 )
 
 ```
@@ -320,10 +318,9 @@ your_thread_id = "your-thread-id"
 
 @observe(metric_collection="Collection 1")
 def outer_function():
-update_current_trace(thread_id=your_thread_id, test_case=...)
+    update_current_trace(thread_id=your_thread_id, test_case=...)
 
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
-
 ```
 </CodeBlock>
 

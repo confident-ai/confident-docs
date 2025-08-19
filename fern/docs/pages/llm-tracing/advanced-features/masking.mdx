@@ -16,7 +16,7 @@ Masking allows you to automatically redact or transform sensitive data in your t
 To implement masking, you need to define a masking function and configure the trace manager to use it.
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {10}
             import re
@@ -38,27 +38,27 @@ To implement masking, you need to define a masking function and configure the tr
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {10}
             import { observe, traceManager } from '@deepeval-ts/tracing';
 
             const maskingFunction = (data: any): any => {
-            if (typeof data === 'string') {
-                return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
-            }
-            return data;
+                if (typeof data === 'string') {
+                    return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
+                }
+                return data;
             };
 
             traceManager.configure({ mask: maskingFunction });
 
             const agent = (query: string): string => {
-            return "4242-4242-4242-4242";
+                return "4242-4242-4242-4242";
             };
 
             const observedAgent = observe({
-            type: "agent",
-            fn: agent
+                type: "agent",
+                fn: agent
             });
 
             observedAgent("Test Masking");
@@ -82,7 +82,7 @@ Since the masking function is applied to an observed function's inputs, outputs,
 ### Credit card number
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py"
             import re
@@ -104,21 +104,21 @@ Since the masking function is applied to an observed function's inputs, outputs,
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts"
             function maskCreditCard(data: any): any {
-            if (typeof data === 'string') {
-                return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
-            } else if (Array.isArray(data)) {
-                return data.map(item => maskCreditCard(item));
-            } else if (data !== null && typeof data === 'object') {
-                return Object.fromEntries(
-                Object.entries(data).map(([k, v]) => [k, maskCreditCard(v)])
-                );
-            } else {
-                return data;
-            }
+                if (typeof data === 'string') {
+                    return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
+                } else if (Array.isArray(data)) {
+                    return data.map(item => maskCreditCard(item));
+                } else if (data !== null && typeof data === 'object') {
+                    return Object.fromEntries(
+                        Object.entries(data).map(([k, v]) => [k, maskCreditCard(v)])
+                    );
+                } else {
+                    return data;
+                }
             }
             
             console.log(maskCreditCard("My card number is 4111 1111 1111 1234."));
@@ -131,7 +131,7 @@ Since the masking function is applied to an observed function's inputs, outputs,
 ### Email address
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py"
             import re
@@ -152,21 +152,21 @@ Since the masking function is applied to an observed function's inputs, outputs,
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts"
             function maskEmail(data: any): any {
-            if (typeof data === 'string') {
-                return data.replace(/\b([\w.%+-])[^\s@]*(@[\w.-]+\.\w+)/g, '$1*****$2');
-            } else if (Array.isArray(data)) {
-                return data.map(item => maskEmail(item));
-            } else if (data !== null && typeof data === 'object') {
-                return Object.fromEntries(
-                Object.entries(data).map(([k, v]) => [k, maskEmail(v)])
-                );
-            } else {
-                return data;
-            }
+                if (typeof data === 'string') {
+                    return data.replace(/\b([\w.%+-])[^\s@]*(@[\w.-]+\.\w+)/g, '$1*****$2');
+                } else if (Array.isArray(data)) {
+                    return data.map(item => maskEmail(item));
+                } else if (data !== null && typeof data === 'object') {
+                    return Object.fromEntries(
+                        Object.entries(data).map(([k, v]) => [k, maskEmail(v)])
+                    );
+                } else {
+                    return data;
+                }
             }
             
             console.log(maskEmail("Contact me at johndoe@example.com."));
@@ -179,7 +179,7 @@ Since the masking function is applied to an observed function's inputs, outputs,
 ### Bank account number
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py"
             import re
@@ -205,23 +205,23 @@ Since the masking function is applied to an observed function's inputs, outputs,
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts"
             function maskBankAccount(data: any): any {
-            if (typeof data === 'string') {
-                return data.replace(/\b\d{6,}(?!\d)/g, match => {
-                return '*'.repeat(match.length - 4) + match.slice(-4);
-                });
-            } else if (Array.isArray(data)) {
-                return data.map(item => maskBankAccount(item));
-            } else if (data !== null && typeof data === 'object') {
-                return Object.fromEntries(
-                Object.entries(data).map(([k, v]) => [k, maskBankAccount(v)])
-                );
-            } else {
-                return data;
-            }
+                if (typeof data === 'string') {
+                    return data.replace(/\b\d{6,}(?!\d)/g, match => {
+                        return '*'.repeat(match.length - 4) + match.slice(-4);
+                    });
+                } else if (Array.isArray(data)) {
+                    return data.map(item => maskBankAccount(item));
+                } else if (data !== null && typeof data === 'object') {
+                    return Object.fromEntries(
+                        Object.entries(data).map(([k, v]) => [k, maskBankAccount(v)])
+                    );
+                } else {
+                    return data;
+                }
             }
             
             console.log(maskBankAccount("My account is 9876543210."));
@@ -234,7 +234,7 @@ Since the masking function is applied to an observed function's inputs, outputs,
 ### Passport number
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py"
             import re
@@ -254,21 +254,21 @@ Since the masking function is applied to an observed function's inputs, outputs,
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts"
             function maskPassportNumber(data: any): any {
-            if (typeof data === 'string') {
-                return data.replace(/\b([A-Z])([A-Z0-9]{6,8})([A-Z0-9])\b/g, '$1*******$3');
-            } else if (Array.isArray(data)) {
-                return data.map(item => maskPassportNumber(item));
-            } else if (data !== null && typeof data === 'object') {
-                return Object.fromEntries(
-                Object.entries(data).map(([k, v]) => [k, maskPassportNumber(v)])
-                );
-            } else {
-                return data;
-            }
+                if (typeof data === 'string') {
+                    return data.replace(/\b([A-Z])([A-Z0-9]{6,8})([A-Z0-9])\b/g, '$1*******$3');
+                } else if (Array.isArray(data)) {
+                    return data.map(item => maskPassportNumber(item));
+                } else if (data !== null && typeof data === 'object') {
+                    return Object.fromEntries(
+                        Object.entries(data).map(([k, v]) => [k, maskPassportNumber(v)])
+                    );
+                } else {
+                    return data;
+                }
             }
             
             console.log(maskPassportNumber("Passport: A12345678."));

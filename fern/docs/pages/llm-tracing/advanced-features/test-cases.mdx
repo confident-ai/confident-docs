@@ -33,7 +33,7 @@ The **input** and **output** accept `Any` type for visualization purposes, but w
 You can set span-level test case parameters in the `update_current_span` function:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {6}
             from deepeval.tracing import observe, update_current_span
@@ -52,19 +52,19 @@ You can set span-level test case parameters in the `update_current_span` functio
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
-            ```js title="index.ts" {5}
+            ```js title="index.ts"
             import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
             import { ToolCall } from "@deepeval-ts/test-case";
 
             const toolCallingAgent = (query: string) => {
-            updateCurrentSpan({
-                input: query,
-                output: "Agent response",
-                toolsCalled: [new ToolCall({ name: "web_search", inputParameters: { query: query } })],
-            });
-            return "Agent response";
+                updateCurrentSpan({
+                    input: query,
+                    output: "Agent response",
+                    toolsCalled: [new ToolCall({ name: "web_search", inputParameters: { query: query } })],
+                });
+                return "Agent response";
             };
 
             const observedToolCallingAgent = observe({ fn: toolCallingAgent });
@@ -85,7 +85,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
 </Info>
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {6}
             from openai import OpenAI
@@ -113,9 +113,9 @@ You can set trace-level test case parameters in the `update_current_trace` funct
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
-            ```js title="index.ts" {5}
+            ```js title="index.ts"
             import OpenAI from "openai";
             import { observe, updateCurrentTrace } from "@deepeval-ts/tracing";
 
@@ -123,21 +123,21 @@ You can set trace-level test case parameters in the `update_current_trace` funct
 
             const observedRetriever = observe({
                 fn: (query: string) => {
-                const retrieved_chunks = ["chunk1", "chunk2"];
-                updateCurrentTrace({ retrievalContext: retrieved_chunks });
+                    const retrieved_chunks = ["chunk1", "chunk2"];
+                    updateCurrentTrace({ retrievalContext: retrieved_chunks });
                 return retrieved_chunks.join("\n");
                 },
             });
 
             const observedLLMApp = observe({
                 fn: async (query: string) => {
-                const retrieval_context = observedRetriever(query);
-                const res = await client.chat.completions.create({
-                    model: "gpt-4o",
-                    messages: [ { role: "user", content: query + retrieval_context } ],
-                });
-                updateCurrentTrace({ input: query, output: res.choices[0].message.content });
-                return res.choices[0].message.content;
+                    const retrieval_context = observedRetriever(query);
+                    const res = await client.chat.completions.create({
+                        model: "gpt-4o",
+                        messages: [ { role: "user", content: query + retrieval_context } ],
+                    });
+                    updateCurrentTrace({ input: query, output: res.choices[0].message.content });
+                    return res.choices[0].message.content;
                 },
             });
 

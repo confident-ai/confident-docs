@@ -24,29 +24,29 @@ Anything that is **NOT** one of these four default span types are **automaticall
 The most flexible `type` out of all (and the default type if `type` is not provided), custom spans are essential for creating hierarchical structures or grouping related spans together. They provide flexibility in organizing your tracing data.
 
 <Tabs>
-    <Tab title="Python">
-          ```python
-            from deepeval.tracing import observe
-            
-            @observe(name="RAG Pipeline")
-            def rag_pipeline(query: str) -> str:
-                pass
-            ```
+    <Tab title="Python" language="python">
+        ```python
+        from deepeval.tracing import observe
+        
+        @observe(name="RAG Pipeline")
+        def rag_pipeline(query: str) -> str:
+            pass
+        ```
     </Tab>
-    <Tab title="Js/TypeScript">
-         ```typescript
-            import { observe } from '@deepeval-ts/tracing';
-            
-            const ragPipeline = (query: string): string => {
+    <Tab title="TypeScript" language="typescript">
+        ```typescript
+        import { observe } from '@deepeval-ts/tracing';
+        
+        const ragPipeline = (query: string): string => {
             // Implementation
             return "";
-            };
-            
-            const observedRagPipeline = observe({
-                name: "RAG Pipeline",
-                fn: ragPipeline
-            });
-            ```
+        };
+        
+        const observedRagPipeline = observe({
+            name: "RAG Pipeline",
+            fn: ragPipeline
+        });
+        ```
     </Tab>
 </Tabs>
 
@@ -63,30 +63,30 @@ The `input` and `output`s of a custom span is defaulted to the function input ar
 An LLM span represents a call to a language model. It tracks the input, output, and token usage of the model.
 
 <Tabs>
-    <Tab title="Python">
-       ```python title="main.py"
-            from deepeval.tracing import observe
-            
-            @observe(type="llm", model="gpt-4")
-            def generate_response(prompt: str) -> str:
-                pass
-            ```
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        
+        @observe(type="llm", model="gpt-4")
+        def generate_response(prompt: str) -> str:
+            pass
+        ```
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
-            import { observe } from '@deepeval-ts/tracing';
-            
-            const generateResponse = (prompt: string): string => {
+        import { observe } from '@deepeval-ts/tracing';
+        
+        const generateResponse = (prompt: string): string => {
             // Implementation
             return "";
-            };
-            
-            const observedGenerateResponse = observe({
-                type: "llm",
-                model: "gpt-4",
-                fn: generateResponse
-            });
-            ```
+        };
+        
+        const observedGenerateResponse = observe({
+            type: "llm",
+            model: "gpt-4",
+            fn: generateResponse
+        });
+        ```
     </Tab>
 </Tabs>
 
@@ -109,31 +109,31 @@ There are **TWO** mandatory and **FOUR** optional parameters when decorating a f
 A Retriever span represents a component that fetches relevant information from a vector store or knowledge base. It's a crucial part of RAG (Retrieval-Augmented Generation) pipelines, handling the embedding and retrieval process.
 
 <Tabs>
-    <Tab title="Python">
-            ```python title="main.py"
-            from deepeval.tracing import observe
-            from typing import List
-            
-            @observe(type="retriever", embedder="text-embedding-ada-002")
-            def retrieve_documents(query: str) -> List[str]:
-                pass
-            ```
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        from typing import List
+        
+        @observe(type="retriever", embedder="text-embedding-ada-002")
+        def retrieve_documents(query: str) -> List[str]:
+            pass
+        ```
     </Tab>
-    <Tab title="Js/TypeScript">
-            ```typescript title="index.ts"
-            import { observe } from '@deepeval-ts/tracing';
-            
-            const retrieveDocuments = (query: string): string[] => {
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from '@deepeval-ts/tracing';
+        
+        const retrieveDocuments = (query: string): string[] => {
             // Implementation
             return [];
-            };
-            
-            const observedRetrieveDocuments = observe({
-                type: "retriever",
-                embedder: "text-embedding-ada-002",
-                fn: retrieveDocuments
-            });
-            ```
+        };
+        
+        const observedRetrieveDocuments = observe({
+            type: "retriever",
+            embedder: "text-embedding-ada-002",
+            fn: retrieveDocuments
+        });
+        ```
     </Tab>
 </Tabs>
 
@@ -149,29 +149,29 @@ There are **TWO** mandatory and **TWO** optional parameters when decorating a fu
 A Tool span represents a function that an agent can call to perform a specific task. It's commonly used for function calling in LLM applications.
 
 <Tabs>
-    <Tab title="Python">
-            ```python title="main.py"
-            from deepeval.tracing import observe
-            
-            @observe(type="tool")
-            def web_search(query: str) -> str:
-                pass
-            ```
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        
+        @observe(type="tool")
+        def web_search(query: str) -> str:
+            pass
+        ```
     </Tab>
-    <Tab title="Js/TypeScript">
-            ```typescript title="index.ts"
-            import { observe } from '@deepeval-ts/tracing';
-            
-            const webSearch = (query: string): string => {
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from '@deepeval-ts/tracing';
+        
+        const webSearch = (query: string): string => {
             // Implementation
             return "";
-            };
-            
-            const observedWebSearch = observe({
-                type: "tool",
-                fn: webSearch
-            });
-            ```
+        };
+        
+        const observedWebSearch = observe({
+            type: "tool",
+            fn: webSearch
+        });
+        ```
     </Tab>
 </Tabs>
 
@@ -187,35 +187,35 @@ There are **ONE** mandatory and **THREE** optional parameters when decorating a 
 An Agent span represents an autonomous entity that can make decisions and interact with other components. It's particularly useful for implementing thinking agents or multi-agent systems.
 
 <Tabs>
-    <Tab title="Python">
-            ```python title="main.py"
-            from deepeval.tracing import observe
-            
-            @observe(
-                type="agent",
-                available_tools=["search", "calculator"],
-                handoff_agents=["research_agent", "math_agent"],
-            )
-            def supervisor_agent(query: str) -> str:
-                pass
-            ```
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        
+        @observe(
+            type="agent",
+            available_tools=["search", "calculator"],
+            handoff_agents=["research_agent", "math_agent"],
+        )
+        def supervisor_agent(query: str) -> str:
+            pass
+        ```
     </Tab>
-    <Tab title="Js/TypeScript">
-            ```typescript title="index.ts"
-            import { observe } from '@deepeval-ts/tracing';
-            
-            const supervisorAgent = (query: string): string => {
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from '@deepeval-ts/tracing';
+        
+        const supervisorAgent = (query: string): string => {
             // Implementation
             return "";
-            };
-            
-            const observedSupervisorAgent = observe({
+        };
+        
+        const observedSupervisorAgent = observe({
             type: "agent",
             availableTools: ["search", "calculator"],
             handoffAgents: ["research_agent", "math_agent"],
             fn: supervisorAgent
-            });
-            ```
+        });
+        ```
     </Tab>
 </Tabs>
 

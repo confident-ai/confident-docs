@@ -13,7 +13,7 @@ Both traces and spans have inputs and outputs, which you can set dynamically wit
 You can set the `input` and `output` of a trace using the `update_current_trace` function:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {13}
             from openai import OpenAI
@@ -35,7 +35,7 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {11}
             import OpenAI from 'openai';
@@ -44,16 +44,16 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
             const openai = new OpenAI();
             
             const llmApp = async (query: string) => {
-            const res = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [{ role: "user", content: query }],
-            });
-            updateCurrentTrace({ input: query, output: res.choices[0].message.content });
-            return res.choices[0].message.content;
+                const res = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }],
+                });
+                updateCurrentTrace({ input: query, output: res.choices[0].message.content });
+                return res.choices[0].message.content;
             };
 
             const observedLlmApp = observe({
-            fn: llmApp,
+                fn: llmApp,
             });
 
             observedLlmApp("Write me a poem.");
@@ -82,7 +82,7 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
 </Note>
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {13}
             from openai import OpenAI
@@ -104,7 +104,7 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {11}
             import OpenAI from 'openai';
@@ -113,16 +113,16 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
             const openai = new OpenAI();
 
             const llmApp = async (query: string) => {
-            const res = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [{ role: "user", content: query }],
-            });
-            updateCurrentSpan({ input: query, output: res.choices[0].message.content });
-            return res.choices[0].message.content;
+                const res = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }],
+                });
+                updateCurrentSpan({ input: query, output: res.choices[0].message.content });
+                return res.choices[0].message.content;
             };
 
             const observedLlmApp = observe({
-            fn: llmApp,
+                fn: llmApp,
             });
 
             observedLlmApp("Write me a poem.");

@@ -15,7 +15,7 @@ Use `update_current_span` and `update_current_trace` to add **span-level** and *
 Each metadata argument is a dictionary whose keys are strings and whose values are any JSON-serializable type.
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {7,15}
             from deepeval.tracing import observe, update_current_span, update_current_trace
@@ -42,27 +42,27 @@ Each metadata argument is a dictionary whose keys are strings and whose values a
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {6,14}
             import { observe, updateCurrentSpan, updateCurrentTrace } from '@deepeval-ts/tracing';
             
             const llmApp = (query: string) => {
-            // Add span-level metadata
-            updateCurrentSpan({
-                metadata: {
-                source: "knowledge_base_1",
-                retrieved_documents: 3
-                }
-            });
-                
-            // Add trace-level metadata
-            updateCurrentTrace({
-                metadata: {
-                user_id: "user-456",
-                app_version: "1.2.3",
-                }
-            });
+                // Add span-level metadata
+                updateCurrentSpan({
+                    metadata: {
+                        source: "knowledge_base_1",
+                        retrieved_documents: 3
+                    }
+                });
+                    
+                // Add trace-level metadata
+                updateCurrentTrace({
+                    metadata: {
+                        user_id: "user-456",
+                        app_version: "1.2.3",
+                    }
+                });
             };
             
             const observedLlmApp = observe({fn: llmApp});

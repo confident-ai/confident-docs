@@ -22,7 +22,7 @@ Attributes are set at runtime using update functions specific to each span type:
 These functions update the attributes for the **CURRENT** span of the component to which the `@observe` decorator is applied. For example, `update_retriever_span` will update the attributes for `inner_function`.
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {10}
             from deepeval.tracing import observe, update_retriever_span
@@ -41,26 +41,23 @@ These functions update the attributes for the **CURRENT** span of the component 
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
-            ```js title="index.ts" {12}
+            ```js title="index.ts" {10}
             import { observe, updateRetrieverSpan } from "@deepeval-ts/tracing";
 
             const observedOuterFunction = observe({
-            fn: () => {
-
-                const observedInnerFunction = observe({
-                type: "retriever",
-                embedder: "text-embedding-ada-002",
                 fn: () => {
-
-                    // Here, updateRetrieverSpan() will update the Retriever span
-                    updateRetrieverSpan({embedder: "new embedder model", chunkSize: 10});
-                },
-                });
-
-                observedInnerFunction();
-            };
+                    const observedInnerFunction = observe({
+                        type: "retriever",
+                        embedder: "text-embedding-ada-002",
+                        fn: () => {
+                            // Here, updateRetrieverSpan() will update the Retriever span
+                            updateRetrieverSpan({embedder: "new embedder model", chunkSize: 10});
+                        },
+                    });
+                    observedInnerFunction();
+                };
             })
             ```
         </CodeBlock>
@@ -80,7 +77,7 @@ These functions update the attributes for the **CURRENT** span of the component 
 LLM attributes track the model, prompt, and token usage and costs of language model calls. It is highly **RECOMMENDED** that you set the attributes for an LLM span.
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>     
         ```python title="main.py" {6}
         from deepeval.tracing import observe, update_llm_span
@@ -98,26 +95,26 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
         ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, updateLlmSpan } from '@deepeval-ts/tracing';
 
             const generateResponse = (prompt: string) => {
-            const output = "Generated response";
-            updateLlmSpan({
-                inputTokenCount: 10,
-                outputTokenCount: 25,
-                costPerInputToken: 0,
-                costPerOutputToken: 0,
-            });
-            return output;
+                const output = "Generated response";
+                updateLlmSpan({
+                    inputTokenCount: 10,
+                    outputTokenCount: 25,
+                    costPerInputToken: 0,
+                    costPerOutputToken: 0,
+                });
+                return output;
             };
 
             const observedGenerateResponse = observe({
-            type: "llm",
-            model: "gpt-4",
-            fn: generateResponse,
+                type: "llm",
+                model: "gpt-4",
+                fn: generateResponse,
             });
             ```
         </CodeBlock>
@@ -143,7 +140,7 @@ The model and per-token costs can be set in the `@observe` decorator, but will b
 Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipelines. It is highly **RECOMMENDED** that you set the attributes for a retriever span.
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>     
         ```python title="main.py" {6}
         from deepeval.tracing import observe, update_retriever_span
@@ -160,7 +157,7 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
         ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, updateRetrieverSpan } from '@deepeval-ts/tracing';
@@ -168,9 +165,9 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
             const retrieveDocuments = (query: string): string[] => {
                 const fetchedDocuments = ["doc1", "doc2"];
                 updateRetrieverSpan({ 
-                embedder: "text-embedding-ada-002", 
-                chunkSize: 10, 
-                topK: 5 
+                    embedder: "text-embedding-ada-002", 
+                    chunkSize: 10, 
+                    topK: 5 
                 });
                 return fetchedDocuments;
             };

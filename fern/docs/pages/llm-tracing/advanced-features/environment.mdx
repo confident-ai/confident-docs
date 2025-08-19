@@ -21,7 +21,7 @@ You can configure the environment with the `CONFIDENT_TRACE_ENVIRONMENT` environ
 Alternatively, you can set the environment directly in code:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {4}
             from openai import OpenAI 
@@ -41,7 +41,7 @@ Alternatively, you can set the environment directly in code:
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {4}
             import OpenAI from 'openai';
@@ -51,17 +51,17 @@ Alternatively, you can set the environment directly in code:
             const openai = new OpenAI();
 
             const llmApp = async (query: string) => {
-            const response = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [{ role: "user", content: query }],
-            });
-            return response.choices[0].message.content;
+                const response = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }],
+                });
+                return response.choices[0].message.content;
             };
 
             const observedLlmApp = observe({
-            type: "llm",
-            model: "gpt-4o",
-            fn: llmApp,
+                type: "llm",
+                model: "gpt-4o",
+                fn: llmApp,
             });
 
             observedLlmApp("Write me a poem.");

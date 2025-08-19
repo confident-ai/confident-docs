@@ -21,7 +21,7 @@ Configure the sampling rate by setting the `CONFIDENT_SAMPLE_RATE` environment v
 Alternatively, you can set the sampling rate directly in code:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {5}
             from deepeval.tracing import observe, trace_manager
@@ -42,7 +42,7 @@ Alternatively, you can set the sampling rate directly in code:
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, traceManager } from '@deepeval-ts/tracing';
@@ -52,17 +52,17 @@ Alternatively, you can set the sampling rate directly in code:
             traceManager.configure({ sampleRate: 0.5 });
 
             const llmApp = (query: string) => {
-            const response = openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [{ role: "user", content: query }]
-            });
-            return response.choices[0].message.content;
+                const response = openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                });
+                return response.choices[0].message.content;
             };
 
             const observedLlmApp = observe({fn: llmApp});
 
             for (let i = 0; i < 10; i++) {
-            observedLlmApp("Write me a poem."); // Roughly half of these traces will be sent
+                observedLlmApp("Write me a poem."); // Roughly half of these traces will be sent
             }
             ```
         </CodeBlock>

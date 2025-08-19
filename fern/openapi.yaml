@@ -554,12 +554,6 @@ paths:
                     id: "TRACE-ID"
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
                   deprecated: false
-              example:
-                success: true
-                data:
-                  id: "TRACE-ID"
-                link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
-                deprecated: false
     get:
       x-fern-server-name: Confident AI
       tags:

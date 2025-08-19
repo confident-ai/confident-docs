@@ -13,7 +13,7 @@ Both traces and spans have names, and you can customize them based on your likin
 You can name a trace at runtime by providing the `name` paramter in `update_current_trace`:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {8}
             from openai import OpenAI 
@@ -33,7 +33,7 @@ You can name a trace at runtime by providing the `name` paramter in `update_curr
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {7}
             import OpenAI from 'openai';
@@ -66,7 +66,7 @@ By default, the name on a trace is set to `None`.
 The default name for a span is the name of the function/method you're decorating. If you wish to overwrite this behavior, simply provide a `name` to the `update_current_span` function:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {8}
             from openai import OpenAI 
@@ -86,7 +86,7 @@ The default name for a span is the name of the function/method you're decorating
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {7}
             import OpenAI from 'openai';

@@ -13,7 +13,7 @@ You can track user interactions with your LLM app by setting the `user_id` in a 
 You can use the `update_current_trace` function to set the `user_id` within traces:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
         <CodeBlock>
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
@@ -35,20 +35,20 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             ```
         </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+    <Tab title="TypeScript" language="typescript">
         <CodeBlock>
             ```typescript title="index.ts" {10}
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
 
             const llmApp = async (query: string) => {
-            const openai = new OpenAI();
-            const res = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [{ role: "user", content: query }]
-            })
-            updateCurrentTrace({ userId: "your-user-id" });
-            return res.choices[0].message.content;
+                const openai = new OpenAI();
+                const res = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                })
+                updateCurrentTrace({ userId: "your-user-id" });
+                return res.choices[0].message.content;
             };
 
             const observedLlmApp = observe({fn: llmApp});
