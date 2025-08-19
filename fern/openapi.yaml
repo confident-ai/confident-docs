@@ -698,7 +698,7 @@ paths:
     post:
       x-fern-server-name: Confident AI
       tags:
-        - Tracing
+        - Annotations
       summary: Create Annotation
       operationId: createAnnotation
       description: Dummy create annotation endpoint to surface in docs.
