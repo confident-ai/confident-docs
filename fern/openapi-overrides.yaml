@@ -178,7 +178,7 @@ paths:
           required: true
           schema:
             type: string
-          description: The unique alias of the dataset.
+          description: The unique alias of the prompt.
     post:
       parameters:
         - in: header
@@ -188,4 +188,3 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
-
