@@ -1,10 +1,229 @@
 ---
-title: LLM Use Cases
-subtitle: Supported use cases
-slug: llm-use-cases
+subtitle: Learn about all the uses cases Confident AI supports
+slug: resources/llm-use-cases
 description: Learn about supported LLM use cases
 ---
 
-# LLM Use Cases
+## Supported For All Use Cases
 
-Content coming soon...
+Confident AI is designed to evaluate any type of LLM application, from simple chatbots to complex agentic systems. Each use case has its own unique evaluation requirements, and we provide specialized [metrics](/docs/concepts/metrics) and features to help you get the most accurate assessment of your LLM's performance.
+
+A use case is something like:
+
+1. [RAG QA:](#rag-qa) Systems that combine document retrieval with LLM generation to provide accurate, source-based answers.
+2. [Chatbots:](#chatbots) Conversational, multi-turn AI systems designed to engage in natural dialogues with users.
+3. [Writing Assistants:](#writing-assistants) AI tools that help users improve their writing by providing suggestions, corrections, and enhancements.
+4. [Summarization:](#summarization) Systems that condense longer documents into shorter, coherent versions while preserving key information.
+5. [Autonomous Agents:](#autonomous-agents) AI systems that can independently perform complex tasks by breaking them down into manageable steps.
+6. [Text-SQL:](#text-sql) Systems that convert natural language queries into SQL database queries.
+7. [Code Generation:](#code-generation) Systems that create executable code from natural language descriptions.
+
+A use case can be built using different systems. You'll notice a clear pattern in how different systems are evaluated:
+
+- Simpler systems (like summarization and writing assistants) focus more on use case-specific **custom** metrics that evaluate output quality
+- Complex systems (like code generation and autonomous agents) require both system metrics and **reference-based evaluation** against [golden `expected_output`s](/docs/concepts/datasets#goldens), along with [tracing](/docs/llm-tracing/introduction) for debugging
+
+<Tip>
+  It is recommended that you allocate one project space per use case on
+  Confident AI
+</Tip>
+
+## RAG QA
+
+RAG (Retrieval-Augmented Generation) QA systems combine **document retrieval with LLM generation** to provide accurate, source-based answers. They first retrieve relevant documents based on a query, then use those documents as context for the LLM to generate an informed response.
+
+- A **medical knowledge base** that helps doctors quickly find relevant research and treatment guidelines
+- A **legal research assistant** that helps lawyers search through case law and generate summaries
+- A **product documentation retriever** that finds relevant documentation sections to answer customer queries
+
+Let's explore how to evaluate a **medical knowledge base** that helps doctors find relevant research and treatment guidelines.
+
+### Metrics
+
+For our medical knowledge base example, we'll want to include a mix of system-specific and use case-specific metrics. RAG QA is a balanced use case that requires both strong system performance and domain-specific evaluation. For a RAG QA system, we recommend:
+
+- **Answer Relevancy** (generic RAG): How well the answer addresses the query
+- **Faithfulness** (generic RAG): Whether the answer is supported by the retrieved context
+- **Contextual Relevancy** (generic RAG): How well the retrieved documents match the query
+- **Clinical Relevance** (custom G-Eval): How well the answer applies to clinical practice
+
+In this example, the answer **WITHOUT THE PROMPT TEMPLATE** is the `input` to a test case, while the `answer` is the `actual_output`, and any medical documents retrieval to generate the answer is the `retrieval_context`.
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+<Note>
+  The prompt in this case should be [logged as a
+  hyperparameter](/docs/llm-evaluation/evaluation-features/parameter-insights)
+  instead during evaluation.
+</Note>
+
+## Chatbots
+
+Chatbots are **conversational, multi-turn AI systems** designed to engage in natural, multi-turn dialogues with users. They can handle various tasks from customer service to information retrieval while maintaining context throughout the conversation.
+
+- A **customer support chatbot** that helps customers find products and make purchases
+- A **patient triage system** that helps healthcare providers assess symptoms and schedule appointments
+- A **banking assistant** that helps customers check balances and make transactions
+
+We'll demonstrate how to evaluate a **customer support chatbot** that helps customers find products and make purchases.
+
+### Metrics
+
+For our customer support chatbot example, we'll focus on both RAG and conversational aspects. This customer support chatbot combines both RAG and multi-turn capabilities, and so for the generic metrics we'll use a combination of RAG and conversational metrics:
+
+- **Contextual Recall** (generic RAG): How well the chatbot retrieves the relevant product information
+- **Role Adherence** (generic conversational): How well the chatbot maintains its helpful, customer-focused persona
+- **Purchase Intent Support** (custom G-Eval): How well the chatbot guides customers toward making a purchase decision
+
+In this example, the customer query is the `input` to an `LLMTestCase` in `turn`s for a `ConversationalTestCase`, while the chatbot's response is the `actual_output`, and any product documentation retrieved to generate the answer is the `retrieval_context`. The system prompt defining the chatbot's role and personality should be provided to the `chatbot_role` parameter.
+
+<Info>
+  You can learn what a `ConversationalTestCase` is
+  [here.](/docs/concepts/test-cases#conversationaltestcase)
+</Info>
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+## Writing Assistants
+
+Writing assistants are AI tools that help users improve their writing by **providing suggestions, corrections, and enhancements.** They can help with grammar, style, tone, and overall content quality while maintaining the user's voice.
+
+- A **marketing writer** that helps create engaging social media posts and content
+- An **academic writing assistant** that helps students improve essays and research papers
+- A **technical documentation generator** that creates clear API descriptions
+
+Here's how to evaluate a **marketing writer** that helps create engaging social media posts and content.
+
+### Metrics
+
+For our marketing writer example, we'll focus on content quality and formatting. While our guide suggests using 1-2 custom metrics and 2-3 generic metrics, this writing assistant is relatively simple with minimal system complexity beyond formatting tools. This is primarily a use case-specific evaluation, focusing on the quality of the output rather than system complexity.
+
+Since this use case is more about the specific use case requirements than the system itself, we'll focus on three key metrics:
+
+- **Tool Correctness** (generic agentic): How accurately the formatting tools are applied
+- **Format Correctness** (custom DAG): How well the writing meets the specified formatting requirements
+- **Brand Voice Alignment** (custom G-Eval): How well the content matches the brand's tone and messaging
+
+In this example, the original text and requirements are the `input` to a test case, while the improved text is the `actual_output`. The style guides and formatting rules are part of the system's configuration, not `retrieval_context`, and should most likely go in the system prompt and [logged as a hyperparameter.](/docs/llm-evaluation/evaluation-features/parameter-insights)
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+<Error title="Warning">
+While this use case references external context like style guides, it doesn't
+require testing as a RAG pipeline. RAG pipeline testing is most valuable when
+the retrieval process itself could be imperfect or needs optimization.
+</Error>
+
+## Summarization
+
+Text summarization systems condense longer documents into shorter, coherent versions while preserving key information. They can be extractive (pulling out important sentences) or abstractive (generating new text that captures the essence).
+
+- A **meeting assistant** that generates action items and key points from transcripts
+- A **research tool** that helps scientists quickly understand new papers in their field
+- A **news aggregator** that creates concise summaries of daily news articles
+
+Let's look at how to evaluate a **meeting assistant** that generates action items and key points from transcripts.
+
+### Metrics
+
+For our meeting assistant example, we'll focus on summary quality and accuracy. Similar to the writing assistant, summarization is primarily about the output quality rather than complex system interactions. This is another use case where the evaluation focuses more on the quality of the generated content than system complexity. We assume the system has access to the original text and doesn't need retrieval. We'll focus on these key metrics:
+
+- **Faithfulness** (generic RAG): Whether the summary hallucinates from the original text
+- **Format Correctness** (custom DAG): How well the summary follows the required structure (e.g., bullet points, sections)
+- **Conciseness** (custom G-Eval): How well the summary captures key information without unnecessary details
+
+In this example, the original text is the `input` to a test case, while the summary is the `actual_output`. The prompts that gives the summarization instructions should be provided in the system prompt and [logged as hyperparameters](/docs/llm-evaluation/evaluation-features/parameter-insights).
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+## Autonomous Agents
+
+Autonomous agents are AI systems that can **independently perform complex tasks** by breaking them down into manageable steps. They can use tools, make decisions, and adapt their approach based on feedback and changing conditions.
+
+- A **travel planner** that creates personalized itineraries and books accommodations
+- A **browser agent** that automates web tasks like sending emails and filling forms
+- A **trading bot** that manages investment portfolios and executes trades
+- A **logistics manager** that coordinates supply chain operations
+
+We'll walk through how to evaluate a **travel planner** that creates personalized itineraries and books accommodations.
+
+### Metrics
+
+For our travel planner example, we'll focus on system execution. Unlike simpler use cases, autonomous agents are system-heavy with complex execution flows. For the travel planner, we'll focus on the core agent execution metrics rather than travel-specific outcomes:
+
+- **Tool Correctness** (generic agentic): How accurately the agent uses tools like search, booking, and calendar APIs
+- **Task Completion** (generic agentic): How successfully the agent completes the full travel planning workflow
+
+In this example, the user's travel requirements are the `input` to a test case, while the final itinerary and bookings are the `actual_output`. [Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+<Tip>
+  For autonomous agents, [setting up tracing](/docs/llm-tracing/introduction) is
+  **highly recommended**. Tracing allows to debug nested components in your
+  agent that might not be performing as expected.
+</Tip>
+
+## Text-SQL
+
+Text-SQL systems convert natural language queries into SQL database queries, allowing users to interact with databases using everyday language. They understand database schemas and can generate complex SQL queries that accurately reflect user intentions.
+
+- A **business intelligence tool** that lets data analysts query sales data
+- A **research database** that allows scientists to query experimental results
+
+Let's see how to evaluate a **business intelligence tool** that lets data analysts query sales data.
+
+### Metrics
+
+For our business intelligence tool example, we'll focus on SQL generation quality. Text-SQL systems usually operate as RAG systems, where the first step is retrieving relevant schema information from potentially large database structures. The generation phase then focuses on SQL correctness rather than natural language quality:
+
+- **Contextual Relevancy** (generic RAG): How well the retrieved schema matches the query intent
+- **Faithfulness** (generic RAG): Whether the generated SQL is supported by the retrieved schema
+- **SQL Correctness** (custom DAG): How well the generated SQL follows syntax rules and best practices
+
+In this example, the natural language query is the `input` to a test case, while the generated SQL is the `actual_output`, and the retrieved schema information is the `retrieval_context`. [Tracing](/docs/llm-tracing/introduction) is also extremely helpful here to visualize the retrieved tables and SQL execution times.
+
+<Info>
+  Database tables are typically indexed by condensed summaries of their
+  structure and content. For example, a "sales" table might be indexed as
+  "Contains daily sales records with columns for product_id, quantity, price,
+  and customer_id. Used for tracking revenue and inventory." This allows the
+  system to quickly retrieve relevant tables based on the query intent.
+</Info>
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+## Code Generation
+
+Code generation systems create executable code from natural language descriptions of what the code should do. They understand programming languages, best practices, and can generate well-documented, maintainable code that meets specified requirements.
+
+- A **frontend UI generator** that creates frontend components and API endpoints
+- A **code generator tool** in VS-code that helps developers create basic application features
+
+Here's how to evaluate a **frontend UI generator** that creates frontend components and API endpoints.
+
+### Metrics
+
+For our frontend UI generator example, we'll focus on both system execution and code quality. The most complex use case of all, code generation is a system-heavy use case that requires careful evaluation of both the agent's execution and the quality of the generated code. We'll focus on:
+
+- **Task Completion** (generic agentic): How successfully the agent completes the full code generation workflow
+- **Code Correctness** (generic DAG): Whether the generated code runs without errors
+- **Code Quality** (custom G-Eval): How well the generated code compares to ideal, production-ready code
+
+In this example, the natural language requirements are the `input` to a test case, while the generated code is the `actual_output`. You'll definitely want [tracing](/docs/llm-tracing/introduction) for this use case.
+
+<Info>
+  For code generation, it's undoubtedly complex and requires `expected_output`s
+  to function well. For a code generation tool like GitHub or Cursor, you'll
+  also want to include contextual recall to make sure that your agent is able to
+  retrieve the relevant code files to generate the ideal piece of code.
+</Info>
+
+[Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
+
+## Important note
+
+For some of the use cases, we've listed example metrics that we believe are most appropriate. However, you should carefully evaluate and adapt these metrics for your specific use case, even if your use case looks identical to ours on paper. While our suggested metrics may be a good starting point, but we made a lot of assumptions about the use case when coming up with the metrics.
+
+Very rarely, some of the metrics require test cases with `expected_output` values. If you don't have a labeled dataset with these expected outputs, you have two options:
+
+1. Label your dataset manually (recommended)
+2. Choose alternative metrics that don't require labeled data

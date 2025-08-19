@@ -28,10 +28,10 @@ Conifdent AI uses API keys for authentication. Every request to the API must inc
 
 If you don't already have a Confident AI account, visit [app.confident-ai.com](https://app.confident-ai.com) and create one. You can create an account using your email address or through Google authentication for a faster process.
 
-<Callout>
+<Tip>
   If you wish to **sign in using SSO**, checkout our [enterprise
   offering.](https://confident-ai.com/pricing)
-</Callout>
+</Tip>
 
 After creating your account, you'll be guided through the onboarding process. You'll find your **Project** API key at the last step of the onboarding.
 
@@ -53,19 +53,8 @@ Follow these steps and get your API key now:
     You can now use your Project API Key to fully integrate your DeepEval evaluations with our platform by logging in to your development and production environment.
     <CodeBlocks>
 
-    ```bash title="Bash"
+    ```bash
     export CONFIDENT_API_KEY=YOUR-API-KEY
-    ```
-    ```bash title="CLI"
-    deepeval login --confident-api-key YOUR_API_KEY
-    ```
-    ```python title="Python"
-    import deepeval
-
-    deepeval.login("YOUR_API_KEY")
-    ```
-    ```python title=".env"
-    CONFIDENT_API_KEY=YOUR-API-KEY
     ```
 
     </CodeBlocks>

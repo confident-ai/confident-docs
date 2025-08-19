@@ -1,10 +1,95 @@
 ---
-title: On-Prem Hosting
 subtitle: Self-hosting options
-slug: on-prem-hosting
+slug: resources/on-prem-hosting
 description: Learn about on-premises hosting
 ---
 
-# On-Prem Hosting
+Confident AI can be self-hosted in your organization's infrastructure through a containerized deployment. This deployment model ensures that **no data ever leaves your data center**, providing enhanced security and compliance for organizations with strict data governance requirements.
 
-Content coming soon...
+Our self-hosted solution includes enterprise **Single Sign-On (SSO)** for secure and seamless authentication.
+
+## Deployment Process
+
+The self-hosting deployment process consists of the following steps:
+
+1. **Acquire Enterprise License**: [Contact our sales](https://calendly.com/d/cqbp-t88-y4j/confident-ai-intro-call) team to obtain an enterprise software license for self-hosting.
+
+2. **Receive Deployment Package**: You'll receive a comprehensive deployment package including:
+
+   - Docker images
+   - Kubernetes manifests
+   - Configuration templates
+   - Deployment documentation
+
+3. **Configure Infrastructure**: Set up the required PostgreSQL and Redis instances according to the specifications.
+
+4. **Integrate Identity Provider**: Configure your SAML or OAuth 2.0 identity provider:
+
+   - For SAML: Configure the service provider settings in your IDP
+   - For OAuth 2.0: Set up the appropriate OAuth application and endpoints
+
+5. **Deploy Application**: Deploy the Confident AI containers using the provided Kubernetes manifests or Docker Compose files.
+
+6. **Verify Deployment**: Run through the verification checklist to ensure all components are functioning correctly.
+
+## System Requirements
+
+Before deploying Confident AI, ensure your infrastructure meets the following requirements:
+
+### Database
+
+- **PostgreSQL 14+**: Required for storing application data, user information, and evaluation results
+- Minimum specifications:
+  - 4 CPU cores
+  - 8GB RAM
+  - 100GB storage (adjust based on expected data volume)
+
+### Caching
+
+- **Redis 6+**: Required for session management and caching
+- Minimum specifications:
+  - 2 CPU cores
+  - 4GB RAM
+  - 20GB storage
+
+### Identity Provider (IDP)
+
+- **SAML 2.0** or **OAuth 2.0** compatible identity provider for **Single Sign-On (SSO) integration**
+- Supported providers include:
+  - Azure AD
+  - Okta
+  - OneLogin
+  - Ping Identity
+  - Custom SAML/OAuth implementations
+
+<Info>
+  Custom authentication methods are also available on-demand. You should reach
+  out to support@confident-ai.com for any additional questions.
+</Info>
+
+### Infrastructure
+
+- Kubernetes cluster or container orchestration platform
+- Load balancer for traffic distribution
+- Persistent storage for database and file storage
+- Network access to required external services (if applicable)
+
+## Support and Maintenance
+
+Our enterprise support team provides assistance throughout the deployment process and ongoing maintenance:
+
+- Initial deployment support
+- Regular security updates
+- Performance optimization guidance
+- Troubleshooting assistance
+
+## Timeline
+
+The typical deployment timeline is 1-2 weeks, depending on your organization's infrastructure complexity and security requirements. This includes:
+
+- Infrastructure setup: 2-3 days
+- Application deployment: 1-2 days
+- IDP integration: 1-2 days
+- Testing and verification: 2-3 days
+
+Contact our team at support@confident-ai.com to discuss your specific self-hosting requirements.
