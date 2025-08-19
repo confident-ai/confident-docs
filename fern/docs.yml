@@ -97,52 +97,55 @@ navigation:
               - page: Working with Prompts
                 path: docs/pages/llm-evaluation/prompt-optimization/using-prompts.mdx
                 icon: fa-light fa-circle-play
+          - section: Metrics
+            icon: fa-light fa-list-check
+            contents:
+              - page: Custom Metrics
+                path: docs/pages/llm-evaluation/metrics/custom-metrics.mdx
+              - page: Metric Collection
+                path: docs/pages/llm-evaluation/metrics/metric-collection.mdx
+              - section: All Metrics
+                collapsed: false
+                contents:
+                  - section: Single Turn
+                    collapsed: false
+                    contents:
+                      - page: Answer Relevancy
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/answer-relevancy.mdx
+                      - page: Bias
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/bias.mdx
+                      - page: Contextual Precision
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/contextual-precision.mdx
+                      - page: Contextual Recall
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/contextual-recall.mdx
+                      - page: Contextual Relevancy
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/contextual-relevancy.mdx
+                      - page: Faithfulness
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/faithfulness.mdx
+                      - page: Hallucination
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/hallucination.mdx
+                      - page: Summarization
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/summarization.mdx
+                      - page: Task Completion
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/task-completion.mdx
+                      - page: Tool Correctness
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/tool-correctness.mdx
+                      - page: Toxicity
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/single-turn/toxicity.mdx
+                  - section: Multi Turn
+                    collapsed: false
+                    contents:
+                      - page: Conversation Completeness
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/conversation-completeness.mdx
+                      - page: Knowledge Retention
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/knowledge-retention.mdx
+                      - page: Role Adherence
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/role-adherence.mdx
+                      - page: Turn Relevancy
+                        path: docs/pages/llm-evaluation/metrics/all-metrics/multi-turn/turn-relevancy.mdx
           - page: Unit-Testing in CI/CD
             path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
             icon: fa-light fa-pipe-valve
-      - section: Metrics
-        contents:
-          - page: All Metrics
-            path: docs/pages/metrics/all-metrics.mdx
-            icon: fa-light fa-list
-          - section: Single Turn
-            collapsed: false
-            icon: fa-light fa-comment
-            contents:
-              - page: Answer Relevancy
-                path: docs/pages/metrics/single-turn/answer-relevancy.mdx
-              - page: Bias
-                path: docs/pages/metrics/single-turn/bias.mdx
-              - page: Contextual Precision
-                path: docs/pages/metrics/single-turn/contextual-precision.mdx
-              - page: Contextual Recall
-                path: docs/pages/metrics/single-turn/contextual-recall.mdx
-              - page: Contextual Relevancy
-                path: docs/pages/metrics/single-turn/contextual-relevancy.mdx
-              - page: Faithfulness
-                path: docs/pages/metrics/single-turn/faithfulness.mdx
-              - page: Hallucination
-                path: docs/pages/metrics/single-turn/hallucination.mdx
-              - page: Summarization
-                path: docs/pages/metrics/single-turn/summarization.mdx
-              - page: Task Completion
-                path: docs/pages/metrics/single-turn/task-completion.mdx
-              - page: Tool Correctness
-                path: docs/pages/metrics/single-turn/tool-correctness.mdx
-              - page: Toxicity
-                path: docs/pages/metrics/single-turn/toxicity.mdx
-          - section: Multi Turn
-            collapsed: false
-            icon: fa-light fa-comments
-            contents:
-              - page: Conversation Completeness
-                path: docs/pages/metrics/multi-turn/conversation-completeness.mdx
-              - page: Knowledge Retention
-                path: docs/pages/metrics/multi-turn/knowledge-retention.mdx
-              - page: Role Adherence
-                path: docs/pages/metrics/multi-turn/role-adherence.mdx
-              - page: Turn Relevancy
-                path: docs/pages/metrics/multi-turn/turn-relevancy.mdx
       - section: LLM Tracing
         contents:
           - page: Introduction
@@ -215,7 +218,7 @@ navigation:
             icon: fa-light fa-question
           - page: LLM Use Cases
             path: docs/pages/resources/llm-use-cases.mdx
-            icon: fa-light fa-list-check
+            icon: fa-light fa-list
           - page: Data Handling
             path: docs/pages/resources/data-handling.mdx
             icon: fa-light fa-shield-check
