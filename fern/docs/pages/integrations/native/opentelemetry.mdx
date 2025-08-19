@@ -466,6 +466,38 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
 
 </Steps>
 
+<Accordion title="Click to see native python implementation using DeepEval">
+DeepEval provides a native `ConfidentSpanExporter` that directly exports traces to Confident AI **observatory**.
+
+```python title="example.py"
+import time
+import json
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+from deepeval.tracing.otel.exporter import ConfidentSpanExporter
+
+# Set up tracer provider
+tracer_provider = trace.get_tracer_provider()
+if not isinstance(tracer_provider, TracerProvider):
+    trace.set_tracer_provider(TracerProvider())
+
+# Add confident span exporter wrapped in batch span processor
+tracer_provider.add_span_processor(BatchSpanProcessor(ConfidentSpanExporter()))
+
+# Get tracer
+tracer = trace.get_tracer("deepeval_tracer")
+
+# set attributes
+with tracer.start_as_current_span("confident-llm-span") as span:
+    span.set_attribute("confident.trace.name", "example-trace")
+    span.set_attribute("confident.span.type", "llm")
+    span.set_attribute("confident.llm.model", "gpt-4o")
+    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
+    span.set_attribute("confident.llm.attributes.output", "Paris")
+```
+</Accordion>
 
 
 
