@@ -11,17 +11,32 @@ You can pull a prompt version from Confident AI like how you would pull a datase
 
 Pull your prompt version from Confident AI by providing the `alias` you've defined:
 
-```python
-from deepeval.prompt import Prompt
+<Tabs>
 
-# Replace with your actual alias
+  <Tab title="Python" language="python">
+  ```python
+  from deepeval.prompt import Prompt
 
-prompt = Prompt(alias="System Prompt")
-prompt.pull()
+  # Replace with your actual alias
 
-print(prompt.\_text_template)
+  prompt = Prompt(alias="System Prompt")
+  prompt.pull()
 
-```
+  print(prompt._text_template)
+  ```
+  </Tab>
+
+  <Tab title="TypeScript" language="typescript">
+  [TODO kritin]
+  </Tab>
+
+  <Tab title="curL" language="curl">
+    <EndpointRequestSnippet
+      endpoint="GET /v1/prompts"
+    />
+  </Tab>
+
+</Tabs>
 
 You'll notice that unlike the `pull()` method on an `EvaluationDataset`, the `alias` is actually defined on `Prompt` instantiation instead. This is because the `pull()` method on a `Prompt` is reserved to specify the version instead.
 
@@ -29,26 +44,50 @@ You'll notice that unlike the `pull()` method on an `EvaluationDataset`, the `al
 
 When no parameters are provided to the `pull()` method, the latest version is pulled by default. To specify the version, simply supply the `version` as an argument:
 
-```python
-...
+<Tabs>
 
-prompt.pull(version="00.00.01")
-print(prompt.\_text_template)
+  <Tab title="Python" language="python">
+  ```python
+  ...
 
-```
+  prompt.pull(version="00.00.01")
+  print(prompt._text_template)
+
+  ```
+  </Tab>
+
+  <Tab title="TypeScript" language="typescript">
+  [TODO kritin]
+  </Tab>
+
+  <Tab title="curL" language="curl">
+    <EndpointRequestSnippet
+      endpoint="GET /v1/prompts"
+    />
+  </Tab>
+
+</Tabs>
 
 ## Interpolate Variables
 
 Now that you have your prompt template, use the `interpolate()` method to interpolate any dynamic variables you may have defined in your prompt version. For example, if you have a `{{ name }}` variable, it will look like this:
 
-```python
-...
+<Tabs>
 
-# Customized accordingly based on your variables
+  <Tab title="Python" language="python">
+  ```python
+  ...
 
-prompt_to_llm = prompt.interpolate(name="Joe")
+  # Customized accordingly based on your variables
+  prompt_to_llm = prompt.interpolate(name="Joe")
+  ```
+  </Tab>
 
-```
+  <Tab title="TypeScript" language="typescript">
+  [TODO kritin]
+  </Tab>
+
+</Tabs>
 
 And if you don't have any variables, you should still use the `interpolate()` method to create a copy of your prompt template to be used in your LLM application.
 
@@ -62,62 +101,84 @@ And if you don't have any variables, you should still use the `interpolate()` me
 
 You pull prompt messages the same way you would pull a single prompt, the difference is it is now stored in the `_messages_template` variable instead, and you can print it out to see it for yourself:
 
-```python
-from deepeval.prompt import Prompt
+<Tabs>
 
-prompt = Prompt(alias="your-alias-here")
-prompt.pull()
-print(prompt.\_messages_template)
+  <Tab title="Python" language="python">
+  ```python focus={1,3-5,13-14}
+  from deepeval.prompt import Prompt
 
-# [
+  prompt = Prompt(alias="your-alias-here")
+  prompt.pull()
+  print(prompt._messages_template)
 
-# PromptMessage(role="system", content="You are a helpful assistant."),
+  # This will print the following
+  # [
+  #   PromptMessage(role="system", content="You are a helpful assistant."),
+  #   PromptMessage(role="user", content="What is the capital of France?"),
+  # ]
 
-# PromptMessage(role="user", content="What is the capital of France?"),
+  messages_to_llm = prompt.interpolate()
+  print(messages_to_llm)
 
-# ]
+  # This will print the following
+  # [
+  #   {"role": "system", "content": "You are a helpful assistant."},
+  #   {"role": "user", "content": "What is the capital of France?"}
+  # ]
+  ```
+  </Tab>
 
-messages_to_llm = prompt.interpolate()
-print(messages_to_llm)
+  <Tab title="TypeScript" language="typescript">
+  [TODO kritin]
+  </Tab>
 
-# [
+  <Tab title="curL" language="curl">
+    <EndpointRequestSnippet
+      endpoint="GET /v1/prompts"
+    />
+  </Tab>
 
-# {"role": "system", "content": "You are a helpful assistant."},
-
-# {"role": "user", "content": "What is the capital of France?"}
-
-# ]
-
-```
+</Tabs>
 
 To be clear, here is an example of how you can use it for OpenAI's APIs:
 
-```python {9, 17}
-from openai import OpenAI
-from deepeval.prompt import Prompt
+<Tabs>
 
-client = OpenAI()
-prompt = Prompt(alias="your-alias-here")
-prompt.pull()
+  <Tab title="Python" language="python">
+  ```python {5,10}
+  from openai import OpenAI
+  from deepeval.prompt import Prompt
 
-# Don't forget to interpolate it
+  client = OpenAI()
+  prompt = Prompt(alias="your-alias-here")
+  prompt.pull()
 
-messages_to_llm = prompt.interpolate()
+  # Don't forget to interpolate it
 
-def your_llm_app(user_input: str): # Combine dynamically with user input
-messages = messages_to_llm + [{"role": "user", "content": user_input}]
+  messages_to_llm = prompt.interpolate()
 
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=messages
-    )
-    return response.choices[0].message.content
+  def your_llm_app(user_input: str): # Combine dynamically with user input
+  messages = messages_to_llm + [{"role": "user", "content": user_input}]
 
-# Print the response
+      response = client.chat.completions.create(
+          model="gpt-4",
+          messages=messages
+      )
+      return response.choices[0].message.content
 
-print(your_llm_app("Hi!"))
+  # Print the response
 
-```
+  print(your_llm_app("Hi!"))
+  ```
+  </Tab>
+
+  <Tab title="TypeScript" language="typescript">
+  [TODO kritin]
+  </Tab>
+
+</Tabs>
+
+
 
 ```
 

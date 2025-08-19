@@ -50,7 +50,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         The `@observe` decorator is the primary way to instrument your LLM application for tracing.
 
         <CodeBlock>
-          ```python title="main.py"
+          ```python title="main.py" focus={2,6,17}
           from openai import OpenAI
           from deepeval.tracing import observe
            
@@ -91,7 +91,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
         <CodeBlock>
-          ```python title="main.py" {6, 15}
+          ```python title="main.py" focus={2,6,15,19}
           from openai import OpenAI
           from deepeval.tracing import observe, update_current_span
 
@@ -155,7 +155,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         The `observe` wrapper is the primary way to instrument your LLM application for tracing.
 
         <CodeBlock>
-          ```ts title="index.ts"
+          ```ts title="index.ts" focus={2,13,16}
           import OpenAI from 'openai';
           import { observe } from '@deepeval-ts/tracing';
             
@@ -194,8 +194,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
 
         First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
-        <CodeBlock>
-          ```ts title="index.ts" {14, 20}
+          ```ts title="index.ts" focus={2,13-15,19-22,25}
           import OpenAI from 'openai';
           import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
            
@@ -222,7 +221,6 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
           // Call app to send trace to Confident AI
           observedLlmApp("Write me a poem.");
           ```
-        </CodeBlock>
       </Step>
 
     </Steps>

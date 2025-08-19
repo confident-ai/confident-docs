@@ -39,9 +39,9 @@ Simply provide the name of the metric collection to tell Confident AI the specif
 You'll also need to use `update_current_span` with an `LLMTestCase` at runtime to actually trigger an online evaluation on the server-side:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
     <CodeBlock>
-    ```python title="main.py" {7, 16}
+    ```python title="main.py" {2,7,16}
     from deepeval.test_case import LLMTestCase
     from deepeval.tracing import observe, update_current_span
     from openai import OpenAI
@@ -64,9 +64,10 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
     ```
     </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+
+    <Tab title="Js/TypeScript" language="typescript">
     <CodeBlock>
-    ```typescript title="index.ts" {5,13}
+    ```typescript title="index.ts" {1,5,13}
     import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
 
     const generate = async (prompt: string): Promise<string> => {
@@ -110,7 +111,7 @@ Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluat
 Similar to evals for spans, you would also provide a `metricCollection` name, but this time call the `update_current_trace()` function instead:
 
 <Tabs>
-    <Tab title="Python">
+    <Tab title="Python" language="python">
     <CodeBlock>
     ```python title="main.py" {7, 16}
     from deepeval.test_case import LLMTestCase
@@ -135,7 +136,8 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
     ```
     </CodeBlock>
     </Tab>
-    <Tab title="Js/TypeScript">
+
+    <Tab title="Js/TypeScript" language="typescript">
     <CodeBlock>
     ```typescript title="index.ts" {5,13}
     import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
