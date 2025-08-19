@@ -1243,3 +1243,66 @@ span.SetAttribute("confident.agent.attributes.output", `{"output": "output"}`);
 ```
 
 </CodeBlocks>
+
+#### **Tool**
+
+To create a Tool span, set the `confident.span.type` to `tool`. After that refer to the table below for more [Tool span attributes](/docs/llm-tracing/tracing-features/span-types#tool-span).
+
+- `"confident.tool.name"` (of type `str`) used for updating Tool span name
+- [Optional] `"confident.tool.description"` (of type `str`) used for updating Tool span description
+- [Optional] `"confident.tool.attributes.input_parameters"` (of type `str`) used for updating Tool span input parameters (parsed to `dict` if `str` is provided)
+- [Optional] `"confident.tool.attributes.output"` (of type `Any`) used for updating Tool span output
+
+Given below is the sample code for setting attributes for Tool span type.
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("tool_span") as span:
+    span.set_attribute("confident.span.type", "tool")
+    span.set_attribute("confident.tool.name", "tool name")
+
+    span.set_attribute("confident.tool.description", "tool description")
+    span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": "input"}))
+    span.set_attribute("confident.tool.attributes.output", json.dumps({"output": "output"}))
+```
+
+```typescript
+span.setAttributes({
+    "confident.span.type": "tool",
+    "confident.tool.name": "tool name",
+    "confident.tool.description": "tool description",
+    "confident.tool.attributes.input_parameters": `{"input": "input"}`,
+    "confident.tool.attributes.output": `{"output": "output"}`,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.tool.name", "tool name"),
+    attribute.String("confident.tool.description", "tool description"),
+    attribute.String("confident.tool.attributes.input_parameters", `{"input": "input"}`),
+    attribute.String("confident.tool.attributes.output", `{"output": "output"}`),
+    attribute.String("confident.span.type", "tool"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.span.type": "tool",
+    "confident.tool.name": "tool name",
+    "confident.tool.description": "tool description",
+    "confident.tool.attributes.input_parameters": `{"input": "input"}`,
+    "confident.tool.attributes.output": `{"output": "output"}`,
+});
+```
+
+```csharp
+span.SetAttribute("confident.span.type", "tool");
+span.SetAttribute("confident.tool.name", "tool name");
+span.SetAttribute("confident.tool.description", "tool description");
+span.SetAttribute("confident.tool.attributes.input_parameters", `{"input": "input"}`);
+span.SetAttribute("confident.tool.attributes.output", `{"output": "output"}`);
+```
+
+</CodeBlocks>
