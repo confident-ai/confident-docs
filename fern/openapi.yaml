@@ -574,6 +574,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetTraceResponse"
+              example:
+                success: true
+                data:
+                  traces:
+                    - id: "TRACE-ID"
+                      name: "Trace Name"
+                      created_at: "2025-01-15T10:30:00Z"
+                      ended_at: "2025-01-15T10:30:05Z"
+                      uuid: "TRACE-UUID"
+                      projectId: "PROJECT-ID"
+                      environment: "production"
+                      tags:
+                        - "General QA"
+                      metadataValues:
+                        - key: "ip_address"
+                          value: "127.0.0.1"
+                      spans:
+                        - id: "SPAN-ID"
+                          uuid: "SPAN-UUID"
+                          name: "Span Name"
+                          startTime: "2025-01-15T10:30:00Z"
+                          endTime: "2025-01-15T10:30:05Z"
+                          traceUuid: "TRACE-UUID"
+                          status: "SUCCESS"
+                          type: "LLM"
+                          model: "gpt-4o"
+                  totalTraces: 1
+                deprecated: false
 
   /v1/traces/{uuid}:
     put:
