@@ -54,26 +54,39 @@ deepeval.login("<your-confident-api-key>")
 
 Provide DeepEval's `CallbackHandler` to your LangChain application's invoke method.
 
-```python main.py {4, 18}
-import os
-import time
-from langchain.chat_models import init_chat_model
+```python main.py {7,29} maxLines=32
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 from deepeval.integrations.langchain import CallbackHandler
 
-os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
-deepeval.login("<your-confident-api-key>")
-
+@tool
 def multiply(a: int, b: int) -> int:
     """Returns the product of two numbers"""
     return a * b
 
-llm = init_chat_model("gpt-4o-mini", model_provider="openai")
-llm_with_tools = llm.bind_tools([multiply])
+llm = ChatOpenAI(model="gpt-4o-mini")
 
-llm_with_tools.invoke(
-    "What is 3 * 12?",
-    config = {"callbacks": [CallbackHandler()]}
+agent_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful assistant that can perform mathematical operations."),
+        ("human", "{input}"),
+        MessagesPlaceholder("agent_scratchpad"),
+    ]
 )
+
+agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
+
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},
+    config={"callbacks": [CallbackHandler()]},
+)
+
+print(result)
 ```
 
 <Note>
@@ -99,16 +112,36 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 You can also set custom trace attributes in your `CallbackHandler` for each invocation:
 
-```python main.py
-...
+```python main.py maxLines=29 focus={20-26}
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from deepeval.integrations.langchain import CallbackHandler
 
-llm_with_tools.invoke(input=input, config={"callbacks": [CallbackHandler(
-    name="Name of Trace",
-    tags=["Tag 1", "Tag 2"],
-    metadata={"Key": "Value"},
-    thread_id="your-thread-id",
-    user_id="your-user-id",
-)]})
+@tool
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])
+agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
+
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},
+    config={"callbacks": [CallbackHandler(
+      name="Name of Trace",
+      tags=["Tag 1", "Tag 2"],
+      metadata={"Key": "Value"},
+      thread_id="your-thread-id",
+      user_id="your-user-id",
+    )]},
+)
+
+print(result)
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -157,7 +190,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoPlay
+    controls
+    autoplay
   />
 </Frame>
 
@@ -172,14 +206,33 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Provide your metric collection name to `CallbackHandler`.
 
-```python main.py {4}
+```python main.py maxLines=28 focus={20-22}
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from deepeval.integrations.langchain import CallbackHandler
 
-llm_with_tools.invoke(
-    "What is 3 * 12?",
-    config = {"callbacks": [
-        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
-    ]}
+@tool
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])
+agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
+
+result = agent_executor.invoke({"input": "What is 8 multiplied by 6?"},
+    config={
+        "callbacks": [CallbackHandler(
+            metric_collection="<metric-collection-with-task-completion>",
+          )]
+    },
 )
+
+print(result)
 ```
 
 <Success>
@@ -189,3 +242,136 @@ llm_with_tools.invoke(
 
 </Step>
 </Steps>
+
+### End-to-end evals
+
+Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your LangChain agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
+
+<Steps>
+
+<Step title="Create metric">
+
+```python
+from deepeval.metrics import TaskCompletionMetric
+
+task_completion = TaskCompletionMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+```
+
+</Step>
+
+<Warning>
+  Similar to online evals, you can only run end-to-end evals on LangChain using
+  `TaskCompletionMetric`.
+</Warning>
+
+<Step title="Run evals">
+
+Provide your metrics to the `CallbackHandler`. Then, use the dataset's `evals_iterator` to invoke your LangChain agent for each golden.
+
+<Tabs>
+<Tab title="Synchronous">
+
+```python main.py focus={16-34} maxLines=34
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from deepeval.metrics import TaskCompletionMetric
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from deepeval.integrations.langchain import CallbackHandler
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+agent_executor = AgentExecutor(agent=create_tool_calling_agent(ChatOpenAI(model="gpt-4o-mini"), [multiply], ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])), tools=[multiply], verbose=True)
+task_completion_metric = TaskCompletionMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(
+    goldens=[
+        Golden(input="What is 3 * 12?"),
+        Golden(input="What is 8 * 6?"),
+    ]
+)
+
+def llm_agent_eval(golden: Golden):
+    result = agent_executor.invoke({"input": golden.input},
+        config={
+            "callbacks": [CallbackHandler(metrics=[task_completion_metric])]
+        },
+    )
+    return result
+
+for golden in dataset.evals_iterator():
+    llm_agent_eval(golden)
+```
+
+</Tab>
+<Tab title="Asynchronous">
+
+```python main.py focus={1, 17-34} maxLines=34
+import asyncio
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from deepeval.metrics import TaskCompletionMetric
+from deepeval.integrations.langchain import CallbackHandler
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+agent_executor = AgentExecutor(agent=create_tool_calling_agent(ChatOpenAI(model="gpt-4o-mini"), [multiply], ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])), tools=[multiply], verbose=True)
+task_completion_metric = TaskCompletionMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(
+    goldens=[
+        Golden(input="What is 3 * 12?"),
+        Golden(input="What is 8 * 6?"),
+    ]
+)
+
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(
+        agent_executor.ainvoke({"input": golden.input},
+            config={
+                "callbacks": [CallbackHandler(metrics=[task_completion_metric])]
+            },
+        )
+    )
+    dataset.evaluate(task)
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  This will automatically generate a test run with evaluated traces using inputs
+  from your dataset.
+</Success>
+
+</Step>
+</Steps>
+
+### View on Confident AI (optional)
+
+You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+<video
+  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
+  controls
+  autoplay
+  playsinline
+/>
+</Frame>
