@@ -1240,9 +1240,12 @@ components:
         data:
           oneOf:
             - type: object
+              title: Single-Turn
+              description: Dataset with Single-Turn goldens
               properties:
                 datasetId:
                   type: string
+                  description: A unique identifier for a dataset
                 goldens:
                   type: array
                   items:
@@ -1251,9 +1254,12 @@ components:
                 - datasetId
                 - goldens
             - type: object
+              title: Multi-Turn
+              description: Dataset with Multi-Turn conversationalGoldens
               properties:
                 datasetId:
                   type: string
+                  description: A unique identifier for a dataset
                 conversationalGoldens:
                   type: array
                   items:
@@ -1410,6 +1416,7 @@ components:
       properties:
         golden:
           $ref: "#/components/schemas/ConversationalGolden"
+          description: A Conversational Golden that is used to simulate your conversations
       required:
         - golden
 

@@ -127,32 +127,32 @@ print(result)
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/tracing-features/names).
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/tracing-features/tags).
+  more](/docs/llm-tracing/advanced-features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/tracing-features/metadata).
+  more](/docs/llm-tracing/advanced-features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/tracing-features/thread-id).
+  [Learn more](/docs/llm-tracing/advanced-features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/tracing-features/user-id).
+  more](/docs/llm-tracing/advanced-features/users).
 </ParamField>
 
 <Info>
   Each attribute is **optional**, and works the same way as the [native tracing
-  features](/docs/llm-tracing/tracing-features) on Confident AI.
+  features](/docs/llm-tracing/introduction) on Confident AI.
 </Info>
 </Accordion>
 
@@ -171,7 +171,7 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoplay
+    autoPlay
     controls
   />
 </Frame>
@@ -218,7 +218,7 @@ print(result)
 
 ### End-to-end evals
 
-Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your LangGraph agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
+Running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end) on your LangGraph agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
 
 <Steps>
 
@@ -330,8 +330,8 @@ You can view the evals on [Confident AI](https://app.confident.ai) by clicking o
 <video
   src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
   controls
-  autoplay
-  playsinline
+  autoPlay
+  playsInline
 />
 </Frame>
 

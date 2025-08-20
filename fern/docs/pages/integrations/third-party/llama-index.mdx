@@ -94,7 +94,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Online evals
 
-You can run [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
+You can run [online evals](/docs/llm-tracing/evaluations) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
 
 <Steps>
 
@@ -105,7 +105,7 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoplay
+    autoPlay
     controls
   />
 </Frame>
@@ -119,7 +119,7 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Confident AI supports [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
+Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
 
 ```python main.py maxLines=100 focus={5,17}
 import asyncio
@@ -157,7 +157,7 @@ asyncio.run(llm_app("What is 3 * 12?"))
 
 ### End-to-end evals
 
-Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your LlamaIndex agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
+Running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end) on your LlamaIndex agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
 
 <Steps>
 
@@ -241,6 +241,6 @@ You can view the evals on [Confident AI](https://app.confident.ai) by clicking o
 <video
   src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Allama-index-1080.mp4"
   controls
-  autoplay
+  autoPlay
 />
 </Frame>
