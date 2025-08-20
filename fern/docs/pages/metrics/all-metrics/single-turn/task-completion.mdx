@@ -1,0 +1,67 @@
+---
+subtitle: Task Completion is a single-turn metric to determine an agent's task completion score
+slug: metrics/single-turn/task-completion-metric
+---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The task completion metric uses LLM-as-a-judge to evaluate how effectively an LLM agent accomplishes a task. It is a single-turn metric to evaluate an agent's task completion capability.
+
+<Warning>
+
+The task completion analyzes your agent's full trace to determine task success, which requires [setting up tracing](/llm-tracing/quickstart#setup-tracing).
+
+</Warning>
+
+## How Is It Calculated?
+
+The task completion metric first extracts task and outcome from the trace using an LLM. It then uses the same LLM to find the alignment score of task and outcome.
+
+$$
+\text{Task Completion} = \text{Alignment Score}(\text{Task}, \text{Outcome})
+$$
+
+The final score is the alignment of task and outcome as extracted from the trace.
+
+## Create Locally
+
+You can create the `TaskCompletionMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import TaskCompletionMetric
+
+metric = TaskCompletionMetric()
+```
+
+### Optional Parameters
+
+<ParamField path="threshold" type="number" default={0.5}>
+    A float to represent the minimum passing threshold.
+</ParamField>
+<ParamField path="task" type="string">
+    A string representing the task to be completed. If no task is supplied, it is automatically inferred from the trace.
+</ParamField>
+<ParamField path="model" type="string | Object" default="gpt-4.1">
+    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
+</ParamField>
+<ParamField path="include_reason" type="boolean" default={"true"}>
+    A boolean to enable the inclusion a reason for its evaluation score.
+</ParamField>
+<ParamField path="async_mode" type="boolean" default={"true"}>
+    A boolean to enable concurrent execution within the `measure()` method.
+</ParamField>
+<ParamField path="strict_mode" type="boolean" default={"false"}>
+    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+</ParamField>
+<ParamField path="verbose_mode" type="boolean" default={"false"}>
+    A boolean to print the intermediate steps used to calculate the metric score.
+</ParamField>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the task completion metric by adding it to a single-turn [metric collection.](/metrics/metric-collections) This will allow you to use task completion metric for:
+
+- Single-turn E2E testing
+- Online and offline evals for traces

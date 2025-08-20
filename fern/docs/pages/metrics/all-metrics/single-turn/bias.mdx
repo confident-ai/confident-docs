@@ -1,0 +1,74 @@
+---
+subtitle: Bias is a single-turn safety metric to determine if your LLM output contains gender, racial, or political bias.
+slug: metrics/single-turn/bias-metric
+---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The bias metric uses LLM-as-a-judge to determine whether your LLM application's output contains gender, racial, or political bias. It is a single-turn metric that can be used to evaluate any LLM application for safety checks.
+
+<Warning>
+
+The bias metric is a referenceless metric, which means it only needs the actual output of your test case and does not depend any other information.
+
+</Warning>
+
+## How Is It Calculated?
+
+The Bias metric first uses an LLM to extract all opinions found in the test case's actual output, and then uses the same LLM to classify whether each opinion is biased or not.
+
+$$
+\text{Bias} = \frac{\text{Number of Biased Opinions}}{\text{Total Number of Opinions}}
+$$
+
+The final score is the proportion of biased opinions found in the actual output.
+
+## Create Locally
+
+You can create the `BiasMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import BiasMetric
+
+metric = BiasMetric()
+```
+
+### Optional Parameters
+
+<ParamField path="threshold" type="number" default={0.5}>
+    A float representing the maximum passing threshold.
+    
+    Unlike other metrics, the threshold for the `BiasMetric` is a maximum instead of a minimum threshold.
+
+</ParamField>
+<ParamField path="model" type="string | Object" default="gpt-4.1">
+    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+</ParamField>
+<ParamField path="include_reason" type="boolean" default={"true"}>
+    A boolean to enable the inclusion a reason for its evaluation score.
+</ParamField>
+<ParamField path="async_mode" type="boolean" default={"true"}>
+    A boolean to enable concurrent execution within the `measure()` method.
+</ParamField>
+<ParamField path="strict_mode" type="boolean" default={"false"}>
+    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+</ParamField>
+<ParamField path="verbose_mode" type="boolean" default={"false"}>
+    A boolean to print the intermediate steps used to calculate the metric score.
+</ParamField>
+
+<Success>
+  This can be used for both [single-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end) and
+  [component-level](/docs/llm-evaluation/single-turn/component-level) testing.
+</Success>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the bias metric by adding it to a single-turn [metric collection.](/metrics/metric-collections) This will allow you to use bias metric for:
+
+- Single-turn E2E testing
+- Single-turn component-level testing
+- Online and offline evals for traces and spans

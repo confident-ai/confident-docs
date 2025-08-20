@@ -1,0 +1,68 @@
+---
+subtitle: Role Adherence is a multi-turn metric to determine if your chatbot adheres to a specified role
+slug: metrics/multi-turn/role-adherence-metric
+---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The role adherence metric is a conversational metric that determines whether your LLM chatbot is able to adhere to its given role throughout a conversation.
+
+<Warning>
+
+You need to supply the `chatbot_role` in all of your conversational test cases.
+
+</Warning>
+
+## How Is It Calculated?
+
+The role adherence metric iterates over each assistant turn and uses an LLM to evaluate whether the content adheres to the specified `chatbot_role`, using previous conversation turns as context.
+
+$$
+\text{Role Adherence} = \frac{\text{Number of Assistant Turns that Adhered to Chatbot Role in Conversation}}{\text{Total Number of Assistant Turns in Conversation}}
+$$
+
+The final score is the proportion of assisant turns that adhere to the role specified in the conversation.
+
+## Create Locally
+
+You can create the `RoleAdherenceMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import RoleAdherenceMetric
+
+metric = RoleAdherenceMetric()
+```
+
+### Optional Parameters
+
+<ParamField path="threshold" type="number" default={0.5}>
+    A float to represent the minimum passing threshold.
+</ParamField>
+<ParamField path="model" type="string | Object" default="gpt-4.1">
+    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+</ParamField>
+<ParamField path="include_reason" type="boolean" default={"true"}>
+    A boolean to enable the inclusion a reason for its evaluation score.
+</ParamField>
+<ParamField path="async_mode" type="boolean" default={"true"}>
+    A boolean to enable concurrent execution within the `measure()` method.
+</ParamField>
+<ParamField path="strict_mode" type="boolean" default={"false"}>
+    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+</ParamField>
+<ParamField path="verbose_mode" type="boolean" default={"false"}>
+    A boolean to print the intermediate steps used to calculate the metric score.
+</ParamField>
+
+<Success>
+  This can be used for [multi-turn E2E](/docs/llm-evaluation/single-turn/end-to-end)
+</Success>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the knowledge retention metric by adding it to a single-turn [metric collection.](/metrics/metric-collections) This will allow you to use knowledge retention metric for:
+
+- Multi-turn E2E testing
+- Online and offline evals for traces and spans

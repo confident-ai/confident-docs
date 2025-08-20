@@ -1,0 +1,74 @@
+---
+subtitle: Tool Correctness is a single-turn metric to determine an agent's tool calling ability
+slug: metrics/single-turn/tool-correctness-metric
+---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The tool correctness metric is an agentic LLM metric that assesses your LLM agent's function/tool calling ability. It is calculated by comparing whether every tool that is expected to be used was indeed called. It is a single-turn metric to evaluate an agent's tool calling ability.
+
+<Warning>
+
+The tool correctness metric needs you to supply both tools called and expected tools in your test case.
+
+</Warning>
+
+## How Is It Calculated?
+
+The tool correctness metric assesses the accuracy of your agent's tool usage by comparing the tools called by your LLM agent to the list of expected tools.
+
+$$
+\text{Tool Correctness} = \frac{\text{Number of Correctly Used Tools(or Correct Input Parameters / Outputs)}}{\text{Total Number of Tools Called}}
+$$
+
+The final score is the proportion of correctly used tools from tools called.
+
+## Create Locally
+
+You can create the `ToolCorrectnessMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import ToolCorrectnessMetric
+
+metric = ToolCorrectnessMetric()
+```
+
+### Optional Parameters
+
+<ParamField path="threshold" type="number" default={0.5}>
+    A float to represent the minimum passing threshold.
+</ParamField>
+<ParamField path="evaluation_params" type="list" default="an empty list">
+    A list of `ToolCallParams` indicating the strictness of the correctness criteria, available options are `ToolCallParams.INPUT_PARAMETERS` and `ToolCallParams.OUTPUT`.
+</ParamField>
+<ParamField path="should_consider_ordering" type="boolean" default={"false"}>
+    A boolean which when set to True, will consider the ordering in which the tools were called in.
+</ParamField>
+<ParamField path="should_exact_match" type="boolean" default={"false"}>
+    A boolean which when set to True, will required the tools called and expected tools to be exactly the same.
+</ParamField>
+<ParamField path="include_reason" type="boolean" default={"true"}>
+    A boolean to enable the inclusion a reason for its evaluation score.
+</ParamField>
+<ParamField path="strict_mode" type="boolean" default={"false"}>
+    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+</ParamField>
+<ParamField path="verbose_mode" type="boolean" default={"false"}>
+    A boolean to print the intermediate steps used to calculate the metric score.
+</ParamField>
+
+<Success>
+  This can be used for both [single-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end) and
+  [component-level](/docs/llm-evaluation/single-turn/component-level) testing.
+</Success>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the tool correctness metric by adding it to a single-turn [metric collection.](/metrics/metric-collections) This will allow you to use tool correctness metric for:
+
+- Single-turn E2E testing
+- Single-turn component-level testing
+- Online and offline evals for traces and spans

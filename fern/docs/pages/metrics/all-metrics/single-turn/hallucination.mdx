@@ -1,0 +1,74 @@
+---
+subtitle: Halucination is a single-turn metric to determine if your LLM is hallucinating false information.
+slug: metrics/single-turn/hallucination-metric
+---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The hallucination metric uses LLM-as-a-judge to determine whether your LLM generates factually correct information by comparing the actual output to the provided context. It is a single-turn metric that can be used to evaluate any LLM application for hallucination checks.
+
+<Warning>
+
+The hallucination metric needs an actual output and context in the test case to perform evaluations.
+
+</Warning>
+
+## How Is It Calculated?
+
+The Hallucination metric uses an LLM to determine for each context in contexts, whether there are any contradictions to the actual output.
+
+$$
+\text{Hallucination} = \frac{\text{Number of Contradicted Contexts}}{\text{Number of Contexts}}
+$$
+
+The final score is the proportion of contradicted contexts found in the actual output.
+
+## Create Locally
+
+You can create the `HallucinationMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import HallucinationMetric
+
+metric = HallucinationMetric()
+```
+
+### Optional Parameters
+
+<ParamField path="threshold" type="number" default={0.5}>
+    A float representing the maximum passing threshold.
+    
+    Unlike other metrics, the threshold for the `HallucinationMetric` is a maximum instead of a minimum threshold.
+
+</ParamField>
+<ParamField path="model" type="string | Object" default="gpt-4.1">
+    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+</ParamField>
+<ParamField path="include_reason" type="boolean" default={"true"}>
+    A boolean to enable the inclusion a reason for its evaluation score.
+</ParamField>
+<ParamField path="async_mode" type="boolean" default={"true"}>
+    A boolean to enable concurrent execution within the `measure()` method.
+</ParamField>
+<ParamField path="strict_mode" type="boolean" default={"false"}>
+    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+</ParamField>
+<ParamField path="verbose_mode" type="boolean" default={"false"}>
+    A boolean to print the intermediate steps used to calculate the metric score.
+</ParamField>
+
+<Success>
+  This can be used for both [single-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end) and
+  [component-level](/docs/llm-evaluation/single-turn/component-level) testing.
+</Success>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the hallucination metric by adding it to a single-turn [metric collection.](/metrics/metric-collections) This will allow you to use hallucination metric for:
+
+- Single-turn E2E testing
+- Single-turn component-level testing
+- Online and offline evals for traces and spans
