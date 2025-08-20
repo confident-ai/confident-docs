@@ -34,7 +34,17 @@ If you haven't already, create one under **Project** > **Datasets**:
 
 You can upload both single and multi-turn goldens stored in CSVs to datasets. The fields that you will be mapping to CSV headers will just be slightly different.
 
-[video]
+<Frame caption="Upload Goldens via CSV" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:upload-csv-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
 
 ## Manage Goldens via Evals API
 
@@ -218,7 +228,17 @@ You need to set the `overwrite` attribute to `false` to queue your `Conversation
 
 You can add custom columns to a dataset to hold additional additation data for each golden as long as they don't clash with any of the existing default field names (e.g. "Input", "Actual Output", etc.)
 
-[video]
+<Frame caption="Create Custom Columns" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:new-column-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
 
 You can also do it through the Evals API when pushing or queueing goldens by including the custom column key values field in single/multi-turn goldens:
 
@@ -258,6 +278,16 @@ const multiturnGolden = new ConversationalGolden({
 
 ## Assign Goldens For Annotation
 
-You can assign goldens to different team members for review and annotation.
+You can also assign goldens to different team members for review and annotation.
 
-[video]
+<Frame caption="Assign Goldens for Annotation" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:assign-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>

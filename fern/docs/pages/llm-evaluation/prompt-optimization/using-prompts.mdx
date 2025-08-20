@@ -5,11 +5,21 @@ slug: llm-evaluation/prompt-optimization/using-prompts
 
 ## Overview
 
-You can pull a prompt version from Confident AI like how you would pull a dataset. You should pull prompts once and save it in memory instead of pulling it everytime you need to use it.
+You can pull a prompt version from Confident AI like how you would pull a dataset. It works by:
 
-## Pull a Prompt Version
+- Providing Confident AI with the alias and optionally version of the prompt you wish to retrieve
+- Confident AI will provide the non-interpolated version of the prompt
+- You will then interpolate the variables in code
 
-Pull your prompt version from Confident AI by providing the `alias` you've defined:
+You should pull prompts once and save it in memory instead of pulling it everytime you need to use it.
+
+## Using Prompt Versions
+
+<Steps>
+
+<Step title="Pull prompt with alias">
+
+Pull your prompt version by providing the `alias` you've defined:
 
 <Tabs>
 
@@ -17,14 +27,11 @@ Pull your prompt version from Confident AI by providing the `alias` you've defin
   ```python
   from deepeval.prompt import Prompt
 
-  # Replace with your actual alias
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
 
-  prompt = Prompt(alias="System Prompt")
-  prompt.pull()
-
-  print(prompt._text_template)
-  ```
-  </Tab>
+````
+</Tab>
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
@@ -37,31 +44,50 @@ Pull your prompt version from Confident AI by providing the `alias` you've defin
   ```
   </Tab>
 
-  <Tab title="curL" language="curl">
-    <EndpointRequestSnippet
-      endpoint="GET /v1/prompts"
-    />
-  </Tab>
+<Tab title="curL" language="curl">
+  <EndpointRequestSnippet
+    endpoint="GET /v1/prompts"
+  />
+</Tab>
 
 </Tabs>
 
-You'll notice that unlike the `pull()` method on an `EvaluationDataset`, the `alias` is actually defined on `Prompt` instantiation instead. This is because the `pull()` method on a `Prompt` is reserved to specify the version instead.
+<Tip>
+By default, Confident AI will return the latest version of your prompt. However, you can also specify the `version` to override this behavior.
+</Tip>
 
-### Specify the Version
+</Step>
 
-When no parameters are provided to the `pull()` method, the latest version is pulled by default. To specify the version, simply supply the `version` as an argument:
+<Step title="Interpolate variables">
+
+
+Now that you have your prompt template, interpolate any dynamic variables you may have defined in your prompt version. For example, if this is your prompt version:
 
 <Tabs>
 
-  <Tab title="Python" language="python">
-  ```python
-  ...
+<Tab title="Messages" langauage="messages">
 
-  prompt.pull(version="00.00.01")
-  print(prompt._text_template)
+```json
+{
+  "role": "system",
+  "content": "You are a helpful assistant called {{ name }}. Speak normally like a human."
+}
+```
 
-  ```
-  </Tab>
+
+
+
+
+And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "Joe") would give you this prompt that is ready for use:
+
+```json
+{
+  "role": "system",
+  "content": "You are a helpful assistant called Joe. Speak normally like a human."
+}
+```
+
+</Tab>
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
@@ -84,20 +110,16 @@ When no parameters are provided to the `pull()` method, the latest version is pu
 
 </Tabs>
 
-## Interpolate Variables
 
-Now that you have your prompt template, use the `interpolate()` method to interpolate any dynamic variables you may have defined in your prompt version. For example, if you have a `{{ name }}` variable, it will look like this:
 
 <Tabs>
 
   <Tab title="Python" language="python">
   ```python
-  ...
+interpolated_prompt = prompt.interpolate(name="Joe")
+````
 
-  # Customized accordingly based on your variables
-  prompt_to_llm = prompt.interpolate(name="Joe")
-  ```
-  </Tab>
+</Tab>
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
@@ -109,44 +131,47 @@ Now that you have your prompt template, use the `interpolate()` method to interp
 
 </Tabs>
 
-And if you don't have any variables, you should still use the `interpolate()` method to create a copy of your prompt template to be used in your LLM application.
+And if you don't have any variables, you must still use the `interpolate()` method to create a copy of your prompt template to be used in your LLM application.
 
-<Error title="Warning">
-  Referencing the `template` variable in a `Prompt` class is extremely bad
-  practice and should be **avoided at all cost**. Always use the `interpolate()`
-  method before supplying prompt templates to your LLM application.
-</Error>
+</Step>
 
-## Pull a List of Prompt Messages
+<Step title="Use interpolated prompt">
 
-You pull prompt messages the same way you would pull a single prompt, the difference is it is now stored in the `_messages_template` variable instead, and you can print it out to see it for yourself:
+By now you should have an interpolated prompt version, for example:
 
 <Tabs>
 
-  <Tab title="Python" language="python">
-  ```python focus={1,3-5,13-14}
-  from deepeval.prompt import Prompt
+<Tab title="Messages" language="messages">
+```json
+{
+  "role": "system",
+  "content": "You are a helpful assistant called Joe. Speak normally like a human."
+}
+```
 
-  prompt = Prompt(alias="your-alias-here")
-  prompt.pull()
-  print(prompt._messages_template)
+Which you can use to generate text from your LLM provider of choice. Here are some examples with OpenAI:
 
-  # This will print the following
-  # [
-  #   PromptMessage(role="system", content="You are a helpful assistant."),
-  #   PromptMessage(role="user", content="What is the capital of France?"),
-  # ]
+<Tabs>
 
-  messages_to_llm = prompt.interpolate()
-  print(messages_to_llm)
+<Tab title="Python" language="python">
 
-  # This will print the following
-  # [
-  #   {"role": "system", "content": "You are a helpful assistant."},
-  #   {"role": "user", "content": "What is the capital of France?"}
-  # ]
-  ```
-  </Tab>
+```python main.py {10}
+from deepeval.prompt import Prompt
+from openai import OpenAI
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate() # interpolate prompt
+
+response = OpenAI().chat.completions.create(
+    model="gpt-4o-mini",
+    messages=interpolated_prompt
+)
+
+print(response.choices[0].message.content)
+```
+
+</Tab>
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
@@ -154,64 +179,65 @@ You pull prompt messages the same way you would pull a single prompt, the differ
   const prompt = new Prompt("System Prompt");
   await prompt.pull();
 
-  const messages_to_llm = prompt.interpolate({});
-  console.log(messages_to_llm);
+const messages_to_llm = prompt.interpolate({});
+console.log(messages_to_llm);
 
-  // This will print the following
-  // [
-  //   {"role": "system", "content": "You are a helpful assistant."},
-  //   {"role": "user", "content": "What is the capital of France?"}
-  // ]
-  ```
-  </Tab>
+// This will print the following
+// [
+// {"role": "system", "content": "You are a helpful assistant."},
+// {"role": "user", "content": "What is the capital of France?"}
+// ]
 
-  <Tab title="curL" language="curl">
-    <EndpointRequestSnippet
-      endpoint="GET /v1/prompts"
-    />
-  </Tab>
+````
+</Tab>
+
+<Tab title="curL" language="curl">
+  <EndpointRequestSnippet
+    endpoint="GET /v1/prompts"
+  />
+</Tab>
 
 </Tabs>
 
-To be clear, here is an example of how you can use it for OpenAI's APIs:
+</Tab>
+
+<Tab title="Text" language="text">
+
+```plaintext
+"You are a helpful assistant called Joe. Speak normally like a human."
+````
+
+Which you can use to generate text from your LLM provider of choice. Here are some examples with OpenAI:
 
 <Tabs>
 
-  <Tab title="Python" language="python">
-  ```python {5,10}
-  from openai import OpenAI
-  from deepeval.prompt import Prompt
+<Tab title="Python" language="python">
 
-  client = OpenAI()
-  prompt = Prompt(alias="your-alias-here")
-  prompt.pull()
+```python main.py {10}
+from deepeval.prompt import Prompt
+from openai import OpenAI
 
-  # Don't forget to interpolate it
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate() # interpolate prompt
 
-  messages_to_llm = prompt.interpolate()
+response = OpenAI().chat.completions.create(
+    model="gpt-4o-mini",
+    messages={"role": "system", "content": interpolated_prompt}
+)
 
-  def your_llm_app(user_input: str): # Combine dynamically with user input
-  messages = messages_to_llm + [{"role": "user", "content": user_input}]
+print(response.choices[0].message.content)
+```
 
-      response = client.chat.completions.create(
-          model="gpt-4",
-          messages=messages
-      )
-      return response.choices[0].message.content
-
-  # Print the response
-
-  print(your_llm_app("Hi!"))
-  ```
-  </Tab>
+</Tab>
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
   import { OpenAI } from "openai";
   import { Prompt } from "deepeval-ts";
 
-  async function main() {
-      const client = new OpenAI();
+async function main() {
+const client = new OpenAI();
 
       // Make sure to replace "your-alias-here" with your actual prompt alias
       const prompt = new Prompt("your-alias-here");
@@ -238,21 +264,21 @@ To be clear, here is an example of how you can use it for OpenAI's APIs:
 
       // Print the response
       console.log(response);
-  }
 
-  main().catch(console.error);
+}
 
-  ```
-  </Tab>
+main().catch(console.error);
+
+```
+</Tab>
 
 </Tabs>
 
+</Tab>
 
+</Tabs>
 
-```
+</Step>
 
-```
-
-```
-
+</Steps>
 ```

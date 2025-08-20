@@ -4,12 +4,14 @@ subtitle: Learn how to find the best models, prompts, etc. for your LLM app
 slug: llm-evaluation/dashboards/model-and-prompt-insights
 ---
 
+## Overview
+
 When running evaluations, it's important to log hyperparameters to track which configurations were used for each test run. This allows you to compare different versions of prompts, models, and other settings to make data-driven decisions about your LLM application.
 
-<Callout type="warning">
+<Warning>
   This is currently only supported for [end-to-end
   evaluation](/docs/llm-evaluation/end-to-end-evals).
-</Callout>
+</Warning>
 
 If you're unsure what are hyperparameters or the types of hyperparameters available, [click here.](/docs/concepts/hyperparameters)
 
@@ -25,11 +27,15 @@ If you're unsure what are hyperparameters or the types of hyperparameters availa
 
 Prompts are a **type** of hyperparameter, and in Confident AI, you can include them as hyperparameters to [test each prompt's performance](/docs/prompt-management/prompt-testing) when running an evaluation:
 
-```python
+<Tabs>
+
+<Tab title="Python" langauag="python">
+
+```python main.py
 from deepeval.prompt import Prompt
 from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.test_case import LLMTestCase
 from deepeval import evaluate
-...
 
 # Pull your prompt version
 prompt = Prompt(alias="your-prompt-alias")
@@ -37,32 +43,42 @@ prompt.pull()
 
 # Run an evaluation with the prompt as a hyperparameter
 evaluate(
-    test_cases=dataset.test_cases,
+    test_cases=[LLMTestCase(input="...", actual_output="...")],
     metrics=[AnswerRelevancyMetric()],
     hyperparameters={"System Prompt": prompt}
 )
 ```
 
-Since hyperparameters are stored as key-value pairs in a dictionary (`Dict[str, Prompt]`), the type of a hyperparameter is determined by its first initial value logged:
+</Tab>
 
-1. If you first log a `Prompt` object for a hyperparameter key, that key will be treated as a prompt type hyperparameter.
-2. If you later log string values for the same key, the hyperparameter will remain a prompt type.
-3. Any new string values logged for this key will be treated as potential new prompt versions.
+<Tab title="Typescript" langauag="typescript">
 
-<Callout type="warning">
-  You should **NEVER** log the interpolated version of your prompt template.
-  This will create a unique version for each variable substitution, making it
-  impossible to meaningfully compare prompt performance. Always log the `Prompt`
-  instance itself.
-</Callout>
+[TODO kritin]
 
-## Models
+</Tab>
 
-You can also log model information as hyperparameters to track which model versions or configurations were used:
+<Tab title="curL" langauag="curl">
 
-```python
-...
+[TODO vamshi]
 
+</Tab>
+
+</Tabs>
+
+You should **NEVER** log the interpolated version of your prompt template.
+This will create a unique version for each variable substitution, making it
+impossible to meaningfully compare prompt performance. Always log the `Prompt`
+instance itself.
+
+## Models and Others
+
+You can also log model and other parameter information as hyperparameters to track which model versions or configurations were used for a test run:
+
+<Tabs>
+
+<Tab title="Python" langauag="python">
+
+```python main.py
 evaluate(
     test_cases=dataset.test_cases,
     metrics=[AnswerRelevancyMetric()],
@@ -72,23 +88,36 @@ evaluate(
 )
 ```
 
-## Others
+</Tab>
 
-You can log any other hyperparameters that has good influence over your LLM app's performance:
+<Tab title="Typescript" langauag="typescript">
 
-```python
-...
+[TODO kritin]
 
-evaluate(
-    test_cases=dataset.test_cases,
-    metrics=[AnswerRelevancyMetric()],
-    hyperparameters={
-        "System Prompt": prompt,
-        "Model": "gpt-4",
-        "Temperature": 0.7,
-        "Max Tokens": 1000,
-    }
-)
+</Tab>
+
+<Tab title="curL" langauag="curl">
+
+[TODO vamshi]
+
+</Tab>
+
+</Tabs>
+
+## In CI/CD
+
+For python users of `deepeval`, you can log parameteres in CI/CD using the `@deepeval.log_hyperparameters()` decorator on top of a function that returns a dictionary of string and prompts:
+
+```python test_llm_app.py
+from deepeval.prompt import Prompt
+import deepeval
+
+prompt = Prompt(alias="your-prompt-alias")
+prompt.pull()
+
+@deepeval.log_hyperparameters()
+def hyperparameters():
+    return {"System Prompt": prompt, "Model": "YOUR-MODEL-NAME"}
 ```
 
-All hyperparameters that you associate with test runs can be viewed on individual [testing reports](/docs/llm-evaluation/evaluation-features/testing-reports) on Confident AI by clicking the **View Hyperparameters** button on a test run's **Overview** page. You can also filter for test runs that are associated with certain hyperparameters on the **Evaluations** page under your project space.
+Now everytime when you run `deepeval test run`, every test file will be ran as unit-tests while logging parameters as part of your test run. Go to the [next section](/docs/llm-evaluation/unit-testing-cicd) to learn more about unit-testing in CI/CD.

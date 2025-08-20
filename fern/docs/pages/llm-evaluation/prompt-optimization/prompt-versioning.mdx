@@ -1,23 +1,20 @@
 ---
-subtitle: Managing prompt versions
+subtitle: Create and manage diferent versions of your prompts
 slug: llm-evaluation/prompt-optimization/prompt-versioning
-description: Learn about prompt versioning
 ---
 
 ## Overview
 
-Confident AI's **Prompt Studio** allows you to create and version different versions of your prompts. This allows you to:
+Prompt versioning allows you to optimize and test different versions of your prompts. Managing prompts on Confident AI allows you to:
 
 1. Collaborate and centralize where prompt is stored and edited, even for non-technical team members
-2. Use it within your LLM application
-3. Pinpoint which version, or even combination of your prompt versions, performs best
+2. Pinpoint which version, or even combination of your prompt versions, performed best
 
 There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping on prompts on Confident AI can you fully leverage Confident AI's evaluation features.
 
 <Note>
-  Prompts are a type of hyperparameter on Confident AI. Other
-  [hyperparameters](/docs/concepts/hyperparameters) include things like models,
-  embedders, top-K, and max tokens. By running evaluations using the same
+  Prompts are a type of hyperparameter on Confident AI. Other include things
+  like models, embedders, top-K, and max tokens. When you run evals against
   prompts that kept on Confident AI, we can tell you which version performs
   best, and later automatically optimize it for you.
 </Note>
@@ -36,9 +33,7 @@ There are two types of prompts you can create:
 
 ## Prompts vs Prompt Versions
 
-A **prompt** is a reusable instruction template that guides your LLM application. In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
-
-A **prompt version** represents a different variation of the same prompt. Each `version` is an iteration or improvement of the original prompt, serving the same purpose but with adjustments—similar to how software versions evolve over time.
+In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
 
 <Info title="Example">
 Suppose you have a prompt with the alias `MyPrompt`. This prompt can have multiple versions, such as `0.0.1`, `0.0.2`, ..., up to `1.0.0`.
@@ -54,13 +49,57 @@ flowchart TD
 
 </Info>
 
-## Create a Prompt Text
+A **prompt version** represents a different variation of the same prompt. Each `version` is an iteration or improvement of the original prompt, serving the same purpose but with adjustments—similar to how software versions evolve over time.
 
-You can create prompts in the Confident AI platform
+## Create a Prompt Version
 
-## Create Prompt Messages
+You can create a prompt version in **Project** > **Prompt Studio** through two simple steps:
 
-## Using Dynamic Variables
+1. Create a text or messages prompt
+2. Edit and commit an initial prompt version in the prompt editor
+
+<Tip>A prompt cannot be both a text and message prompt at the same time.</Tip>
+
+<Tabs>
+
+<Tab title="Messages">
+
+<Frame caption="Create Prompt Messages" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-messages-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+</Tab>
+
+<Tab title="Text">
+
+<Frame caption="Create Prompt Text" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-text-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+</Tab>
+
+</Tabs>
+
+Don't forget to **commit** an initial version of your prompt after you're done
+editing it.
+
+## Setting Dynamic Variables
 
 You can include variables that can be interpolated dynamically in your LLM application later on. There are four ways currently for you to include variables:
 
@@ -89,8 +128,4 @@ For example:
 
 ```
 
-You can select which variable interpolation type you wish to use in the **Prompt Editor**.
-
-```
-
-```
+In the next section, we'll show you how to work with prompts you've created on Confident AI.

@@ -1,5 +1,154 @@
 ---
-subtitle: G-Eval Metric
-slug: metrics/custom-metrics/g-eval-metric
-description: The G-Eval Metric For Multi-Turn Test Cases
+subtitle: Learn how to create and use custom metrics locally and remotely
+slug: metrics/custom-metrics
 ---
+
+## Overview
+
+Custom metrics are one of the most important metrics for testing LLM apps as they allow you to evaluate on criteria specific to your use case. You can create and use custom metrics either:
+
+- **Locally**, to run evals on your machine before sending test results to Confident AI’s
+- **Remotely**, to run evals on Confident AI directly
+
+Running custom metrics locally gives you code-level control over your metrics, but they are only limited to python users using `deepeval` and is not available for on/offline evals in production.
+
+<CardGroup cols={2}>
+  <Card
+    title="Local Evals"
+    icon="laptop"
+    iconType="solid"
+  >
+
+    - Run evaluations locally using `deepeval` with full control over metrics
+    - Support for custom metrics, DAG, and advanced evaluation algorithms
+
+    **Suitable for:** Python users, development, and pre-deployment workflows
+
+  </Card>
+  <Card
+    title="Remote Evals"
+    icon="cloud"
+    iconType="solid"
+  >
+
+    - Run evaluations on Confident AI platform with pre-built metrics
+    - Integrated with monitoring, datasets, and team collaboration features
+
+    **Suitable for:** Non-python users, online + offline evals for tracing in prod
+
+  </Card>
+</CardGroup>
+
+## How It Works
+
+Currently, all custom metrics on Confident AI uses the G-Eval algorithm. It first:
+
+1. Generates a list of evaluation steps, using an initial custom criteria
+2. Uses this list of evaluation steps to compute a score from 0 - 10
+3. Normalizes and takes a weighted summation of the final score to make the score more reliable
+4. The final score is then divided by 10 to normalize it to the range 0 - 1
+
+Custom metrics also provide an optional rubric, which you can use to confine custom metric scores in-between a certain range.
+
+<Note>
+  The evaluation steps **does not determine** what score G-Eval gives, but
+  simply guide the LLM judge as a form of CoT to output something more reliable.
+</Note>
+
+If you're creating custom metrics locally, you can implement anything you wish.
+
+## Create Custom Metrics on the Platform
+
+Single or multi-turn custom metrics can be created under **Project** > **Metrics** > **Library**.
+
+<Steps>
+
+<Step title="Fill in metric details">
+
+Provide the metric name, and optionally a description. You can also toggle whether you're creating a single-turn or multi-turn metric.
+
+[video]
+
+<Warning>
+  Your metric name must be unique in your project and clash with any of the
+  default metric names.
+</Warning>
+
+</Step>
+
+<Step title="Select required parameters">
+
+Custom metrics needs to know which parameters in test cases it should consider during evaluation for the results to be accurate and reliable. This step gives you the opportunity to do exactly this.
+
+<Tabs>
+
+<Tab title="Single-Turn"></Tab>
+<Tab title="Multi-Turn"></Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Define custom criteria">
+
+<Tip>
+  A custom criteria helps Confident AI generate evaluation steps and is what
+  separates an out-of-the-box metric to a custom one.
+</Tip>
+
+You **must mention** the names of the required parameters you've selected from the previous step. For example, if you've selected the "Input" and "Actual Output" for a single-turn use case, you criteria could be something like:
+
+```plaintext wordWrap
+Given the 'input' and 'actual output' which are the query and answer to an AI medical chatbot,
+determine whether the 'actual output' is relevant and helpful to the 'input'.
+
+Penalize heavily if not helpful. Relevancy is not so important.
+```
+
+[video]
+
+Criteria are used for generating evaluation steps, and not used directly for evaluation.
+
+</Step>
+
+<Step title="Outline evaluation steps (optional)">
+
+This step is optional because Confident AI will auto generate evaluation steps based on your criteria if not provided one.
+
+However, providing evaluation steps gives custom metrics more reliable scores, as Confident AI will skip the steps generation process if one is provided.
+
+<Warning>
+  You should **not** outline what scores to return at this stage (that goes in
+  the rubric which we will talk about later).
+</Warning>
+
+[video]
+
+</Step>
+
+<Step title="Setup rubric (optional)">
+
+Lastly, you can optionally provide a set of rubrics to confine evaluation scores. Your list of rubrics must:
+
+- Not overlap in score range
+- Contain a clear expected outcome for each score range
+- Be inclusive of 0 - 10
+
+[video]
+
+</Step>
+
+</Steps>
+
+Done ✅. You can now add your custom metric to a metric collection to start running remote evals.
+
+## Create Custom Metrics Locally
+
+You can create custom metrics using various methods through `deepeval`:
+
+- [`GEval`](https://deepeval.com/docs/metrics-llm-evals): SOTA LLM-as-a-judge framework
+- [`DAGMetric`](https://deepeval.com/docs/metrics-dag): Decision-based LLM-as-a-judge framework
+- [`ConversationalGEval`](https://deepeval.com/docs/metrics-conversational-g-eval): G-Eval but for multi-turn use cases
+- [Do it yourself](https://deepeval.com/docs/metrics-custom): 100% custom metric that you can implement it code
+
+The best place to learn how to create custom metrics locally would be to use `deepeval`'s documentation, which you can navigate to by clicking on the respective links above.
