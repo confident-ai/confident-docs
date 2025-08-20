@@ -1,5 +1,52 @@
 ---
-subtitle: Answer Relevancy Metric
+subtitle: Answer relevancy is a single-turn metric to evaluate RAG generators
 slug: metrics/single-turn/answer-relevancy-metric
-description: The Answer Relevancy Metric For Single-Turn Test Cases
 ---
+
+[pills to show it is available locally on deepeval and on platform]
+
+## Overview
+
+The answer relevancy metric uses LLM-as-a-judge to measure the quality of your RAG generator's quality by assessing whether your test case's actual outputs are relevant to the given input. It is a single-turn metric to evaluate RAG QA specifically, and not general RAG.
+
+<Warning>
+
+The input of a test case should not contain the entire prompt, but just the query when using the answer relevanacy metric.
+
+</Warning>
+
+## How Is It Calculated?
+
+The answer relevancy metric first breaks down a test case's actual output into distinct statements, before determining the proportion of statements that are relevant to the given input.
+
+[equation here?]
+
+The final score is the proportion of relevant statements found in the actual output.
+
+## Create Locally
+
+You can create the `AnswerRelevancyMetric` in `deepeval` as follows:
+
+```python
+from deepeval.metrics import AnswerRelevancyMetric
+
+metric = AnswerRelevancyMetric()
+```
+
+[parameters go here, don't copy deepeval directly]
+
+<Success>
+  This can be used for both [single-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end) and
+  [component-level](/docs/llm-evaluation/single-turn/component-level) testing.
+</Success>
+
+## Create Remotely
+
+For users not using `deepeval` python, or want to run evals remotely on Confident AI, you can use the answer relevanacy metric by adding it to a single-turn [metric collection.](link to metric collection) This will allow you to use answer relevnacy for:
+
+- Single-turn E2E testing
+- Single-turn component-level testing
+- Online and offline evals for traces and spans
+
+[^ insert correct links above]
