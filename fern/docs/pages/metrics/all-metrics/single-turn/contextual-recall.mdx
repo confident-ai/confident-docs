@@ -5,6 +5,8 @@ slug: metrics/single-turn/contextual-recall-metric
 
 [pills to show it is available locally on deepeval and on platform]
 
+## Overview
+
 The contextual recall metric uses LLM-as-a-judge to measure the quality of your RAG retriever by evaluating the extent of which your test case's retrieval context aligns with the expected output. It is a single-turn metric to evaluate RAG retriver only.
 
 <Warning>
@@ -17,9 +19,13 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 The contextual recall metric first uses an LLM to extract all statements made in the expected output, and then uses the same LLM to classify whether each statement can be attributed to the nodes present in the retrieval context.
 
+<br />
+
 $$
 \text{Contextual Recall} = \frac{\text{Number of Attributable Statements}}{\text{Total Number of Statements}}
 $$
+
+<br />
 
 The final score is the proportion of attributable statements in retrieval context.
 
@@ -36,25 +42,32 @@ metric = ContextualRecallMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
-<ParamField path="evaluation_template" type="ContextualRecallTemplate" default={"deepeval's template"}>
-    An instance of `ContextualRecallTemplate` object, which allows you to override the default prompts used to compute the `ContextualRecallMetric` score.
+<ParamField
+  path="evaluation_template"
+  type="ContextualRecallTemplate"
+  default={"deepeval's template"}
+>
+  An instance of `ContextualRecallTemplate` object, which allows you to override
+  the default prompts used to compute the `ContextualRecallMetric` score.
 </ParamField>
 
 <Success>

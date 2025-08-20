@@ -19,9 +19,13 @@ You need to supply the `chatbot_role` in all of your conversational test cases.
 
 The role adherence metric iterates over each assistant turn and uses an LLM to evaluate whether the content adheres to the specified `chatbot_role`, using previous conversation turns as context.
 
+<br />
+
 $$
 \text{Role Adherence} = \frac{\text{Number of Assistant Turns that Adhered to Chatbot Role in Conversation}}{\text{Total Number of Assistant Turns in Conversation}}
 $$
+
+<br />
 
 The final score is the proportion of assisant turns that adhere to the role specified in the conversation.
 
@@ -38,26 +42,29 @@ metric = RoleAdherenceMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
 
 <Success>
-  This can be used for [multi-turn E2E](/docs/llm-evaluation/single-turn/end-to-end)
+  This can be used for [multi-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end)
 </Success>
 
 ## Create Remotely

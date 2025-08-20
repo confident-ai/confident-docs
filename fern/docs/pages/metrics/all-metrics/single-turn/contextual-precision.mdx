@@ -5,6 +5,8 @@ slug: metrics/single-turn/contextual-precision-metric
 
 [pills to show it is available locally on deepeval and on platform]
 
+## Overview
+
 The contextual precision metric uses LLM-as-a-judge to measure the quality of your RAG retriever by assessing whether your test case's retrieval context nodes are relevant to the given input. It is a single-turn metric to evaluate RAG retriver only.
 
 <Warning>
@@ -17,9 +19,13 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 The contextual precison metric first uses an LLM to determine for each node in the retrieval context whether it is relevant to the input based on information in the expected output. After which it calculates the weighted cumulative precision as the contextual precision score.
 
+<br />
+
 $$
 \text{Contextual Precision} = \frac{1}{\text{Num of Relevant Nodes}}\sum_{k=1}^{n}(\frac{\text{Num of Relevant Nodes Upto position k}}{k} \times r_k)
 $$
+
+<br />
 
 The final score is the proportion of weighted cumulative precision.
 
@@ -36,25 +42,33 @@ metric = ContextualPrecisionMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
-<ParamField path="evaluation_template" type="ContextualPrecisionTemplate" default={"deepeval's template"}>
-    An instance of `ContextualPrecisionTemplate` object, which allows you to override the default prompts used to compute the `ContextualPrecisionMetric` score.
+<ParamField
+  path="evaluation_template"
+  type="ContextualPrecisionTemplate"
+  default={"deepeval's template"}
+>
+  An instance of `ContextualPrecisionTemplate` object, which allows you to
+  override the default prompts used to compute the `ContextualPrecisionMetric`
+  score.
 </ParamField>
 
 <Success>

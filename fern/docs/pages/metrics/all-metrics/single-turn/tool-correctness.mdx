@@ -19,9 +19,13 @@ The tool correctness metric needs you to supply both tools called and expected t
 
 The tool correctness metric assesses the accuracy of your agent's tool usage by comparing the tools called by your LLM agent to the list of expected tools.
 
+<br />
+
 $$
 \text{Tool Correctness} = \frac{\text{Number of Correctly Used Tools(or Correct Input Parameters / Outputs)}}{\text{Total Number of Tools Called}}
 $$
+
+<br />
 
 The final score is the proportion of correctly used tools from tools called.
 
@@ -38,25 +42,29 @@ metric = ToolCorrectnessMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="evaluation_params" type="list" default="an empty list">
-    A list of `ToolCallParams` indicating the strictness of the correctness criteria, available options are `ToolCallParams.INPUT_PARAMETERS` and `ToolCallParams.OUTPUT`.
+  A list of `ToolCallParams` indicating the strictness of the correctness
+  criteria, available options are `ToolCallParams.INPUT_PARAMETERS` and
+  `ToolCallParams.OUTPUT`.
 </ParamField>
 <ParamField path="should_consider_ordering" type="boolean" default={"false"}>
-    A boolean which when set to True, will consider the ordering in which the tools were called in.
+  A boolean which when set to True, will consider the ordering in which the
+  tools were called in.
 </ParamField>
 <ParamField path="should_exact_match" type="boolean" default={"false"}>
-    A boolean which when set to True, will required the tools called and expected tools to be exactly the same.
+  A boolean which when set to True, will required the tools called and expected
+  tools to be exactly the same.
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
 
 <Success>

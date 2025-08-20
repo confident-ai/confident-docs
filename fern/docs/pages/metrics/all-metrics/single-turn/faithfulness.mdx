@@ -13,12 +13,17 @@ The faithfulness metric uses LLM-as-a-judge to measure the quality of your RAG's
 
 The faithfulness metric first uses an LLM to extract all claims made in the actual output, and then uses the same LLM to classify whether each claim is truthful based on the facts presented in the retrieval context.
 
+<br />
+
 $$
 \text{Faithfulness} = \frac{\text{Number of Truthful Claims}}{\text{Total Number of Claims}}
 $$
 
+<br />
+
 <Tip>
-A claim is considered truthful if it does not contradict any facts presented in the retrieval context.
+  A claim is considered truthful if it does not contradict any facts presented
+  in the retrieval context.
 </Tip>
 
 The final score is the proportion of truthful claims found in the actual output.
@@ -36,25 +41,32 @@ metric = FaithfulnessMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
-<ParamField path="evaluation_template" type="FaithfulnessTemplate" default={"deepeval's template"}>
-    An instance of `FaithfulnessTemplate` object, which allows you to override the default prompts used to compute the `FaithfulnessMetric` score.
+<ParamField
+  path="evaluation_template"
+  type="FaithfulnessTemplate"
+  default={"deepeval's template"}
+>
+  An instance of `FaithfulnessTemplate` object, which allows you to override the
+  default prompts used to compute the `FaithfulnessMetric` score.
 </ParamField>
 
 <Success>

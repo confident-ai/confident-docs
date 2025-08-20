@@ -19,9 +19,13 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 The answer relevancy metric first breaks down a test case's actual output into distinct statements, before determining the proportion of statements that are relevant to the given input.
 
+<br />
+
 $$
 \text{Answer Relevanacy} = \frac{\text{Number of Relevant Statements}}{\text{Total Number of Statements}}
 $$
+
+<br />
 
 The final score is the proportion of relevant statements found in the actual output.
 
@@ -38,25 +42,32 @@ metric = AnswerRelevancyMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
-<ParamField path="evaluation_template" type="AnswerRelevancyTemplate" default={"deepeval's template"}>
-    An instance of `AnswerRelevancyTemplate` object, which allows you to override the default prompts used to compute the `AnswerRelevancyMetric` score.
+<ParamField
+  path="evaluation_template"
+  type="AnswerRelevancyTemplate"
+  default={"deepeval's template"}
+>
+  An instance of `AnswerRelevancyTemplate` object, which allows you to override
+  the default prompts used to compute the `AnswerRelevancyMetric` score.
 </ParamField>
 
 <Success>

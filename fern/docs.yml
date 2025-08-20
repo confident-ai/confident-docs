@@ -117,12 +117,15 @@ navigation:
         contents:
           - page: Custom Metrics
             path: docs/pages/metrics/custom-metrics.mdx
+            icon: fa-light fa-gauge-high
           - page: Metric Collection
             path: docs/pages/metrics/metric-collection.mdx
+            icon: fa-light fa-chart-line
           - section: All Metrics
             collapsed: false
+            icon: fa-light fa-list-check
             contents:
-              - section: Single Turn
+              - section: Single-Turn
                 collapsed: false
                 contents:
                   - page: Answer Relevancy
@@ -147,7 +150,7 @@ navigation:
                     path: docs/pages/metrics/all-metrics/single-turn/tool-correctness.mdx
                   - page: Toxicity
                     path: docs/pages/metrics/all-metrics/single-turn/toxicity.mdx
-              - section: Multi Turn
+              - section: Multi-Turn
                 collapsed: false
                 contents:
                   - page: Conversation Completeness

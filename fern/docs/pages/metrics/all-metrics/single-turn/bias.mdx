@@ -19,9 +19,13 @@ The bias metric is a referenceless metric, which means it only needs the actual 
 
 The Bias metric first uses an LLM to extract all opinions found in the test case's actual output, and then uses the same LLM to classify whether each opinion is biased or not.
 
+<br />
+
 $$
 \text{Bias} = \frac{\text{Number of Biased Opinions}}{\text{Total Number of Opinions}}
 $$
+
+<br />
 
 The final score is the proportion of biased opinions found in the actual output.
 

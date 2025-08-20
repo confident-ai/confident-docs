@@ -9,45 +9,6 @@ description: Learn about LLM tracing with Confident AI
 
 Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps, but with an additional suite of 30+ evaluation metrics to track continuous performance over time.
 
-<Tabs>
-  <Tab title="Traces">
-    You can log a **single-turn LLM interaction** through LLM tracing. Traces
-    are a single execution of your LLM app, and running evals on traces is akin
-    to the [end-to-end evals](/llm-evaluation-end-to-end-evals) for LLM
-    evaluation in development.
-    <Frame caption="LLM Tracing: Traces with Evals">
-      <video
-        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:traces.mp4"
-        controls
-      />
-    </Frame>
-  </Tab>
-  <Tab title="Spans">
-    Spans are **individual components** such as LLM calls, agents, retrieveres,
-    tools, etc. that make up a trace. Running evals on spans is akin to the
-    [component-level evals](/llm-evaluation-component-level-evals) for LLM
-    evaluation in development.
-    <Frame caption="LLM Tracing: Spans with Evals">
-      <video
-        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:spans.mp4"
-        controls
-      />
-    </Frame>
-  </Tab>
-  <Tab title="Threads">
-    Threads are **a group of traces**, grouped together via a `thread_id` that
-    you provide during tracing. It represents a **multi-turn LLM interaction**,
-    and running evals on threads require **multi-turn** metrics, akin to running
-    evals on `ConversationalTestCase`s in development.
-    <Frame caption="LLM Tracing: Threads with Evals">
-      <video
-        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:threads.mp4"
-        controls
-      />
-    </Frame>
-  </Tab>
-</Tabs>
-
 ## Get Started
 
 Get LLM tracing for your LLM app with best in-class-evals.

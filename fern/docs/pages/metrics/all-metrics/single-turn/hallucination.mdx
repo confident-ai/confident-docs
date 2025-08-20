@@ -19,9 +19,13 @@ The hallucination metric needs an actual output and context in the test case to 
 
 The Hallucination metric uses an LLM to determine for each context in contexts, whether there are any contradictions to the actual output.
 
+<br />
+
 $$
 \text{Hallucination} = \frac{\text{Number of Contradicted Contexts}}{\text{Number of Contexts}}
 $$
+
+<br />
 
 The final score is the proportion of contradicted contexts found in the actual output.
 

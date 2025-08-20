@@ -7,7 +7,7 @@ slug: metrics/single-turn/knowledge-retention-metric
 
 ## Overview
 
-The knowledge retention metric is a conversational metric that determines whether your LLM chatbot is able to retain factual information presented throughout a conversation. 
+The knowledge retention metric is a conversational metric that determines whether your LLM chatbot is able to retain factual information presented throughout a conversation.
 
 <Warning>
 
@@ -19,9 +19,13 @@ The knowledge retention metric is great for a LLM powered questionnaire use case
 
 The knowledge retention metric uses an LLM to extract knowledge supplied in `content` by the `user` role throughout turns, before using the same LLM to determine whether each corresponding `assistant` content indicates an inability to recall said knowledge.
 
+<br />
+
 $$
 \text{Knowledge Retention} = \frac{\text{Number of Assistant Turns without Knowledge Attritions}}{\text{Total Number of Assistant Turns}}
 $$
+
+<br />
 
 The final score is the proportion of assisant turns with knowledge attrition found in the conversation.
 
@@ -38,26 +42,29 @@ metric = KnowledgeRetentionMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
 
 <Success>
-  This can be used for [multi-turn E2E](/docs/llm-evaluation/single-turn/end-to-end)
+  This can be used for [multi-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end)
 </Success>
 
 ## Create Remotely

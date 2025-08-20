@@ -19,9 +19,13 @@ The toxicity metric is a referenceless metric, which means it only needs the act
 
 The Toxicity metric first uses an LLM to extract all opinions found in the actual output, and then uses the same LLM to classify whether each opinion is toxic or not.
 
+<br />
+
 $$
 \text{Toxicity} = \frac{\text{Number of Toxic Opinions}}{\text{Total Number of Opinions}}
 $$
+
+<br />
 
 The final score is the proportion of biased opinions found in the actual output.
 

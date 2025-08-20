@@ -13,9 +13,13 @@ The turn relevancy metric is a conversational metric that determines whether you
 
 The turn relevancy metric first constructs a sliding windows of turns for each turn, before using an LLM to determine whether the last turn in each sliding window has an `assistant` content that is relevant to the previous conversational context found in the sliding window.
 
+<br />
+
 $$
 \text{Turn Relevancy} = \frac{\text{Number of Assistant Turns with Relevant Assistant Content}}{\text{Total Number of Assistant Turns}}
 $$
+
+<br />
 
 The final score is the proportion of assisant turns that give relevant output in the conversation.
 
@@ -32,29 +36,33 @@ metric = TurnRelevancyMetric()
 ### Optional Parameters
 
 <ParamField path="threshold" type="number" default={0.5}>
-    A float to represent the minimum passing threshold.
+  A float to represent the minimum passing threshold.
 </ParamField>
 <ParamField path="window_size" type="number" default={10}>
-    An integer which defines the size of the sliding window of turns used during evaluation.
+  An integer which defines the size of the sliding window of turns used during
+  evaluation.
 </ParamField>
 <ParamField path="model" type="string | Object" default="gpt-4.1">
-    A string specifying which of OpenAI's GPT models to use OR any custom LLM model of type [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms). 
+  A string specifying which of OpenAI's GPT models to use OR any custom LLM
+  model of type
+  [`DeepEvalBaseLLM`](https://deepeval.com/guides/guides-using-custom-llms).
 </ParamField>
 <ParamField path="include_reason" type="boolean" default={"true"}>
-    A boolean to enable the inclusion a reason for its evaluation score.
+  A boolean to enable the inclusion a reason for its evaluation score.
 </ParamField>
 <ParamField path="async_mode" type="boolean" default={"true"}>
-    A boolean to enable concurrent execution within the `measure()` method.
+  A boolean to enable concurrent execution within the `measure()` method.
 </ParamField>
 <ParamField path="strict_mode" type="boolean" default={"false"}>
-    A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
+  A boolean to enforce a binary metric score: 0 for perfection, 1 otherwise.
 </ParamField>
 <ParamField path="verbose_mode" type="boolean" default={"false"}>
-    A boolean to print the intermediate steps used to calculate the metric score.
+  A boolean to print the intermediate steps used to calculate the metric score.
 </ParamField>
 
 <Success>
-  This can be used for [multi-turn E2E](/docs/llm-evaluation/single-turn/end-to-end)
+  This can be used for [multi-turn
+  E2E](/docs/llm-evaluation/single-turn/end-to-end)
 </Success>
 
 ## Create Remotely

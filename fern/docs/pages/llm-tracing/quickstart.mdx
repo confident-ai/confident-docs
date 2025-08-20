@@ -1,11 +1,53 @@
 ---
 title: LLM Tracing Quickstart
-subtitle: Quick start for setting up LLM tracing on Confident AI.
+subtitle: Setup LLM observability for your application in less than 5 minutes
 slug: llm-tracing/quickstart
-description: Get started with LLM tracing in minutes
 ---
 
-To use LLM Tracing, you will need to setup the `@observe` decorator through DeepEval in your project.
+## Overview
+
+Confident AI allows anyone building with any framework, language, and LLMs to setup LLM observability through tracing.
+
+<Tabs>
+  <Tab title="Traces">
+    Traces are a single execution of your LLM app, and running evals on traces
+    is akin to the [end-to-end
+    evals](/docs/llm-evaluation/single-turn/end-to-end) for single-turn
+    evaluation in development.
+    <Frame caption="LLM Tracing: Traces with Evals">
+      <video
+        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:traces.mp4"
+        controls
+      />
+    </Frame>
+  </Tab>
+  <Tab title="Spans">
+    Spans are individual components such as LLM calls, agents, retrieveres,
+    tools, etc. that make up a trace. Running evals on spans is akin to the
+    [component-level evals](/docs/llm-evaluation/single-turn/component-level)
+    for multi-turn evaluation in development.
+    <Frame caption="LLM Tracing: Spans with Evals">
+      <video
+        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:spans.mp4"
+        controls
+      />
+    </Frame>
+  </Tab>
+  <Tab title="Threads">
+    Threads are **a group of traces**, grouped together via a `thread_id` that
+    you provide during tracing. It represents a multi-turn LLM interaction,
+    exactly the same as [E2E multi-turn
+    evals.](/docs/llm-evaluation/multi-turn/end-to-end)
+    <Frame caption="LLM Tracing: Threads with Evals">
+      <video
+        src="https://confident-docs.s3.us-east-1.amazonaws.com/llm-tracing:threads.mp4"
+        controls
+      />
+    </Frame>
+  </Tab>
+</Tabs>
+
+## Trace Your First LLM App
 
 <Tabs>
   <Tab title="Python">
@@ -53,9 +95,9 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
           ```python title="main.py" focus={2,6,17}
           from openai import OpenAI
           from deepeval.tracing import observe
-           
+
           client = OpenAI()
-           
+
           @observe()
           def llm_app(query: str) -> str:
               return client.chat.completions.create(
@@ -65,7 +107,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
                   ]
               ).choices[0].message.content
               return
-           
+
           # Call app to send trace to Confident AI
           llm_app("Write me a poem.")
           ```
@@ -76,9 +118,9 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         ✅ You just created a trace with a span inside it. Go to the Observatory to see your traces there.
 
         <Accordion title="What is a Trace and Span?">
-          - **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application  
-          - **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)  
-          
+          - **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application
+          - **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)
+
           Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. When you have tracing setup, you can run evaluations on both the trace and span level.
         </Accordion>
 
@@ -86,7 +128,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
       </Step>
 
       <Step title="Run An Online Evaluation">
-        You can run online evaluation on both [end-to-end](/docs/llm-evaluation/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/component-level-evals) (metrics on the span) evaluations on Confident AI. 
+        You can run online evaluation on both [end-to-end](/docs/llm-evaluation/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/component-level-evals) (metrics on the span) evaluations on Confident AI.
 
         First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
@@ -116,6 +158,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
       </Step>
 
     </Steps>
+
   </Tab>
 
   <Tab title="TypeScript">
@@ -158,7 +201,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
           ```ts title="index.ts" focus={2,13,16}
           import OpenAI from 'openai';
           import { observe } from '@deepeval-ts/tracing';
-            
+
           const llmApp = async (query: string) => {
             const openai = new OpenAI();
             const res = await openai.chat.completions.create({
@@ -167,9 +210,9 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
             });
             return res.choices[0].message.content;
           };
-            
+
           const observedLlmApp = observe({ fn: llmApp });
-            
+
           // Call app to send trace to Confident AI
           observedLlmApp("Write me a poem.");
           ```
@@ -180,8 +223,8 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
         ✅ You just created a trace with a span inside it. Go to the Observatory to see your traces there.
 
         <Accordion title="What is a Trace and Span?">
-          - **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application  
-          - **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)  
+          - **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application
+          - **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)
 
           Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. When you have tracing setup, you can run evaluations on both the trace and span level.
         </Accordion>
@@ -190,14 +233,14 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
       </Step>
 
       <Step title="Run An Online Evaluation">
-        You can run online evaluation on both [end-to-end](/docs/llm-evaluation/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/component-level-evals) (metrics on the span) evaluations on Confident AI. 
+        You can run online evaluation on both [end-to-end](/docs/llm-evaluation/end-to-end-evals) (metrics on the trace) and [component-level](/docs/llm-evaluation/component-level-evals) (metrics on the span) evaluations on Confident AI.
 
         First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
           ```ts title="index.ts" focus={2,13-15,19-22,25}
           import OpenAI from 'openai';
           import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
-           
+
           const openai = new OpenAI();
           const llmApp = async (query: string) => {
             const res = await openai.chat.completions.create({
@@ -212,7 +255,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
             )
             return res;
           };
-           
+
           const observedLlmApp = observe({
             metricCollection: ["My Metrics"],
             fn: llmApp
@@ -224,6 +267,7 @@ To use LLM Tracing, you will need to setup the `@observe` decorator through Deep
       </Step>
 
     </Steps>
+
   </Tab>
 </Tabs>
 
