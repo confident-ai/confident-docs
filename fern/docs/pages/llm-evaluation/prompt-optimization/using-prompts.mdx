@@ -36,11 +36,8 @@ prompt.pull()
   <Tab title="TypeScript" language="typescript">
   ```typescript
   import { Prompt } from "deepeval-ts";
-  // Replace with your actual alias
-  const prompt = new Prompt("System Prompt");
+  const prompt = new Prompt("<your-prompt-alias>");
   await prompt.pull();
-
-  console.log(prompt.textTemplate);
   ```
   </Tab>
 
@@ -92,13 +89,9 @@ And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "J
   <Tab title="TypeScript" language="typescript">
   ```typescript
   import { Prompt } from "deepeval-ts";
-  // Replace with your actual alias
   const prompt = new Prompt("System Prompt");
-
-  // Replace with your actual version
-  await prompt.pull("00.00.01");
-
-  console.log(prompt.textTemplate);
+  
+  await prompt.pull("00.00.01"); // Replace with your actual version
   ```
   </Tab>
 
@@ -123,7 +116,6 @@ interpolated_prompt = prompt.interpolate(name="Joe")
 
   <Tab title="TypeScript" language="typescript">
   ```typescript
-  ...
   const prompt_to_llm = prompt.interpolate({ name: "Joe" });
   console.log(prompt_to_llm);
   ```
