@@ -105,7 +105,7 @@ For **multi-turn** datasets, push multi-turn goldens:
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
-goldens = [ConversationalGolden({ scenario: "Angry user asking for a refund." })]
+goldens = [ConversationalGolden(scenario="Angry user asking for a refund.")]
 dataset = EvaluationDataset(goldens=goldens)
 
 dataset.push(alias="YOUR-DATASET-ALIAS")
@@ -191,7 +191,7 @@ For **multi-turn** datasets, queue multi-turn goldens:
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
-goldens = [new ConversationalGolden({ scenario: "User asking for a refund." })]
+goldens = [ConversationalGolden(scenario="User asking for a refund.")]
 dataset = EvaluationDataset()
 
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)

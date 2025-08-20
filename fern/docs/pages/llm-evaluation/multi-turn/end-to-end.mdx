@@ -32,9 +32,14 @@ In this example, we'll be using this mock LLM app for our callback for turns sim
 
 ```python callback.py
 from deepeval.test_case import Turn
+from typing import List
 
-def model_callback() -> Turn:
-    pass
+def chatbot_callback(input: str, turns: List[Turn], thread_id: str) -> Turn:
+    messages = [{"role": turn.role, "content": turn.content} for turn in turns]
+    messages.append({"role": "user", "content": input})
+    response = your_chatbot(messages) # Replace with your chatbot
+    return Turn(role="assistant", content=response)
+
 ```
 
 ## Run E2E Tests Locally
@@ -60,8 +65,7 @@ dataset.pull(alias="YOUR-DATASET-ALIAS")
 
 Loop through multi-turn goldens and simulate turns for test cases, before adding them back to your dataset:
 
-```python main.py focus={8-15}
-from deepeval.test_case import ConversationalTestCase
+```python main.py focus={7-15}
 from deepeval.simulator import ConversationSimulator
 from deepeval.dataset import EvaluationDataset
 
@@ -88,6 +92,7 @@ The `evaluate()` function allows you to create test runs and uploads the data to
 
 ```python main.py
 from deepeval.metrics import TurnRelevancyMetric
+from deepeval import evaluate
 # Replace with your metrics
 evaluate(test_cases=dataset.test_cases, metrics=[TurnRelevancyMetric()])
 ```
@@ -142,8 +147,7 @@ Using your language of choice, you would call your LLM app to construct a list o
 
 <Tab title="Python" language="python">
 
-```python main.py focus={8-15}
-from deepeval.test_case import ConversationalTestCase
+```python main.py focus={7-15}
 from deepeval.simulator import ConversationSimulator
 from deepeval.dataset import EvaluationDataset
 

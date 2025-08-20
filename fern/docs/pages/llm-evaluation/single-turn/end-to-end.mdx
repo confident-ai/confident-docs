@@ -108,6 +108,8 @@ The `evaluate()` function allows you to create test runs and uploads the data to
 
 ```python main.py
 from deepeval.metrics import AnswerRelevancyMetric
+from deepeval import evaluate
+
 # Replace with your metrics
 evaluate(test_cases=dataset.test_cases, metrics=[AnswerRelevancyMetric()])
 ```
@@ -149,7 +151,7 @@ All you need is to add a few lines of code to your existing LLM app (we'll be us
 
 ```python main.py focus={4,7,10,13,17}
 from openai import OpenAI
-from deepeval import observe, update_current_trace
+from deepeval.tracing import observe, update_current_trace
 
 @observe()
 def llm_app(query: str) -> str:
@@ -264,7 +266,8 @@ Using your language of choice, you would call your LLM app to construct a list o
 <Tab title="Python" language="python">
 
 ```python main.py
-from deepeval.dataset import EvaluationDataset, LLMTestCase
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
 
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")

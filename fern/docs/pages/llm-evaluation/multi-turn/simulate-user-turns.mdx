@@ -32,6 +32,7 @@ Pull your multi-turn dataset (and [create one](/llm-evaluation/dataset-managemen
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset
+
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
 ```
@@ -45,7 +46,7 @@ Define a callback that wraps around your chatbot and generates the next conversa
 from deepeval.test_case import Turn
 from typing import List
 
-def chatbot_callback(input: str, turns: List[Turn] = [], thread_id: str) -> Turn:
+def chatbot_callback(input: str, turns: List[Turn], thread_id: str) -> Turn:
     messages = [{"role": turn.role, "content": turn.content} for turn in turns]
     messages.append({"role": "user", "content": input})
     response = your_chatbot(messages) # Replace with your chatbot
@@ -66,7 +67,7 @@ Create a [simulator](https://deepeval.com/docs/conversation-simulator) with your
 from deepeval.simulator import ConversationSimulator
 
 simulator = ConversationSimulator(model_callback=chatbot_callback)
-conversational_test_cases = simulator.simulate(conversational_goldens=dataset.conversational_goldens)
+conversational_test_cases = simulator.simulate(conversational_goldens=dataset.goldens)
 ```
 
 <Success>
@@ -210,7 +211,7 @@ You can extend existing conversations by providing existing `Turn`s to each gold
 
 ```python
 from deepeval.dataset import ConversationalGolden
-from deepeval.turns import Turn
+from deepeval.test_case import Turn
 
 conversation_golden = ConversationalGolden(
     scenario="Andy Byron wants to purchase a VIP ticket to a cold play concert.",
