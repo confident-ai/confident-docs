@@ -52,16 +52,15 @@ deepeval.login("<your-confident-api-key>")
 
 <Step title="Configure LlamaIndex">
 
-Instrument LlamaIndex using `instrument_llama_index` to enable Confident AI's `LlamaIndexSpanHandler`.
+Instrument LlamaIndex using `instrument_llama_index` to enable Confident AI's `LlamaIndexHandler`.
 
-```python main.py {8}
-import os
-from llama_index.core.agent.workflow import FunctionAgent
+```python main.py maxLines=100 {6,7}
+import asyncio
 from llama_index.llms.openai import OpenAI
+from llama_index.core.agent import FunctionAgent
 import llama_index.core.instrumentation as instrument
-from deepeval.integrations.llama_index import instrument_llama_index
 
-os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+from deepeval.integrations.llama_index import instrument_llama_index
 instrument_llama_index(instrument.get_dispatcher())
 
 def multiply(a: float, b: float) -> float:
@@ -73,34 +72,17 @@ agent = FunctionAgent(
     llm=OpenAI(model="gpt-4o-mini"),
     system_prompt="You are a helpful assistant that can perform calculations.",
 )
+
+async def llm_app(input: str):
+    return await agent.run(input)
+
+asyncio.run(llm_app("What is 3 * 12?"))
 ```
 
 <Note>
   Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex traces and
   publish them to Confident AI.
 </Note>
-
-</Step>
-
-<Step title="Run LlamaIndex">
-
-Invoke your agent and run the script to see your traces on Confident AI.
-
-```python main.py
-import asyncio
-import time
-...
-
-async def main():
-    response = await agent.run("What's 7 * 8?")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-```bash
-python main.py
-```
 
 You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
@@ -123,7 +105,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoPlay
+    autoplay
+    controls
   />
 </Frame>
 
@@ -138,24 +121,30 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Confident AI supports [online evals](https://documentation.confident-ai.com/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
 
-```python main.py {1, 9}
+```python main.py maxLines=100 focus={5,17}
+import asyncio
+from llama_index.llms.openai import OpenAI
+import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrument_llama_index
 from deepeval.integrations.llama_index import FunctionAgent
 
-...
+instrument_llama_index(instrument.get_dispatcher())
+
+def multiply(a: float, b: float) -> float:
+    """Useful for multiplying two numbers."""
+    return a * b
 
 agent = FunctionAgent(
     tools=[multiply],
     llm=OpenAI(model="gpt-4o-mini"),
     system_prompt="You are a helpful assistant that can perform calculations.",
-    metric_collection="test_collection_1",
+    metric_collection="<your-metric-collection-name>",
 )
 
-async def main():
-    response = await agent.run("What's 7 * 8?")
-    print(response)
+async def llm_app(input: str):
+    return await agent.run(input)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(llm_app("What is 3 * 12?"))
 ```
 
 <Success>
@@ -165,3 +154,93 @@ if __name__ == "__main__":
 
 </Step>
 </Steps>
+
+### End-to-end evals
+
+Running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals) on your LlamaIndex agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
+
+<Steps>
+
+<Step title="Create metric">
+
+```python
+from deepeval.metrics import AnswerRelevancyMetric
+
+answer_relevancy_metric = AnswerRelevancyMetric(
+    threshold=0.7,
+    model="gpt-4o-mini",
+    include_reason=True
+)
+```
+
+</Step>
+
+<Warning>
+  Similar to online evals, you can only run end-to-end evals on metrics that don't require `retrieval_context`, `context`, `expected_output`, or `expected_tools` for evaluation.
+</Warning>
+
+<Step title="Run evals">
+
+Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your LlamaIndex agent for each golden.
+
+<Tabs>
+<Tab title="Asynchronous">
+
+```python main.py focus={6,19, 25-33} maxLines=100
+import asyncio
+from llama_index.llms.openai import OpenAI
+import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrument_llama_index
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.integrations.llama_index import FunctionAgent
+
+instrument_llama_index(instrument.get_dispatcher())
+answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+def multiply(a: float, b: float) -> float:
+    """Useful for multiplying two numbers."""
+    return a * b
+
+agent = FunctionAgent(
+    tools=[multiply],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant that can perform calculations.",
+    metrics=[answer_relevancy_metric],
+)
+
+async def llm_app(input: str):
+    return await agent.run(input)
+
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(
+    goldens=[Golden(input="What is 3 * 12?"), Golden(input="What is 4 * 13?")]
+)
+
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(llm_app(golden.input))
+    dataset.evaluate(task)
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  This will automatically generate a test run with evaluated traces using inputs
+  from your dataset.
+</Success>
+
+</Step>
+</Steps>
+
+### View on Confident AI (optional)
+
+You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+<video
+  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Allama-index-1080.mp4"
+  controls
+  autoplay
+/>
+</Frame>
