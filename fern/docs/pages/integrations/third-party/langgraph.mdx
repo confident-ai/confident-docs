@@ -54,13 +54,10 @@ deepeval.login("<your-confident-api-key>")
 
 Provide DeepEval's `CallbackHandler` to your LangGraph agent's invoke method.
 
-```python main.py {20}
-import os
-import time
+```python main.py {3,19} maxLines=25
 from langgraph.prebuilt import create_react_agent
-from deepeval.integrations.langchain import CallbackHandler
 
-os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
+from deepeval.integrations.langchain import CallbackHandler
 
 def get_weather(city: str) -> str:
     """Returns the weather in a city"""
@@ -69,13 +66,17 @@ def get_weather(city: str) -> str:
 agent = create_react_agent(
     model="openai:gpt-4o-mini",
     tools=[get_weather],
-    prompt="You are a helpful assistant"
+    prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
-    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config = {"callbacks": [CallbackHandler()]}
+    input={
+        "messages": [{"role": "user", "content": "what is the weather in sf"}]
+    },
+    config={"callbacks": [CallbackHandler()]},
 )
+
+print(result)
 ```
 
 <Note>
@@ -101,16 +102,27 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 You can also set custom trace attributes in your `CallbackHandler` for each agent invocation:
 
-```python main.py
-...
+```python main.py focus={11-17} maxLines=20
+from langgraph.prebuilt import create_react_agent
+from deepeval.integrations.langchain import CallbackHandler
 
-agent.invoke(input=input, config={"callbacks": [CallbackHandler(
-    name="Name of Trace",
-    tags=["Tag 1", "Tag 2"],
-    metadata={"Key": "Value"},
-    thread_id="your-thread-id",
-    user_id="your-user-id",
-)]})
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+agent = create_react_agent(model="openai:gpt-4o-mini", tools=[get_weather], prompt="You are a helpful assistant")
+
+result = agent.invoke(input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={"callbacks": [CallbackHandler(
+      name="Name of Trace",
+      tags=["Tag 1", "Tag 2"],
+      metadata={"Key": "Value"},
+      thread_id="your-thread-id",
+      user_id="your-user-id",
+    )]},
+)
+
+print(result)
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -159,7 +171,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoPlay
+    autoplay
+    controls
   />
 </Frame>
 
@@ -174,17 +187,25 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Provide your metric collection name to `CallbackHandler`.
 
-```python main.py {8}
+```python main.py focus={12-14} maxLines=18
+from langgraph.prebuilt import create_react_agent
 from deepeval.integrations.langchain import CallbackHandler
-...
 
-# Invoke your agent with the metric collection name
-agent.invoke(
-    input = {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config = {"callbacks": [
-        CallbackHandler(metric_collection="<metric-collection-name-with-task-completion>")
-    ]}
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+agent = create_react_agent(model="openai:gpt-4o-mini", tools=[get_weather], prompt="You are a helpful assistant")
+
+result = agent.invoke(input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={
+        "callbacks": [CallbackHandler(
+          metric_collection="<metric-collection-with-task-completion>"
+        )]
+    },
 )
+
+print(result)
 ```
 
 <Success>
@@ -227,40 +248,67 @@ Provide your metrics to the `CallbackHandler`. Then, use the dataset's `evals_it
 <Tabs>
 <Tab title="Synchronous">
 
-```python main.py {7}
+```python main.py focus={12-25} maxLines=25
+from langgraph.prebuilt import create_react_agent
+from deepeval.metrics import TaskCompletionMetric
+from deepeval.integrations.langchain import CallbackHandler
+
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+agent = create_react_agent(model="openai:gpt-4o-mini",tools=[get_weather],prompt="You are a helpful assistant",)
+task_completion = TaskCompletionMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
 from deepeval.dataset import Golden, EvaluationDataset
 
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
 
-# Run evaluation for each golden
+dataset = EvaluationDataset(goldens=goldens)
+
 for golden in dataset.evals_iterator():
     agent.invoke(
         input={"messages": [{"role": "user", "content": golden.input}]},
-        config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
+        config={"callbacks": [CallbackHandler(metrics=[task_completion])]},
     )
 ```
 
 </Tab>
 <Tab title="Asynchronous">
 
-```python main.py {8}
-from deepeval.dataset import Golden, EvaluationDataset
+```python main.py focus={1, 13-29} maxLines=29
 import asyncio
+from langgraph.prebuilt import create_react_agent
+from deepeval.metrics import TaskCompletionMetric
+from deepeval.integrations.langchain import CallbackHandler
 
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
 
-# Run evaluation for each golden
+agent = create_react_agent(model="openai:gpt-4o-mini",tools=[get_weather],prompt="You are a helpful assistant",)
+task_completion = TaskCompletionMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+from deepeval.dataset import Golden, EvaluationDataset
+
+goldens = [
+    Golden(input="What is the weather in Bogotá, Colombia?"),
+    Golden(input="What is the weather in Paris, France?"),
+]
+
+dataset = EvaluationDataset(goldens=goldens)
+
 for golden in dataset.evals_iterator():
     task = asyncio.create_task(
         agent.ainvoke(
             input={"messages": [{"role": "user", "content": golden.input}]},
-            config={"callbacks": [CallbackHandler(metrics=[task_completion])]}
+            config={"callbacks": [CallbackHandler(metrics=[task_completion])]},
         )
     )
     dataset.evaluate(task)
-
 ```
 
 </Tab>
@@ -273,3 +321,18 @@ for golden in dataset.evals_iterator():
 
 </Step>
 </Steps>
+
+### View on Confident AI (optional)
+
+You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+<video
+  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
+  controls
+  autoplay
+  playsinline
+/>
+</Frame>
+
+
