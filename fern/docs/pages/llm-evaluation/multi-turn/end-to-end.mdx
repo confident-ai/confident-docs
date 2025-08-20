@@ -149,7 +149,14 @@ for golden in dataset.goldens:
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-[TODO: kritin]
+```ts main.ts
+import { EvaluationDataset, LLMTestCase, Golden } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+// simulate conversation [TODO MAYANK]
+```
 
 </Tab>
 <Tab title="curL" language="curl">
@@ -177,7 +184,14 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-[TODO: kritin]
+```ts main.ts
+import { evaluate } from "deepeval-ts";
+
+evaluate({
+  testCases: dataset.testCases,
+  metricCollection: "YOUR-COLLECTION-NAME",
+});
+```
 
 </Tab>
 <Tab title="curL" language="curl">

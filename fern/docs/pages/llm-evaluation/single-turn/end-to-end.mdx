@@ -254,7 +254,7 @@ Using your language of choice, you would call your LLM app to construct a list o
 <Tab title="Python" language="python">
 
 ```python main.py
-from deepeval.dataset import EvaluationDataset
+from deepeval.dataset import EvaluationDataset, LLMTestCase
 
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
@@ -268,12 +268,12 @@ for golden in dataset.goldens:
 <Tab title="Typescript" language="typescript">
 
 ```ts main.ts
-import { EvaluationDataset } from "deepeval-ts";
+import { EvaluationDataset, LLMTestCase, Golden } from "deepeval-ts";
 
 const dataset = new EvaluationDataset();
-dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
-for (const golden of dataset.goldens) {
+for (const golden of dataset.goldens as Golden[]) {
   const testCase = new LLMTestCase({
     input: golden.input,
     actualOutput: llmApp(golden.input),
@@ -285,9 +285,7 @@ for (const golden of dataset.goldens) {
 </Tab>
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet
-  endpoint="GET /v1/datasets"
-/>
+<EndpointRequestSnippet endpoint="GET /v1/datasets" />
 
 </Tab>
 
@@ -322,10 +320,7 @@ evaluate({
 </Tab>
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet
-  endpoint="POST /v1/evaluate"
-  example="Single-Turn"
-/>
+<EndpointRequestSnippet endpoint="POST /v1/evaluate" example="Single-Turn" />
 
 </Tab>
 
