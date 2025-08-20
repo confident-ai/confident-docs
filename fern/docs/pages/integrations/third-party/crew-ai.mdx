@@ -25,28 +25,28 @@ pip install -U deepeval crewai
 
 Instrument CrewAI with your Confident AI API key using `instrument_crewai`.
 
-```python main.py {7}
-import os
-import time
+```python main.py maxLines=100 {3,4}
 from crewai import Task, Crew, Agent
+
 from deepeval.integrations.crewai import instrument_crewai
+instrument_crewai()
 
-os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
-instrument_crewai(api_key="<your-confident-api-key>")
-
-# Define your agents with roles and goals
-coder = Agent(
-    role='Consultant',
-    goal='Write clear, concise explanation.',
-    backstory='An expert consultant with a keen eye for software trends.',
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
 )
 
-# Create tasks for your agents
-task1 = Task(description="Explain the given topic", expected_output="A clear and concise explanation.", agent=coder)
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
 
-# Instantiate and kickoff your crew
-crew = Crew(agents=[coder], tasks=[task1])
+crew = Crew(agents=[agent], tasks=[task])
+
 result = crew.kickoff({"input": "What are the LLMs?"})
+print(result)
 ```
 
 </Step>
@@ -80,7 +80,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoPlay
+    controls
+    autoplay
   />
 </Frame>
 
@@ -95,20 +96,26 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Replace your CrewAI `Agent` with DeepEval’s, and provide a metric collection name as an argument to the `Agent`.
 
-```python main.py {1, 8}
-from deepeval.integrations.crewai.agent import Agent
+```python main.py maxLines=100 focus={3,12}
+from crewai import Task, Crew
 
-# Define your agents with metric collection name
-coder = Agent(
-    role='Consultant',
-    goal='Write clear, concise explanation.',
-    backstory='An expert consultant with a keen eye for software trends.',
-    metric_collection="<your-metric-collection-name>"
+from deepeval.integrations.crewai import Agent
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metric_collection="<your-metric-collection-name>",
 )
-...
 
-# Kickoff your crew
+task = Task(description="Explain the given topic", expected_output="A clear and concise explanation.", agent=agent)
+crew = Crew(agents=[agent], tasks=[task])
+
 result = crew.kickoff({"input": "What are the LLMs?"})
+print(result)
 ```
 
 <Success>
@@ -149,21 +156,35 @@ Replace your CrewAI Agent with DeepEval’s, and provide `metrics` to DeepEval's
 <Tabs>
 <Tab title="Synchronous">
 
-```python main.py {11, 15}
-from deepeval.integrations.crewai.agent import Agent
-from deepeval.dataset import EvaluationDataset, Golden
+```python main.py maxLines=100 focus={3,14,20-30}
+from crewai import Task, Crew
 
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
+from deepeval.integrations.crewai import Agent
+from deepeval.integrations.crewai import instrument_crewai
+from deepeval.metrics import AnswerRelevancyMetric
 
-coder = Agent(
-    role='Consultant',
-    goal='Write clear, concise explanation.',
-    backstory='An expert consultant with a keen eye for software trends.',
-    metrics=[answer_relevancy]
+instrument_crewai()
+answer_relavancy_metric = AnswerRelevancyMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metrics=[answer_relavancy_metric],
 )
 
-# Run evaluation for each golden
+task = Task(description="Explain the given topic", expected_output="A clear and concise explanation.", agent=agent)
+crew = Crew(agents=[agent], tasks=[task])
+
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(
+    goldens=[
+        Golden(input="What are Transformers in AI?"),
+        Golden(input="What is the biggest open source database?")
+    ]
+)
+
 for golden in dataset.evals_iterator():
     result = crew.kickoff(inputs={"input": golden.input})
 ```
@@ -171,24 +192,41 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Asynchronous">
 
-```python main.py {12, 16}
-from deepeval.integrations.crewai.agent import Agent
-from deepeval.dataset import EvaluationDataset, Golden
+```python main.py maxLines=100 focus={1,4,16, 22-35}
 import asyncio
+from crewai import Task, Crew
 
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
+from deepeval.integrations.crewai import Agent
+from deepeval.integrations.crewai import instrument_crewai
+from deepeval.metrics import AnswerRelevancyMetric
 
-coder = Agent(
-    role='Consultant',
-    goal='Write clear, concise explanation.',
-    backstory='An expert consultant with a keen eye for software trends.',
-    metrics=[answer_relevancy]
+instrument_crewai()
+
+answer_relavancy_metric = AnswerRelevancyMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metrics=[answer_relavancy_metric],
 )
 
-# Run evaluation for each golden
+task = Task(description="Explain the given topic", expected_output="A clear and concise explanation.", agent=agent)
+crew = Crew(agents=[agent], tasks=[task])
+
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(
+    goldens=[
+        Golden(input="What are Transformers in AI?"),
+        Golden(input="What is the biggest open source database?"),
+    ]
+)
+
 for golden in dataset.evals_iterator():
-    task = asyncio.create_task(crew.kickoff_async(inputs={"input": golden.input}))
+    task = asyncio.create_task(
+        crew.kickoff_async(inputs={"input": golden.input})
+    )
     dataset.evaluate(task)
 ```
 
@@ -202,4 +240,15 @@ for golden in dataset.evals_iterator():
 
 </Step>
 </Steps>
-```
+
+### View on Confident AI (optional)
+
+You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+<video
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/end-to-end%3Acrewai-4k-no-zoom.mp4"
+  controls
+  autoplay
+/>
+</Frame>
