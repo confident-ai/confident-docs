@@ -27,7 +27,14 @@ Pull your prompt version from Confident AI by providing the `alias` you've defin
   </Tab>
 
   <Tab title="TypeScript" language="typescript">
-  [TODO kritin]
+  ```typescript
+  import { Prompt } from "deepeval-ts";
+  // Replace with your actual alias
+  const prompt = new Prompt("System Prompt");
+  await prompt.pull();
+
+  console.log(prompt.textTemplate);
+  ```
   </Tab>
 
   <Tab title="curL" language="curl">
@@ -57,7 +64,16 @@ When no parameters are provided to the `pull()` method, the latest version is pu
   </Tab>
 
   <Tab title="TypeScript" language="typescript">
-  [TODO kritin]
+  ```typescript
+  import { Prompt } from "deepeval-ts";
+  // Replace with your actual alias
+  const prompt = new Prompt("System Prompt");
+
+  // Replace with your actual version
+  await prompt.pull("00.00.01");
+
+  console.log(prompt.textTemplate);
+  ```
   </Tab>
 
   <Tab title="curL" language="curl">
@@ -84,7 +100,11 @@ Now that you have your prompt template, use the `interpolate()` method to interp
   </Tab>
 
   <Tab title="TypeScript" language="typescript">
-  [TODO kritin]
+  ```typescript
+  ...
+  const prompt_to_llm = prompt.interpolate({ name: "Joe" });
+  console.log(prompt_to_llm);
+  ```
   </Tab>
 
 </Tabs>
@@ -129,7 +149,20 @@ You pull prompt messages the same way you would pull a single prompt, the differ
   </Tab>
 
   <Tab title="TypeScript" language="typescript">
-  [TODO kritin]
+  ```typescript
+  import { Prompt } from "deepeval-ts";
+  const prompt = new Prompt("System Prompt");
+  await prompt.pull();
+
+  const messages_to_llm = prompt.interpolate({});
+  console.log(messages_to_llm);
+
+  // This will print the following
+  // [
+  //   {"role": "system", "content": "You are a helpful assistant."},
+  //   {"role": "user", "content": "What is the capital of France?"}
+  // ]
+  ```
   </Tab>
 
   <Tab title="curL" language="curl">
@@ -173,7 +206,43 @@ To be clear, here is an example of how you can use it for OpenAI's APIs:
   </Tab>
 
   <Tab title="TypeScript" language="typescript">
-  [TODO kritin]
+  ```typescript
+  import { OpenAI } from "openai";
+  import { Prompt } from "deepeval-ts";
+
+  async function main() {
+      const client = new OpenAI();
+
+      // Make sure to replace "your-alias-here" with your actual prompt alias
+      const prompt = new Prompt("your-alias-here");
+      await prompt.pull();
+
+      // The interpolate method in TypeScript expects an object for replacements,
+      // so we pass an empty object if there are no variables to interpolate.
+      const messagesToLlm = prompt.interpolate({}) as any[];
+
+      async function yourLlmApp(userInput: string) {
+          // Combine the pulled prompt messages with the user's input
+          const messages = [...messagesToLlm, { role: "user", content: userInput }];
+
+          const response = await client.chat.completions.create({
+              model: "gpt-4",
+              messages: messages as any, // Casting to any to match OpenAI's expected type
+          });
+
+          return response.choices[0].message.content;
+      }
+
+      // Get the response from your LLM application
+      const response = await yourLlmApp("Hi!");
+
+      // Print the response
+      console.log(response);
+  }
+
+  main().catch(console.error);
+
+  ```
   </Tab>
 
 </Tabs>
