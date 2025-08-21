@@ -163,13 +163,19 @@ for golden in dataset.goldens:
 </Tab>
 <Tab title="Typescript" language="typescript">
 
-```ts main.ts
+```ts main.ts focus={6-12}
 import { EvaluationDataset, LLMTestCase, Golden } from "deepeval-ts";
 
 const dataset = new EvaluationDataset();
 await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
-// simulate conversation [TODO MAYANK]
+const simulator = new ConversationSimulator({ modelCallback: chatbotCallback });
+const testCases = simulator.simulate({
+  conversationalGoldens: dataset.goldens,
+});
+for (const testCase of testCases) {
+  dataset.add_test_case(testCase);
+}
 ```
 
 </Tab>
