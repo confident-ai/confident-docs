@@ -53,13 +53,25 @@ evaluate(
 
 <Tab title="Typescript" langauag="typescript">
 
-[TODO kritin]
+```ts
+evaluate({
+  hyperparameters: {
+    Model: "YOUR-MODEL",
+    "Prompt Version": "YOUR-PROMPT-VERSION",
+  },
+  testCases: [...],
+  metricCollection: "YOUR-COLLECTION-NAME",
+});
+```
 
 </Tab>
 
 <Tab title="curL" langauag="curl">
 
-[TODO vamshi]
+<EndpointRequestSnippet
+  endpoint="POST /v1/evaluate"
+  example="Logging Parameters"
+/>
 
 </Tab>
 
