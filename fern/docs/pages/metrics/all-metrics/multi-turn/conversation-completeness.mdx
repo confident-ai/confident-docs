@@ -7,17 +7,28 @@ slug: metrics/multi-turn/conversation-completeness-metric
 
 ## Overview
 
-The conversation completeness metric is a conversational metric that determines whether your LLM chatbot is able to complete an end-to-end conversation by satisfying user needs throughout a conversation. It is a multi-turn metric that can be used to evaluate if a conversation satisfies a user's needs overall.
+The conversational completeness is a multi-turn metric that is used to evaluate whether your chatbot is satisfying the user in each turn. It uses LLM-as-a-judge to see if the chatbot meets the user's requirements throughout the conversation.
 
-<Warning>
+### Required Parameters
 
-The conversation completeness metric can be used as a proxy to measure user satisfaction throughout a conversation. Conversational metrics are particular useful for an LLM chatbot use case.
+These are the parameters you must supply in your test case to run evaluations for conversation completeness metric:
 
-</Warning>
+<ParamField path="turns" type="list of Turn" required>
+  A list of `Turn`s as exchanges between user and assistant.
+  <Card title="Parameters of `Turn`:">
+    ---
+    <ParamField path="role" type="user | assistant" required>
+      The role of the person speaking, it's either `user` or `assistant`
+    </ParamField>
+    <ParamField path="content" type="string" required>
+      The content provided by the `role` for the turn
+    </ParamField>
+  </Card>
+</ParamField>
 
 ## How Is It Calculated?
 
-The conversation completeness metric first uses an LLM to extract a list of high level user intentions found in turns (in `user` roles), before using the same LLM to determine whether each intention was met and/or satisfied throughout the conversation by the `assistant`.
+The conversation completeness metric fist extracts distinct user intentions from all the turns using an LLM. It then uses the same LLM to see if the corresponding assistant's turn has satisfied the user's intentions.
 
 <br />
 

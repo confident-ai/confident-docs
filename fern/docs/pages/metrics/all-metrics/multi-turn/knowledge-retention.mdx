@@ -7,17 +7,28 @@ slug: metrics/single-turn/knowledge-retention-metric
 
 ## Overview
 
-The knowledge retention metric is a conversational metric that determines whether your LLM chatbot is able to retain factual information presented throughout a conversation.
+The knowledge retention metric is a multi-turn metric that is used to evaluate whether your chatbot retains the important information given by the user throughout the conversation. It uses LLM-as-a-judge to check if your chatbot has remembered the information the user has provided until that turn for each interaction.
 
-<Warning>
+### Required Parameters
 
-The knowledge retention metric is great for a LLM powered questionnaire use case.
+These are the parameters you must supply in your test case to run evaluations for knowledge retention metric:
 
-</Warning>
+<ParamField path="turns" type="list of Turn" required>
+  A list of `Turn`s as exchanges between user and assistant.
+  <Card title="Parameters of `Turn`:">
+    ---
+    <ParamField path="role" type="user | assistant" required>
+      The role of the person speaking, it's either `user` or `assistant`
+    </ParamField>
+    <ParamField path="content" type="string" required>
+      The content provided by the `role` for the turn
+    </ParamField>
+  </Card>
+</ParamField>
 
 ## How Is It Calculated?
 
-The knowledge retention metric uses an LLM to extract knowledge supplied in `content` by the `user` role throughout turns, before using the same LLM to determine whether each corresponding `assistant` content indicates an inability to recall said knowledge.
+The knowledge retention metric uses an LLM to extract the information provided in the `content` for all `user` turns. It then uses the same LLM to see if the `assistant` turns have any `content` that doesn't recall infomation.
 
 <br />
 

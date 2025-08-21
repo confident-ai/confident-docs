@@ -7,17 +7,31 @@ slug: metrics/multi-turn/role-adherence-metric
 
 ## Overview
 
-The role adherence metric is a conversational metric that determines whether your LLM chatbot is able to adhere to its given role throughout a conversation.
+The role adherence is a multi-turn metric that is used to determine if your chatbot sticks to the pre-determined role throughtout the conversation. It uses LLM-as-a-judge to determine if the assisant has stayed consistent with its replies by impersonating a role.
 
-<Warning>
+### Required Parameters
 
-You need to supply the `chatbot_role` in all of your conversational test cases.
+These are the parameters you must supply in your test case to run evaluations for role adherence metric:
 
-</Warning>
+<ParamField path="chatbot_role" type="string" required>
+  The role your chatbot has to adhere to throughtout the conversation.
+</ParamField>
+<ParamField path="turns" type="list of Turn" required>
+  A list of `Turn`s as exchanges between user and assistant.
+  <Card title="Parameters of `Turn`:">
+    ---
+    <ParamField path="role" type="user | assistant" required>
+      The role of the person speaking, it's either `user` or `assistant`
+    </ParamField>
+    <ParamField path="content" type="string" required>
+      The content provided by the `role` for the turn
+    </ParamField>
+  </Card>
+</ParamField>
 
 ## How Is It Calculated?
 
-The role adherence metric iterates over each assistant turn and uses an LLM to evaluate whether the content adheres to the specified `chatbot_role`, using previous conversation turns as context.
+The role adherence metric iterates over each `assistant` turn and checks if the corresponding `content` of that turn adheres to the `chatbot_role` specified using an LLM.
 
 <br />
 
