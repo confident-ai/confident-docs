@@ -23,40 +23,42 @@ Pull your prompt version by providing the `alias` you've defined:
 
 <Tabs>
 
-  <Tab title="Python" language="python">
-  ```python
-  from deepeval.prompt import Prompt
+<Tab title="Python" language="python">
+
+```python
+from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull()
+```
 
-````
 </Tab>
 
-  <Tab title="TypeScript" language="typescript">
-  ```typescript
-  import { Prompt } from "deepeval-ts";
-  const prompt = new Prompt("<your-prompt-alias>");
-  await prompt.pull();
-  ```
-  </Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+```
+
+</Tab>
 
 <Tab title="curL" language="curl">
-  <EndpointRequestSnippet
-    endpoint="GET /v1/prompts"
-  />
+  <EndpointRequestSnippet endpoint="GET /v1/prompts" />
 </Tab>
 
 </Tabs>
 
 <Tip>
-By default, Confident AI will return the latest version of your prompt. However, you can also specify the `version` to override this behavior.
+  By default, Confident AI will return the latest version of your prompt.
+  However, you can also specify the `version` to override this behavior.
 </Tip>
 
 </Step>
 
 <Step title="Interpolate variables">
-
 
 Now that you have your prompt template, interpolate any dynamic variables you may have defined in your prompt version. For example, if this is your prompt version:
 
@@ -71,10 +73,6 @@ Now that you have your prompt template, interpolate any dynamic variables you ma
 }
 ```
 
-
-
-
-
 And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "Joe") would give you this prompt that is ready for use:
 
 ```json
@@ -84,43 +82,83 @@ And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "J
 }
 ```
 
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+interpolated_prompt = prompt.interpolate(name="Joe")
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+```
+
 </Tab>
 
-  <Tab title="TypeScript" language="typescript">
-  ```typescript
-  import { Prompt } from "deepeval-ts";
-  const prompt = new Prompt("System Prompt");
-  
-  await prompt.pull("00.00.01"); // Replace with your actual version
-  ```
-  </Tab>
+<Tab title="curL" language="curl">
 
-  <Tab title="curL" language="curl">
-    <EndpointRequestSnippet
-      endpoint="GET /v1/prompts"
-    />
-  </Tab>
+```bash
+# Interpolation is done client-side after pulling the prompt
+# The API response includes an "interpolationType" field indicating the format:
+# - "FSTRING": Use {{ variable }} format (default)
+# - "HANDLEBARS": Use {{variable}} format
+# Replace variables manually based on the interpolationType in your application code
+```
+
+</Tab>
 
 </Tabs>
 
+</Tab>
 
+<Tab title="Text" language="text">
+
+```plaintext
+You are a helpful assistant called {{ name }}. Speak normally like a human.
+```
+
+And your interpolation type is `{{ variable }}`, interpolating the name (e.g. “Joe”) would give you this prompt that is ready for use:
+
+```plaintext
+You are a helpful assistant called Joe. Speak normally like a human.
+```
 
 <Tabs>
 
-  <Tab title="Python" language="python">
-  ```python
+<Tab title="Python" language="python">
+
+```python
 interpolated_prompt = prompt.interpolate(name="Joe")
-````
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+```
 
 </Tab>
 
-  <Tab title="TypeScript" language="typescript">
-  ```typescript
-  const prompt_to_llm = prompt.interpolate({ name: "Joe" });
-  console.log(prompt_to_llm);
-  ```
-  </Tab>
+<Tab title="curL" language="curl">
 
+```bash
+# Interpolation is done client-side after pulling the prompt
+# The API response includes an "interpolationType" field indicating the format:
+# - "FSTRING": Use {{ variable }} format (default)
+# - "HANDLEBARS": Use {{variable}} format
+# Replace variables manually based on the interpolationType in your application code
+```
+
+</Tab>
+
+</Tabs>
+
+</Tab>
 </Tabs>
 
 And if you don't have any variables, you must still use the `interpolate()` method to create a copy of your prompt template to be used in your LLM application.
@@ -134,6 +172,7 @@ By now you should have an interpolated prompt version, for example:
 <Tabs>
 
 <Tab title="Messages" language="messages">
+
 ```json
 {
   "role": "system",
@@ -165,28 +204,45 @@ print(response.choices[0].message.content)
 
 </Tab>
 
-  <Tab title="TypeScript" language="typescript">
-  ```typescript
-  import { Prompt } from "deepeval-ts";
-  const prompt = new Prompt("System Prompt");
-  await prompt.pull();
+<Tab title="TypeScript" language="typescript" >
 
-const messages_to_llm = prompt.interpolate({});
-console.log(messages_to_llm);
+```typescript main.ts {11}
+import { Prompt } from "deepeval-ts";
+import { OpenAI } from "openai";
 
-// This will print the following
-// [
-// {"role": "system", "content": "You are a helpful assistant."},
-// {"role": "user", "content": "What is the capital of France?"}
-// ]
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate(); // interpolate prompt
 
-````
+const openai = new OpenAI();
+const response = await openai.chat.completions.create({
+  model: "gpt-3.5-turbo",
+  messages: interpolatedPrompt as any[],
+});
+
+console.log(response.choices[0].message.content);
+```
+
 </Tab>
 
 <Tab title="curL" language="curl">
-  <EndpointRequestSnippet
-    endpoint="GET /v1/prompts"
-  />
+
+First, pull the prompt from Confident AI:
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts" />
+
+Then, interpolate the variables and use the interpolated prompt with OpenAI:
+
+```curl
+curl -X POST "https://api.openai.com/v1/chat/completions" \
+  -H "Authorization: Bearer YOUR_OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4.1",
+    "messages": <YOUR-INTERPOLATED-PROMPT>
+  }'
+```
+
 </Tab>
 
 </Tabs>
@@ -196,8 +252,8 @@ console.log(messages_to_llm);
 <Tab title="Text" language="text">
 
 ```plaintext
-"You are a helpful assistant called Joe. Speak normally like a human."
-````
+You are a helpful assistant called Joe. Speak normally like a human.
+```
 
 Which you can use to generate text from your LLM provider of choice. Here are some examples with OpenAI:
 
@@ -223,45 +279,45 @@ print(response.choices[0].message.content)
 
 </Tab>
 
-  <Tab title="TypeScript" language="typescript">
-  ```typescript
-  import { OpenAI } from "openai";
-  import { Prompt } from "deepeval-ts";
+<Tab title="TypeScript" language="typescript">
 
-async function main() {
-const client = new OpenAI();
+```typescript main.ts {11}
+import { Prompt } from "deepeval-ts";
+import { OpenAI } from "openai";
 
-      // Make sure to replace "your-alias-here" with your actual prompt alias
-      const prompt = new Prompt("your-alias-here");
-      await prompt.pull();
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate(); // interpolate prompt
 
-      // The interpolate method in TypeScript expects an object for replacements,
-      // so we pass an empty object if there are no variables to interpolate.
-      const messagesToLlm = prompt.interpolate({}) as any[];
+const openai = new OpenAI();
+const response = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "system", content: interpolatedPrompt }],
+});
 
-      async function yourLlmApp(userInput: string) {
-          // Combine the pulled prompt messages with the user's input
-          const messages = [...messagesToLlm, { role: "user", content: userInput }];
-
-          const response = await client.chat.completions.create({
-              model: "gpt-4",
-              messages: messages as any, // Casting to any to match OpenAI's expected type
-          });
-
-          return response.choices[0].message.content;
-      }
-
-      // Get the response from your LLM application
-      const response = await yourLlmApp("Hi!");
-
-      // Print the response
-      console.log(response);
-
-}
-
-main().catch(console.error);
-
+console.log(response.choices[0].message.content);
 ```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+First, pull the prompt from Confident AI:
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts" />
+
+Then, interpolate the variables and use the interpolated prompt with OpenAI:
+
+```curl
+curl -X POST "https://api.openai.com/v1/chat/completions" \
+  -H "Authorization: Bearer YOUR_OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4.1",
+    "messages": <YOUR-INTERPOLATED-PROMPT>
+  }'
+```
+
 </Tab>
 
 </Tabs>
@@ -273,4 +329,3 @@ main().catch(console.error);
 </Step>
 
 </Steps>
-```
