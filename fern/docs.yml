@@ -1,6 +1,6 @@
 instances:
   - url: confident-ai.docs.buildwithfern.com/docs # update this to {yourorg}.docs.buildwithfern.com
-    # custom-domain: confident-ai.dev # specify your custom domain when you are ready to go live
+    custom-domain: www.confident-ai.com/docs
 
 title: Confident AI Docs
 favicon: docs/assets/logo.png
