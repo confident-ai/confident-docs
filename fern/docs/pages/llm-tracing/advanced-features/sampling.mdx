@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Sampling
+subtitle: Sending only part of your traces to Confident AI
 slug: llm-tracing/advanced-features/sampling
-description: Learn about sampling in LLM Tracing
 ---
 
 ## Overview
@@ -16,13 +15,14 @@ This is useful for high-volume applications where you may want to reduce the amo
 
 Configure the sampling rate by setting the `CONFIDENT_SAMPLE_RATE` environment variable, which represents the proportion of traces that will be sent to the observatory.
 
-<CodeBlock>```bash export CONFIDENT_SAMPLE_RATE=0.5 ```</CodeBlock>
+```bash 
+export CONFIDENT_SAMPLE_RATE=0.5 
+```
 
 Alternatively, you can set the sampling rate directly in code:
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {5}
             from deepeval.tracing import observe, trace_manager
             from openai import OpenAI
@@ -40,10 +40,8 @@ Alternatively, you can set the sampling rate directly in code:
             for _ in range(10):
                 llm_app("Write me a poem.")  # roughly half of these traces will be sent
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, traceManager } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
@@ -65,7 +63,6 @@ Alternatively, you can set the sampling rate directly in code:
                 observedLlmApp("Write me a poem."); // Roughly half of these traces will be sent
             }
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>

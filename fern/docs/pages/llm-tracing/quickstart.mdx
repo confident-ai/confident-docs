@@ -56,11 +56,9 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
       <Step title="Installation">
         Install DeepEval and setup your tracing environment:
 
-        <CodeBlock>
           ```bash
           pip install -U deepeval
           ```
-        </CodeBlock>
       </Step>
 
       <Step title="Login to Confident AI">
@@ -70,8 +68,8 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
           You'll need to get your API key as shown in the [setup and
           installation](/docs/setup-and-installation) section before continuing.
         </Warning>
-
         <CodeBlocks>
+
           ```python title="In code"
           from deepeval.tracing import trace_manager
 
@@ -85,13 +83,13 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
           ```bash title="Login through CLI"
           deepeval login
           ```
+
         </CodeBlocks>
       </Step>
 
       <Step title="Setup Tracing">
         The `@observe` decorator is the primary way to instrument your LLM application for tracing.
 
-        <CodeBlock>
           ```python title="main.py" focus={2,6,17}
           from openai import OpenAI
           from deepeval.tracing import observe
@@ -111,7 +109,6 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
           # Call app to send trace to Confident AI
           llm_app("Write me a poem.")
           ```
-        </CodeBlock>
 
         If your `llm_app` has more than one function, simply decorate those functions with `@observe` too.
 
@@ -132,7 +129,6 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
 
         First [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud#create-a-metric-collection), and add at least one referenceless metric to it. Now in your code, add these lines to automatically run online evals in production:
 
-        <CodeBlock>
           ```python title="main.py" focus={2,6,15,19}
           from openai import OpenAI
           from deepeval.tracing import observe, update_current_span
@@ -154,7 +150,6 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
           # Call app to send trace to Confident AI
           llm_app("Write me a poem.")
           ```
-        </CodeBlock>
       </Step>
 
     </Steps>
@@ -166,14 +161,15 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
 
       <Step title="Installation">
         Install DeepEval and setup your tracing environment:
-
         <CodeBlocks>
+
           ```bash title="npm"
           npm install deepeval-ts
           ```
           ```bash title="yarn"
           yarn add deepeval-ts
           ```
+
         </CodeBlocks>
       </Step>
 
@@ -197,7 +193,6 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
       <Step title="Setup Tracing">
         The `observe` wrapper is the primary way to instrument your LLM application for tracing.
 
-        <CodeBlock>
           ```ts title="index.ts" focus={2,13,16}
           import OpenAI from 'openai';
           import { observe } from '@deepeval-ts/tracing';
@@ -216,7 +211,6 @@ Confident AI allows anyone building with any framework, language, and LLMs to se
           // Call app to send trace to Confident AI
           observedLlmApp("Write me a poem.");
           ```
-        </CodeBlock>
 
         If your `llmApp` has more than one function, simply wrap those functions in `observe` too and call the wrapped functions in `llmApp` instead.
 

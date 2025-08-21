@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Metadata
+subtitle: Adding metadata to your traces for additional information
 slug: llm-tracing/advanced-features/metadata
-description: Learn about masking in LLM Tracing
 ---
 
 ## Overview
@@ -55,7 +54,6 @@ Each metadata argument is a dictionary whose keys are strings and whose values a
                         retrieved_documents: 3
                     }
                 });
-                    
                 // Add trace-level metadata
                 updateCurrentTrace({
                     metadata: {
@@ -66,7 +64,6 @@ Each metadata argument is a dictionary whose keys are strings and whose values a
             };
             
             const observedLlmApp = observe({fn: llmApp});
-            
             observedLlmApp("Test Metadata");
             ```
         </CodeBlock>

@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Threads
+subtitle: Group your traces as threads to evaluate an entire conversation workflow
 slug: llm-tracing/advanced-features/threads
-description: Learn about threads in LLM Tracing
 ---
 
 ## Overview
@@ -18,7 +17,6 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
             from openai import OpenAI
@@ -37,11 +35,9 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
-            ```typescript title="index.ts" {13}
+            ```typescript title="index.ts" {11}
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
             
@@ -49,22 +45,16 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
                 const openai = new OpenAI();
                 const res = openai.chat.completions.create({
                     model: "gpt-4o",
-                    messages: [
-                    { role: "user", content: query }
-                    ]
+                    messages: [ { role: "user", content: query } ]
                 }).choices[0].message.content;
                 
                 updateCurrentTrace({ threadId: "your-thread-id", input: query, output: res });
                 return res;
             };
 
-            const observedLlmApp = observe({
-                fn: llmApp
-            });
-
+            const observedLlmApp = observe({ fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -79,8 +69,7 @@ If the I/O is not provided, it will be set to the [default I/O values of the tra
 
 Note that although not strictly enforced, you should aim to make the **input** the user **text** input that is incoming to your multi-turn LLM app, and the output being the generated **text** output. Essentially, your trace should represent the observable system inputs and outputs of your application.
 
-<CodeBlock>
-```python title="main.py" {15, 18}
+```python title="main.py" focus={1-12,15,19}
 from deepeval.tracing import observe, update_current_trace
 from openai import OpenAI
 
@@ -101,12 +90,10 @@ def llm_app(query: str):
     # update_current_trace(thread_id="your-thread-id", input=messages, output=res)
     return res
 ```
-</CodeBlock>
 
 Also note that you **don't** have to set `input`s/`output`s for a trace that does not contain an user input or LLM output. You can simply leave it blank, and Confident AI will format the turns accordingly on the UI and for evals.
 
-<CodeBlock>
-```python filename="example.py"
+```python title="example.py"
 # ✅ You can set inputs and not set outputs
 update_current_trace(thread_id="your-thread-id", input=query)
 
@@ -117,13 +104,11 @@ update_current_trace(thread_id="your-thread-id", output=res)
 update_current_trace(thread_id="your-thread-id")
 ```
 
-</CodeBlock>
 
 ### Tools Called and Retrieval Context
 
 You can also specify any tools that were called or retrieval context involved (for a RAG system) for any LLM generated text in a conversation (which in this case is the `output` on a trace).
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.test_case import ToolCall
 ...
@@ -134,9 +119,7 @@ update_current_trace(
     retrieval_context=["RAG context goes here."],
     tools_called=[ToolCall(name="Websearch")]
 )
-
 ```
-</CodeBlock>
 
 The turn context is complimentry to the `output`, and allows you to log any additional context involved in the generation of this turn.
 
@@ -144,14 +127,12 @@ The turn context is complimentry to the `output`, and allows you to log any addi
 
 Use the `evaluate_thread` method to run offline evals on conversations **once they've finished running**:
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import evaluate_thread
 
 evaluate_thread(thread_id="your-thread-id", metric_collection="Metric Collection")
 ```
 
-</CodeBlock>
 
 You'll need to create a **multi-turn** metric collection on Confident AI if you haven't already to specify which metrics you invoke for a particular thread.
 

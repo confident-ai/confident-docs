@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Environments
+subtitle: Set your environments during tracing for better debugging
 slug: llm-tracing/advanced-features/environment
-description: Learn about environments in LLM Tracing
 ---
 
 ## Overview
@@ -16,13 +15,14 @@ Traces from [component-level evals](/docs/llm-evaluation/component-level-evals) 
 
 You can configure the environment with the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
 
-<CodeBlock>```bash export CONFIDENT_TRACE_ENVIRONMENT="staging" ```</CodeBlock>
+```bash 
+export CONFIDENT_TRACE_ENVIRONMENT="staging" 
+```
 
 Alternatively, you can set the environment directly in code:
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {4}
             from openai import OpenAI 
             from deepeval.tracing import observe, trace_manager
@@ -39,10 +39,8 @@ Alternatively, you can set the environment directly in code:
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {4}
             import OpenAI from 'openai';
             import { observe, traceManager } from '@deepeval-ts/tracing';
@@ -51,22 +49,16 @@ Alternatively, you can set the environment directly in code:
             const openai = new OpenAI();
 
             const llmApp = async (query: string) => {
-                const response = await openai.chat.completions.create({
-                    model: "gpt-4o",
-                    messages: [{ role: "user", content: query }],
-                });
-                return response.choices[0].message.content;
+                const result = await openai.chat.completions.create({ 
+                    model: "gpt-4o", 
+                    messages: [{ role: "user", content: query }] 
+                })
+                return result.choices[0].message.content;
             };
 
-            const observedLlmApp = observe({
-                type: "llm",
-                model: "gpt-4o",
-                fn: llmApp,
-            });
-
+            const observedLlmApp = observe({ type: "llm", model: "gpt-4o", fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>

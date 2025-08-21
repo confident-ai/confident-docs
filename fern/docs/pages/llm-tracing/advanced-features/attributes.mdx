@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Attributes
+subtitle: Learn how to set attributes while tracing your LLM application
 slug: llm-tracing/advanced-features/attributes
-description: Learn about attributes in LLM Tracing
 ---
 
 ## Overview
@@ -23,7 +22,6 @@ These functions update the attributes for the **CURRENT** span of the component 
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {10}
             from deepeval.tracing import observe, update_retriever_span
             
@@ -39,10 +37,8 @@ These functions update the attributes for the **CURRENT** span of the component 
                         chunk_size=10,
                     )
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```js title="index.ts" {10}
             import { observe, updateRetrieverSpan } from "@deepeval-ts/tracing";
 
@@ -60,7 +56,6 @@ These functions update the attributes for the **CURRENT** span of the component 
                 };
             })
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -78,7 +73,6 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>     
         ```python title="main.py" {6}
         from deepeval.tracing import observe, update_llm_span
         
@@ -93,10 +87,8 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
             )
             return output
         ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, updateLlmSpan } from '@deepeval-ts/tracing';
 
@@ -117,7 +109,6 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
                 fn: generateResponse,
             });
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -141,7 +132,6 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>     
         ```python title="main.py" {6}
         from deepeval.tracing import observe, update_retriever_span
         
@@ -155,10 +145,8 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
             )
             return fetched_documents
         ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, updateRetrieverSpan } from '@deepeval-ts/tracing';
             
@@ -178,7 +166,6 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
                 fn: retrieveDocuments,
             });
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 

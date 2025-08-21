@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Masking
+subtitle: Protect your sensitive information from traces using the masking feature
 slug: llm-tracing/advanced-features/masking
-description: Learn about masking in LLM Tracing
 ---
 
 ## Overview
@@ -17,7 +16,6 @@ To implement masking, you need to define a masking function and configure the tr
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {10}
             import re
             from deepeval.tracing import observe, trace_manager
@@ -36,17 +34,14 @@ To implement masking, you need to define a masking function and configure the tr
             
             llm_app("Test Masking")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
-            ```typescript title="index.ts" {10}
+            ```typescript title="index.ts" {9}
             import { observe, traceManager } from '@deepeval-ts/tracing';
 
             const maskingFunction = (data: any): any => {
-                if (typeof data === 'string') {
+                if (typeof data === 'string')
                     return data.replace(/\b(?:\d{4}[- ]?){3}\d{4}\b/g, '[REDACTED CARD]');
-                }
                 return data;
             };
 
@@ -56,14 +51,9 @@ To implement masking, you need to define a masking function and configure the tr
                 return "4242-4242-4242-4242";
             };
 
-            const observedAgent = observe({
-                type: "agent",
-                fn: agent
-            });
-
+            const observedAgent = observe({ type: "agent", fn: agent });
             observedAgent("Test Masking");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -83,7 +73,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py"
             import re
             from typing import Any
@@ -102,10 +91,8 @@ Since the masking function is applied to an observed function's inputs, outputs,
             print(mask_credit_card("My card number is 4111 1111 1111 1234."))
             # Output: My card number is [REDACTED CARD].
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts"
             function maskCreditCard(data: any): any {
                 if (typeof data === 'string') {
@@ -124,7 +111,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
             console.log(maskCreditCard("My card number is 4111 1111 1111 1234."));
             // Output: My card number is [REDACTED CARD].
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -132,7 +118,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py"
             import re
             from typing import Any
@@ -150,10 +135,8 @@ Since the masking function is applied to an observed function's inputs, outputs,
             print(mask_email("Contact me at johndoe@example.com."))
             # Output: Contact me at j*****@example.com.
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts"
             function maskEmail(data: any): any {
                 if (typeof data === 'string') {
@@ -172,7 +155,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
             console.log(maskEmail("Contact me at johndoe@example.com."));
             // Output: Contact me at j*****@example.com.
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -180,7 +162,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py"
             import re
             from typing import Any
@@ -203,10 +184,8 @@ Since the masking function is applied to an observed function's inputs, outputs,
             print(mask_bank_account("My account is 9876543210."))
             # Output: My account is ******3210.
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts"
             function maskBankAccount(data: any): any {
                 if (typeof data === 'string') {
@@ -227,7 +206,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
             console.log(maskBankAccount("My account is 9876543210."));
             // Output: My account is ******3210.
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>
 
@@ -235,7 +213,6 @@ Since the masking function is applied to an observed function's inputs, outputs,
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py"
             import re
             from typing import Any
@@ -252,10 +229,8 @@ Since the masking function is applied to an observed function's inputs, outputs,
             print(mask_passport_number("Passport: A12345678."))
             # Output: Passport: A*******8.
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts"
             function maskPassportNumber(data: any): any {
                 if (typeof data === 'string') {
@@ -274,6 +249,5 @@ Since the masking function is applied to an observed function's inputs, outputs,
             console.log(maskPassportNumber("Passport: A12345678."));
             // Output: Passport: A*******8.
             ```
-        </CodeBlock>
     </Tab>
 </Tabs>

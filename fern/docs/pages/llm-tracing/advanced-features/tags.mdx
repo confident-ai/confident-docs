@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Tags
+subtitle: Adding tags to your traces for better visibility on Confident AI
 slug: llm-tracing/advanced-features/tags
-description: Learn about tags in LLM Tracing
 ---
 
 ## Overview
@@ -18,7 +17,6 @@ Tags are applied at the trace level, making them visible for all spans within th
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {8}
             from deepeval.tracing import observe, update_current_trace
             from openai import OpenAI
@@ -36,10 +34,8 @@ Tags are applied at the trace level, making them visible for all spans within th
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {5}
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
@@ -55,14 +51,9 @@ Tags are applied at the trace level, making them visible for all spans within th
                 return response.choices[0].message.content;
             };
 
-            const observedLlmApp = observe({
-                type: "agent",
-                fn: llmApp
-            });
-
+            const observedLlmApp = observe({ type: "agent", fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>

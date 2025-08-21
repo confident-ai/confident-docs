@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Input & Output
+subtitle: Learn how to supply input and output of your LLM application in a trace
 slug: llm-tracing/advanced-features/input-output
-description: Learn about input and output in LLM Tracing
 ---
 
 ## Overview
@@ -14,7 +13,6 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {13}
             from openai import OpenAI
             from deepeval.tracing import observe, update_current_trace
@@ -33,10 +31,8 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {11}
             import OpenAI from 'openai';
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
@@ -52,13 +48,9 @@ You can set the `input` and `output` of a trace using the `update_current_trace`
                 return res.choices[0].message.content;
             };
 
-            const observedLlmApp = observe({
-                fn: llmApp,
-            });
-
+            const observedLlmApp = observe({ fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -83,7 +75,6 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {13}
             from openai import OpenAI
             from deepeval.tracing import observe, update_current_span
@@ -102,10 +93,8 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {11}
             import OpenAI from 'openai';
             import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
@@ -121,13 +110,9 @@ For example, the `"retriever"` span `type` expects a string as the `input` and l
                 return res.choices[0].message.content;
             };
 
-            const observedLlmApp = observe({
-                fn: llmApp,
-            });
-
+            const observedLlmApp = observe({ fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>

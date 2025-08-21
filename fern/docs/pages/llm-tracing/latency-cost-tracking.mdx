@@ -28,7 +28,6 @@ Confident AI lets you track the latency and cost of your LLM calls, which can he
 <Tab title="Manual Cost Tracking">
 
 <CodeBlocks>
-<CodeBlock language="python">
 
 ```python {6,7,12,13}
 from deepeval.tracing import observe, update_llm_span
@@ -47,9 +46,6 @@ def generate_response(prompt: str) -> str:
     )
     return output
 ```
-
-</CodeBlock>
-<CodeBlock language="ts">
 
 ```typescript {6,7,15,16}
 import { observe, updateLlmSpan } from "@deepeval-ts/tracing";
@@ -71,15 +67,12 @@ const observedGenerateResponse = observe({
   fn: generateResponse,
 });
 ```
-
-</CodeBlock>
 </CodeBlocks>
 
 </Tab>
 <Tab title="Automatic Cost Tracking">
 
 <CodeBlocks>
-<CodeBlock language="python">
 
 ```python {5}
 from deepeval.tracing import observe, update_current_span
@@ -96,9 +89,6 @@ def generate_response(prompt: str) -> str:
     )
     return output
 ```
-
-</CodeBlock>
-<CodeBlock language="ts">
 
 ```typescript {14}
 import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
@@ -118,9 +108,6 @@ const observedGenerateResponse = observe({
   fn: generateResponse,
 });
 ```
-
-</CodeBlock>
-
 </CodeBlocks>
 
 </Tab>
@@ -163,7 +150,6 @@ To set up automatic cost tracking, provide the `model` in the `@observe` decorat
 
 <Tabs>
 <Tab title="Python">
-<CodeBlock>
 
 ```python title="main.py" {5}
 from deepeval.tracing import observe, update_current_span
@@ -181,10 +167,8 @@ def generate_response(prompt: str) -> str:
     return output
 ```
 
-</CodeBlock>
 </Tab>
 <Tab title="TypeScript">
-<CodeBlock>
 
 ```typescript title="index.ts" {14}
 import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
@@ -205,7 +189,6 @@ const observedGenerateResponse = observe({
 });
 ```
 
-</CodeBlock>
 </Tab>
 </Tabs>
 
@@ -231,7 +214,6 @@ To manually set up cost tracking, provide the `cost_per_input_token` and `cost_p
 
 <Tabs>
 <Tab title="Python">
-<CodeBlock>
 
 ```python title="main.py" {6,7,12,13}
 from deepeval.tracing import observe, update_llm_span
@@ -251,11 +233,8 @@ def generate_response(prompt: str) -> str:
     return output
 ```
 
-</CodeBlock>
 </Tab>
 <Tab title="TypeScript">
-
-<CodeBlock>
 
 ```typescript title="index.ts" {6,7,15,16}
 import { observe, updateLlmSpan } from "@deepeval-ts/tracing";
@@ -278,7 +257,6 @@ const observedGenerateResponse = observe({
 });
 ```
 
-</CodeBlock>
 </Tab>
 </Tabs>
 

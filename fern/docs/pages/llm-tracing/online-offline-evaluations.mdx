@@ -40,7 +40,6 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
 
 <Tabs>
     <Tab title="Python" language="python">
-    <CodeBlock>
     ```python title="main.py" {2,7,16}
     from deepeval.test_case import LLMTestCase
     from deepeval.tracing import observe, update_current_span
@@ -62,11 +61,9 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
 
     llm_app("Write me a poem.")
     ```
-    </CodeBlock>
     </Tab>
 
     <Tab title="TypeScript" language="typescript">
-    <CodeBlock>
     ```typescript title="index.ts" {1,5,13}
     import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
 
@@ -84,7 +81,6 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
         fn: generate,
     );
     ```
-    </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -112,7 +108,6 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 
 <Tabs>
     <Tab title="Python" language="python">
-    <CodeBlock>
     ```python title="main.py" {2,7,16}
     from deepeval.test_case import LLMTestCase
     from deepeval.tracing import observe, update_current_trace
@@ -134,11 +129,9 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 
     llm_app("Write me a poem.")
     ```
-    </CodeBlock>
     </Tab>
 
     <Tab title="TypeScript" language="typescript">
-    <CodeBlock>
     ```typescript title="index.ts" {5,13}
     import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
 
@@ -156,7 +149,6 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
         fn: generate,
     );
     ```
-    </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -173,7 +165,6 @@ All threads are offline evaluations because you should only run evals on threads
 
 Since it is impossible for Confident AI to automatically know whether a multi-turn conversation has completed or not, you'll have to trigger an offline evaluation using the `evaluate_thread()` method **ONLY AFTER** once you're certain a conversation has completed:
 
-<CodeBlock>
 ```python title="main.py" {2,15,22}
 from openai import OpenAI
 from deepeval.tracing import observe, update_current_trace, evaluate_thread
@@ -198,17 +189,14 @@ if __name__ == "__main__":
     print(f"\n🤖 Response:\n{response}")
     evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
-</CodeBlock>
 
 You can also use `a_evaluate_thread`, the `async` version of `evaluate_thread()`:
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import evaluate_thread
 
 a_evaluate_thread(thread_id=your_thread_id, metric_collection="Collection Name")
 ```
-</CodeBlock>
 
 You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input-output) of individual traces in a thread for multi-turn evaluations to work. To recap, DeepEval uses the `input` of a trace as the `"user"` role content and the `output` of a trace as the `"assistant"` role content as turns in your thread.
 
@@ -219,7 +207,6 @@ You **MUST** [set the `input`/`output`](/docs/llm-tracing/tracing-features/input
 
 You can also set the retrieval context and tools called (if any) for each assistant/AI turn as part of the `output` setting, which would allow you to see the context of which an LLM generation was invoked in:
 
-<CodeBlock>
 ```python title="main.py" {8}
 from deepeval.test_case import ToolCall
 from deepeval.tracing import TurnContext
@@ -234,7 +221,6 @@ update_current_trace(
 )
 
 ```
-</CodeBlock>
 
 To learn more, visit the [threads section.](/docs/llm-tracing/tracing-features/threads)
 
@@ -242,14 +228,11 @@ To learn more, visit the [threads section.](/docs/llm-tracing/tracing-features/t
 
 Although less common since you can run online evals on traces, you can also run **single-turn**, offline evals on trace retrospectively:
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import evaluate_trace
 
 evaluate_trace(trace_uuid=<your-trace-uuid>, metric_collection="Collection Name")
 ```
-
-</CodeBlock>
 
 <Tip>
   The asynchronous version, `a_evaluate_trace` is also available for traces.
@@ -261,14 +244,11 @@ Note that your trace **must already contain** the necessary test case parameters
 
 The same offline evals can also be ran in the same say for spans:
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import evaluate_span
 
 evaluate_span(span_uuid=<your-span-uuid>, metric_collection="Collection Name")
-
 ```
-</CodeBlock>
 
 <Tip>
 The asynchronous version, `a_evaluate_span` is also available for spans.
@@ -283,7 +263,6 @@ Remember, the metric collection you provide must be a **single-turn** one.
 
 **Quick quiz:** Given the code below, will Confidnet AI run online evaluations on the trace using metrics in `"Collection 2"` or `"Collection 1"`?
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import observe, update_current_span, update_current_trace
 
@@ -294,8 +273,6 @@ def outer_function():
         update_current_span(test_case=...)
         update_current_trace(test_case=...)
 ```
-
-</CodeBlock>
 
 **Answer:** This will run `"Collection 1"` for traces, and `"Collection 2"` for spans.
 
@@ -310,7 +287,6 @@ This is because in this example:
 
 **Quick quiz:** Given the code below, will Confident AI run online evaluations on the thread using metrics in `"Collection 2"` or `"Collection 1"`?
 
-<CodeBlock>
 ```python title="main.py"
 from deepeval.tracing import observe, update_current_trace, evaluate_thread
 
@@ -322,7 +298,6 @@ def outer_function():
 
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
 ```
-</CodeBlock>
 
 **Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection.
 

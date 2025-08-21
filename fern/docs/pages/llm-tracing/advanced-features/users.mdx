@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Users
+subtitle: Tracking user info in your traces for observability
 slug: llm-tracing/advanced-features/users
-description: Learn about users in LLM Tracing
 ---
 
 ## Overview
@@ -14,7 +13,6 @@ You can use the `update_current_trace` function to set the `user_id` within trac
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
             from openai import OpenAI
@@ -33,10 +31,8 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             
             llm_app("Write me a poem.")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
             ```typescript title="index.ts" {10}
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
@@ -52,10 +48,8 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             };
 
             const observedLlmApp = observe({fn: llmApp});
-
             observedLlmApp("Write me a poem.");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>

@@ -1,7 +1,6 @@
 ---
-subtitle: LLM Tracing Test Cases
+subtitle: Creating test cases in your traces to run evaluations on-the-fly
 slug: llm-tracing/advanced-features/test-cases
-description: Learn about test cases in LLM Tracing
 ---
 
 ## Overview
@@ -34,7 +33,6 @@ You can set span-level test case parameters in the `update_current_span` functio
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
             ```python title="main.py" {6}
             from deepeval.tracing import observe, update_current_span
             from deepeval.test_case import ToolCall
@@ -50,11 +48,9 @@ You can set span-level test case parameters in the `update_current_span` functio
 
             tool_calling_agent("What is weather in San Francisco?")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
-            ```js title="index.ts"
+            ```js title="index.ts" {5}
             import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
             import { ToolCall } from "@deepeval-ts/test-case";
 
@@ -68,10 +64,8 @@ You can set span-level test case parameters in the `update_current_span` functio
             };
 
             const observedToolCallingAgent = observe({ fn: toolCallingAgent });
-
             observedToolCallingAgent("What is weather in San Francisco?");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
@@ -86,8 +80,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
 
 <Tabs>
     <Tab title="Python" language="python">
-        <CodeBlock>
-            ```python title="main.py" {6}
+            ```python title="main.py" {19}
             from openai import OpenAI
             from deepeval.tracing import observe, update_current_trace
 
@@ -111,11 +104,9 @@ You can set trace-level test case parameters in the `update_current_trace` funct
 
             llm_app("What is weather typically like in San Francisco?")
             ```
-        </CodeBlock>
     </Tab>
     <Tab title="TypeScript" language="typescript">
-        <CodeBlock>
-            ```js title="index.ts"
+            ```js title="index.ts" {21}
             import OpenAI from "openai";
             import { observe, updateCurrentTrace } from "@deepeval-ts/tracing";
 
@@ -125,7 +116,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
                 fn: (query: string) => {
                     const retrieved_chunks = ["chunk1", "chunk2"];
                     updateCurrentTrace({ retrievalContext: retrieved_chunks });
-                return retrieved_chunks.join("\n");
+                    return retrieved_chunks.join("\n");
                 },
             });
 
@@ -143,7 +134,6 @@ You can set trace-level test case parameters in the `update_current_trace` funct
 
             observedLLMApp("What is weather typically like in San Francisco?");
             ```
-        </CodeBlock>
     </Tab>
 
 </Tabs>
