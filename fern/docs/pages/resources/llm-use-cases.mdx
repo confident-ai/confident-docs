@@ -52,9 +52,9 @@ In this example, the answer **WITHOUT THE PROMPT TEMPLATE** is the `input` to a 
 [Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
 
 <Note>
-  The prompt in this case should be [logged as a
-  hyperparameter](/docs/llm-evaluation/evaluation-features/parameter-insights)
-  instead during evaluation.
+  The prompt in this case can be used for [prompt
+  insights](/docs/llm-evaluation/dashboards/model-and-prompt-insights) during
+  evaluation.
 </Note>
 
 ## Chatbots
@@ -104,14 +104,12 @@ Since this use case is more about the specific use case requirements than the sy
 - **Format Correctness** (custom DAG): How well the writing meets the specified formatting requirements
 - **Brand Voice Alignment** (custom G-Eval): How well the content matches the brand's tone and messaging
 
-In this example, the original text and requirements are the `input` to a test case, while the improved text is the `actual_output`. The style guides and formatting rules are part of the system's configuration, not `retrieval_context`, and should most likely go in the system prompt and [logged as a hyperparameter.](/docs/llm-evaluation/evaluation-features/parameter-insights)
-
 [Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
 
 <Error title="Warning">
-While this use case references external context like style guides, it doesn't
-require testing as a RAG pipeline. RAG pipeline testing is most valuable when
-the retrieval process itself could be imperfect or needs optimization.
+  While this use case references external context like style guides, it doesn't
+  require testing as a RAG pipeline. RAG pipeline testing is most valuable when
+  the retrieval process itself could be imperfect or needs optimization.
 </Error>
 
 ## Summarization
@@ -131,8 +129,6 @@ For our meeting assistant example, we'll focus on summary quality and accuracy. 
 - **Faithfulness** (generic RAG): Whether the summary hallucinates from the original text
 - **Format Correctness** (custom DAG): How well the summary follows the required structure (e.g., bullet points, sections)
 - **Conciseness** (custom G-Eval): How well the summary captures key information without unnecessary details
-
-In this example, the original text is the `input` to a test case, while the summary is the `actual_output`. The prompts that gives the summarization instructions should be provided in the system prompt and [logged as hyperparameters](/docs/llm-evaluation/evaluation-features/parameter-insights).
 
 [Click here](/docs/llm-evaluation/metrics/create-locally) to learn how to create and use these metrics for evaluation.
 

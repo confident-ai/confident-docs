@@ -101,7 +101,7 @@ evaluate(test_cases=dataset.test_cases, metrics=[...])
 
 First use the `.pull()` method:
 
-```ts main.ts
+```ts index.ts
 import { EvaluationDataset } from "deepeval-ts";
 
 dataset = new EvaluationDataset();
@@ -116,7 +116,7 @@ console.log(dataset.goldens);
 
 Then loop through your dataset of goldens to create a list of test cases:
 
-```ts main.ts focus={7-13}
+```ts index.ts focus={7-13}
 import { EvaluationDataset } from "deepeval-ts";
 import { LLMTestCase } from "deepeval-ts";
 
@@ -136,7 +136,7 @@ for (const golden of dataset.goldens) {
 <Tip>
   For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
 
-```ts main.ts
+```ts index.ts
 import { ConversationalTestCase } from "deepeval-ts";
 
 for (const golden of dataset.goldens) {

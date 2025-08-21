@@ -1,10 +1,113 @@
 ---
 title: Why Confident AI
-subtitle: Understanding the value proposition
-slug: why-confident-ai
-description: Learn why to choose Confident AI
+subtitle: Understanding why Confident AI is right for you
+slug: resources/why-confident-ai
 ---
 
-# Why Confident AI
+## Overview
 
-Content coming soon...
+Confident AI is an evaluation-first platform for testing LLM applications and replaces a lot if not all of your tedious manual LLM evaluation workflows / any existing solutions you may already be using.
+
+A few reasons why engineering teams choose Confident AI:
+
+- Built on DeepEval, the most adopted open-source LLM evaluation framework (10M+ evals per week, 40+ metrics for all use cases)
+- Every feature is purpose-built for LLM evaluation workflows — improve metrics, datasets, models, or prompts
+- Never get stuck — built by the creators of DeepEval, you won't run into issues with more complicated evals when compared to generic platforms that treat eval as an afterthought
+
+## DeepEval vs Confident AI
+
+> "Oh, so DeepEval is Confident AI's biggest competitor?"
+
+DeepEval is the open-source LLM evaluation framework, and while DeepEval powers the metrics that are used to populate evaluation results on Confident AI, they are very different products.
+
+**DeepEval is like Pytest for LLMs** - it runs in the terminal through a Python script, you get to see the results, but nothing else happens afterwards.
+
+<Callout type="info">Confident AI created and owns DeepEval.</Callout>
+
+With Confident AI, you'll have a centralized place to manage testing reports, [catch regressions](/docs/llm-evaluation/dashboards/ab-regression-testing) before your users do, auto-optimize on prompts you [version on the platform](/docs/prompt-management/prompt-versioning) (based on eval results), [trace and monitor](/docs/llm-tracing/introduction) LLM interactions in production, and collect human feedback from either end users or internal reviewers just to make better data driven decisions apart from relying on DeepEval's LLM-as-a-judge metrics.
+
+| DeepEval                          | Confident AI                                         |
+| --------------------------------- | ---------------------------------------------------- |
+| Open-source                       | 100% integrated with DeepEval                        |
+| Runs evals locally                | Runs evals locally and on the cloud                  |
+| No data persistence & UI          | Manage and A\|B test prompts                         |
+| No testing report sharing         | Curate and annotate datasets                         |
+| Hard for A\|B testing             | Data persistence with sharable testing reports       |
+| No real-time evals                | Accessible for all stakeholders in your organization |
+| No observability and tracing      | Real-time online evals and performance alerting      |
+| Red teaming available in DeepTeam | LLM observability with tracing                       |
+| Community support                 | Collect end-user and internal feedback               |
+|                                   | Email, private, and live video call support          |
+
+## Just Starting Out With LLM Evaluation?
+
+<Callout>Confident AI takes on average 10 minutes to setup</Callout>
+
+For those that have yet to start using any LLM evaluation/observability platform, Confident AI will help you build the best version of your LLM application by:
+
+- Regression testing LLM apps for quality
+- Eliminate manual CSV workflows for analyzing and sharing testing reports
+- Version and optimize prompts
+- Avoid spreadsheets to annotate datasets
+- Streamline collaboration between engineering and non-engineering teams
+- Gain real-time visibility into LLM app performance in production
+- Use production data to make datasets more robust
+- Collect human feedback from users and internal reviewers
+
+Every feature is designed to either enhance your evaluation results — so you can iterate faster with more valid data, or directly improve your LLM application (through model and prompt suggestions).
+
+| Self-Maintained Methods                       | Confident AI                                                         |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| Hours spent manually reviewing outputs        | Save countless hours on LLM evaluation with automated testing        |
+| Constantly recreating test cases from scratch | Build a reusable test suite that grows with your application         |
+| No way to track if quality drops over time    | Catch quality drops before your users do                             |
+| Hard to share insights with team members      | Create shareable testing reports that anyone can understand          |
+| Difficult to justify model or prompt changes  | Make data-driven decisions about model and prompt changes            |
+| Built your own dashboard                      | Turn user feedback directly into test cases                          |
+|                                               | Identify exactly which model or prompt works best for your use case  |
+|                                               | Confidently ship LLM features knowing they've been thoroughly tested |
+|                                               | Detect and fix hallucinations before deployment                      |
+|                                               | Show stakeholders clear evidence of LLM performance improvements     |
+
+## What If I'm Already Using Another Solution?
+
+If you decide Confident AI is a better fit for you, switching to Confident AI is an extremely easy process. Common reasons why users switch to us:
+
+- Whatever you're using does not work (literally)
+- Your provider is trying to force you into an annual contract
+- Evaluation features are minimal (limited metrics, poor support for chatbots and agents, etc.)
+- Does not cover the workflows of non-technical team members (domain experts needing to review testing data, external stakeholders, legal compliance people)
+- You'd like an all-in-one solution with safety testing features as well ([red teaming](/docs/llm-red-teaming), guardrails)
+- Frustration with customer support
+- You like reading our docs more 😉
+
+> [!NOTE]
+>
+> The most common solutions users switch from to Confident AI is Arize AI, Langsmith, Galileo, and Braintrust.
+
+On the contrary, sometimes what you're using works completely fine, and it's true that some evaluation needs can be satisfied by LLM observability-first solutions. But as your LLM system matures, issues like poor test coverage, unreliable metrics, and scaling to more LLM evaluation needs start to surface, especially with tools that don't specialize in evaluation and **OWN** their eval algorithms.
+
+<Callout>
+  Confident AI started with DeepEval, meaning that you'll know for sure that
+  whatever metrics you decide to use is the best out there.
+</Callout>
+
+Common problems you'll face:
+
+- Poor LLM test coverage
+- "LLM-as-a-judge" metrics that aren't repeatable, with no clear path to customization
+- Does not extend into safety testing ([red teaming](/docs/llm-red-teaming) and guardrails) for things like bias, PII leakage, misinformation, etc.
+- No clear ownership or expertise in LLM evaluation means you're on your own for any evaluation related problems, even for things as simple as coming up with an evaluation strategy
+
+Confident AI is built by the creators of DeepEval, so unlike general-purpose platforms, we're here to make sure you never hit any bottlenecks.
+
+| Other Solutions                               | Confident AI                                                              |
+| --------------------------------------------- | ------------------------------------------------------------------------- |
+| Generic metrics that miss LLM-specific issues | Purpose-built metrics that catch the issues users actually care about     |
+| Limited understanding of your use case        | Evaluation expertise from the team behind DeepEval (10M+ evals/week)      |
+| Minimal protection against LLM risks          | Comprehensive safety testing to protect your brand and users              |
+| Left to figure out evaluation strategy alone  | Guided evaluation strategy from experts who've seen it all                |
+| Not built for your entire team's workflow     | Helps both engineers and non-technical team members make better decisions |
+|                                               | Clear path to improving your prompts based on real user data              |
+|                                               | One place to test, monitor, and improve your LLM applications             |
+|                                               | Tailored advice on which models work best for your specific needs         |

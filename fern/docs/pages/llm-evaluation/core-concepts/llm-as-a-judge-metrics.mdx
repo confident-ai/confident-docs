@@ -194,11 +194,13 @@ In Confident AI, out of the 40+ LLM evaluation metrics, only the Arena G-Eval me
 
 ## Single vs Multi-turn
 
-Scoring single-turn LLM apps are straightforward, as we saw in the previous section. For single-output, simply provide the test case parameters as dynamic variables in your evaluation prompt, and out you get a score.
+Scoring single-turn LLM apps are straightforward, as we saw in the previous section. For **single-turn evals**, simply provide the test case parameters as dynamic variables in your evaluation prompt, and out you get a score.
 
-[image]
+<Frame caption="Single-Turn LLM-as-a-Judge">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/concepts:single-turn-llm-judge.png" />
+</Frame>
 
-However for multi-turn evals, you'll need a prompt that:
+However for **multi-turn evals**, you'll need a prompt that:
 
 - Takes into account entire conversations
 - Calculates a score based on portions of a conversation
@@ -206,7 +208,9 @@ However for multi-turn evals, you'll need a prompt that:
 
 In fact, often times a conversation can get length and the best way to evaluate it is to partition it into several list of turns instead:
 
-[image]
+<Frame caption="Multi-Turn LLM-as-a-Judge">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/concepts:multi-turn-llm-judge.png" />
+</Frame>
 
 Despite how different single and mult-turn LLM-as-a-judge may look, they both actually fall under the **single-output** LLM-as-a-judge category. For pairwise comparison, we generally **don't** do it for multi-turn since that would overload the LLM judge with too much context, hence it doesn't work as well compared to single-turn pairwise comparisons.
 
