@@ -7,7 +7,7 @@ slug: metrics/multi-turn/role-adherence-metric
 
 ## Overview
 
-The role adherence is a multi-turn metric that is used to determine if your chatbot sticks to the pre-determined role throughtout the conversation. It uses LLM-as-a-judge to determine if the assisant has stayed consistent with its replies by impersonating a role.
+The role adherence metric is a multi-turn metric that uses LLM-as-a-judge to evaluate whether your chatbot consistently maintains its pre-determined role throughout the conversation.
 
 ### Required Parameters
 
@@ -31,7 +31,7 @@ These are the parameters you must supply in your test case to run evaluations fo
 
 ## How Is It Calculated?
 
-The role adherence metric iterates over each `assistant` turn and checks if the corresponding `content` of that turn adheres to the `chatbot_role` specified using an LLM.
+The role adherence metric iterates over each `assistant` turn and uses an LLM to check if the content adheres to the specified `chatbot_role`.
 
 <br />
 

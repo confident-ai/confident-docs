@@ -7,7 +7,7 @@ slug: metrics/single-turn/contextual-recall-metric
 
 ## Overview
 
-The contextual recall metric is a single-turn RAG-based metric that is used to evaluate your retriever's quality on the amount of context retrieved. It uses LLM-as-a-judge to see if the retrieved context is enough to give an answer similar to expected output.
+The contextual recall metric is a single-turn RAG metric that uses LLM-as-a-judge to assess whether your retriever has surfaced enough relevant context to produce an answer similar to the expected output.
 
 <Warning>
 
@@ -31,7 +31,7 @@ These are the parameters you must supply in your test case to run evaluations fo
 
 ## How Is It Calculated?
 
-The contextual recall metric first extracts distinct statements from the expected output using an LLM. After that it uses the same LLM to see how many independent statements can be attributed to any of the nodes in the retrieved context.
+The contextual recall metric first extracts distinct statements from the expected output using an LLM, then uses the same LLM to check how many of those statements are supported by the retrieved context nodes.
 
 <br />
 

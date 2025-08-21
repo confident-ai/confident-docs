@@ -7,7 +7,7 @@ slug: metrics/single-turn/contextual-precision-metric
 
 ## Overview
 
-The contextual precision metric is a single-turn RAG-based metric that is used to evaluate a retriever's quality on the criteria of ranking the retrieved nodes. It uses LLM-as-a-judge to check if your retriever has accurately retrieved context and ranked them properly considering the input query.
+The contextual precision metric is a single-turn RAG metric that uses LLM-as-a-judge to evaluate how well your retriever ranks the retrieved context based on the input query.
 
 <Warning>
 
@@ -31,7 +31,7 @@ These are the parameters you must supply in your test case to run evaluations fo
 
 ## How Is It Calculated?
 
-The contextual precision metric uses an LLM-as-a-judge to check each retrieved node in the list to see if it is in the correct position of relevance to the given input based on the expected output. It uses the following equation to calculate the final score:
+The contextual precision metric evaluates each retrieved node using an LLM to check if it is correctly ranked for relevance to the input. It then calculates the final score using the following equation:
 
 <br />
 

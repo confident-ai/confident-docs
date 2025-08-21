@@ -7,7 +7,7 @@ slug: metrics/multi-turn/turn-relevancy-metric
 
 ## Overview
 
-The turn relevancy metric is a multi-turn metric that is used to evaluate whether your chatbot provides relevant outputs for a given user input in turns. It uses LLM-as-a-judge to evaluate if your all the chatbot turns in the conversation are relevant to the corresponding user's inputs.
+The turn relevancy metric is a multi-turn metric that uses LLM-as-a-judge to evaluate whether your chatbot’s responses are relevant to the corresponding user inputs at each turn in the conversation.
 
 ### Required Parameters
 
@@ -28,7 +28,7 @@ These are the parameters you must supply in your test case to run evaluations fo
 
 ## How Is It Calculated?
 
-The turn relevancy metric loops over all the turns to find the `assistant` turns and uses an LLM to see if the corresponding turn's `content` is relevant to the previous `user` turn's `content`.
+The turn relevancy metric loops over all the turns to find the `assistant` turns and uses an LLM to see if the corresponding turn's `content` is relevant to the previous user turn's `content`.
 
 <br />
 

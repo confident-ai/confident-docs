@@ -7,7 +7,7 @@ slug: metrics/single-turn/faithfulness-metric
 
 ## Overview
 
-The faithfulness metric is a single-turn RAG-based metric that is used to evaluate your generator's quality on it's ability to generate answers that are based only on the retrieved context. It uses LLM-as-a-judge to check if the actual output is only based on the retrieved context and does not hallucinate or provide misinformation.
+The faithfulness metric is a single-turn RAG metric that uses LLM-as-a-judge to assess whether your generator's answers rely solely on the retrieved context, without hallucinating or providing misinformation.
 
 ### Required Parameters
 
@@ -25,7 +25,7 @@ These are the parameters you must supply in your test case to run evaluations fo
 
 ## How Is It Calculated?
 
-The faithfulness metric first extracts individual statements as claims from the actual output using an LLM. It then uses the same LLM to check how many claims are supported by the retrieved context.
+The faithfulness metric first extracts individual claims from the actual output using an LLM, then uses the same LLM to check how many claims are supported by the retrieved context.
 
 <br />
 

@@ -7,7 +7,7 @@ slug: metrics/single-turn/task-completion-metric
 
 ## Overview
 
-The task completion metric is a single-turn metric that evaluates your LLM agent's entire trace to evaluate its ability on completeing the task given to it. It uses LLM-as-a-judge to see if your LLM agent has ultimately finished the task given to it.
+The task completion metric is a single-turn metric that uses LLM-as-a-judge to assess whether your LLM agent successfully completes the given task based on its entire trace.
 
 <Error title="Important Note">
 
@@ -17,7 +17,7 @@ The task completion analyzes your agent's full trace to determine task success, 
 
 ## How Is It Calculated?
 
-The task completion metric uses an LLM to extract the task and outcome of each step in the trace. After which it uses the same LLM to see if the task extracted has been satisfied given the outcome of that step.
+The task completion metric uses an LLM to extract the task and outcome from each step in the trace, then uses the same LLM to determine if the task was satisfied based on the outcome.
 
 <br />
 
