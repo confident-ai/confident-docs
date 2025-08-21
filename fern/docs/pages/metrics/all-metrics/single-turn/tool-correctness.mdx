@@ -7,7 +7,7 @@ slug: metrics/single-turn/tool-correctness-metric
 
 ## Overview
 
-The tool correctness metric is an agentic LLM metric that assesses your LLM agent's function/tool calling ability. It is calculated by comparing whether every tool that is expected to be used was indeed called. It is a single-turn metric to evaluate an agent's tool calling ability.
+The tool correctness metric is a single-turn metric that is used to evaluate your LLM agent's tool calling ability. Unlike the other metrics, tool correctness metric does not use an LLM for evaluation.
 
 <Warning>
 
@@ -15,9 +15,26 @@ The tool correctness metric needs you to supply both tools called and expected t
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for tool correctness metric:
+
+<ParamField path="input" type="string" required>
+  The input supplied to your LLM agent.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your LLM agent generated for the given input.
+</ParamField>
+<ParamField path="tools_called" type="list" required>
+  A list of the tools called by your LLM agent in the order of their calling in a `ToolCall` instance.
+</ParamField>
+<ParamField path="expected_tools" type="string" required>
+  A list of the expected tools to be called by your LLM agent in the order of how they should be called in a `ToolCall` instance.
+</ParamField>
+
 ## How Is It Calculated?
 
-The tool correctness metric assesses the accuracy of your agent's tool usage by comparing the tools called by your LLM agent to the list of expected tools.
+The tool correctness metric uses a deterministic approach to calculate the score by iterating over the tools called and expected tools to see if your agent has called the appropriate tools.
 
 <br />
 

@@ -7,7 +7,7 @@ slug: metrics/single-turn/toxicity-metric
 
 ## Overview
 
-The toxicity metric uses uses LLM-as-a-judge to evaluate toxicness in your LLM outputs. This is particularly useful for a fine-tuning use case. It is a single-turn metric that can be used to evaluate any LLM application for safety checks.
+The toxicity metric is a single-turn safety metric that is used to evaluate if your LLM application is generating output that may be considered toxic. It uses LLM-as-a-judge to evaluate if the actaul output contains any toxic statements.
 
 <Warning>
 
@@ -15,9 +15,20 @@ The toxicity metric is a referenceless metric, which means it only needs the act
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for toxicity metric:
+
+<ParamField path="input" type="string" required>
+  The input you supplied to your LLM application.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your LLM application generates.
+</ParamField>
+
 ## How Is It Calculated?
 
-The Toxicity metric first uses an LLM to extract all opinions found in the actual output, and then uses the same LLM to classify whether each opinion is toxic or not.
+The toxicity metric uses an LLM to extract independent opinions from the actual output. And then uses the same LLM to find the number of opinions that contain toxic content in them.
 
 <br />
 

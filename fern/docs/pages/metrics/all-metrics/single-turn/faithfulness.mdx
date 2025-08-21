@@ -7,11 +7,25 @@ slug: metrics/single-turn/faithfulness-metric
 
 ## Overview
 
-The faithfulness metric uses LLM-as-a-judge to measure the quality of your RAG's generator by evaluating whether the actual output factually aligns with the contents of your retrieval context. It is a single-turn metric to evaluate RAG QA specifically, and not general RAG.
+The faithfulness metric is a single-turn RAG-based metric that is used to evaluate your generator's quality on it's ability to generate answers that are based only on the retrieved context. It uses LLM-as-a-judge to check if the actual output is only based on the retrieved context and does not hallucinate or provide misinformation.
+
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for faithfulness metric:
+
+<ParamField path="input" type="string" required>
+  The input query you supply to your RAG application.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your RAG application's generator generates.
+</ParamField>
+<ParamField path="retrieval_context" type="list of string" required>
+  The retrieved context your retriever outputs for a given input sorted by their rank.
+</ParamField>
 
 ## How Is It Calculated?
 
-The faithfulness metric first uses an LLM to extract all claims made in the actual output, and then uses the same LLM to classify whether each claim is truthful based on the facts presented in the retrieval context.
+The faithfulness metric first extracts individual statements as claims from the actual output using an LLM. It then uses the same LLM to check how many claims are supported by the retrieved context.
 
 <br />
 

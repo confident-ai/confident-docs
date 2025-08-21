@@ -7,7 +7,7 @@ slug: metrics/single-turn/contextual-precision-metric
 
 ## Overview
 
-The contextual precision metric uses LLM-as-a-judge to measure the quality of your RAG retriever by assessing whether your test case's retrieval context nodes are relevant to the given input. It is a single-turn metric to evaluate RAG retriver only.
+The contextual precision metric is a single-turn RAG-based metric that is used to evaluate a retriever's quality on the criteria of ranking the retrieved nodes. It uses LLM-as-a-judge to check if your retriever has accurately retrieved context and ranked them properly considering the input query.
 
 <Warning>
 
@@ -15,9 +15,23 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for contextual precision metric:
+
+<ParamField path="input" type="string" required>
+  The input query you supply to your RAG application.
+</ParamField>
+<ParamField path="expected_output" type="string" required>
+  The expected output your RAG application has to generate for a given input.
+</ParamField>
+<ParamField path="retrieval_context" type="list of string" required>
+  The retrieved context your retriever outputs for a given input sorted by their rank.
+</ParamField>
+
 ## How Is It Calculated?
 
-The contextual precison metric first uses an LLM to determine for each node in the retrieval context whether it is relevant to the input based on information in the expected output. After which it calculates the weighted cumulative precision as the contextual precision score.
+The contextual precision metric uses an LLM-as-a-judge to check each retrieved node in the list to see if it is in the correct position of relevance to the given input based on the expected output. It uses the following equation to calculate the final score:
 
 <br />
 
@@ -27,7 +41,15 @@ $$
 
 <br />
 
-The final score is the proportion of weighted cumulative precision.
+<Info>
+k - `i+1`th node in the retrieval context
+
+n - number of nodes in the retrieval context
+
+rₖ - the binary relevance of the `k`th node. 1 if relevant, 0 otherwise.
+</Info>
+
+A high contextual precison score indicates that all the retrieved nodes are in the order of their relevance to the input.
 
 ## Create Locally
 

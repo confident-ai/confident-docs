@@ -7,7 +7,7 @@ slug: metrics/single-turn/hallucination-metric
 
 ## Overview
 
-The hallucination metric uses LLM-as-a-judge to determine whether your LLM generates factually correct information by comparing the actual output to the provided context. It is a single-turn metric that can be used to evaluate any LLM application for hallucination checks.
+The hallucination metric is a single-turn safety metric that is used to check if your LLM application is generating outputs that are false or hallucinated. It uses LLM-as-a-judge to check if the actual output is truthful to the context provided.
 
 <Warning>
 
@@ -15,9 +15,23 @@ The hallucination metric needs an actual output and context in the test case to 
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for hallucination metric:
+
+<ParamField path="input" type="string" required>
+  The input you supplied to your LLM application.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your LLM application generates.
+</ParamField>
+<ParamField path="context" type="list of string" required>
+  A list of strings containing context that can be used to answer the input. Usually strings of documents.
+</ParamField>
+
 ## How Is It Calculated?
 
-The Hallucination metric uses an LLM to determine for each context in contexts, whether there are any contradictions to the actual output.
+The Hallucination metric uses an LLM to determine if there are any contradictions made to the contexts from the actual output. Here the context provided is used as the ground truth.
 
 <br />
 

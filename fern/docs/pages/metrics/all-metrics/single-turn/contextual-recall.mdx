@@ -7,7 +7,7 @@ slug: metrics/single-turn/contextual-recall-metric
 
 ## Overview
 
-The contextual recall metric uses LLM-as-a-judge to measure the quality of your RAG retriever by evaluating the extent of which your test case's retrieval context aligns with the expected output. It is a single-turn metric to evaluate RAG retriver only.
+The contextual recall metric is a single-turn RAG-based metric that is used to evaluate your retriever's quality on the amount of context retrieved. It uses LLM-as-a-judge to see if the retrieved context is enough to give an answer similar to expected output.
 
 <Warning>
 
@@ -15,9 +15,23 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for contextual recall metric:
+
+<ParamField path="input" type="string" required>
+  The input query you supply to your RAG application.
+</ParamField>
+<ParamField path="expected_output" type="string" required>
+  The expected output your RAG application has to generate for a given input.
+</ParamField>
+<ParamField path="retrieval_context" type="list of string" required>
+  The retrieved context your retriever outputs for a given input sorted by their rank.
+</ParamField>
+
 ## How Is It Calculated?
 
-The contextual recall metric first uses an LLM to extract all statements made in the expected output, and then uses the same LLM to classify whether each statement can be attributed to the nodes present in the retrieval context.
+The contextual recall metric first extracts distinct statements from the expected output using an LLM. After that it uses the same LLM to see how many independent statements can be attributed to any of the nodes in the retrieved context.
 
 <br />
 
@@ -27,7 +41,7 @@ $$
 
 <br />
 
-The final score is the proportion of attributable statements in retrieval context.
+The final score is the proportion of attributable statements in expected output.
 
 ## Create Locally
 

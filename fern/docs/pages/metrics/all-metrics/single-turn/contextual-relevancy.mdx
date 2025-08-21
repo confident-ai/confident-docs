@@ -7,7 +7,7 @@ slug: metrics/single-turn/contextual-relevancy-metric
 
 ## Overview
 
-The contextual relevancy metric uses LLM-as-a-judge to measure the quality of your RAG's retriever by evaluating the overall relevance of the information presented in your retrieval context for a given input. It is a single-turn metric to evaluate RAG retriver only.
+The contextual relevancy metric is a single-turn RAG-based metric that is used to evaluate your retriever's quality on how relevant all the retrived nodes are compared to the input query. It uses LLM-as-a-judge to see if all the retrieved nodes are relevant to input.
 
 <Warning>
 
@@ -15,9 +15,23 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for contextual relevancy metric:
+
+<ParamField path="input" type="string" required>
+  The input query you supply to your RAG application.
+</ParamField>
+<ParamField path="expected_output" type="string" required>
+  The expected output your RAG application has to generate for a given input.
+</ParamField>
+<ParamField path="retrieval_context" type="list of string" required>
+  The retrieved context your retriever outputs for a given input sorted by their rank.
+</ParamField>
+
 ## How Is It Calculated?
 
-The contextual relevancy metric first uses an LLM to extract all statements made in the retrieval context, and then uses the same LLM to classify whether each statement is relevant to the input.
+The contextual relevancy metric first extracts independent statements from all the retrieved context using an LLM. It then uses the same LLM to see how many statements are actually relevant to the input query.
 
 <br />
 

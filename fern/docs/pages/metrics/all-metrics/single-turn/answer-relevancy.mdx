@@ -7,7 +7,7 @@ slug: metrics/single-turn/answer-relevancy-metric
 
 ## Overview
 
-The answer relevancy metric uses LLM-as-a-judge to measure the quality of your RAG generator by assessing whether your test case's actual outputs are relevant to the given input. It is a single-turn metric to evaluate RAG QA specifically, and not general RAG.
+The answer relevancy metric is a single-turn RAG-based metric that is used to evaluate a generator's output in a RAG application for a given input. It uses LLM-as-a-judge to make evaluations to see if the answer given by your RAG agent is relevant to the question asked in the input.
 
 <Warning>
 
@@ -15,9 +15,20 @@ The input of a test case should not contain the entire prompt, but just the quer
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for answer relevancy metric:
+
+<ParamField path="input" type="string" required>
+  The input query you supply to your RAG application.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your RAG application's generator generates.
+</ParamField>
+
 ## How Is It Calculated?
 
-The answer relevancy metric first breaks down a test case's actual output into distinct statements, before determining the proportion of statements that are relevant to the given input.
+The answer relevancy metric breaks down the actual output in your test case into individual statements using an LLM, after which it uses the same LLM to check if the statements are relevant to the input supplied.
 
 <br />
 

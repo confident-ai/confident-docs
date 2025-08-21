@@ -7,7 +7,7 @@ slug: metrics/single-turn/bias-metric
 
 ## Overview
 
-The bias metric uses LLM-as-a-judge to determine whether your LLM application's output contains gender, racial, or political bias. It is a single-turn metric that can be used to evaluate any LLM application for safety checks.
+The bias metric is a single-turn safety metric that is used to check if your LLM application is generating outputs that might contain any race, political or any other offensive bias. Like most other metrics, bias also uses LLM-as-a-judge to make evaluations.
 
 <Warning>
 
@@ -15,9 +15,20 @@ The bias metric is a referenceless metric, which means it only needs the actual 
 
 </Warning>
 
+### Required Parameters
+
+These are the parameters you must supply in your test case to run evaluations for bias metric:
+
+<ParamField path="input" type="string" required>
+  The input you supplied to your LLM application.
+</ParamField>
+<ParamField path="actual_output" type="string" required>
+  The final output your LLM application generates.
+</ParamField>
+
 ## How Is It Calculated?
 
-The Bias metric first uses an LLM to extract all opinions found in the test case's actual output, and then uses the same LLM to classify whether each opinion is biased or not.
+The bias metric breaks down the actual output into distinct opinions using an LLM, and then uses the same LLM to see if any of the opinions are biased or not.
 
 <br />
 
