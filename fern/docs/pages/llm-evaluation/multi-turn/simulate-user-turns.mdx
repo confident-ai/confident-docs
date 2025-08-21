@@ -88,7 +88,7 @@ Pull your multi-turn dataset as you would with local simulations:
 
 <Tabs>
 
-<Tab title="Python">
+<Tab title="Python" langauage="python">
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset
@@ -99,7 +99,7 @@ dataset.pull(alias="YOUR-DATASET-ALIAS")
 
 </Tab>
 
-<Tab title="Typescript">
+<Tab title="Typescript" langauage="typescript">
 
 ```ts index.ts
 import { EvaluationDataset } from "deepeval-ts";
@@ -110,7 +110,7 @@ await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 </Tab>
 
-<Tab title="cURL">
+<Tab title="cURL" langauage="curl">
 
 <EndpointRequestSnippet endpoint="GET /v1/datasets" />
 
@@ -124,7 +124,7 @@ await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 <Tabs>
 
-<Tab title="Python">
+<Tab title="Python" langauage="python">
 
 Set `run_remote` to true to run simulations remotely.
 
@@ -137,7 +137,7 @@ conversational_test_cases = simulator.simulate(conversational_goldens=dataset.go
 
 </Tab>
 
-<Tab title="Typescript">
+<Tab title="Typescript" langauage="typescript">
 
 Only remote simluation is available in typescript.
 
@@ -173,7 +173,7 @@ const chatbotCallback = async (args: {
 
 </Tab>
 
-<Tab title="cURL">
+<Tab title="cURL" langauage="curl">
 Use `/v1/simulate` to generate the first user turn for each golden.
 
 ```curl
@@ -191,10 +191,9 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
 Continue calling `/v1/simulate` until you’ve simulated the desired number of turns.
 
 <Note>
-  {" "}
-  The `/v1/simulate` endpoint returns the **next user turn**. You should add this
-  turn to your golden, append the chatbot’s response, and then call the endpoint
-  again.{" "}
+  The `/v1/simulate` endpoint returns the **next user turn**. You should add
+  this turn to your golden, append the chatbot’s response, and then call the
+  endpoint again.
 </Note>
 
 ```curl
@@ -236,7 +235,7 @@ To stop a simulation naturally before it reaches the maximum number of turns, yo
 
 <Tabs>
 
-<Tab title="Python">
+<Tab title="Python" langauage="python">
 
 ```python main.py
 from deepeval.dataset import ConversationalGolden
@@ -256,7 +255,7 @@ conversation_golden = ConversationalGolden(
 
 </Tab>
 
-<Tab title="Typescript">
+<Tab title="Typescript" langauage="typescript">
 
 ```ts index.ts
 import { ConversationalGolden } from "deepeval-ts";
@@ -270,7 +269,7 @@ const conversationGolden = new ConversationalGolden({
 
 </Tab>
 
-<Tab title="cURL">
+<Tab title="cURL" langauage="curl">
 
 If the expected outcome is provided and reached during simulation, the
 conversation will be marked as complete in the response to `/v1/simulate`.
@@ -299,7 +298,7 @@ You can extend existing conversations by providing existing `Turn`s to each gold
 
 <Tabs>
 
-<Tab title="Python">
+<Tab title="Python" langauage="python">
 
 ```python main.py
 from deepeval.dataset import ConversationalGolden
@@ -318,7 +317,7 @@ conversation_golden = ConversationalGolden(
 
 </Tab>
 
-<Tab title="Typescript">
+<Tab title="Typescript" langauage="python">
 
 ```ts index.ts
 import { ConversationalGolden } from "deepeval-ts";
@@ -339,7 +338,7 @@ const conversationGolden = new ConversationalGolden({
 
 </Tab>
 
-<Tab title="cURL">
+<Tab title="cURL" langauage="python">
 
 ```curl
 mcurl -X POST https://api.confident-ai.com/v1/simulate \
