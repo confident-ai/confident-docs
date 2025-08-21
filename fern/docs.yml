@@ -233,15 +233,18 @@ navigation:
           - page: Why Confident AI
             path: docs/pages/resources/why-confident-ai.mdx
             icon: fa-light fa-question
-          - page: LLM Use Cases
-            path: docs/pages/resources/llm-use-cases.mdx
-            icon: fa-light fa-list
+          - page: Support
+            path: docs/pages/support.mdx
+            icon: fa-light fa-headset
           - page: Data Handling
             path: docs/pages/resources/data-handling.mdx
             icon: fa-light fa-shield-check
           - page: On-Prem Hosting
             path: docs/pages/resources/on-prem-hosting.mdx
             icon: fa-light fa-server
+          - page: LLM Use Cases
+            path: docs/pages/resources/llm-use-cases.mdx
+            icon: fa-light fa-list
   - tab: api-reference
     layout:
       - section: "API Reference"
@@ -303,11 +306,11 @@ navbar-links:
   - type: outlined
     text: Support
     rightIcon: fa-solid fa-headset
-    href: https://confident-ai.com/book-a-demo
+    href: /docs/support
   - type: outlined
     text: Get a demo
     rightIcon: fa-solid fa-presentation-screen
-    href: /support
+    href: https://confident-ai.com/book-a-demo
   - type: filled
     text: Platform
     rightIcon: fa-solid fa-chevron-right
