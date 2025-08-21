@@ -19,7 +19,7 @@ tabs:
   api-reference:
     slug: api-reference
     icon: terminal
-    display-name: API Reference
+    display-name: Evals API Reference
   documentation:
     slug: documentation
     icon: book
@@ -120,12 +120,13 @@ navigation:
             icon: fa-light fa-gauge-high
           - page: Metric Collection
             path: docs/pages/metrics/metric-collection.mdx
-            icon: fa-light fa-chart-line
+            icon: fa-light fa-bucket
           - section: All Metrics
             collapsed: false
             icon: fa-light fa-list-check
             contents:
               - section: Single-Turn
+                icon: fa-light fa-arrow-turn-down-right
                 collapsed: false
                 contents:
                   - page: Answer Relevancy
@@ -152,6 +153,7 @@ navigation:
                     path: docs/pages/metrics/all-metrics/single-turn/toxicity.mdx
               - section: Multi-Turn
                 collapsed: false
+                icon: fa-light fa-comments
                 contents:
                   - page: Conversation Completeness
                     path: docs/pages/metrics/all-metrics/multi-turn/conversation-completeness.mdx
@@ -247,6 +249,9 @@ navigation:
           - page: Introduction
             path: docs/api-docs/introduction.mdx
             icon: fa-light fa-circle-info
+          - page: Data Models
+            path: docs/api-docs/data-models.mdx
+            icon: fa-light fa-table-cells
       - api: API Reference
         flattened: true
         skip-slug: true
@@ -289,12 +294,25 @@ navigation:
             icon: fa-light fa-user-group
 
 navbar-links:
-  - type: secondary
-    text: Fork this repo
-    url: https://github.com/fern-api/docs-starter
-  - type: primary
+  - type: minimal
+    text: Trust Center
+    href: https://trust.delve.co/confident-ai
+  - type: minimal
+    text: Status
+    href: https://status.confident-ai.com/
+  - type: outlined
+    text: Support
+    rightIcon: fa-solid fa-headset
+    href: https://confident-ai.com/book-a-demo
+  - type: outlined
     text: Get a demo
-    url: https://buildwithfern.com/contact?utm_campaign=demo&utm_medium=plantstore&utm_source=navbar
+    rightIcon: fa-solid fa-presentation-screen
+    href: /support
+  - type: filled
+    text: Platform
+    rightIcon: fa-solid fa-chevron-right
+    href: https://app.confident-ai.com/
+    rounded: true
 
 colors:
   accentPrimary:
@@ -306,7 +324,7 @@ colors:
     light: "#fdfdfa"
 
 logo:
-  dark: docs/assets/docs-logo.svg
-  light: docs/assets/docs-logo.svg
-  height: 32
-  href: https://buildwithfern.com/?utm_campaign=demo&utm_medium=plantstore&utm_source=logo
+  dark: docs/assets/docs-light-logo.svg
+  light: docs/assets/docs-dark-logo.svg
+  height: 18
+  href: https://www.confident-ai.com

@@ -71,36 +71,7 @@ dataset = EvaluationDataset(goldens=goldens)
 dataset.push(alias="YOUR-DATASET-ALIAS")
 ```
 
-</Tab>
-
-<Tab title="Typescript" language="typescript">
- 
- For **single-turn** datasets, push single-turn goldens:
-
-```ts main.ts
-import { EvaluationDataset, Golden } from "deepeval-ts";
-
-const goldens = [new Golden({ input: "How tall is Mr. Everest?" })];
-const dataset = new EvaluationDataset({ goldens });
-
-dataset.push({ alias: "YOUR-DATASET-ALIAS" });
-```
-
-</Tab>
-
-<Tab title="curL" language="curl">
-
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
-
-</Tab>
-
-</Tabs>
-
 For **multi-turn** datasets, push multi-turn goldens:
-
-<Tabs>
-
-<Tab title="Python" language="python">
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
@@ -114,8 +85,21 @@ dataset.push(alias="YOUR-DATASET-ALIAS")
 </Tab>
 
 <Tab title="Typescript" language="typescript">
+ 
+ For **single-turn** datasets, push single-turn goldens:
 
-```ts main.ts
+```ts index.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+const goldens = [new Golden({ input: "How tall is Mr. Everest?" })];
+const dataset = new EvaluationDataset({ goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS" });
+```
+
+For **multi-turn** datasets, push multi-turn goldens:
+
+```ts index.ts
 import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
 
 const goldens = [
@@ -129,6 +113,10 @@ dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 </Tab>
 
 <Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
+
+For **multi-turn** datasets, push multi-turn goldens:
 
 <EndpointRequestSnippet endpoint="POST /v1/datasets" example="Multi-Turn" />
 
@@ -155,38 +143,7 @@ dataset = EvaluationDataset()
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 ```
 
-</Tab>
-
-<Tab title="Typescript" language="typescript">
-
-For **single-turn** datasets, queue single-turn goldens:
-
-```ts main.ts
-import { EvaluationDataset, Golden } from "deepeval-ts";
-
-const goldens = [new Golden({ input: "How tall is Mr. Everest?" })];
-const dataset = new EvaluationDataset();
-
-dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
-```
-
-</Tab>
-
-<Tab title="curL" language="curl">
-
-You need to set the `overwrite` attribute to `false` to queue your `golden`s.
-
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
-
-</Tab>
-
-</Tabs>
-
 For **multi-turn** datasets, queue multi-turn goldens:
-
-<Tabs>
-
-<Tab title="Python" language="python">
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
@@ -201,7 +158,20 @@ dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 
 <Tab title="Typescript" language="typescript">
 
-```ts main.ts
+For **single-turn** datasets, queue single-turn goldens:
+
+```ts index.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+const goldens = [new Golden({ input: "How tall is Mr. Everest?" })];
+const dataset = new EvaluationDataset();
+
+dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
+```
+
+For **multi-turn** datasets, queue multi-turn goldens:
+
+```ts index.ts
 import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
 
 const goldens = [
@@ -216,7 +186,11 @@ dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
 
 <Tab title="curL" language="curl">
 
-You need to set the `overwrite` attribute to `false` to queue your `ConversationalGolden`s.
+You need to set the `overwrite` attribute to `false` to queue your `golden`s.
+
+<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
+
+For **multi-turn** datasets, queue multi-turn goldens:
 
 <EndpointRequestSnippet endpoint="POST /v1/datasets" example="Multi-Turn" />
 
@@ -257,7 +231,7 @@ multiturn_golden = ConversationalGolden(custom_column_key_values={"Key": "Value"
 
 <Tab title="Typescript" language="typescript">
 
-```ts main.ts
+```ts index.ts
 import { Golden, ConversationalGolden } from "deepeval-ts";
 
 const golden = new Golden({ customColumnKeyValues: { Key: "Value" }, ... });
