@@ -42,7 +42,7 @@ dataset.pull(alias="YOUR-DATASET-ALIAS")
 
 Define a callback that wraps around your chatbot and generates the next conversation turn.
 
-```python callback.py
+```python main.py
 from deepeval.test_case import Turn
 from typing import List
 
@@ -84,18 +84,96 @@ conversational_test_cases = simulator.simulate(conversational_goldens=dataset.go
 <Steps>
 <Step title="Pull dataset">
 
-Pull your dataset using `v1/datasets` endpoint.
+Pull your multi-turn dataset as you would with local simulations:
 
-```curl
-curl -G https://api.confident-ai.com/v1/datasets \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -d alias="YOUR-DATASET-ALIAS"
+<Tabs>
+
+<Tab title="Python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
 ```
+
+</Tab>
+
+<Tab title="Typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+```
+
+</Tab>
+
+<Tab title="cURL">
+
+<EndpointRequestSnippet endpoint="GET /v1/datasets" />
+
+</Tab>
+
+</Tabs>
 
 </Step>
 
-<Step title="Simulate first user turn">
+<Step title="Simulate turns">
 
+<Tabs>
+
+<Tab title="Python">
+
+Set `run_remote` to true to run simulations remotely.
+
+```python main.py {3}
+from deepeval.simulator import ConversationSimulator
+
+simulator = ConversationSimulator(model_callback=chatbot_callback, run_remote=True)
+conversational_test_cases = simulator.simulate(conversational_goldens=dataset.goldens)
+```
+
+</Tab>
+
+<Tab title="Typescript">
+
+Only remote simluation is available in typescript.
+
+```ts index.ts
+import { ConversationSimulator } from "deepeval-ts";
+
+const simulator = new ConversationSimulator({
+  modelCallback: chatbotCallback,
+});
+const results1 = await simulator.simulate({
+  conversationalGoldens: dataset.goldens,
+});
+```
+
+<Accordion title="Click to see example callback in Typescript">
+
+```typescript
+import { Turn } from "deepeval-ts";
+
+const chatbotCallback = async (args: {
+  input: string;
+  turns: Turn[];
+  threadId: string;
+}): Promise<Turn> => {
+  return new Turn({
+    role: "assistant",
+    content: "Chatbot answer to input",
+  });
+};
+```
+
+</Accordion>
+
+</Tab>
+
+<Tab title="cURL">
 Use `/v1/simulate` to generate the first user turn for each golden.
 
 ```curl
@@ -109,10 +187,6 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
   }],
 }'
 ```
-
-</Step>
-
-<Step title="Simulate remaining turns">
 
 Continue calling `/v1/simulate` until you’ve simulated the desired number of turns.
 
@@ -146,6 +220,10 @@ mcurl -X POST https://api.confident-ai.com/v1/simulate \
   turns is provided.
 </Warning>
 
+</Tab>
+
+</Tabs>
+
 </Step>
 
 </Steps>
@@ -160,7 +238,7 @@ To stop a simulation naturally before it reaches the maximum number of turns, yo
 
 <Tab title="Python">
 
-```python
+```python main.py
 from deepeval.dataset import ConversationalGolden
 
 conversation_golden = ConversationalGolden(
@@ -175,6 +253,20 @@ conversation_golden = ConversationalGolden(
   the `simluate` method will stop simulation after a certain number of user
   turns, which is defaulted to 10.
 </Note>
+
+</Tab>
+
+<Tab title="Typescript">
+
+```ts index.ts
+import { ConversationalGolden } from "deepeval-ts";
+
+const conversationGolden = new ConversationalGolden({
+  scenario: "Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+  expectedOutcome: "Successful purchase of a ticket.",
+  userDescription: "Andy Byron is the CEO of Astronomer.",
+});
+```
 
 </Tab>
 
@@ -209,7 +301,7 @@ You can extend existing conversations by providing existing `Turn`s to each gold
 
 <Tab title="Python">
 
-```python
+```python main.py
 from deepeval.dataset import ConversationalGolden
 from deepeval.test_case import Turn
 
@@ -222,6 +314,27 @@ conversation_golden = ConversationalGolden(
         Turn(role="user", content="I want to purchase a VIP ticket to a cold play concert."),
     ]
 )
+```
+
+</Tab>
+
+<Tab title="Typescript">
+
+```ts index.ts
+import { ConversationalGolden } from "deepeval-ts";
+
+const conversationGolden = new ConversationalGolden({
+  scenario: "Andy Byron wants to purchase a VIP ticket to a cold play concert.",
+  userDescription: "Andy Byron is the CEO of Astronomer.",
+  turns: [
+    { role: "user", content: "Hi" },
+    { role: "assistant", content: "Hello! How can I help you today?" },
+    {
+      role: "user",
+      content: "I want to purchase a VIP ticket to a cold play concert.",
+    },
+  ],
+});
 ```
 
 </Tab>
