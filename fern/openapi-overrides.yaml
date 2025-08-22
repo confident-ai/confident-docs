@@ -36,9 +36,15 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/datasets:
+  /v1/datasets/{alias}:
     get:
       parameters:
+        - in: path
+          name: alias
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the dataset.
         - in: header
           name: CONFIDENT_API_KEY
           required: true
@@ -46,14 +52,14 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
-        - in: query
+    post:
+      parameters:
+        - in: path
           name: alias
           required: true
           schema:
             type: string
           description: The unique alias of the dataset.
-    post:
-      parameters:
         - in: header
           name: CONFIDENT_API_KEY
           required: true

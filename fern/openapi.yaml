@@ -158,7 +158,7 @@ paths:
                     id: "COLLECTION-ID"
                   deprecated: false
 
-  /v1/datasets:
+  /v1/datasets/{alias}:
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -206,21 +206,18 @@ paths:
               $ref: "#/components/schemas/CreateDatasetRequestData"
             examples:
               Single-Turn:
-                alias: "my-dataset-alias"
-                overwrite: true
+                finalized: true
                 goldens:
                   - input: "How is the weather like in NYC?"
                     expectedOutput: "No idea"
               Multi-Turn:
-                alias: "my-dataset-alias"
-                overwrite: true
+                finalized: true
                 conversationalGoldens:
                   - scenario: "Booking a hotel"
                     expectedOutcome: "Successfully booked"
                     userDescription: "Finds hotels in NYC"
               Custom-Columns:
-                alias: "my-dataset-with-columns"
-                overwrite: false
+                finalized: true
                 goldens:
                   - input: "What is 2 + 2?"
                     customColumnKeyValues:
@@ -1274,12 +1271,8 @@ components:
     CreateDatasetRequestData:
       type: object
       properties:
-        alias:
-          type: string
-          description: "This is the unique name of the dataset you want to push."
-        overwrite:
+        finalized:
           type: boolean
-          description: "This determines whether to overwrite the existing dataset. If `false`, the goldens will be appended to the existing dataset, otherwise the existing dataset will be overwritten."
         goldens:
           type: array
           items:
@@ -1291,8 +1284,7 @@ components:
             $ref: "#/components/schemas/ConversationalGolden"
           description: "This is a list of conversational goldens to push. If you are pushing a single-turn dataset, this should be `null`."
       required:
-        - alias
-        - overwrite
+        - finalized
 
     CreateOrUpdateGoldenRequestData:
       type: object
