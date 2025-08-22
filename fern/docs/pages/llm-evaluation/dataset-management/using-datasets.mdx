@@ -188,8 +188,6 @@ Construct a JSON array of test cases from the goldens you pulled, preserving the
     [
       {
         "input": "How tall is Mount Everest?",
-        "datasetId": "YOUR-DATASET-ID",
-        "datasetAlias": "YOUR-DATASET-ALIAS",
         // Replace with your LLM app output
         "actualOutput": "Mount Everest is 9K meters tall."
       }
@@ -214,12 +212,10 @@ Construct a JSON array of test cases from the goldens you pulled, preserving the
     [
       {
         "scenario": "User asking about Mount Everest height.",
-        "datasetId": "YOUR-DATASET-ID",
-        "datasetAlias": "YOUR-DATASET-ALIAS",
-        // Replace with your LLM app outputs
         "turns": [
           { "role": "user", "content": "How tall is Mount Everest?" },
           { "role": "assistant", "content": "Mount Everest is 9K meters tall." }
+          // Replace with your LLM app outputs
         ],
       }
     ]
