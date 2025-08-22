@@ -255,6 +255,9 @@ navigation:
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
+          - page: Evals Quickstart
+            path: docs/api-docs/evals-quickstart.mdx
+            icon: fa-light fa-flask-vial
       - api: API Reference
         flattened: true
         skip-slug: true

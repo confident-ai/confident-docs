@@ -1,0 +1,139 @@
+---
+subtitle: Run your first online eval by using the Confident AI's Evals API
+slug: api-reference/evals-quickstart
+---
+
+## Overview
+
+Confident AI offers the Evals API for users to run online evals on their test cases using our [`/v1/evaluate`](/docs/api-reference/evaluation/evaluate-llm) endpoint.
+
+In this 5-minute quickstart, you'll learn how to:
+
+- Create a **metric collection** that includes all the metrics you want to use to evaluate your test cases.
+- Run your first evaluation by making a call to the `/v1/evaluate` endpoint with your test cases.
+- View your eval results on the Confident AI platform.
+
+## Get Your API Key
+
+If you don't already have a Confident AI account, visit [app.confident-ai.com](https://app.confident-ai.com) and create one. You can create an account using your email address or through Google authentication for a faster process.
+
+<Tip>
+  If you wish to **sign in using SSO**, checkout our [enterprise
+  offering.](https://confident-ai.com/pricing)
+</Tip>
+
+After creating your account, you'll be guided through the onboarding process. You'll find your **Project API Key** at the last step of the onboarding.
+
+## Create A Metric Collection
+
+A metric collection is a list of metrics that are used to evaluate your test cases. It can either consist of single-turn or multi-turn metrics but not both. Learn more about [metric collections here](/docs/metrics/metric-collections).
+
+<Tabs>
+    <Tab title="Create">
+        You can create a metric collection using the [`/v1/metric-collections`](http://localhost:3000/docs/api-reference/metric-collections/create-metric-collection) endpoint. Note that all metric collections must have a unique name within your project.
+
+        Here's how to create a metric collection using our API:
+
+        <EndpointRequestSnippet
+            endpoint="POST /v1/metric-collections"
+        />
+
+        <Accordion title="Click here to see the response of a successful API call">
+            <EndpointResponseSnippet
+                endpoint="POST /v1/metric-collections"
+            />
+        </Accordion>
+
+    </Tab>
+    <Tab title="List">
+        You can check all the metric collections you have in your project as shown below:
+
+        <EndpointRequestSnippet
+            endpoint="GET /v1/metric-collections"
+        />
+
+        <Accordion title="Click here to see the response of a successful API call">
+            <EndpointResponseSnippet
+                endpoint="GET /v1/metric-collections"
+            />
+        </Accordion>
+
+    </Tab>
+</Tabs>
+
+## Run Your First Eval
+
+To run an evaluation, provide the name of the metric collection you just created and the list of test cases:
+
+<Tabs>
+    <Tab title="Single Turn">
+        
+        <EndpointRequestSnippet
+            endpoint="POST /v1/evaluate"
+            example="Single-Turn"
+        />
+
+        <Accordion title="Click here to see the parameters for creating a single-turn test case">
+        
+            <Card title="Parameters of `LLMTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.testCases.LLMTestCase">
+            <br />
+                - input: `string`
+                - actualOutput: `string`
+                - name: `string`
+                - expectedOutput: `string`
+                - retrievalContext: `list of strings`
+                - context: `list of strings`
+                - toolsCalled: `list of ToolCall`
+                - expectedTools: `list of ToolCall`
+            </Card>
+        </Accordion>
+
+    </Tab>
+    <Tab title="Multi Turn">
+        
+        <EndpointRequestSnippet
+            endpoint="POST /v1/evaluate"
+            example="Multi-Turn"
+        />
+
+        <Accordion title="Click here to see the parameters for creating a multi-turn test case">
+
+            <Card title="Parameters of `ConversationalTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.testCases.ConversationalTestCase">
+            <br />
+                - turns: `list of Turn`
+                - scenario: `string`
+                - name: `string`
+                - expectedOutput: `string`
+                - userDescription: `string`
+                - chatbotRole: `string`
+            </Card>
+        </Accordion>
+
+    </Tab>
+</Tabs>
+
+The `/v1/evaluate` API endpoint will create a test run on Confident AI and return the following response:
+
+<EndpointResponseSnippet
+    endpoint="POST /v1/evaluate"
+/>
+
+**🎉 Congratulations!** You just ran your first evaluation on Confident AI via the Evals API.
+
+{/* <Tip>
+For one-off evaluations, it is recommended that you use the `POST /v1/metric` endpoint instead, which avoids polluting your dashboard with necessary test runs.
+</Tip> */}
+
+## Viewing Results on Confident AI
+
+After running an eval using our Evals API, your test results will be automatically stored on the Confident AI platform in a [comprehensive report format](/docs/llm-evaluation/dashboards/testing-reports). You can also separate the test results using the `TEST-RUN-ID` from the API response.
+
+Here's an example report you'll get on the platform whenever you call the `/v1/evaluate` endpoint:
+
+<Frame caption="Test Reports on Confident AI">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
