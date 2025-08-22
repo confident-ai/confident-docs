@@ -12,7 +12,7 @@ Span types are **hugely optional** but allow you to classify the most common typ
 - `"tool"`
 - `"agent"`
 
-This is set via the `type` argument in the `@observe` decorator. By classifying span types you can create more tailored UIs on Confident AI, and set more specific [`attribtues`](/docs/llm-tracing/tracing-features/attributes) instead of using generalized [`metadata`](/docs/llm-tracing/tracing-features/metadata).
+This is set via the `type` argument in the `@observe` decorator. By classifying span types you can create more tailored UIs on Confident AI, and set more specific [`attribtues`](/docs/llm-tracing/advanced-features/attributes) instead of using generalized [`metadata`](/docs/llm-tracing/advanced-features/metadata).
 
 <Warning>
 Anything that is **NOT** one of these four default span types are **automatically custom spans.**
@@ -53,9 +53,9 @@ There is **ONE** mandatory and **TWO** optional parameters when decorating a fun
 
 - `type`: The type of span. Anything other than `"llm"`, `"retriever"`, `"tool"`, and `"agent"` is a custom span type. Defaulted to the `name`.
 - [Optional] `name`: A string specifying how this custom span is displayed on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics [here](/docs/llm-tracing/evaluations#online-evaluations).
 
-The `input` and `output`s of a custom span is defaulted to the function input arguments and the output, however you can also [set it dynamically yourself.](/docs/llm-tracing/tracing-features/input-output#set-span-io-at-runtime)
+The `input` and `output`s of a custom span is defaulted to the function input arguments and the output, however you can also [set it dynamically yourself.](/docs/llm-tracing/advanced-features/input-output#set-span-io-at-runtime)
 
 ## LLM Span
 
@@ -70,6 +70,16 @@ An LLM span represents a call to a language model. It tracks the input, output, 
         def generate_response(prompt: str) -> str:
             pass
         ```
+
+        There are **TWO** mandatory and **FOUR** optional parameters when decorating a function of the LLM span type:
+
+        - `type`: The type of span. Must be `"llm"` for LLM spans.
+        - `model`: A string representing the name of the LLM used.
+        - [Optional] `cost_per_input_token`: A float specifying the cost per input token. Defaulted to None.
+        - [Optional] `cost_per_output_token`: A float specifying the cost per output token. Defaulted to None.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
+
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
@@ -86,17 +96,18 @@ An LLM span represents a call to a language model. It tracks the input, output, 
             fn: generateResponse
         });
         ```
+
+        There are **TWO** mandatory and **FOUR** optional parameters when decorating a function of the LLM span type:
+
+        - `type`: The type of span. Must be `"llm"` for LLM spans.
+        - `model`: A string representing the name of the LLM used.
+        - [Optional] `costPerInputToken`: A float specifying the cost per input token. Defaulted to None.
+        - [Optional] `costPerOutputToken`: A float specifying the cost per output token. Defaulted to None.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
+        
     </Tab>
 </Tabs>
-
-There are **TWO** mandatory and **FOUR** optional parameters when decorating a function of the LLM span type:
-
-- `type`: The type of span. Must be `"llm"` for LLM spans.
-- `model`: A string representing the name of the LLM used.
-- [Optional] `cost_per_input_token`: A float specifying the cost per input token. Defaulted to None.
-- [Optional] `cost_per_output_token`: A float specifying the cost per output token. Defaulted to None.
-- [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
 
 <Note>
   If `cost_per_input_token` is not set, setting `input_token_count` will not help calculate the cost. The same applies to
@@ -141,7 +152,7 @@ There are **TWO** mandatory and **TWO** optional parameters when decorating a fu
 - `type`: The type of span. Must be `"retriever"` for retriever spans.
 - `embedder`: A string representing the name of the embedding model used.
 - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
 
 ## Tool Span
 
@@ -179,7 +190,7 @@ There are **ONE** mandatory and **THREE** optional parameters when decorating a 
 - `type`: The type of span. Must be `"tool"` for tool spans.
 - [Optional] `description`: A string that describes what the tool does. Defaulted to an empty string.
 - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
 
 ## Agent Span
 
@@ -198,6 +209,15 @@ An Agent span represents an autonomous entity that can make decisions and intera
         def supervisor_agent(query: str) -> str:
             pass
         ```
+
+        There are **ONE** mandatory and **FOUR** optional parameters when decorating a function of the agent span type:
+
+        - `type`: The type of span. Must be `"agent"` for agent spans.
+        - [Optional] `available_tools`: A list of strings specifying the tools this agent can use. Defaulted to an empty list.
+        - [Optional] `handoff_agents`: A list of strings specifying other agents this agent can delegate to. Defaulted to an empty list.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
+
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
@@ -215,15 +235,16 @@ An Agent span represents an autonomous entity that can make decisions and intera
             fn: supervisorAgent
         });
         ```
+
+        There are **ONE** mandatory and **FOUR** optional parameters when decorating a function of the agent span type:
+
+        - `type`: The type of span. Must be `"agent"` for agent spans.
+        - [Optional] `availableTools`: A list of strings specifying the tools this agent can use. Defaulted to an empty list.
+        - [Optional] `handoffAgents`: A list of strings specifying other agents this agent can delegate to. Defaulted to an empty list.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
+
     </Tab>
 </Tabs>
-
-There are **ONE** mandatory and **FOUR** optional parameters when decorating a function of the agent span type:
-
-- `type`: The type of span. Must be `"agent"` for agent spans.
-- [Optional] `available_tools`: A list of strings specifying the tools this agent can use. Defaulted to an empty list.
-- [Optional] `handoff_agents`: A list of strings specifying other agents this agent can delegate to. Defaulted to an empty list.
-- [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
-- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [next section here.](/docs/llm-tracing/evaluations)
 
 Agents can be nested within other agents, which is useful for implementing hierarchical agent architectures. For instance, a "supervisor" agent might coordinate communication between specialized agents.

@@ -9,10 +9,11 @@ You can track user interactions with your LLM app by setting the `user_id` in a 
 
 ## Set Users At Runtime
 
-You can use the `update_current_trace` function to set the `user_id` within traces:
-
 <Tabs>
     <Tab title="Python" language="python">
+
+        You can use the `update_current_trace` function to set the `user_id` within traces:
+
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
             from openai import OpenAI
@@ -31,8 +32,14 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             
             llm_app("Write me a poem.")
             ```
+
+            The `user_id` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.
+
     </Tab>
     <Tab title="TypeScript" language="typescript">
+
+        You can use the `updateCurrentTrace` function to set the `userId` within traces:
+
             ```typescript title="index.ts" {10}
             import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
             import OpenAI from 'openai';
@@ -50,8 +57,9 @@ You can use the `update_current_trace` function to set the `user_id` within trac
             const observedLlmApp = observe({fn: llmApp});
             observedLlmApp("Write me a poem.");
             ```
+
+            The `userId` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.
+
     </Tab>
 
 </Tabs>
-
-The `user_id` can be any string, including the actual IDs of customers in your own database, or even their email addresses. Everything will be viewable and searched in the UI.

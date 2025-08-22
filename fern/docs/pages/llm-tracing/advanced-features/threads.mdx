@@ -35,6 +35,9 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
             
             llm_app("Write me a poem.")
             ```
+
+            The `thread_id` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI.
+
     </Tab>
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {11}
@@ -55,14 +58,15 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
             const observedLlmApp = observe({ fn: llmApp });
             observedLlmApp("Write me a poem.");
             ```
+
+            The `threadId` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI.
+
     </Tab>
 
 </Tabs>
 
-The `thread_id` can be any string, and the `input` and `output` is optional and simply gives you more control on what is displayed on the UI.
-
 <Note>
-If the I/O is not provided, it will be set to the [default I/O values of the trace.](/docs/llm-tracing/tracing-features/input-output#set-trace-io-at-runtime) 
+If the I/O is not provided, it will be set to the [default I/O values of the trace.](/docs/llm-tracing/advanced-features/input-output#set-trace-io-at-runtime) 
 </Note>
 
 ### Inputs/Outputs

@@ -13,15 +13,32 @@ Each metric requires different test case parameters. For detailed information on
 
 ## Test Case Parameters
 
-Both `update_current_span` and `update_current_trace` accept 7 **OPTIONAL** test case parameters:
+<Tabs>
+    <Tab title="Python" language="python" >
+        Both `update_current_span` and `update_current_trace` accept 7 **OPTIONAL** test case parameters:
 
-- `input`: The input to your LLM app
-- `output`: The output of your LLM app
-- `expected_output`: The expected output of your LLM app
-- `retrieval_context`: A list of strings representing the retrieved text chunks from a retrieval system
-- `context`: A list of strings representing the ideal retrieved text chunks provided from a retrieval system
-- `tools_called`: A list of `ToolCall` objects representing the tools called by your LLM app
-- `expected_tools`: A list of `ToolCall` objects representing the expected tools to be called by the LLM app
+        - `input`: The input to your LLM app
+        - `output`: The output of your LLM app
+        - `expected_output`: The expected output of your LLM app
+        - `retrieval_context`: A list of strings representing the retrieved text chunks from a retrieval system
+        - `context`: A list of strings representing the ideal retrieved text chunks provided from a retrieval system
+        - `tools_called`: A list of `ToolCall` objects representing the tools called by your LLM app
+        - `expected_tools`: A list of `ToolCall` objects representing the expected tools to be called by the LLM app
+
+    </Tab>
+    <Tab title="TypeScript" language="typescript" >
+        Both `updateCurrentSpan` and `updateCurrentTrace` accept 7 **OPTIONAL** test case parameters:
+
+        - `input`: The input to your LLM app
+        - `output`: The output of your LLM app
+        - `expectedOutput`: The expected output of your LLM app
+        - `retrievalContext`: A list of strings representing the retrieved text chunks from a retrieval system
+        - `context`: A list of strings representing the ideal retrieved text chunks provided from a retrieval system
+        - `toolsCalled`: A list of `ToolCall` objects representing the tools called by your LLM app
+        - `expectedTools`: A list of `ToolCall` objects representing the expected tools to be called by the LLM app
+
+    </Tab>
+</Tabs>
 
 <Tip>
 The **input** and **output** accept `Any` type for visualization purposes, but we recommend setting them as strings for running evaluations.
