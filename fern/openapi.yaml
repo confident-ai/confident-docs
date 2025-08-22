@@ -177,14 +177,14 @@ paths:
                 Single-Turn:
                   success: true
                   data:
-                    datasetId: "DATASET-ID"
+                    id: "DATASET-ID"
                     goldens:
                       - input: "How's the weather like in NYC?"
                         expectedOutput: "No idea"
                 Multi-Turn:
                   success: true
                   data:
-                    datasetId: "DATASET-ID"
+                    id: "DATASET-ID"
                     conversationalGoldens:
                       - scenario: "Booking a hotel"
                         expectedOutcome: "Successfully booked"
@@ -1241,9 +1241,9 @@ components:
           oneOf:
             - type: object
               title: Single-Turn
-              description: Dataset with Single-Turn goldens
+              description: Dataset with single-turn goldens
               properties:
-                datasetId:
+                id:
                   type: string
                   description: A unique identifier for a dataset
                 goldens:
@@ -1251,13 +1251,13 @@ components:
                   items:
                     $ref: "#/components/schemas/Golden"
               required:
-                - datasetId
+                - id
                 - goldens
             - type: object
               title: Multi-Turn
-              description: Dataset with Multi-Turn conversationalGoldens
+              description: Dataset with multi-turn goldens
               properties:
-                datasetId:
+                id:
                   type: string
                   description: A unique identifier for a dataset
                 conversationalGoldens:
@@ -1265,7 +1265,7 @@ components:
                   items:
                     $ref: "#/components/schemas/ConversationalGolden"
               required:
-                - datasetId
+                - id
                 - conversationalGoldens
       required:
         - success
