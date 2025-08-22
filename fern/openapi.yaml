@@ -258,12 +258,12 @@ paths:
             examples:
               Single-Turn:
                 metricCollection: "Collection Name"
-                testCases:
+                llmTestCases:
                   - input: "How tall is mount everest?"
                     actualOutput: "No clue, pretty tall I guess?"
               Multi-Turn:
                 metricCollection: "Multi-Turn Collection Name"
-                testCases:
+                conversationalTestCases:
                   - turns:
                       - role: user
                         content: "How tall is Mount Everest?"
@@ -275,15 +275,15 @@ paths:
                         content: "Yes, a 2020 survey by China and Nepal revised the height to 8,848.86 meters."
               Logging Parameters:
                 metricCollection: "Collection Name"
-                testCases:
+                llmTestCases:
                   input: "How tall is mount everest?"
                   actualOutput: "No clue, pretty tall I guess?"
                 hyperparameters:
-                  model: "gpt-40-mini"
+                  model: "gpt-4o-mini"
                   prompt-version: "ai_generation_v2"
               Logging Identifier:
                 metricCollection: "Collection Name"
-                testCases:
+                llmTestCases:
                   input: "How tall is mount everest?"
                   actualOutput: "No clue, pretty tall I guess?"
                   name: "Your Test Case Name"
@@ -1374,12 +1374,16 @@ components:
         metricCollection:
           type: string
           description: "The name of the metric collection you wish to use for evaluation."
-        testCases:
+        llmTestCases:
           type: array
+          description: "This is a list of single-turn test cases to evaluate. If you are evaluating multi-turn test cases, this should be `null`."
           items:
-            oneOf:
-              - $ref: "#/components/schemas/LLMTestCase"
-              - $ref: "#/components/schemas/ConversationalTestCase"
+            $ref: "#/components/schemas/LLMTestCase"
+        conversationalTestCases:
+          type: array
+          description: "This is a list of multi-turn test cases to evaluate. If you are evaluating single-turn test cases, this should be `null`."
+          items:
+            $ref: "#/components/schemas/ConversationalTestCase"
         hyperparameters:
           type: object
           additionalProperties: true
