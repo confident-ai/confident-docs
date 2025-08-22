@@ -163,8 +163,8 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Datasets
-      summary: Pull Datasets
-      operationId: getDatasetByAlias
+      summary: Pull Dataset
+      operationId: pullDataset
       description: Retrieves a list of `Golden`s or `ConversationalGolden`s from your dataset.
       responses:
         "200":
