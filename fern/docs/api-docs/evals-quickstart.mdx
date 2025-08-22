@@ -59,6 +59,7 @@ A metric collection is a list of metrics that are used to evaluate your test cas
         </Accordion>
 
     </Tab>
+
 </Tabs>
 
 ## Run Your First Eval
@@ -74,7 +75,7 @@ To run an evaluation, provide the name of the metric collection you just created
         />
 
         <Accordion title="Click here to see the parameters for creating a single-turn test case">
-        
+
             <Card title="Parameters of `LLMTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.llmTestCases">
             <br />
                 - input: `string`
@@ -90,7 +91,7 @@ To run an evaluation, provide the name of the metric collection you just created
 
     </Tab>
     <Tab title="Multi Turn">
-        
+
         <EndpointRequestSnippet
             endpoint="POST /v1/evaluate"
             example="Multi-Turn"
@@ -110,19 +111,20 @@ To run an evaluation, provide the name of the metric collection you just created
         </Accordion>
 
     </Tab>
+
 </Tabs>
 
 The `/v1/evaluate` API endpoint will create a test run on Confident AI and return the following response:
 
-<EndpointResponseSnippet
-    endpoint="POST /v1/evaluate"
-/>
+<EndpointResponseSnippet endpoint="POST /v1/evaluate" />
 
 **🎉 Congratulations!** You just ran your first evaluation on Confident AI via the Evals API.
 
-{/* <Tip>
-For one-off evaluations, it is recommended that you use the `POST /v1/metric` endpoint instead, which avoids polluting your dashboard with necessary test runs.
-</Tip> */}
+<Tip>
+  For one-off evaluations, it is recommended that you use the `POST /v1/metric`
+  endpoint instead, which avoids polluting your dashboard with necessary test
+  runs.
+</Tip>
 
 ## Viewing Results on Confident AI
 
@@ -132,7 +134,7 @@ Here's an example report you'll get on the platform whenever you call the `/v1/e
 
 <Frame caption="Test Reports on Confident AI">
   <video
-    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:testing-report.mp4"
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:single-turn-e2e-report.mp4"
     controls
     autoPlay
   />

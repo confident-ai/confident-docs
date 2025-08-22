@@ -203,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateDatasetRequestData"
+              $ref: "#/components/schemas/PushDatasetRequestData"
             examples:
               Single-Turn:
                 finalized: true
@@ -1268,11 +1268,12 @@ components:
         - success
         - data
 
-    CreateDatasetRequestData:
+    PushDatasetRequestData:
       type: object
       properties:
         finalized:
           type: boolean
+          description: "Determines whether goldens are finalized when pushed to the dataset."
         goldens:
           type: array
           items:
