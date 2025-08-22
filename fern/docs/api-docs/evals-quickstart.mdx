@@ -30,7 +30,7 @@ A metric collection is a list of metrics that are used to evaluate your test cas
 
 <Tabs>
     <Tab title="Create">
-        You can create a metric collection using the [`/v1/metric-collections`](http://localhost:3000/docs/api-reference/metric-collections/create-metric-collection) endpoint. Note that all metric collections must have a unique name within your project.
+        You can create a metric collection using the [`/v1/metric-collections`](/docs/api-reference/metric-collections/create-metric-collection) endpoint. Note that all metric collections must have a unique name within your project.
 
         Here's how to create a metric collection using our API:
 
@@ -75,7 +75,7 @@ To run an evaluation, provide the name of the metric collection you just created
 
         <Accordion title="Click here to see the parameters for creating a single-turn test case">
         
-            <Card title="Parameters of `LLMTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.testCases.LLMTestCase">
+            <Card title="Parameters of `LLMTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.llmTestCases">
             <br />
                 - input: `string`
                 - actualOutput: `string`
@@ -98,7 +98,7 @@ To run an evaluation, provide the name of the metric collection you just created
 
         <Accordion title="Click here to see the parameters for creating a multi-turn test case">
 
-            <Card title="Parameters of `ConversationalTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.testCases.ConversationalTestCase">
+            <Card title="Parameters of `ConversationalTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.conversationalTestCases">
             <br />
                 - turns: `list of Turn`
                 - scenario: `string`

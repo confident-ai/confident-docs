@@ -172,11 +172,9 @@ evaluate({ testCases: dataset.testCases, metrics: [...]});
 
 First, pull goldens using the `/v1/datasets` endpoint.
 
-```curl
-curl -G https://api.confident-ai.com/v1/datasets \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -d alias=alias
-```
+<EndpointRequestSnippet
+  endpoint="GET /v1/datasets"
+/>
 
 </Step>
 
@@ -184,36 +182,61 @@ curl -G https://api.confident-ai.com/v1/datasets \
 
 Construct a JSON array of test cases from the goldens you pulled, preserving the golden fields.
 
-```json
-[
-  {
-    "input": "How tall is Mount Everest?",
-    "datasetId": "YOUR-DATASET-ID",
-    "datasetAlias": "YOUR-DATASET-ALIAS",
-    // Replace with your LLM app output
-    "actualOutput": "Mount Everest is 9K meters tall."
-  }
-]
-```
-
-<Tip>
-  For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
-```json
-[
-  {
-    "scenario": "User asking about Mount Everest height.",
-    "datasetId": "YOUR-DATASET-ID",
-    "datasetAlias": "YOUR-DATASET-ALIAS"
-    // Replace with your LLM app outputs
-    "turns": [
-      { "role": "user", "content": "How tall is Mount Everest?" },
-      { "role": "assistant", "content": "Mount Everest is 9K meters tall." }
-    ],
-  }
-]
-```
-
-</Tip>
+<Tabs>
+  <Tab title="Single-Turn">
+    ```json
+    [
+      {
+        "input": "How tall is Mount Everest?",
+        "datasetId": "YOUR-DATASET-ID",
+        "datasetAlias": "YOUR-DATASET-ALIAS",
+        // Replace with your LLM app output
+        "actualOutput": "Mount Everest is 9K meters tall."
+      }
+    ]
+    ```
+    <Accordion title="Click here to see the parameters for creating a single-turn test case">
+      <Card title="Parameters of `LLMTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.llmTestCases">
+      <br />
+        - input: `string`
+        - actualOutput: `string`
+        - name: `string`
+        - expectedOutput: `string`
+        - retrievalContext: `list of strings`
+        - context: `list of strings`
+        - toolsCalled: `list of ToolCall`
+        - expectedTools: `list of ToolCall`
+      </Card>
+    </Accordion>
+  </Tab>
+  <Tab title="Multi-Turn">
+    ```json
+    [
+      {
+        "scenario": "User asking about Mount Everest height.",
+        "datasetId": "YOUR-DATASET-ID",
+        "datasetAlias": "YOUR-DATASET-ALIAS",
+        // Replace with your LLM app outputs
+        "turns": [
+          { "role": "user", "content": "How tall is Mount Everest?" },
+          { "role": "assistant", "content": "Mount Everest is 9K meters tall." }
+        ],
+      }
+    ]
+    ```
+    <Accordion title="Click here to see the parameters for creating a multi-turn test case">
+      <Card title="Parameters of `ConversationalTestCase`" href="/docs/api-reference/evaluation/evaluate-llm#request.body.conversationalTestCases">
+      <br />
+        - turns: `list of Turn`
+        - scenario: `string`
+        - name: `string`
+        - expectedOutput: `string`
+        - userDescription: `string`
+        - chatbotRole: `string`
+      </Card>
+    </Accordion>
+  </Tab>
+</Tabs>
 
 </Step>
 
@@ -221,23 +244,9 @@ Construct a JSON array of test cases from the goldens you pulled, preserving the
 
 Create a metric collection through `v1/metric-collections`.
 
-```curl
-curl -X POST https://api.confident-ai.com/v1/metric-collections \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -H "Content-Type: application/json" \
-     -d '{
-  "name": "Collection Name",
-  "multiTurn": false,
-  "metricSettings": [
-    {
-      "metric": {
-        "name": "Answer Relevancy"
-      },
-      "threshold": 0.8
-    }
-  ]
-}'
-```
+<EndpointRequestSnippet
+  endpoint="POST /v1/metric-collections"
+/>
 
 </Step>
 
@@ -245,22 +254,9 @@ curl -X POST https://api.confident-ai.com/v1/metric-collections \
 
 Run an evaluation using the test cases you constructed and metric collection you created using `/v1/evaluate`.
 
-```curl
-curl -X POST https://api.confident-ai.com/v1/evaluate \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -H "Content-Type: application/json" \
-     -d '{
-  "metricCollection": "Collection Name",
-  "testCases": [
-    {
-      "input": "How tall is Mount Everest?",
-      "datasetId": "YOUR-DATASET-ID",
-      "datasetAlias": "YOUR-DATASET-ALIAS",
-      "actualOutput": "Mount Everest is 9K meters tall."
-    }
-  ]
-}'
-```
+<EndpointRequestSnippet
+  endpoint="POST /v1/evaluate"
+/>
 
 </Step>
 
