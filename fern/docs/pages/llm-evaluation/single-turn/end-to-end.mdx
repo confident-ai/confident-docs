@@ -176,7 +176,7 @@ def llm_app(query: str) -> str:
     def generator(query: str, text_chunks: list[str]) -> str:
         res = OpenAI().chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
         ).choices[0].message.content
-        update_current_trace(input=query, actual_output=res)
+        update_current_trace(input=query, output=res)
         return res
 
     return generator(query, retriever(query))
@@ -204,12 +204,13 @@ now. We'll go through it in in a dedicated LLM tracing section.
 Pull your dataset in the same way as before, and use the `.evals_iterator()` to loop through your goldens. You will use data in your goldens (most likely the `input`) to call your LLM app:
 
 ```python main.py
+from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.dataset import EvaluationDataset
 
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
 
-for golden in dataset.evals_iterator():
+for golden in dataset.evals_iterator(metrics=[AnswerRelevancyMetric()]):
     llm_app(golden.input) # Replace with your LLM app
 ```
 
@@ -230,14 +231,15 @@ Done ✅. You should see a link to your newly created sharable testing report. *
 <Note>
 You can also run your for-loop asynchronously:
 
-```python focus={8-9}
+```python focus={9-10}
 import asyncio
+from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.dataset import EvaluationDataset
 
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
 
-for golden in dataset.evals_iterator():
+for golden in dataset.evals_iterator(metrics=[AnswerRelevancyMetric()]):
     task = asyncio.create_task(a_llm_app(golden.input))
     dataset.evaluate(task)
 ```
@@ -345,7 +347,7 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 import { evaluate } from "deepeval-ts";
 
 evaluate({
-  testCases: dataset.testCases,
+  llmTestCases: dataset.testCases,
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -418,7 +420,7 @@ evaluate({
     Model: "YOUR-MODEL",
     "Prompt Version": "YOUR-PROMPT-VERSION",
   },
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -459,7 +461,7 @@ evaluate(
 ```ts
 evaluate({
   identifer: "Any custom string",
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -503,7 +505,7 @@ evaluate(
 
 ```ts
 evaluate({
-  testCases: [new LLMTestCase({ name: "Any custom string", ... })],
+  llmTestCases: [new LLMTestCase({ name: "Any custom string", ... })],
   metricCollection: "..."
 });
 ```

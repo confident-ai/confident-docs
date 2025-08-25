@@ -10,10 +10,8 @@ When running evaluations, it's important to log hyperparameters to track which c
 
 <Warning>
   This is currently only supported for [end-to-end
-  evaluation](/docs/llm-evaluation/end-to-end-evals).
+  evaluation](/docs/llm-evaluation/single-turn/end-to-end).
 </Warning>
-
-If you're unsure what are hyperparameters or the types of hyperparameters available, [click here.](/docs/concepts/hyperparameters)
 
 <Frame caption="Prompt and Model Insights">
   <video
@@ -25,7 +23,7 @@ If you're unsure what are hyperparameters or the types of hyperparameters availa
 
 ## Prompts
 
-Prompts are a **type** of hyperparameter, and in Confident AI, you can include them as hyperparameters to [test each prompt's performance](/docs/prompt-management/prompt-testing) when running an evaluation:
+Prompts are a **type** of hyperparameter, and in Confident AI, you can include them as hyperparameters to test each prompt's performance when running an evaluation:
 
 <Tabs>
 
@@ -59,7 +57,7 @@ evaluate({
     Model: "YOUR-MODEL",
     "Prompt Version": "YOUR-PROMPT-VERSION",
   },
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -109,7 +107,7 @@ evaluate({
   hyperparameters: {
     Model: "YOUR-MODEL",
   },
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
