@@ -156,7 +156,7 @@ By calling `.addTestCase()` in the previous step, each time you run evaluate Con
 ```ts
 import { evaluate } from "deepeval-ts";
 
-evaluate({ testCases: dataset.testCases, metrics: [...]});
+evaluate({ conversationalTestCases: dataset.testCases, metrics: [...]});
 ```
 
 </Step>
@@ -172,9 +172,7 @@ evaluate({ testCases: dataset.testCases, metrics: [...]});
 
 First, pull goldens using the `/v1/datasets` endpoint.
 
-<EndpointRequestSnippet
-  endpoint="GET /v1/datasets"
-/>
+<EndpointRequestSnippet endpoint="GET /v1/datasets" />
 
 </Step>
 
@@ -240,9 +238,7 @@ Construct a JSON array of test cases from the goldens you pulled, preserving the
 
 Create a metric collection through `v1/metric-collections`.
 
-<EndpointRequestSnippet
-  endpoint="POST /v1/metric-collections"
-/>
+<EndpointRequestSnippet endpoint="POST /v1/metric-collections" />
 
 </Step>
 
@@ -250,9 +246,7 @@ Create a metric collection through `v1/metric-collections`.
 
 Run an evaluation using the test cases you constructed and metric collection you created using `/v1/evaluate`.
 
-<EndpointRequestSnippet
-  endpoint="POST /v1/evaluate"
-/>
+<EndpointRequestSnippet endpoint="POST /v1/evaluate" />
 
 </Step>
 

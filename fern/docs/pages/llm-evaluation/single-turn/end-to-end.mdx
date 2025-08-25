@@ -345,7 +345,7 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 import { evaluate } from "deepeval-ts";
 
 evaluate({
-  testCases: dataset.testCases,
+  llmTestCases: dataset.testCases,
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -418,7 +418,7 @@ evaluate({
     Model: "YOUR-MODEL",
     "Prompt Version": "YOUR-PROMPT-VERSION",
   },
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -459,7 +459,7 @@ evaluate(
 ```ts
 evaluate({
   identifer: "Any custom string",
-  testCases: [...],
+  llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
@@ -503,7 +503,7 @@ evaluate(
 
 ```ts
 evaluate({
-  testCases: [new LLMTestCase({ name: "Any custom string", ... })],
+  llmTestCases: [new LLMTestCase({ name: "Any custom string", ... })],
   metricCollection: "..."
 });
 ```
