@@ -72,12 +72,12 @@ Decorate your application with the `@observe` decorator, and provide `metrics` f
 ```python main.py focus={5,8,11,14,18} maxLines=21
 from openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric, ContextualRelevancyMetric
-from deepeval import observe, update_current_span
+from deepeval.tracing import observe, update_current_span
 
 @observe()
 def llm_app(query: str) -> str:
 
-    @observe(metrics=[ContextualRelevancyMetric()])
+    @observe(metrics=[ContextualRelevancyMetric()], embedder="your-embedding-model-name")
     def retriever(query: str) -> list[str]:
         chunks = ["List", "of", "text", "chunks"]
         update_current_span(input=query, retrieval_context=chunks)
