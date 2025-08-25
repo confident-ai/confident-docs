@@ -258,6 +258,9 @@ navigation:
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
+          - page: Quickstart
+            path: docs/api-docs/quickstart.mdx
+            icon: fa-light fa-stopwatch
       - api: API Reference
         flattened: true
         skip-slug: true
