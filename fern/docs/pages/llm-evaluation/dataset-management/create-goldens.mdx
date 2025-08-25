@@ -114,11 +114,11 @@ dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Single-Turn" />
 
 For **multi-turn** datasets, push multi-turn goldens:
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Multi-Turn" />
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Multi-Turn" />
 
 </Tab>
 
@@ -188,11 +188,11 @@ dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
 
 You need to set the `overwrite` attribute to `false` to queue your `golden`s.
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Single-Turn" />
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Single-Turn" />
 
 For **multi-turn** datasets, queue multi-turn goldens:
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Multi-Turn" />
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Multi-Turn" />
 
 </Tab>
 
@@ -244,7 +244,7 @@ const multiturnGolden = new ConversationalGolden({
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets" example="Custom-Columns" />
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Custom-Columns" />
 
 </Tab>
 

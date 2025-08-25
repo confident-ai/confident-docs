@@ -252,12 +252,12 @@ navigation:
           - page: Introduction
             path: docs/api-docs/introduction.mdx
             icon: fa-light fa-circle-info
+          - page: Authentication
+            path: docs/api-docs/authentication.mdx
+            icon: fa-light fa-lock-keyhole
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
-          - page: Evals Quickstart
-            path: docs/api-docs/evals-quickstart.mdx
-            icon: fa-light fa-flask-vial
       - api: API Reference
         flattened: true
         skip-slug: true
