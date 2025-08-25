@@ -26,6 +26,7 @@ If you're planning to run offline evals on threads, create a multi-turn metric c
 Only **referenceless** metric you've enabled inside the metric collection are runnable upon tracing. For non-referenceless metrics, Confident AI will simply ignore them.
 
 To recap, [referenceless metrics](/docs/concepts/metrics#referenceless-metrics) section, referenceless metrics are a special type of metric that can evaluate your LLM's performance without requiring reference data (like `expected_output` or `expected_tools`).
+
 </Warning>
 
 ## Online Evaluations
@@ -98,11 +99,9 @@ If you specify a `metricCollection` list but don't update your current span with
 
 ### Traces
 
-Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluation/end-to-end-evals), where you disregard the performance of individual spans within the trace and treat your application as a black-box.
+Running evals on traces are akin to running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end), where you disregard the performance of individual spans within the trace and treat your application as a black-box.
 
-<Tip>
-  You can run online evals on both traces and spans at the same time.
-</Tip>
+<Tip>You can run online evals on both traces and spans at the same time.</Tip>
 
 Similar to evals for spans, you would also provide a `metricCollection` name, but this time call the `update_current_trace()` function instead:
 
@@ -251,7 +250,7 @@ evaluate_span(span_uuid=<your-span-uuid>, metric_collection="Collection Name")
 ```
 
 <Tip>
-The asynchronous version, `a_evaluate_span` is also available for spans.
+  The asynchronous version, `a_evaluate_span` is also available for spans.
 </Tip>
 
 Remember, the metric collection you provide must be a **single-turn** one.
@@ -259,7 +258,6 @@ Remember, the metric collection you provide must be a **single-turn** one.
 ## Examples
 
 ### Trace and span evals
-
 
 **Quick quiz:** Given the code below, will Confidnet AI run online evaluations on the trace using metrics in `"Collection 2"` or `"Collection 1"`?
 
@@ -302,6 +300,7 @@ evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
 **Answer:** This will **NOT** run `"Collection 1"` or `"Collection 2"`, because neither the `input` or `output` has been specified in `update_current_trace`. This means Confident AI will have no turns to evaluate using metrics in your metric collection.
 
 <Warning>
-Note that setting the `test_case` for a trace has no bearing on the `input` and `output`.
+  Note that setting the `test_case` for a trace has no bearing on the `input`
+  and `output`.
 </Warning>
 ```
