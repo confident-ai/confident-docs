@@ -21,121 +21,101 @@ Whether you're evaluating LLM outputs in production or integrating directly with
 
 </Tip>
 
-## Quickstart
+## Features of Evals API
 
-Here's how you can run your first online evaluation on the Confident AI platform using our [`/v1/evaluate`](/docs/api-reference/evaluation/evaluate-llm) endpoint.
+Our Evals API offers a rich set of RESTful endpoints that lets you run online evaluations, create datasets, manage prompts, and more — all without needing Python or TypeScript SDKs in a production environment.
 
-<Steps>
-  <Step title="Get Your API Key">
-    Get your Project API Key from the Confident AI platform's project settings. Click here to [learn more](/docs/api-reference/authentication).
-  </Step>
+### Get Started
 
-  <Step title="Create A Metric Collection">
-    A metric collection is a list of metrics that are used to evaluate your test cases. It can either consist of single-turn or multi-turn metrics but not both. Learn more about [metric collections here](/docs/metrics/metric-collections).
+Get started with the Evals API by going through these sections:
 
-    <Tabs>
-        <Tab title="Create">
-            You can create a metric collection using the POST [`/v1/metric-collections`](/docs/api-reference/metric-collections/create-metric-collection) endpoint. Note that all metric collections must have a unique name within your project.
+<CardGroup cols={3}>
+  <Card
+    title="Authentication"
+    icon="lock-keyhole"
+    iconType="solid"
+    href="/docs/api-reference/authentication"
+  >
+    Create a Confident AI account and generate your API keys to start using our services.
+  </Card>
+  <Card
+    title="Data Models"
+    icon="table-cells"
+    iconType="solid"
+    href="/docs/api-reference/data-models"
+  >
+    Learn about the core data models and terminologies used in the Evals API.
+  </Card>
+  <Card
+    title="Quickstart"
+    icon="stopwatch"
+    iconType="solid"
+    href="/docs/api-reference/quickstart"
+  >
+    Run your first online evaluation using Confident AI's Evals API in under 5 minutes.
+  </Card>
+</CardGroup>
 
-            <EndpointRequestSnippet
-                endpoint="POST /v1/metric-collections"
-            />
+### Our Endpoints
 
-        </Tab>
-        <Tab title="List">
-            You can see all the metric collections you have in your project using the GET [`/v1/metric-collections`](/docs/api-reference/metric-collections/list-metric-collections) endpoint.
+Access a full suite of endpoints to manage evaluations, datasets, prompts, traces, and more.
 
-            <EndpointRequestSnippet
-                endpoint="GET /v1/metric-collections"
-            />
-
-        </Tab>
-
-    </Tabs>
-
-  </Step>
-  
-  <Step title="Run Your First Eval">
-    To run an evaluation, provide the name of the metric collection and the other relevant details based on your use case:
-
-    <Tabs>
-        <Tab title="Single Turn">
-
-          Add a list of **llmTestCases** in your request body to run single-turn evaluations. Click here to see the data model of [llmTestCases](/docs/api-reference/evaluation/evaluate-llm#request.body.llmTestCases).
-            
-          <EndpointRequestSnippet
-              endpoint="POST /v1/evaluate"
-              example="Single-Turn"
-          />
-
-        </Tab>
-        <Tab title="Multi Turn">
-
-          Add a list of **conversationalTestCases** in your request body to run multi-turn evaluations. Click here to see the data model of [conversationalTestCases](/docs/api-reference/evaluation/evaluate-llm#request.body.conversationalTestCases).
-
-          <EndpointRequestSnippet
-              endpoint="POST /v1/evaluate"
-              example="Multi-Turn"
-          />
-
-        </Tab>
-        <Tab title="Span">
-          Get the `uuid` of the span you want to evaluate from the Confident AI platform's Observatory. To learn more about this endpoint [click here](/docs/api-reference/evaluation/evaluate-span).
-            
-          <EndpointRequestSnippet
-              endpoint="POST /v1/evaluate/spans/{uuid}"
-              example="Single-Turn"
-          />
-
-        </Tab>
-        <Tab title="Trace">
-          Get the `uuid` of the trace you want to evaluate from the Confident AI platform's Observatory. To learn more about this endpoint [click here](/docs/api-reference/evaluation/evaluate-trace).
-            
-          <EndpointRequestSnippet
-              endpoint="POST /v1/evaluate/traces/{uuid}"
-              example="Single-Turn"
-          />
-
-        </Tab>
-        <Tab title="Thread">
-          Get the `id` of the trace you want to evaluate from the Confident AI platform's Observatory. To learn more about this endpoint [click here](/docs/api-reference/evaluation/evaluate-thread).
-            
-          <EndpointRequestSnippet
-              endpoint="POST /v1/evaluate/threads/{id}"
-              example="Single-Turn"
-          />
-
-        </Tab>
-    </Tabs>
-
-  </Step>
-</Steps>
-
-The `/v1/evaluate` API endpoint will create a test run on Confident AI and return the following response:
-
-<EndpointResponseSnippet endpoint="POST /v1/evaluate" />
-
-**🎉 Congratulations!** You just ran your first evaluation on Confident AI via the Evals API.
-
-## Test Reports on Confident AI
-
-After running an eval using our Evals API, your test results will be automatically stored on the Confident AI platform in a [comprehensive report format](/docs/llm-evaluation/dashboards/testing-reports). You can also separate the test results using the `TEST-RUN-ID` from the API response.
-
-Here's an example report you'll get on the platform whenever you call the `/v1/evaluate` endpoint:
-
-<Frame caption="Test Reports on Confident AI">
-  <video
-    src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:single-turn-e2e-report.mp4"
-    controls
-    autoPlay
-  />
-</Frame>
+<CardGroup cols={3}>
+  <Card
+    title="Metric Collections"
+    icon="album-collection"
+    iconType="solid"
+    href="/docs/api-reference/metric-collections/list-metric-collections"
+  >
+    Create and use metric collections that allow you to run remote evals.
+  </Card>
+  <Card
+    title="Datasets"
+    icon="database"
+    iconType="solid"
+    href="/docs/api-reference/datasets/pull-dataset"
+  >
+    Store a list of goldens that serve as inputs to evaluate your applications.
+  </Card>
+  <Card
+    title="Evaluation"
+    icon="flask"
+    iconType="solid"
+    href="/docs/api-reference/evaluation/evaluate-llm"
+  >
+    Evaluate your test cases, traces, spans and threads using our API.
+  </Card>
+  <Card
+    title="Tracing"
+    icon="hexagon-nodes"
+    iconType="solid"
+    href="/docs/api-reference/tracing/get-trace"
+  >
+    Utilize your application's traces and get full visibility of its workflow.
+  </Card>
+  <Card
+    title="Prompt"
+    icon="pen-to-square"
+    iconType="solid"
+    href="/docs/api-reference/prompt/get-prompt"
+  >
+    Use prompt templates to iterate and improve your application's performance.
+  </Card>
+  <Card
+    title="Annotations"
+    icon="thumbs-up"
+    iconType="solid"
+    href="/docs/api-reference/annotations/create-annotation"
+  >
+    Annotate your evaluations with human feedback to meet your goals.
+  </Card>
+</CardGroup>
 
 ## FAQs
 
 <AccordionGroup>
 
-    <Accordion title="How the Evals API different from DeepEval?">
+    <Accordion title="How is the Evals API different from DeepEval?">
 
     The Evals API provides more low-level control over the DeepEval client and provide benefits that DeepEval alone doesn't offer:
 
