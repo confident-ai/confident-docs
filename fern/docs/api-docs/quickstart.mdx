@@ -6,7 +6,7 @@ slug: api-reference/quickstart
 
 ## Overview
 
-Confident AI's Evals API allows you to run online evaluations on test cases, traces, spans, and threads. This 5 minute quickstart will teach you how to:
+Confident AI's Evals API allows you to run online evaluations on test cases, traces, spans, and threads. This 5-minute quickstart will walk you through how to:
 
 - Create **Metric Collections** to run your online evaluations.
 - Use the `/v1/evaluate` endpoint to run your first eval.
@@ -20,8 +20,8 @@ Here's a step-by-step guide on how to run your first online evaluation using the
     Get your Project API Key from the Confident AI platform's project settings. Click here to [learn more](/docs/api-reference/authentication).
   </Step>
 
-  <Step title="Create A Metric Collection">
-    A metric collection is a list of metrics that are used to evaluate your test cases. It can either consist of single-turn or multi-turn metrics but not both. Learn more about [metric collections here](/docs/metrics/metric-collections).
+  <Step title="Create a Metric Collection">
+    A metric collection is a group of metrics used to evaluate your test cases. It can either consist of single-turn or multi-turn metrics but not both. Learn more about [metric collections here](/docs/metrics/metric-collections).
 
     <Tabs>
         <Tab title="Create">
@@ -47,7 +47,7 @@ Here's a step-by-step guide on how to run your first online evaluation using the
     To run an evaluation, provide the name of the metric collection and the other relevant details based on your use case:
 
     <Tabs>
-        <Tab title="Single Turn">
+        <Tab title="Single-Turn">
 
           Add a list of **llmTestCases** in your request body to run single-turn evaluations. Click here to see the data model of [llmTestCases](/docs/api-reference/evaluation/evaluate-llm#request.body.llmTestCases).
             
@@ -57,7 +57,7 @@ Here's a step-by-step guide on how to run your first online evaluation using the
           />
 
         </Tab>
-        <Tab title="Multi Turn">
+        <Tab title="Multi-Turn">
 
           Add a list of **conversationalTestCases** in your request body to run multi-turn evaluations. Click here to see the data model of [conversationalTestCases](/docs/api-reference/evaluation/evaluate-llm#request.body.conversationalTestCases).
 
@@ -103,7 +103,7 @@ The `/v1/evaluate` API endpoint will create a test run on Confident AI and retur
 
 <EndpointResponseSnippet endpoint="POST /v1/evaluate" />
 
-**🎉 Congratulations!** You just ran your first evaluation on Confident AI via the Evals API.
+**🎉 Congratulations!** You just successfully ran your first evaluation on Confident AI via the Evals API.
 
 ## View Results on Confident AI
 
@@ -118,3 +118,11 @@ Here's an example report you'll get on the platform whenever you call the `/v1/e
     autoPlay
   />
 </Frame>
+
+## Next Steps
+
+Now that you've run your first online evaluation, explore these next steps to go deeper with Confident AI:
+
+- **Custom Datasets** — Create custom datasets using the [datasets endpoint](/docs/api-reference/datasets/push-dataset).
+- **Prompt Templates** — Iterate and version your LLM prompts directly through the [prompts endpoint](/docs/api-reference/prompt/get-prompt).
+- **Human Annotations** — Annotate your evaluations to enable human-in-the-loop feedback to guide metric tuning and reinforce quality with the [annotation endpoint](/docs/api-reference/annotations/create-annotation).
