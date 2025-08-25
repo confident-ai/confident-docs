@@ -87,7 +87,7 @@ def llm_app(query: str) -> str:
     def generator(query: str, text_chunks: list[str]) -> str:
         res = OpenAI().chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": query}]
         ).choices[0].message.content
-        update_current_span(input=query, actual_output=res)
+        update_current_span(input=query, output=res)
         return res
 
     return generator(query, retriever(query))
