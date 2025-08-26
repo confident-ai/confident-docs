@@ -1,0 +1,1 @@
+<script defer data-domain="confident-ai.com" src="https://plausible.io/js/script.tagged-events.js"></script>

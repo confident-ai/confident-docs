@@ -14,6 +14,7 @@ layout:
   sidebar-width: 300px
 
 css: assets/styles.css
+js: ./custom.js
 
 tabs:
   api-reference:
