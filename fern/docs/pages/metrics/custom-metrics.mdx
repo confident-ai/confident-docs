@@ -57,6 +57,25 @@ Custom metrics also provide an optional rubric, which you can use to confine cus
 
 If you're creating custom metrics locally, you can implement anything you wish.
 
+## Common Mistakes to Avoid
+
+There are a few common mistakes when creating a custom metric for the first time:
+
+- **Criteria/evaluation steps are not detailed enough**  
+  Many issues arise when criteria are too vague. If you expect the metric to handle X, Y, or Z, make sure those requirements are actually written into the criteria so the metric can use them.
+
+- **Required test case parameters are not referenced**  
+  When defining a custom metric, explicitly state what each parameter means and how they connect. For example, specify that the `'actual output'` should semantically match the `'expected output'`.
+
+- **Vague language in crtieria**  
+  Avoid terms like “accurate” without explanation. Instead, define what “accurate” means — e.g., “does not contradict the `'retrieval context'`”, instead of a general “factually correct”.
+
+- **Trying to set the rubric in the evaluation steps**  
+  The evaluation steps are meant to help the LLM-as-a-Judge think. When you try to define the score that should be outputted instead of telling the metric how it should consider different parameters at play, it can lead to worst results.
+
+- **Non-quantiative language in Rubric**  
+  If a rubric range of `0–1` represents “low accuracy,” spell out what that means in practice — for example, does it allow 2–3 contradictions between the `"actual output"` and `"retrieval context"`? Always use concrete definitions like this rather than vague labels such as “low,” “medium,” or “high” without explanation.
+
 ## Create Custom Metrics on the Platform
 
 Single or multi-turn custom metrics can be created under **Project** > **Metrics** > **Library**.
@@ -67,7 +86,13 @@ Single or multi-turn custom metrics can be created under **Project** > **Metrics
 
 Provide the metric name, and optionally a description. You can also toggle whether you're creating a single-turn or multi-turn metric.
 
-[video]
+<Frame caption="General Metric Info">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/metric:general-info.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
 
 <Warning>
   Your metric name must be unique in your project and clash with any of the
@@ -78,14 +103,14 @@ Provide the metric name, and optionally a description. You can also toggle wheth
 
 <Step title="Select required parameters">
 
-Custom metrics needs to know which parameters in test cases it should consider during evaluation for the results to be accurate and reliable. This step gives you the opportunity to do exactly this.
+Custom metrics needs to know which parameters in [test cases](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets#test-cases) it should consider during evaluation for the results to be accurate and reliable - this step gives you the opportunity to do exactly this. The example below shows selecting single-turn test case parameters for a single-turn metric, but you can also do it for multi-turn parameters.
 
-<Tabs>
-
-<Tab title="Single-Turn"></Tab>
-<Tab title="Multi-Turn"></Tab>
-
-</Tabs>
+<Frame caption="Evaluation Parameters">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/metric:select-parameters.mp4"
+    autoPlay
+  />
+</Frame>
 
 </Step>
 
@@ -105,7 +130,13 @@ determine whether the 'actual output' is relevant and helpful to the 'input'.
 Penalize heavily if not helpful. Relevancy is not so important.
 ```
 
-[video]
+<Frame caption="Metric Criteria">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/metric:criteria.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
 
 Criteria are used for generating evaluation steps, and not used directly for evaluation.
 
@@ -122,7 +153,13 @@ However, providing evaluation steps gives custom metrics more reliable scores, a
   the rubric which we will talk about later).
 </Warning>
 
-[video]
+<Frame caption="Optional Evaluation Steps">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/metric:evaluation-steps.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
 
 </Step>
 
@@ -134,13 +171,30 @@ Lastly, you can optionally provide a set of rubrics to confine evaluation scores
 - Contain a clear expected outcome for each score range
 - Be inclusive of 0 - 10
 
-[video]
+The rubric score is defined on a 0–10 scale, but the final score reported by Confident AI is normalized to a 0–1 range. We use integers for the rubric since LLM-as-a-Judge performs more reliably with whole numbers, and then divide by 10 afterward to convert it into the normalized scale.
+
+<Frame caption="Optional Rubric">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/metric:rubric.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+</Step>
+
+<Step title="Review and save">
+
+Once you have your criteria set, make sure everything looks right in the final review page, and click **Save**.
+
+<Success>
+  You can now add your custom metric to a metric collection to start running
+  remote evals.
+</Success>
 
 </Step>
 
 </Steps>
-
-Done ✅. You can now add your custom metric to a metric collection to start running remote evals.
 
 ## Create Custom Metrics Locally
 
