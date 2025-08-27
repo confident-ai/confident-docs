@@ -12,6 +12,10 @@ tags:
     description: Metric Collection API
     externalDocs:
       description: Learn about metric collection
+  - name: Metric
+    description: Metrics API
+    externalDocs:
+      description: Learn about metrics
   - name: Datasets
     description: Confident AI Datasets API
     externalDocs:
@@ -66,7 +70,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateMetricResponse"
+                $ref: "#/components/schemas/CreateMetricCollectionResponse"
               examples:
                 Single-Turn:
                   success: true
@@ -776,6 +780,144 @@ paths:
                   data:
                     id: "ANNOTATION-ID"
                   deprecated: false
+  /v1/metrics:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metric
+      summary: Get Metric
+      operationId: getCustomMetric
+      description: Retrieves all the metrics from your Confident AI project.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMetricResponse"
+              example:
+                success: true
+                data:
+                  metrics:
+                    - id: "METRIC-ID-1"
+                      name: Correctness
+                      criteria: Determine if the `actual output` is correct based on the `input`.
+                      evaluationParams:
+                        - input
+                        - actualOutput
+                      multiTurn: false
+                    - id: "METRIC-ID-2"
+                      name: Relevancy
+                      criteria: Determine if the assistant answers are relevant to what the user is asking.
+                      multiTurn: true
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metric
+      summary: Create Metric
+      operationId: createCustomMetric
+      description: Creates a new metric on your Confident AI project.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMetric"
+            examples:
+              Single-Turn:
+                name: Correctness
+                criteria: Determine if the `actual output` is correct based on the `expected output`.
+                evaluationParams:
+                  - actualOutput
+                  - expectedOutput
+                multiTurn: false
+              Multi-Turn:
+                name: Relevancy
+                criteria: Determine if the assistant answers are relevant to what the user is asking.
+                multiTurn: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateMetricResponse"
+              examples:
+                Single-Turn:
+                  success: true
+                  data:
+                    id: METRIC-ID
+                Multi-Turn:
+                  success: true
+                  data:
+                    id: METRIC-ID
+
+  /v1/metrics/{id}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metric
+      summary: Update Metric
+      operationId: updateCustomMetric
+      description: Updates a custom metric on your Confident AI project.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMetric"
+            example:
+              criteria: Determine if the `actual output` is correct based on the `input`.
+              evaluationParams:
+                - actualOutput
+                - expectedOutput
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateMetricResponse"
+              example:
+                success: true
+
+  /v1/batch-metrics:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metric
+      summary: Create Metrics
+      operationId: createBatchMetrics
+      description: Creates a batch of new metrics on your Confident AI project.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBatchMetrics"
+            example:
+              metrics:
+                - name: Correctness
+                  criteria: Determine if the `actual output` is correct based on the `expected output`.
+                  evaluationParams:
+                    - actualOutput
+                    - expectedOutput
+                  multiTurn: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateBatchMetricsResponse"
+              example:
+                success: true
+                data:
+                  ids:
+                    - METRIC-ID
 
 components:
   schemas:
@@ -843,7 +985,7 @@ components:
     required:
       - metric
 
-    CreateMetricResponse:
+    CreateMetricCollectionResponse:
       type: object
       properties:
         success:
@@ -957,6 +1099,134 @@ components:
       required:
         - success
         - data
+
+    Metric:
+      type: object
+      properties:
+        id: 
+          type: string
+        name: 
+          type: string
+        criteria:
+          type: string
+        evaluationSteps:
+          type: string
+        evaluationParams:
+          type: array
+          items:
+            type: string
+            enum: [input, actualOutput, expectedOutput, context, expectedTools]
+        multiTurn:
+          type: boolean
+      required:
+        - id
+        - name
+        - multiTurn
+
+    CreateBatchMetrics:
+      type: object
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/Metric"
+      required:
+        - metrics
+    
+    CreateBatchMetricsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            ids:
+              type: array
+              items:
+                type: string
+          required:
+            - ids
+      required:
+        - success
+        - data
+
+    GetMetricResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            metrics:
+              type: array
+              items:
+                $ref: "#/components/schemas/Metric"
+          required:
+            - metrics
+      required:
+        - success
+        - data  
+      
+    CreateMetric:
+      type: object
+      properties:
+        name: 
+          type: string
+        criteria:
+          type: string
+        evaluationSteps:
+          type: string
+        evaluationParams:
+          type: array
+          items:
+            type: string
+            enum: [input, actualOutput, expectedOutput, context, expectedTools]
+        multiTurn:
+          type: boolean
+      required: 
+        - name
+        - multiTurn
+      
+    CreateMetricResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties: 
+            id:
+              type: string
+          required:
+            - id
+      required: 
+        - success
+        - data
+
+    UpdateMetric:
+      type: object
+      properties:
+        name: 
+          type: string
+        criteria:
+          type: string
+        evaluationSteps:
+          type: string
+        evaluationParams:
+          type: array
+          items:
+            type: string
+            enum: [input, actualOutput, expectedOutput, context, expectedTools]
+      
+    UpdateMetricResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: 
+        - success
 
     RetrievedGolden:
       type: object

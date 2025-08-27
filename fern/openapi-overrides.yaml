@@ -35,6 +35,54 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+    
+  /v1/metrics:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/metrics/{id}:
+    put:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the metric you wish to update.
+          schema:
+            type: string
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        
+  /v1/batch-metrics:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
 
   /v1/datasets/{alias}:
     get:
