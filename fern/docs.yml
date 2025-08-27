@@ -1,5 +1,5 @@
 instances:
-  - url: www.confident-ai.docs.buildwithfern.com/docs # update this to {yourorg}.docs.buildwithfern.com
+  - url: https://www.confident-ai.docs.buildwithfern.com/docs # update this to {yourorg}.docs.buildwithfern.com
     custom-domain: www.confident-ai.com/docs
 
 title: Confident AI Docs
