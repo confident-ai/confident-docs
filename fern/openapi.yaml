@@ -836,6 +836,22 @@ paths:
                 name: Relevancy
                 criteria: Determine if the assistant answers are relevant to what the user is asking.
                 multiTurn: true
+              With-Rubric:
+                name: Accuracy
+                criteria: Determine if the `actual output` is correct based on the `expected output`.
+                evaluationParams:
+                  - actualOutput
+                  - expectedOutput
+                multiTurn: false
+                rubric:
+                  - scoreRange:
+                      - 0
+                      - 2
+                    expectedOutcome: "Factually incorrect."
+                  - scoreRange:
+                      - 10
+                      - 10
+                    expectedOutcome: "100% correct."
       responses:
         "200":
           description: ""
@@ -851,6 +867,10 @@ paths:
                 Multi-Turn:
                   success: true
                   data:
+                    id: METRIC-ID
+                With-Rubric:
+                  success: true
+                  data: 
                     id: METRIC-ID
 
   /v1/metrics/{id}:
@@ -1105,21 +1125,31 @@ components:
       properties:
         id: 
           type: string
+          description: This is the unique id of the metric.
         name: 
           type: string
+          description: This is the name of the metric, it's unique to all metrics.
         criteria:
           type: string
+          description: This is the criteria this metric uses to evaluate test cases.
         evaluationSteps:
           type: string
+          description: This is the alternative of criteria and is used to evaluate your test cases.
         evaluationParams:
           type: array
+          description: It is an array of the params that will be used to evaluate your test cases.
           items:
             type: string
             enum: [input, actualOutput, expectedOutput, context, expectedTools]
         multiTurn:
           type: boolean
+          description: This is true if the metric is used to evaluate multi-turn test cases.
+        rubric:
+          type: array
+          description: A list of rubrics that will be used to evaluate your test cases.
+          items:
+            $ref: "#/components/schemas/Rubric"
       required:
-        - id
         - name
         - multiTurn
 
@@ -1128,6 +1158,7 @@ components:
       properties:
         metrics:
           type: array
+          description: This is the list of metrics you want to add to your project.
           items:
             $ref: "#/components/schemas/Metric"
       required:
@@ -1138,8 +1169,10 @@ components:
       properties:
         success:
           type: boolean
+          description: "This is true if the metrics were created successfully."
         data:
           type: object
+          description: "This maps to the ids of the metrics created."
           properties:
             ids:
               type: array
@@ -1156,8 +1189,10 @@ components:
       properties:
         success:
           type: boolean
+          description: "This is true if the metrics were successfully retrieved."
         data:
           type: object
+          description: "This maps to all the metrics retrieved."
           properties:
             metrics:
               type: array
@@ -1174,28 +1209,56 @@ components:
       properties:
         name: 
           type: string
+          description: The name of the metric you're creating in your project.
         criteria:
           type: string
+          description: The criteria for this particular metric, that will be used to evaluate test cases later.
         evaluationSteps:
           type: string
+          description: An alternative to criteria, it is a list of steps to take to evaluate your test cases.
         evaluationParams:
           type: array
+          description: It is an array of the params that will be used to evaluate your test cases.
           items:
             type: string
             enum: [input, actualOutput, expectedOutput, context, expectedTools]
         multiTurn:
           type: boolean
+          description: This is true if your metric is used for evaluating multi-turn test cases.
+        rubric:
+          type: array
+          description: A list of rubrics that will be used to evaluate your test cases.
+          items:
+            $ref: "#/components/schemas/Rubric"
+          
       required: 
         - name
         - multiTurn
+
+    Rubric:
+      type: object
+      properties:
+        scoreRange:
+          type: array
+          description: An array consisting of the ranges of scores to generate.
+          items:
+            type: number
+        expectedOutcome: 
+          type: string
+          description: The expected outcome for your evaluation.
+      required:
+        - scoreRange
+        - expectedOutcome
       
     CreateMetricResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the metric was created successfully."
         data:
           type: object
+          description: "This maps to the id of the metric created."
           properties: 
             id:
               type: string
@@ -1210,21 +1273,31 @@ components:
       properties:
         name: 
           type: string
+          description: The name of the metric you're updating.
         criteria:
           type: string
+          description: The new criteria for this particular metric, that you want to update to.
         evaluationSteps:
           type: string
+          description: The new evaluation steps that you want to update for this metric.
         evaluationParams:
           type: array
+          description: The new evaluation params that you want to update for this metric.
           items:
             type: string
             enum: [input, actualOutput, expectedOutput, context, expectedTools]
+        rubric:
+          type: array
+          description: The new list of rubrics for this metric.
+          items:
+            $ref: "#/components/schemas/Rubric"
       
     UpdateMetricResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: "This is true if the metric was updated successfully."
       required: 
         - success
 
