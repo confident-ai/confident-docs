@@ -4,13 +4,18 @@ subtitle: Welcome to Confident AI's Evals API reference.
 slug: api-reference/introduction
 ---
 
-## What is Confident AI's Evals API?
+## What is Evals API?
 
-Confident AI enables organizations to offload evaluations, tracing, dataset management, and prompt versioning via a comprehensive RESTFUL **Evals API**.
+The RESTFUL Evals API enables organizations to offload evaluations, ingest LLM traces, manage datasets, prompt versions, and more on Confident AI. It allows you to:
 
-Whether you're evaluating LLM outputs in production or integrating directly with [DeepEval](https://github.com/confident-ai/deepeval), the platform supports a multi-tenant structure for clean project-level isolation and scalability.
+- Run metrics remotely on Confident AI, without having to manage the infrastructure overhead
+- Keep a centralized admin dashbaord for all evals, traces, datasets, prompts etc. ingested
+- Manage user annotations, and manipulate LLM traces
+- And most important, **build your custom LLMOps pipeline**
 
-<Tip title="Evaluation metrics via the Evals API are 100% powered by DeepEval">
+All evaluations ran using the Evals API is powered by DeepEval, the open-source LLM Evaluation framework.
+
+<Tip title="Evaluation metrics via the Evals API are 100% powered by ⭐ DeepEval 💯">
   DeepEval is one of the most widely adopted LLM evaluation framework in the
   world, with over 10k stars and 20 million daily evaluations.
 
@@ -21,61 +26,77 @@ Whether you're evaluating LLM outputs in production or integrating directly with
 
 </Tip>
 
-## Features of Evals API
+## Key Capabilities
 
-Our Evals API offers a rich set of RESTful endpoints that lets you run online evaluations, create datasets, manage prompts, and more — all without needing Python or TypeScript SDKs in a production environment.
+The Evals API offers the same functionality but more low-level control over clicking around in the UI:
 
-### Get Started
+- Comprehensive single-turn, multi-turn LLM testing
+- Experiment with different versions of prompts and models
+- Detect unexpected breaking changes through evals
+- LLM tracing to debug and monitor in production
+- Track product analytics and user stats
+- Include human-in-the-loop to notice what needs to be worked on
 
-Get started with the Evals API by going through these sections:
+## Get Started
+
+Start building your own LLMops pipeline with Evals API.
 
 <CardGroup cols={3}>
   <Card
+    title="5 Min Quickstart"
+    icon="fa-light stopwatch"
+    href="/docs/api-reference/quickstart"
+  >
+    Run your first remote LLM evaluation.
+  </Card>
+  <Card
     title="Authentication"
-    icon="lock-keyhole"
-    iconType="solid"
+    icon="fa-light lock-keyhole"
     href="/docs/api-reference/authentication"
   >
-    Create a Confident AI account and generate your API keys to start using our services.
+    Learn how authentication works in Evals API.
   </Card>
   <Card
     title="Data Models"
-    icon="table-cells"
-    iconType="solid"
+    icon="fa-light table-cells"
     href="/docs/api-reference/data-models"
   >
-    Learn about the core data models and terminologies used in the Evals API.
-  </Card>
-  <Card
-    title="Quickstart"
-    icon="stopwatch"
-    iconType="solid"
-    href="/docs/api-reference/quickstart"
-  >
-    Run your first online evaluation using Confident AI's Evals API in under 5 minutes.
+    Understand core data models and how they connect.
   </Card>
 </CardGroup>
 
-### Our Endpoints
+## Main Endpoints
 
 Access a full suite of endpoints to manage evaluations, datasets, prompts, traces, and more.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card
-    title="Metric Collections"
-    icon="album-collection"
+    title="Metrics"
+    icon="chart-line"
     iconType="solid"
     href="/docs/api-reference/metric-collections/list-metric-collections"
   >
-    Create and use metric collections that allow you to run remote evals.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Define custom metrics for specific use cases
+    - Create and manage collection of metrics to run evals on test cases, traces, spans, and threads
+
   </Card>
   <Card
     title="Datasets"
-    icon="database"
+    icon="table"
     iconType="solid"
     href="/docs/api-reference/datasets/pull-dataset"
   >
-    Store a list of goldens that serve as inputs to evaluate your applications.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Store and manage golden datasets for consistent testing
+    - Pull datasets to be used for evaluation, for both single and multi-turn use cases
+
   </Card>
   <Card
     title="Evaluation"
@@ -83,15 +104,27 @@ Access a full suite of endpoints to manage evaluations, datasets, prompts, trace
     iconType="solid"
     href="/docs/api-reference/evaluation/evaluate-llm"
   >
-    Evaluate your test cases, traces, spans and threads using our API.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Run create test runs on list of test cases
+    - Get detailed scoring and feedback on model performance
+
   </Card>
   <Card
     title="Tracing"
-    icon="hexagon-nodes"
+    icon="route"
     iconType="solid"
     href="/docs/api-reference/tracing/get-trace"
   >
-    Utilize your application's traces and get full visibility of its workflow.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Track and analyze your AI's execution workflow
+    - Get full visibility into LLM calls and component interactions
+
   </Card>
   <Card
     title="Prompt"
@@ -99,7 +132,13 @@ Access a full suite of endpoints to manage evaluations, datasets, prompts, trace
     iconType="solid"
     href="/docs/api-reference/prompt/get-prompt"
   >
-    Use prompt templates to iterate and improve your application's performance.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Manage and version prompt templates programmatically
+    - Track prompt performance and iterate on improvements
+
   </Card>
   <Card
     title="Annotations"
@@ -107,7 +146,13 @@ Access a full suite of endpoints to manage evaluations, datasets, prompts, trace
     iconType="solid"
     href="/docs/api-reference/annotations/create-annotation"
   >
-    Annotate your evaluations with human feedback to meet your goals.
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Add human feedback and annotations to evaluation results
+    - Create feedback loops for continuous model improvement
+
   </Card>
 </CardGroup>
 

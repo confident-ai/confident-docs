@@ -1,5 +1,5 @@
 instances:
-  - url: https://www.confident-ai.docs.buildwithfern.com/docs # update this to {yourorg}.docs.buildwithfern.com
+  - url: https://confident-ai.docs.buildwithfern.com/docs # update this to {yourorg}.docs.buildwithfern.com
     custom-domain: www.confident-ai.com/docs
 
 title: Confident AI Docs
@@ -248,20 +248,20 @@ navigation:
             icon: fa-light fa-list
   - tab: api-reference
     layout:
-      - section: "API Reference"
+      - section: "Get Started"
         contents:
           - page: Introduction
             path: docs/api-docs/introduction.mdx
             icon: fa-light fa-circle-info
+          - page: Quickstart
+            path: docs/api-docs/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: Authentication
             path: docs/api-docs/authentication.mdx
             icon: fa-light fa-lock-keyhole
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
-          - page: Quickstart
-            path: docs/api-docs/quickstart.mdx
-            icon: fa-light fa-stopwatch
       - api: API Reference
         flattened: true
         skip-slug: true
