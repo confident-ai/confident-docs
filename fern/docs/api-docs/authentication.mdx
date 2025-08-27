@@ -1,6 +1,6 @@
 ---
 title: Authentication
-subtitle: Authentication for Confident AI's Evals API Usage
+subtitle: Understand how auth works for Evals API
 slug: api-reference/authentication
 ---
 
@@ -29,19 +29,15 @@ flowchart TD
     style P3 fill:#e8f5e8
     style P4 fill:#d1c4e9
 ```
+
 <br />
 
-## Create an Account
-
-If you don't already have a Confident AI account, visit [app.confident-ai.com](https://app.confident-ai.com) to sign up. You can register with your email address or use Google authentication for a faster experience.
-
 <Tip>
-  Want to use **SSO**? Check out our [enterprise offering.](https://confident-ai.com/pricing)
+  Want to use **SSO**? Check out our [enterprise
+  offering.](https://confident-ai.com/pricing)
 </Tip>
 
-Once registered, follow the onboarding flow to create your first project.
-
-## Organization Authentication
+## Organization-Level Auth
 
 Organization-level authentication gives you access to manage teams, billing, and multiple projects across your organization. You'll use the **Organization API Key** to authenticate.
 
@@ -57,7 +53,7 @@ To retrieve your **Organization API Key**:
 
 You can now copy your Organization API Key and use it for authentication.
 
-## Project Authentication
+## Project-Level Auth
 
 Project-level authentication provides access to all resources within a specific project — including datasets, prompts, metric collections, traces, and more.
 
@@ -76,5 +72,3 @@ Copy the Project API Key to authenticate all project-scoped API calls. You can a
 ```bash
 export CONFIDENT_API_KEY=YOUR-API-KEY
 ```
-
-🎉 You're now ready to use Confident AI's Evals API with full access to powerful evaluation workflows and performance insights for your LLM applications.

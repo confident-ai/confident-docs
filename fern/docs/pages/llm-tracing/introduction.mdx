@@ -72,8 +72,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
     Set different trace environments for your app.
   </Card>
 
-{" "}
-
 <Card
   title="Sampling Rate"
   icon="fa-light fa-percent"
@@ -85,8 +83,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
   </div>
   Configure the trace sampling rate.
 </Card>
-
-{" "}
 
 <Card
   title="Any Metadata"
@@ -100,8 +96,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
   Log any custom metadata with your traces.
 </Card>
 
-{" "}
-
 <Card
   title="Tags"
   icon="fa-light fa-tag"
@@ -113,8 +107,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
   </div>
   Log any tags for better trace organization.
 </Card>
-
-{" "}
 
 <Card
   title="Threads/Conversations"
@@ -128,8 +120,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
   Log entire conversations (threads) for multi-turn tracing.
 </Card>
 
-{" "}
-
 <Card
   title="Mask PII"
   icon="fa-light fa-eye-slash"
@@ -141,8 +131,6 @@ You can configure tracing on Confident AI in virtually any way you wish:
   </div>
   Mask PII for traces to protect sensitive data.
 </Card>
-
-{" "}
 
 <Card
   title="User Tracking"
@@ -167,6 +155,120 @@ You can configure tracing on Confident AI in virtually any way you wish:
   </div>
   Set span and component types for detailed tracing.
 </Card>
+</CardGroup>
+
+## Integrations
+
+You can also setup tracing via 1-line integrations.
+
+<Note>
+  Only Python is supported for itnegrations, with Typescript coming very soon.
+</Note>
+
+<CardGroup cols={3}>
+  <Card
+    title="OpenTelemetry"
+    icon="satellite-dish"
+    href="/integrations/opentelemetry"
+  >
+    Industry-standard observability framework for LLM monitoring.
+  </Card>
+  <Card
+    title="OpenAI"
+    icon={
+      <img
+        src="https://www.svgrepo.com/show/306500/openai.svg"
+        alt="OpenAI logo"
+      />
+    }
+    href="/integrations/third-party/openai"
+  >
+    Chat completion and responses APIs.
+  </Card>
+  <Card
+    title="LangChain"
+    icon={
+      <img
+        src="https://logo.svgcdn.com/s/langchain-dark-8x.png"
+        alt="LangChain logo"
+      />
+    }
+    href="/integrations/third-party/langchain"
+  >
+    Framework for building AI applications.
+  </Card>
+  <Card
+    title="Pydantic AI"
+    icon={
+      <img
+        src="https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/logos/pydantic-srs7pxjs9skodrjb64x86f.png/pydantic-ae96ag6mv67bf6hz5726v8.png?_a=DATAg1AAZAA0"
+        alt="Pydantic AI logo"
+      />
+    }
+    href="/integrations/third-party/pydantic-ai"
+  >
+    Type-safe agent framework for Python.
+  </Card>
+  <Card
+    title="LangGraph"
+    icon={
+      <img
+        src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/langgraph.png"
+        alt="LangGraph logo"
+      />
+    }
+    href="/integrations/third-party/langgraph"
+  >
+    Graph-based framework for stateful AI applications.
+  </Card>
+  <Card
+    title="OpenAI Agents"
+    icon={
+      <img
+        src="https://www.svgrepo.com/show/306500/openai.svg"
+        alt="OpenAI logo"
+      />
+    }
+    href="/integrations/third-party/openai-agents"
+  >
+    OpenAI's agent framework for intelligent assistants.
+  </Card>
+  <Card
+    title="LlamaIndex"
+    icon={
+      <img
+        src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/llamaindex.png"
+        alt="LlamaIndex logo"
+      />
+    }
+    href="/integrations/third-party/llama-index"
+  >
+    Data framework for RAG systems and knowledge agents.
+  </Card>
+  <Card
+    title="LiteLLM"
+    icon={
+      <img
+        src="https://thumb.ac-illust.com/42/425e87b240c970dfc92bfb0252ea7e52_t.jpeg"
+        alt="LiteLLM logo"
+      />
+    }
+    href="/integrations/third-party/litellm"
+  >
+    Unified API for 100+ LLM providers.
+  </Card>
+  <Card
+    title="Crew AI"
+    icon={
+      <img
+        src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/crewai.png"
+        alt="Crew AI logo"
+      />
+    }
+    href="/integrations/third-party/crew-ai"
+  >
+    Multi-agent orchestration for collaborative AI workflows.
+  </Card>
 </CardGroup>
 
 ## FAQs
