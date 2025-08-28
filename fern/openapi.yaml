@@ -64,6 +64,7 @@ paths:
                       name: Relevancy
                       criteria: Determine if the assistant answers are relevant to what the user is asking.
                       multiTurn: true
+                deprecated: false
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -118,14 +119,17 @@ paths:
                   success: true
                   data:
                     id: METRIC-ID
+                  deprecated: false
                 Multi-Turn:
                   success: true
                   data:
                     id: METRIC-ID
+                  deprecated: false
                 With-Rubric:
                   success: true
                   data: 
                     id: METRIC-ID
+                  deprecated: false
 
   /v1/metrics/{id}:
     put:
@@ -156,6 +160,7 @@ paths:
                 $ref: "#/components/schemas/UpdateMetricResponse"
               example:
                 success: true
+                deprecated: false
 
   /v1/batch-metrics:
     post:
@@ -192,6 +197,7 @@ paths:
                 data:
                   ids:
                     - METRIC-ID
+                deprecated: false
 
   /v1/metric-collections:
     post:
@@ -1003,9 +1009,13 @@ components:
                 type: string
           required:
             - ids
+        deprecated:
+          type: boolean
+          description: "This is true if this batch metrics endpoint is deprecated."
       required:
         - success
         - data
+        - deprecated
 
     GetMetricResponse:
       type: object
@@ -1023,9 +1033,13 @@ components:
                 $ref: "#/components/schemas/Metric"
           required:
             - metrics
+        deprecated:
+          type: boolean
+          description: "This is true if this metrics endpoint is deprecated."
       required:
         - success
-        - data  
+        - data
+        - deprecated
       
     CreateMetric:
       type: object
@@ -1088,9 +1102,13 @@ components:
               description: The id of the metric created
           required:
             - id
+        deprecated:
+          type: boolean
+          description: "This is true if this metrics endpoint is deprecated."
       required: 
         - success
         - data
+        - deprecated
 
     UpdateMetric:
       type: object
@@ -1122,8 +1140,12 @@ components:
         success:
           type: boolean
           description: "This is true if the metric was updated successfully."
+        deprecated:
+          type: boolean
+          description: "This is true if this metrics endpoint is deprecated."
       required: 
         - success
+        - deprecated
 
     CreateMetricCollection:
       type: object
