@@ -964,17 +964,24 @@ components:
           type: string
           description: This is the alternative of criteria and is used to evaluate your test cases.
         evaluationParams:
-          type: array
           description: It is an array of the params that will be used to evaluate your test cases.
-          items:
-            type: string
-            enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+          oneOf:
+            - type: array
+              title: llmTestCaseParams
+              items:
+                type: string
+                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+            - type: array
+              title: conversationalTestCaseParams
+              items:
+                type: string
+                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
         multiTurn:
           type: boolean
           description: This is true if the metric is used to evaluate multi-turn test cases.
         rubric:
           type: array
-          description: A list of rubrics that will be used to evaluate your test cases.
+          description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
       required:
@@ -1054,17 +1061,24 @@ components:
           type: string
           description: An alternative to criteria, it is a list of steps to take to evaluate your test cases.
         evaluationParams:
-          type: array
           description: It is an array of the params that will be used to evaluate your test cases.
-          items:
-            type: string
-            enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+          oneOf:
+            - type: array
+              title: llmTestCaseParams
+              items:
+                type: string
+                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+            - type: array
+              title: conversationalTestCaseParams
+              items:
+                type: string
+                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
         multiTurn:
           type: boolean
           description: This is true if your metric is used for evaluating multi-turn test cases.
         rubric:
           type: array
-          description: A list of rubrics that will be used to evaluate your test cases.
+          description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
           
@@ -1074,6 +1088,7 @@ components:
 
     Rubric:
       type: object
+      description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
       properties:
         scoreRange:
           type: array
@@ -1123,14 +1138,21 @@ components:
           type: string
           description: The new evaluation steps that you want to update for this metric.
         evaluationParams:
-          type: array
-          description: The new evaluation params that you want to update for this metric.
-          items:
-            type: string
-            enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+          description: It is an array of the params that will be used to evaluate your test cases.
+          oneOf:
+            - type: array
+              title: llmTestCaseParams
+              items:
+                type: string
+                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+            - type: array
+              title: conversationalTestCaseParams
+              items:
+                type: string
+                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
         rubric:
           type: array
-          description: The new list of rubrics for this metric.
+          description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
       
