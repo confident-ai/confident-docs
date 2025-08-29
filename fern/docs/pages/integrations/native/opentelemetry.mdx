@@ -603,9 +603,46 @@ span.SetAttribute("confident.trace.output", output);
 
 </CodeBlocks>
 
+### Metric Collection
+
+[Metric collection](/docs/metrics/metric-collections) allows you to run metrics on cloud and publish results to the observatory.
+
+- `"confident.trace.metric_collection"` (of type `str`) update the name of the metric collection for the span
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.metric_collection", "<your_metric_collection>")
+```
+
+```typescript
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.metric_collection", "<your_metric_collection>"),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.metric_collection": "<your_metric_collection>",
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>");
+```
+
+</CodeBlocks>
+
 ### Test Case
 
-[LLM Test Case](/docs/llm-tracing/advanced-features/test-cases) attributes can be used to unit test interactions within your LLM application. It can be set in the span as **trace level attributes** using the `confident.trace.llm_test_case.*` namespace.
+[LLM test case parameters](/docs/llm-tracing/advanced-features/test-cases) can be used to unit test interactions within your LLM application. They can be set in the span as **trace level attributes** using the `confident.trace.*` namespace.
 
 Given below is the example of running [online evaluation](/docs/llm-tracing/evaluations#online-evaluations) for a span.
 
@@ -614,41 +651,51 @@ Given below is the example of running [online evaluation](/docs/llm-tracing/eval
 ```python
 with tracer.start_as_current_span("confident_evaluation") as span:
     input = "What is the capital of France?"
-    output = my_llm_app(input)
+    output = my_llm_app(input) # your LLM application
     
     span.set_attribute('confident.trace.metric_collection', "<your_metric_collection>")
-    span.set_attribute('confident.trace.llm_test_case.input', input)
-    span.set_attribute('confident.trace.llm_test_case.actual_output', output)
+    span.set_attribute('confident.trace.input', input)
+    span.set_attribute('confident.trace.output', output)
+    span.set_attribute('confident.trace.retrieval_context', ["context1", "context2"])
+    span.set_attribute('confident.trace.expected_output', "Paris")
 ```
 
 ```typescript
 span.setAttributes({
     "confident.trace.metric_collection": "<your_metric_collection>",
-    "confident.trace.llm_test_case.input": input,
-    "confident.trace.llm_test_case.actual_output": output,
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+    "confident.trace.retrieval_context": ["context1", "context2"],
+    "confident.trace.expected_output": "Paris",
 });
 ```
 
 ```go
 span.SetAttributes(
     attribute.String("confident.trace.metric_collection", "<your_metric_collection>"),
-    attribute.String("confident.trace.llm_test_case.input", input),
-    attribute.String("confident.trace.llm_test_case.actual_output", output),
+    attribute.String("confident.trace.input", input),
+    attribute.String("confident.trace.output", output),
+    attribute.String("confident.trace.retrieval_context", ["context1", "context2"]),
+    attribute.String("confident.trace.expected_output", "Paris"),
 )
 ```
 
 ```ruby
 span.setAttributes({
     "confident.trace.metric_collection": "<your_metric_collection>",
-    "confident.trace.llm_test_case.input": input,
-    "confident.trace.llm_test_case.actual_output": output,
+    "confident.trace.input": input,
+    "confident.trace.output": output,
+    "confident.trace.retrieval_context": ["context1", "context2"],
+    "confident.trace.expected_output": "Paris",
 });
 ```
 
 ```csharp
 span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>");
-span.SetAttribute("confident.trace.llm_test_case.input", input);
-span.SetAttribute("confident.trace.llm_test_case.actual_output", output);
+span.SetAttribute("confident.trace.input", input);
+span.SetAttribute("confident.trace.output", output);
+span.SetAttribute("confident.trace.retrieval_context", ["context1", "context2"]);
+span.SetAttribute("confident.trace.expected_output", "Paris");
 ```
 
 </CodeBlocks>
@@ -659,13 +706,13 @@ Make sure you have [metric collection](/docs/metrics/metric-collections) created
 
 LLM test case attributes mapping:
 
-- `"confident.trace.llm_test_case.input"` (of type `str`) used for updating test case input
-- `"confident.trace.llm_test_case.actual_output"` (of type `str`) used for updating test case actual output
-- [Optional] `"confident.trace.llm_test_case.expected_output"` (of type `str`) used for updating test case expected output
-- [Optional] `"confident.trace.llm_test_case.context"` (of type `list[str]`) used for updating test case context
-- [Optional] `"confident.trace.llm_test_case.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
-- [Optional] `"confident.trace.llm_test_case.tools_called"` (of type `str`) used for updating test case tools called
-- [Optional] `"confident.trace.llm_test_case.expected_tools"` (of type `str`) used for updating test case expected tools
+- `"confident.trace.input"` (of type `str`) used for updating test case input
+- `"confident.trace.output"` (of type `str`) used for updating test case actual output
+- [Optional] `"confident.trace.expected_output"` (of type `str`) used for updating test case expected output
+- [Optional] `"confident.trace.context"` (of type `list[str]`) used for updating test case context
+- [Optional] `"confident.trace.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
+- [Optional] `"confident.trace.tools_called"` (of type `ToolCall`) used for updating test case tools called
+- [Optional] `"confident.trace.expected_tools"` (of type `ToolCall`) used for updating test case expected tools
 
 ### Tags
 
@@ -936,7 +983,7 @@ span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>"
 
 ### Test Case
 
-[LLM Test Case](/docs/llm-tracing/advanced-features/test-cases) attributes can be used to unit test interactions within your LLM application. It can be set in **any span type**.
+[LLM test case parameters](/docs/llm-tracing/advanced-features/test-cases) can be used to unit test interactions within your LLM application. They can be set on the span level in **any span type** using the `confident.span.*` namespace.
 
 Given below is the example of running [online evaluation](/docs/llm-tracing/evaluations#online-evaluations) for a span.
 
@@ -948,51 +995,61 @@ with tracer.start_as_current_span("confident_evaluation") as span:
     output = my_llm_app(input) # your LLM application
     
     span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
-    span.set_attribute('confident.span.llm_test_case.input', input)
-    span.set_attribute('confident.span.llm_test_case.actual_output', output)
+    span.set_attribute('confident.span.input', input)
+    span.set_attribute('confident.span.output', output)
+    span.set_attribute('confident.span.retrieval_context', ["context1", "context2"])
+    span.set_attribute('confident.span.expected_output', "Paris")
 ```
 
 ```typescript
 span.setAttributes({
     "confident.span.metric_collection": "<your_metric_collection>",
-    "confident.span.llm_test_case.input": input,
-    "confident.span.llm_test_case.actual_output": output,
+    "confident.span.input": input,
+    "confident.span.output": output,
+    "confident.span.retrieval_context": ["context1", "context2"],
+    "confident.span.expected_output": "Paris",
 });
 ```
 
 ```go
 span.SetAttributes(
     attribute.String("confident.span.metric_collection", "<your_metric_collection>"),
-    attribute.String("confident.span.llm_test_case.input", input),
-    attribute.String("confident.span.llm_test_case.actual_output", output),
+    attribute.String("confident.span.input", input),
+    attribute.String("confident.span.output", output),
+    attribute.String("confident.span.retrieval_context", "context1"),
+    attribute.String("confident.span.expected_output", "Paris"),
 )
 ```
 
 ```ruby
 span.setAttributes({
     "confident.span.metric_collection": "<your_metric_collection>",
-    "confident.span.llm_test_case.input": input,
-    "confident.span.llm_test_case.actual_output": output,
+    "confident.span.input": input,
+    "confident.span.output": output,
+    "confident.span.retrieval_context": ["context1", "context2"],
+    "confident.span.expected_output": "Paris",
 });
 ```
 
 ```csharp
 span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>");
-span.SetAttribute("confident.span.llm_test_case.input", input);
-span.SetAttribute("confident.span.llm_test_case.actual_output", output);
+span.SetAttribute("confident.span.input", input);
+span.SetAttribute("confident.span.output", output);
+span.SetAttribute("confident.span.retrieval_context", "context1");
+span.SetAttribute("confident.span.expected_output", "Paris");
 ```
 
 </CodeBlocks>
 
 LLM test case attributes mapping:
 
-- `"confident.span.llm_test_case.input"` (of type `str`) used for updating test case input
-- `"confident.span.llm_test_case.actual_output"` (of type `str`) used for updating test case actual output
-- [Optional] `"confident.span.llm_test_case.expected_output"` (of type `str`) used for updating test case expected output
-- [Optional] `"confident.span.llm_test_case.context"` (of type `list[str]`) used for updating test case context
-- [Optional] `"confident.span.llm_test_case.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
-- [Optional] `"confident.span.llm_test_case.tools_called"` (of type `str`) used for updating test case tools called
-- [Optional] `"confident.span.llm_test_case.expected_tools"` (of type `str`) used for updating test case expected tools
+- `"confident.span.input"` (of type `str`) used for updating test case input
+- `"confident.span.output"` (of type `str`) used for updating test case actual output
+- [Optional] `"confident.span.expected_output"` (of type `str`) used for updating test case expected output
+- [Optional] `"confident.span.context"` (of type `list[str]`) used for updating test case context
+- [Optional] `"confident.span.retrieval_context"` (of type `list[str]`) used for updating test case retrieval context
+- [Optional] `"confident.span.tools_called"` (of type `ToolCall`) used for updating test case tools called
+- [Optional] `"confident.span.expected_tools"` (of type `ToolCall`) used for updating test case expected tools
 
 ### Metadata
 
@@ -1091,8 +1148,6 @@ This is the default span type. All the attributes that we used above with `confi
 
 To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/advanced-features/span-types#llm-span).
 
-- `"confident.span.input"` (of type `str`, `list[str]`) used for updating LLM Span input (parsed to `list[dict]` if `list[str]` is provided)
-- `"confident.span.output"` (of type `Any`) used for updating LLM Span output
 - `"confident.llm.model"` (of type `str`) used for updating LLM model
 - [Optional] `"confident.llm.cost_per_input_token"` (of type `float`) used for updating cost per input token
 - [Optional] `"confident.llm.cost_per_output_token"` (of type `float`) used for updating cost per output token
@@ -1171,8 +1226,6 @@ To create a Agent span, set the `confident.span.type` to `agent`. After that ref
 - `"confident.agent.name"` (of type `str`) used for updating Agent span name
 - [Optional] `"confident.agent.available_tools"` (of type `list[str]`) used for updating Agent span available tools
 - [Optional] `"confident.agent.agent_handoffs"` (of type `list[str]`) used for updating Agent span agent handoffs
-- `"confident.span.input"` (of type `Any`) used for updating Agent span input
-- `"confident.span.output"` (of type `Any`) used for updating Agent span output
 
 Given below is the sample code for setting attributes for Agent span type.
 
@@ -1239,8 +1292,6 @@ To create a Tool span, set the `confident.span.type` to `tool`. After that refer
 
 - `"confident.tool.name"` (of type `str`) used for updating Tool span name
 - [Optional] `"confident.tool.description"` (of type `str`) used for updating Tool span description
-- [Optional] `"confident.span.input"` (of type `str`) used for updating Tool span input parameters (parsed to `dict` if `str` is provided)
-- [Optional] `"confident.span.output"` (of type `Any`) used for updating Tool span output
 
 Given below is the sample code for setting attributes for Tool span type.
 
@@ -1301,8 +1352,6 @@ span.SetAttribute("confident.span.output", `{"output": "output"}`);
 To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/advanced-features/span-types#retriever-span).
 
 - `"confident.retriever.embedder"` (of type `str`) used for updating Retrieval span embedder model
-- `"confident.span.input"` (of type `str`) used for updating Retrieval span embedding input
-- `"confident.retriever.retrieval_context"` (of type `list[str]`) used for updating Retrieval span retrieval context
 - [Optional] `"confident.retriever.top_k"` (of type `int`) used for updating Retrieval span top k
 - [Optional] `"confident.retriever.chunk_size"` (of type `int`) used for updating Retrieval span chunk size
 
