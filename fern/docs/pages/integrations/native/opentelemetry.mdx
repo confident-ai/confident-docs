@@ -66,8 +66,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     span.set_attribute("confident.trace.name", "example-trace")
                     span.set_attribute("confident.span.type", "llm")
                     span.set_attribute("confident.llm.model", "gpt-4o")
-                    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
-                    span.set_attribute("confident.llm.attributes.output", "Paris")
+                    span.set_attribute("confident.span.input", "What is the capital of France?")
+                    span.set_attribute("confident.span.output", "Paris")
                 
                 trace_provider.force_flush()
                 print("Traces posted successfully to https://otel.confident-ai.com")
@@ -174,8 +174,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                             'confident.trace.name': 'example-trace',
                             'confident.span.type': 'llm',
                             'confident.llm.model': 'gpt-4o',
-                            'confident.llm.attributes.input': 'What is the capital of France?',
-                            'confident.llm.attributes.output': 'Paris'
+                            'confident.span.input': 'What is the capital of France?',
+                            'confident.span.output': 'Paris'
                         });
 
                         // Simulate some work here
@@ -344,8 +344,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 span.set_attribute('confident.trace.name', 'example-trace')
                 span.set_attribute('confident.span.type', 'llm')
                 span.set_attribute('confident.llm.model', 'gpt-4o')
-                span.set_attribute('confident.llm.attributes.input', 'What is the capital of France?')
-                span.set_attribute('confident.llm.attributes.output', 'Paris')
+                span.set_attribute('confident.span.input', 'What is the capital of France?')
+                span.set_attribute('confident.span.output', 'Paris')
 
                 puts 'Span created successfully!'
             end
@@ -421,8 +421,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                         currentSpan.SetAttribute("confident.trace.name", "example-trace");
                         currentSpan.SetAttribute("confident.span.type", "llm");
                         currentSpan.SetAttribute("confident.llm.model", "gpt-4o");
-                        currentSpan.SetAttribute("confident.llm.attributes.input", "What is the capital of France?");
-                        currentSpan.SetAttribute("confident.llm.attributes.output", "Paris");
+                        currentSpan.SetAttribute("confident.span.input", "What is the capital of France?");
+                        currentSpan.SetAttribute("confident.span.output", "Paris");
 
                         Console.WriteLine("Span created with attributes. It will end after 5 seconds.");
                         await Task.Delay(5000);
@@ -484,8 +484,8 @@ with tracer.start_as_current_span("confident-llm-span") as span:
     span.set_attribute("confident.trace.name", "example-trace")
     span.set_attribute("confident.span.type", "llm")
     span.set_attribute("confident.llm.model", "gpt-4o")
-    span.set_attribute("confident.llm.attributes.input", "What is the capital of France?")
-    span.set_attribute("confident.llm.attributes.output", "Paris")
+    span.set_attribute("confident.span.input", "What is the capital of France?")
+    span.set_attribute("confident.span.output", "Paris")
 ```
 </Accordion>
 
@@ -1091,13 +1091,13 @@ This is the default span type. All the attributes that we used above with `confi
 
 To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/advanced-features/span-types#llm-span).
 
-- `"confident.llm.attributes.input"` (of type `str`, `list[str]`) used for updating LLM Span input (parsed to `list[dict]` if `list[str]` is provided)
-- `"confident.llm.attributes.output"` (of type `Any`) used for updating LLM Span output
+- `"confident.span.input"` (of type `str`, `list[str]`) used for updating LLM Span input (parsed to `list[dict]` if `list[str]` is provided)
+- `"confident.span.output"` (of type `Any`) used for updating LLM Span output
 - `"confident.llm.model"` (of type `str`) used for updating LLM model
 - [Optional] `"confident.llm.cost_per_input_token"` (of type `float`) used for updating cost per input token
 - [Optional] `"confident.llm.cost_per_output_token"` (of type `float`) used for updating cost per output token
-- [Optional] `"confident.llm.attributes.input_token_count"` (of type `int`) used for updating LLM Span input token count
-- [Optional] `"confident.llm.attributes.input_token_count"` (of type `int`) used for updating LLM Span input token count
+- [Optional] `"confident.llm.input_token_count"` (of type `int`) used for updating LLM Span input token count
+- [Optional] `"confident.llm.output_token_count"` (of type `int`) used for updating LLM Span output token count
 
 Given below is the sample code for setting attributes for LLM span type.
 
@@ -1107,23 +1107,23 @@ Given below is the sample code for setting attributes for LLM span type.
 with tracer.start_as_current_span("llm_span") as span:
     span.set_attribute("confident.span.type", "llm")
     span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
-    span.set_attribute("confident.llm.attributes.input", [
+    span.set_attribute("confident.span.input", [
         json.dumps({"role": "system", "content": "You are a helpful assistant."}),
         json.dumps({"role": "user", "content": input})
     ])
     time.sleep(0.5)
-    span.set_attribute("confident.llm.attributes.output", "Hello world")
+    span.set_attribute("confident.span.output", "Hello world")
 ```
 
 ```typescript
 span.setAttributes({
     "confident.span.type": "llm",
     "confident.llm.model": "gpt-3.5-turbo",
-    "confident.llm.attributes.input": [
+    "confident.span.input": [
         JSON.stringify({ role: "system", content: "You are a helpful assistant." }),
         JSON.stringify({ role: "user", content: "What is the capital of France?" })
     ],
-    "confident.llm.attributes.output": "Hello world",
+    "confident.span.output": "Hello world",
 });
 ```
 
@@ -1131,11 +1131,11 @@ span.setAttributes({
 span.SetAttributes(
     attribute.String("confident.span.type", "llm"),
     attribute.String("confident.llm.model", "gpt-3.5-turbo"),
-    attribute.StringSlice("confident.llm.attributes.input", []string{
+    attribute.StringSlice("confident.span.input", []string{
         `{"role": "system", "content": "You are a helpful assistant."}`,
         `{"role": "user", "content": "What is the capital of France?"}`,
     }),
-    attribute.String("confident.llm.attributes.output", "Hello world"),
+    attribute.String("confident.span.output", "Hello world"),
 )
 ```
 
@@ -1143,22 +1143,22 @@ span.SetAttributes(
 span.setAttributes({
     "confident.span.type": "llm",
     "confident.llm.model": "gpt-3.5-turbo",
-    "confident.llm.attributes.input": [
+    "confident.span.input": [
         `{"role": "system", "content": "You are a helpful assistant."}`,
         `{"role": "user", "content": "What is the capital of France?"}`
     ],
-    "confident.llm.attributes.output": "Hello world",
+    "confident.span.output": "Hello world",
 });
 ```
 
 ```csharp
 span.SetAttribute("confident.span.type", "llm");
 span.SetAttribute("confident.llm.model", "gpt-3.5-turbo");
-span.SetAttribute("confident.llm.attributes.input", [
+span.SetAttribute("confident.span.input", [
     `{"role": "system", "content": "You are a helpful assistant."}`,
     `{"role": "user", "content": "What is the capital of France?"}`
 ]);
-span.SetAttribute("confident.llm.attributes.output", "Hello world");
+span.SetAttribute("confident.span.output", "Hello world");
 ```
 
 </CodeBlocks>
@@ -1171,8 +1171,8 @@ To create a Agent span, set the `confident.span.type` to `agent`. After that ref
 - `"confident.agent.name"` (of type `str`) used for updating Agent span name
 - [Optional] `"confident.agent.available_tools"` (of type `list[str]`) used for updating Agent span available tools
 - [Optional] `"confident.agent.agent_handoffs"` (of type `list[str]`) used for updating Agent span agent handoffs
-- `"confident.agent.attributes.input"` (of type `Any`) used for updating Agent span input
-- `"confident.agent.attributes.output"` (of type `Any`) used for updating Agent span output
+- `"confident.span.input"` (of type `Any`) used for updating Agent span input
+- `"confident.span.output"` (of type `Any`) used for updating Agent span output
 
 Given below is the sample code for setting attributes for Agent span type.
 
@@ -1185,8 +1185,8 @@ with tracer.start_as_current_span("agent_span") as span:
     span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
     span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
     
-    span.set_attribute("confident.agent.attributes.input", json.dumps({"input": "input"}))
-    span.set_attribute("confident.agent.attributes.output", json.dumps({"output": "output"}))
+    span.set_attribute("confident.span.input", json.dumps({"input": "input"}))
+    span.set_attribute("confident.span.output", json.dumps({"output": "output"}))
 ```
 
 ```typescript
@@ -1195,8 +1195,8 @@ span.setAttributes({
     "confident.agent.name": "agent_span",
     "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
     "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
-    "confident.agent.attributes.input": `{"input": input}`,
-    "confident.agent.attributes.output": `{"output": input}`,
+    "confident.span.input": `{"input": input}`,
+    "confident.span.output": `{"output": input}`,
 });
 ```
 
@@ -1205,8 +1205,8 @@ span.SetAttributes(
     attribute.String("confident.agent.name", "agent_span"),
     attribute.String("confident.agent.available_tools", []string{"llm_agent", "retriever_span", "tool_span"}),
     attribute.String("confident.agent.agent_handoffs", []string{"llm_agent", "retriever_span", "tool_span"}),
-    attribute.String("confident.agent.attributes.input", `{"input": "input"}`),
-    attribute.String("confident.agent.attributes.output", `{"output": "output"}`),
+    attribute.String("confident.span.input", `{"input": "input"}`),
+    attribute.String("confident.span.output", `{"output": "output"}`),
     attribute.String("confident.span.type", "agent"),
 )
 ```
@@ -1217,8 +1217,8 @@ span.setAttributes({
     "confident.agent.name": "agent_span",
     "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
     "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
-    "confident.agent.attributes.input": `{"input": "input"}`,
-    "confident.agent.attributes.output": `{"output": "output"}`,
+    "confident.span.input": `{"input": "input"}`,
+    "confident.span.output": `{"output": "output"}`,
 });
 ```
 
@@ -1227,8 +1227,8 @@ span.SetAttribute("confident.span.type", "agent");
 span.SetAttribute("confident.agent.name", "agent_span");
 span.SetAttribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"]);
 span.SetAttribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"]);
-span.SetAttribute("confident.agent.attributes.input", `{"input": "input"}`);
-span.SetAttribute("confident.agent.attributes.output", `{"output": "output"}`);
+span.SetAttribute("confident.span.input", `{"input": "input"}`);
+span.SetAttribute("confident.span.output", `{"output": "output"}`);
 ```
 
 </CodeBlocks>
@@ -1239,8 +1239,8 @@ To create a Tool span, set the `confident.span.type` to `tool`. After that refer
 
 - `"confident.tool.name"` (of type `str`) used for updating Tool span name
 - [Optional] `"confident.tool.description"` (of type `str`) used for updating Tool span description
-- [Optional] `"confident.tool.attributes.input_parameters"` (of type `str`) used for updating Tool span input parameters (parsed to `dict` if `str` is provided)
-- [Optional] `"confident.tool.attributes.output"` (of type `Any`) used for updating Tool span output
+- [Optional] `"confident.span.input"` (of type `str`) used for updating Tool span input parameters (parsed to `dict` if `str` is provided)
+- [Optional] `"confident.span.output"` (of type `Any`) used for updating Tool span output
 
 Given below is the sample code for setting attributes for Tool span type.
 
@@ -1252,8 +1252,8 @@ with tracer.start_as_current_span("tool_span") as span:
     span.set_attribute("confident.tool.name", "tool name")
 
     span.set_attribute("confident.tool.description", "tool description")
-    span.set_attribute("confident.tool.attributes.input_parameters", json.dumps({"input": "input"}))
-    span.set_attribute("confident.tool.attributes.output", json.dumps({"output": "output"}))
+    span.set_attribute("confident.span.input", json.dumps({"input": "input"}))
+    span.set_attribute("confident.span.output", json.dumps({"output": "output"}))
 ```
 
 ```typescript
@@ -1261,8 +1261,8 @@ span.setAttributes({
     "confident.span.type": "tool",
     "confident.tool.name": "tool name",
     "confident.tool.description": "tool description",
-    "confident.tool.attributes.input_parameters": `{"input": "input"}`,
-    "confident.tool.attributes.output": `{"output": "output"}`,
+    "confident.span.input": `{"input": "input"}`,
+    "confident.span.output": `{"output": "output"}`,
 });
 ```
 
@@ -1270,8 +1270,8 @@ span.setAttributes({
 span.SetAttributes(
     attribute.String("confident.tool.name", "tool name"),
     attribute.String("confident.tool.description", "tool description"),
-    attribute.String("confident.tool.attributes.input_parameters", `{"input": "input"}`),
-    attribute.String("confident.tool.attributes.output", `{"output": "output"}`),
+    attribute.String("confident.span.input", `{"input": "input"}`),
+    attribute.String("confident.span.output", `{"output": "output"}`),
     attribute.String("confident.span.type", "tool"),
 )
 ```
@@ -1281,8 +1281,8 @@ span.setAttributes({
     "confident.span.type": "tool",
     "confident.tool.name": "tool name",
     "confident.tool.description": "tool description",
-    "confident.tool.attributes.input_parameters": `{"input": "input"}`,
-    "confident.tool.attributes.output": `{"output": "output"}`,
+    "confident.span.input": `{"input": "input"}`,
+    "confident.span.output": `{"output": "output"}`,
 });
 ```
 
@@ -1290,8 +1290,8 @@ span.setAttributes({
 span.SetAttribute("confident.span.type", "tool");
 span.SetAttribute("confident.tool.name", "tool name");
 span.SetAttribute("confident.tool.description", "tool description");
-span.SetAttribute("confident.tool.attributes.input_parameters", `{"input": "input"}`);
-span.SetAttribute("confident.tool.attributes.output", `{"output": "output"}`);
+span.SetAttribute("confident.span.input", `{"input": "input"}`);
+span.SetAttribute("confident.span.output", `{"output": "output"}`);
 ```
 
 </CodeBlocks>
@@ -1301,10 +1301,10 @@ span.SetAttribute("confident.tool.attributes.output", `{"output": "output"}`);
 To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/advanced-features/span-types#retriever-span).
 
 - `"confident.retriever.embedder"` (of type `str`) used for updating Retrieval span embedder model
-- `"confident.retriever.attributes.embedding_input"` (of type `str`) used for updating Retrieval span embedding input
-- `"confident.retriever.attributes.retrieval_context"` (of type `list[str]`) used for updating Retrieval span retrieval context
-- [Optional] `"confident.retriever.attributes.top_k"` (of type `int`) used for updating Retrieval span top k
-- [Optional] `"confident.retriever.attributes.chunk_size"` (of type `int`) used for updating Retrieval span chunk size
+- `"confident.span.input"` (of type `str`) used for updating Retrieval span embedding input
+- `"confident.retriever.retrieval_context"` (of type `list[str]`) used for updating Retrieval span retrieval context
+- [Optional] `"confident.retriever.top_k"` (of type `int`) used for updating Retrieval span top k
+- [Optional] `"confident.retriever.chunk_size"` (of type `int`) used for updating Retrieval span chunk size
 
 Given below is the sample code for setting attributes for Retriever span type.
 
@@ -1315,30 +1315,30 @@ with tracer.start_as_current_span("retriever_span") as span:
     span.set_attribute("confident.span.type", "retriever")
     span.set_attribute("confident.retriever.embedder", "embedder")
 
-    span.set_attribute("confident.retriever.attributes.embedding_input", input)
-    span.set_attribute("confident.retriever.attributes.retrieval_context", ["asd", "asd"])
-    span.set_attribute("confident.retriever.attributes.top_k", 10)
-    span.set_attribute("confident.retriever.attributes.chunk_size", 10)
+    span.set_attribute("confident.span.input", input)
+    span.set_attribute("confident.retriever.retrieval_context", ["asd", "asd"])
+    span.set_attribute("confident.retriever.top_k", 10)
+    span.set_attribute("confident.retriever.chunk_size", 10)
 ```
 
 ```typescript
 span.setAttributes({
     "confident.span.type": "retriever",
     "confident.retriever.embedder": "embedder",
-    "confident.retriever.attributes.embedding_input": input,
-    "confident.retriever.attributes.retrieval_context": ["asd", "asd"],
-    "confident.retriever.attributes.top_k": 10,
-    "confident.retriever.attributes.chunk_size": 10,
+    "confident.span.input": input,
+    "confident.retriever.retrieval_context": ["asd", "asd"],
+    "confident.retriever.top_k": 10,
+    "confident.retriever.chunk_size": 10,
 });
 ```
 
 ```go
 span.SetAttributes(
     attribute.String("confident.retriever.embedder", "embedder"),
-    attribute.String("confident.retriever.attributes.embedding_input", input),
-    attribute.StringSlice("confident.retriever.attributes.retrieval_context", []string{"asd", "asd"}),
-    attribute.Int("confident.retriever.attributes.top_k", 10),
-    attribute.Int("confident.retriever.attributes.chunk_size", 10),
+    attribute.String("confident.span.input", input),
+    attribute.StringSlice("confident.retriever.retrieval_context", []string{"asd", "asd"}),
+    attribute.Int("confident.retriever.top_k", 10),
+    attribute.Int("confident.retriever.chunk_size", 10),
     attribute.String("confident.span.type", "retriever"),
 )
 ```
@@ -1347,18 +1347,18 @@ span.SetAttributes(
 span.setAttributes({
     "confident.span.type": "retriever",
     "confident.retriever.embedder": "embedder",
-    "confident.retriever.attributes.embedding_input": input,
-    "confident.retriever.attributes.retrieval_context": new string[] { "asd", "asd" },
-    "confident.retriever.attributes.top_k": 10,
-    "confident.retriever.attributes.chunk_size": 10,
+    "confident.span.input": input,
+    "confident.retriever.retrieval_context": new string[] { "asd", "asd" },
+    "confident.retriever.top_k": 10,
+    "confident.retriever.chunk_size": 10,
 });
 ```
 
 ```csharp
 span.SetAttribute("confident.retriever.embedder", "embedder");
-span.SetAttribute("confident.retriever.attributes.embedding_input", input);
-span.SetAttribute("confident.retriever.attributes.retrieval_context", new string[] { "asd", "asd" });
-span.SetAttribute("confident.retriever.attributes.top_k", 10);
-span.SetAttribute("confident.retriever.attributes.chunk_size", 10);
+span.SetAttribute("confident.span.input", input);
+span.SetAttribute("confident.retriever.retrieval_context", new string[] { "asd", "asd" });
+span.SetAttribute("confident.retriever.top_k", 10);
+span.SetAttribute("confident.retriever.chunk_size", 10);
 ```
 </CodeBlocks>
