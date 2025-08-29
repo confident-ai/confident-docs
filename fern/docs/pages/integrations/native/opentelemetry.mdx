@@ -41,28 +41,10 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 Run the following code:
 
                 ```python title="main.py"
-                import os
+                from deepeval.tracing.otel import TracerManager
 
-                from opentelemetry import trace
-                from opentelemetry.sdk.trace import TracerProvider
-                from opentelemetry.sdk.trace.export import BatchSpanProcessor
-                from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-
-                OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-                CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
-
-                # Set up the tracer provider
-                trace.set_tracer_provider(TracerProvider(
-                    active_span_processor=BatchSpanProcessor(
-                        OTLPSpanExporter(
-                            endpoint=OTLP_ENDPOINT + "/v1/traces",
-                            headers={"x-confident-api-key": CONFIDENT_API_KEY}
-                        )
-                    )
-                ))
-
-                # Create a tracer
-                tracer = trace.get_tracer(__name__)
+                tracer_manager = TracerManager()
+                tracer = tracer_manager.get_tracer()
 
                 # Start a span
                 with tracer.start_as_current_span("confident-llm-span") as span:
@@ -75,7 +57,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     span.set_attribute("confident.llm.attributes.output", "Paris")
                 
                 trace.get_tracer_provider().force_flush()
-                print(f"Traces posted successfully to {OTLP_ENDPOINT}")
+                print("Traces posted successfully to https://otel.confident-ai.com")
                 ```
 
                 Run the code:
@@ -83,6 +65,41 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 ```bash
                 python main.py
                 ```
+
+                <Note>
+                The above example uses the DeepEval's `TracerManager` to create a new OpenTelemetry trace provider. If you wish to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider, refer to the following example.
+                </Note>
+
+                <Accordion title="Click here to know how to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider">
+
+                ```python title="main.py"
+                from opentelemetry import trace
+                from opentelemetry.sdk.trace import TracerProvider
+                from opentelemetry.sdk.trace.export import BatchSpanProcessor
+                from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+
+                OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+                CONFIDENT_API_KEY = os.getenv("CONFIDENT_API_KEY")
+
+                # Setup OpenTelemetry
+                if not isinstance(trace.get_tracer_provider(), TracerProvider):
+                    tracer_provider = TracerProvider()
+                    trace.set_tracer_provider(tracer_provider)
+                else:
+                    tracer_provider = trace.get_tracer_provider()
+
+                exporter = OTLPSpanExporter(
+                    endpoint=f"{OTLP_ENDPOINT}/v1/traces",
+                    headers={"x-confident-api-key": CONFIDENT_API_KEY},
+                )
+
+                span_processor = BatchSpanProcessor(span_exporter=exporter)
+                tracer_provider.add_span_processor(span_processor)
+                tracer = trace.get_tracer("deepeval_tracer")
+
+                ```
+                </Accordion>
 
             </Tab>
 
