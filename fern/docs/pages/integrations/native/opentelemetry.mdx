@@ -80,7 +80,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 ```
 
                 <Note>
-                The above example uses the DeepEval's `TracerManager` to create a new OpenTelemetry trace provider. If you wish to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider, refer to the following example.
+                The above example creates a new OpenTelemetry trace provider and sets `OTLPSpanExporter` to it so that the spans are exported to the Confident AI OTLP endpoint ONLY. If you wish to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider, refer to the following example.
                 </Note>
 
                 <Accordion title="Click here to know how to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider">
