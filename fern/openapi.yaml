@@ -127,7 +127,7 @@ paths:
                   deprecated: false
                 With-Rubric:
                   success: true
-                  data: 
+                  data:
                     id: METRIC-ID
                   deprecated: false
 
@@ -922,6 +922,10 @@ paths:
                 type: "THUMBS_RATING"
                 expectedOutcome: "Agent confirms identity and successfully walks the user through a reset."
                 explanation: "User should be guided to reset their password successfully, which did "
+              User ID:
+                threadId: "<THREAD-ID>"
+                rating: 1
+                userId: "<USER-ID>"
       responses:
         "200":
           description: ""
@@ -951,10 +955,10 @@ components:
     Metric:
       type: object
       properties:
-        id: 
+        id:
           type: string
           description: This is the unique id of the metric.
-        name: 
+        name:
           type: string
           description: This is the name of the metric, it's unique to all metrics.
         criteria:
@@ -970,12 +974,29 @@ components:
               title: llmTestCaseParams
               items:
                 type: string
-                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+                enum:
+                  [
+                    input,
+                    actualOutput,
+                    expectedOutput,
+                    context,
+                    toolsCalled,
+                    expectedTools,
+                    retrievalContext,
+                  ]
             - type: array
               title: conversationalTestCaseParams
               items:
                 type: string
-                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
+                enum:
+                  [
+                    turns,
+                    scenario,
+                    expectedOutcome,
+                    userDescription,
+                    context,
+                    chatbotRole,
+                  ]
         multiTurn:
           type: boolean
           description: This is true if the metric is used to evaluate multi-turn test cases.
@@ -998,7 +1019,7 @@ components:
             $ref: "#/components/schemas/Metric"
       required:
         - metrics
-    
+
     CreateBatchMetricsResponse:
       type: object
       properties:
@@ -1047,11 +1068,11 @@ components:
         - success
         - data
         - deprecated
-      
+
     CreateMetric:
       type: object
       properties:
-        name: 
+        name:
           type: string
           description: The name of the metric you're creating in your project.
         criteria:
@@ -1067,12 +1088,29 @@ components:
               title: llmTestCaseParams
               items:
                 type: string
-                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+                enum:
+                  [
+                    input,
+                    actualOutput,
+                    expectedOutput,
+                    context,
+                    toolsCalled,
+                    expectedTools,
+                    retrievalContext,
+                  ]
             - type: array
               title: conversationalTestCaseParams
               items:
                 type: string
-                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
+                enum:
+                  [
+                    turns,
+                    scenario,
+                    expectedOutcome,
+                    userDescription,
+                    context,
+                    chatbotRole,
+                  ]
         multiTurn:
           type: boolean
           description: This is true if your metric is used for evaluating multi-turn test cases.
@@ -1081,8 +1119,8 @@ components:
           description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
-          
-      required: 
+
+      required:
         - name
         - multiTurn
 
@@ -1095,13 +1133,13 @@ components:
           description: An array consisting of the ranges of scores to generate.
           items:
             type: number
-        expectedOutcome: 
+        expectedOutcome:
           type: string
           description: The expected outcome for your evaluation.
       required:
         - scoreRange
         - expectedOutcome
-      
+
     CreateMetricResponse:
       type: object
       properties:
@@ -1111,7 +1149,7 @@ components:
         data:
           type: object
           description: "This maps to the id of the metric created."
-          properties: 
+          properties:
             id:
               type: string
               description: The id of the metric created
@@ -1120,7 +1158,7 @@ components:
         deprecated:
           type: boolean
           description: "This is true if this metrics endpoint is deprecated."
-      required: 
+      required:
         - success
         - data
         - deprecated
@@ -1128,7 +1166,7 @@ components:
     UpdateMetric:
       type: object
       properties:
-        name: 
+        name:
           type: string
           description: The name of the metric you're updating.
         criteria:
@@ -1144,18 +1182,35 @@ components:
               title: llmTestCaseParams
               items:
                 type: string
-                enum: [input, actualOutput, expectedOutput, context, toolsCalled, expectedTools, retrievalContext]
+                enum:
+                  [
+                    input,
+                    actualOutput,
+                    expectedOutput,
+                    context,
+                    toolsCalled,
+                    expectedTools,
+                    retrievalContext,
+                  ]
             - type: array
               title: conversationalTestCaseParams
               items:
                 type: string
-                enum: [turns, scenario, expectedOutcome, userDescription, context, chatbotRole]
+                enum:
+                  [
+                    turns,
+                    scenario,
+                    expectedOutcome,
+                    userDescription,
+                    context,
+                    chatbotRole,
+                  ]
         rubric:
           type: array
           description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
-      
+
     UpdateMetricResponse:
       type: object
       properties:
@@ -1165,7 +1220,7 @@ components:
         deprecated:
           type: boolean
           description: "This is true if this metrics endpoint is deprecated."
-      required: 
+      required:
         - success
         - deprecated
 
@@ -2697,6 +2752,9 @@ components:
         explanation:
           type: string
           description: This is an explanation for the annotation.
+        userId:
+          type: string
+          description: This can be any user ID that you want to associate with the annotation.
       required:
         - rating
 
