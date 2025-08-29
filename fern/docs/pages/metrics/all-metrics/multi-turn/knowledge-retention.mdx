@@ -16,7 +16,6 @@ These are the parameters you must supply in your test case to run evaluations fo
 <ParamField path="turns" type="list of Turn" required>
   A list of `Turn`s as exchanges between user and assistant.
   <Card title="Parameters of `Turn`:">
-    ---
     <ParamField path="role" type="user | assistant" required>
       The role of the person speaking, it's either `user` or `assistant`
     </ParamField>
@@ -50,7 +49,7 @@ from deepeval.metrics import KnowledgeRetentionMetric
 metric = KnowledgeRetentionMetric()
 ```
 
-### Optional Parameters
+Here's a list of parameters you can configure when creating a `KnowledgeRetentionMetric`:
 
 <ParamField path="threshold" type="number" default={0.5}>
   A float to represent the minimum passing threshold.
