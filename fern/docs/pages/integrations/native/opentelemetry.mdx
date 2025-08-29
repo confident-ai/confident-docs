@@ -81,9 +81,6 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
 
                 <Note>
                 The above example creates a new OpenTelemetry trace provider and sets `OTLPSpanExporter` to it so that the spans are exported to the Confident AI OTLP endpoint ONLY. If you wish to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider, refer to the following example.
-                </Note>
-
-                <Accordion title="Click here to know how to set `OTLPSpanExporter` to the existing OpenTelemetry trace provider">
 
                 ```python title="main.py"
                 from opentelemetry import trace
@@ -110,9 +107,8 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                 span_processor = BatchSpanProcessor(span_exporter=exporter)
                 tracer_provider.add_span_processor(span_processor)
                 tracer = trace.get_tracer("deepeval_tracer")
-
                 ```
-                </Accordion>
+                </Note>
 
             </Tab>
 
