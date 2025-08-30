@@ -1396,12 +1396,18 @@ components:
                         strictMode:
                           type: boolean
                           description: "This is true if the metric is in strict mode. Metrics in strict mode output a binary score of 0 or 1, indicating pass or fail, as opposed to a continuous score from 0 to 1."
+                        sampleRate:
+                          type: number
+                          minimum: 0
+                          maximum: 1
+                          description: "This is the probability of the metric being ran for evaluation."
                       required:
                         - metric
                         - activated
                         - threshold
                         - includeReason
                         - strictMode
+                        - sampleRate
                 required:
                   - id
                   - name
