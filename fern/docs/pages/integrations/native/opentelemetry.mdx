@@ -2,14 +2,15 @@
 slug: integrations/opentelemetry
 ---
 
-[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data. 
+[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source observability framework that allows teams to collect, analyze, and visualize telemetry data.
 
 ## Overview
 
 **Confident AI** can recieve traces on `https://otel.confident-ai.com`. To export traces using the OpenTelemetry SDK, you can configure your Collector with the official open-telemetry library.
 
 <Note>
-If your configration requires signal specific environment variable, set the trace endpoint to `https://otel.confident-ai.com/v1/traces`.
+  If your configration requires signal specific environment variable, set the
+  trace endpoint to `https://otel.confident-ai.com/v1/traces`.
 </Note>
 
 ## Quickstart
@@ -61,14 +62,14 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
 
                 # Start a span
                 with tracer.start_as_current_span("confident-llm-span") as span:
-                    
+
                     # Set attributes
                     span.set_attribute("confident.trace.name", "example-trace")
                     span.set_attribute("confident.span.type", "llm")
                     span.set_attribute("confident.llm.model", "gpt-4o")
                     span.set_attribute("confident.span.input", "What is the capital of France?")
                     span.set_attribute("confident.span.output", "Paris")
-                
+
                 trace_provider.force_flush()
                 print("Traces posted successfully to https://otel.confident-ai.com")
                 ```
@@ -263,9 +264,9 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exporter))
                     otel.SetTracerProvider(tp)
                     otel.SetTextMapPropagator(propagation.TraceContext{})
-                    defer func() { 
+                    defer func() {
                         fmt.Println("Shutting down tracer provider...")
-                        _ = tp.Shutdown(context.Background()) 
+                        _ = tp.Shutdown(context.Background())
                     }()
 
                     _, span := otel.Tracer("example.com/otel-openai").Start(context.Background(), "chat gpt-4o")
@@ -280,7 +281,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                         attribute.String("confident.span.input", "input"),
                         attribute.String("confident.span.output", "output"),
                     )
-                    
+
                 }
                 ```
 
@@ -360,7 +361,7 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
             </Tab>
 
             <Tab title="C#">
-            
+
             Create a New Console App
 
             ```bash
@@ -425,10 +426,10 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
                     }
 
                     Console.WriteLine("Span ended. Flushing traces...");
-                    
+
                     // Force flush traces before exiting
                     tracerProvider.ForceFlush();
-                    
+
                     // Wait a bit to ensure traces are sent
                     await Task.Delay(2000);
                     Console.WriteLine($"Trace posted successfully to {otlpEndpoint}.");
@@ -441,9 +442,9 @@ Given below is the quickstart for exporting traces to Confident AI OTLP endpoint
             ```bash
             dotnet run
             ```
-            
+
             </Tab>
-            
+
         </Tabs>
 
     </Step>
@@ -483,6 +484,7 @@ with tracer.start_as_current_span("confident-llm-span") as span:
     span.set_attribute("confident.span.input", "What is the capital of France?")
     span.set_attribute("confident.span.output", "Paris")
 ```
+
 </Accordion>
 
 ## Understanding OTEL with Confident AI
@@ -502,7 +504,8 @@ Confident AI offers the `https://otel.confident-ai.com` endpoint that accepts Op
 **Confident AI** adheres to the [GenAI semantic convention](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and adds an extra layer on top of it to capture additional data about the LLM applications. Confident AI uses `confident.*` namespace to map specific attributes with [llm tracing](/docs/llm-tracing/introduction) data model. These specific attributes always take precedence over `gen_ai.*` conventions and are recommended for all users that are manually instrumenting their applications.
 
 <Warning>
-The **GenAI semantic conventions** are still under development and are subject to change.
+  The **GenAI semantic conventions** are still under development and are subject
+  to change.
 </Warning>
 
 ### Advanced configurations
@@ -512,12 +515,15 @@ The [enviornment](/llm-tracing/advanced-features/environment) allows you to conf
 ```bash
 OTEL_RESOURCE_ATTRIBUTES="confident.trace.environment=production"
 ```
+
 ## Trace-Level Attribute Mappings
 
 These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/advanced-features/attributes). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
 
 <Info>
-It is recommended to set trace attributes once in any span in a trace lifecycle. The value of the **specific attribute** will be updated to the latest value if set in multiple spans.
+  It is recommended to set trace attributes once in any span in a trace
+  lifecycle. The value of the **specific attribute** will be updated to the
+  latest value if set in multiple spans.
 </Info>
 
 ### Name
@@ -534,7 +540,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.name": "example-trace",
+  "confident.trace.name": "example-trace",
 });
 ```
 
@@ -573,8 +579,8 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.input": input,
-    "confident.trace.output": output,
+  "confident.trace.input": input,
+  "confident.trace.output": output,
 });
 ```
 
@@ -614,7 +620,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.metric_collection": "<your_metric_collection>",
+  "confident.trace.metric_collection": "<your_metric_collection>",
 });
 ```
 
@@ -648,7 +654,7 @@ Given below is the example of running [online evaluation](/docs/llm-tracing/eval
 with tracer.start_as_current_span("confident_evaluation") as span:
     input = "What is the capital of France?"
     output = my_llm_app(input) # your LLM application
-    
+
     span.set_attribute('confident.trace.metric_collection', "<your_metric_collection>")
     span.set_attribute('confident.trace.input', input)
     span.set_attribute('confident.trace.output', output)
@@ -658,11 +664,9 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.metric_collection": "<your_metric_collection>",
-    "confident.trace.input": input,
-    "confident.trace.output": output,
-    "confident.trace.retrieval_context": ["context1", "context2"],
-    "confident.trace.expected_output": "Paris",
+  "confident.trace.metric_collection": "<your_metric_collection>",
+  "confident.trace.llm_test_case.input": input,
+  "confident.trace.llm_test_case.actual_output": output,
 });
 ```
 
@@ -697,7 +701,8 @@ span.SetAttribute("confident.trace.expected_output", "Paris");
 </CodeBlocks>
 
 <Info>
-Make sure you have [metric collection](/docs/metrics/metric-collections) created on the platform for running online evaluation on this test case.
+  Make sure you have [metric collection](/docs/metrics/metric-collections)
+  created on the platform for running online evaluation on this test case.
 </Info>
 
 LLM test case attributes mapping:
@@ -724,7 +729,7 @@ with tracer.start_as_current_span("custom_span") as span:
 ```
 
 ```typescript
-span.setAttributes({"confident.trace.tags": ["tag1", "tag2"]});
+span.setAttributes({ "confident.trace.tags": ["tag1", "tag2"] });
 ```
 
 ```go
@@ -762,7 +767,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    'confident.trace.metadata': JSON.stringify({ key: "value" }),
+  "confident.trace.metadata": JSON.stringify({ key: "value" }),
 });
 ```
 
@@ -797,7 +802,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.thread_id": "123",
+  "confident.trace.thread_id": "123",
 });
 ```
 
@@ -834,7 +839,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.trace.user_id": "123",
+  "confident.trace.user_id": "123",
 });
 ```
 
@@ -875,7 +880,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.name": "custom_span",
+  "confident.span.name": "custom_span",
 });
 ```
 
@@ -914,8 +919,8 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.input": input,
-    "confident.span.output": output,
+  "confident.span.input": input,
+  "confident.span.output": output,
 });
 ```
 
@@ -955,7 +960,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.metric_collection": "<your_metric_collection>",
+  "confident.span.metric_collection": "<your_metric_collection>",
 });
 ```
 
@@ -989,7 +994,7 @@ Given below is the example of running [online evaluation](/docs/llm-tracing/eval
 with tracer.start_as_current_span("confident_evaluation") as span:
     input = "What is the capital of France?"
     output = my_llm_app(input) # your LLM application
-    
+
     span.set_attribute('confident.span.metric_collection', "<your_metric_collection>")
     span.set_attribute('confident.span.input', input)
     span.set_attribute('confident.span.output', output)
@@ -999,11 +1004,9 @@ with tracer.start_as_current_span("confident_evaluation") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.metric_collection": "<your_metric_collection>",
-    "confident.span.input": input,
-    "confident.span.output": output,
-    "confident.span.retrieval_context": ["context1", "context2"],
-    "confident.span.expected_output": "Paris",
+  "confident.span.metric_collection": "<your_metric_collection>",
+  "confident.span.llm_test_case.input": input,
+  "confident.span.llm_test_case.actual_output": output,
 });
 ```
 
@@ -1065,7 +1068,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.metadata": JSON.stringify({ key: "value" }),
+  "confident.span.metadata": JSON.stringify({ key: "value" }),
 });
 ```
 
@@ -1109,7 +1112,7 @@ with tracer.start_as_current_span("custom_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.type": "llm",
+  "confident.span.type": "llm",
 });
 ```
 
@@ -1130,7 +1133,6 @@ span.SetAttribute("confident.span.type", "llm");
 ```
 
 </CodeBlocks>
-
 
 ### Span-Level Attributes for Specific Span Types
 
@@ -1168,13 +1170,13 @@ with tracer.start_as_current_span("llm_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.type": "llm",
-    "confident.llm.model": "gpt-3.5-turbo",
-    "confident.span.input": [
-        JSON.stringify({ role: "system", content: "You are a helpful assistant." }),
-        JSON.stringify({ role: "user", content: "What is the capital of France?" })
-    ],
-    "confident.span.output": "Hello world",
+  "confident.span.type": "llm",
+  "confident.llm.model": "gpt-3.5-turbo",
+  "confident.span.input": [
+    JSON.stringify({ role: "system", content: "You are a helpful assistant." }),
+    JSON.stringify({ role: "user", content: "What is the capital of France?" }),
+  ],
+  "confident.span.output": "Hello world",
 });
 ```
 
@@ -1218,7 +1220,6 @@ span.SetAttribute("confident.span.output", "Hello world");
 
 To create a Agent span, set the `confident.span.type` to `agent`. After that refer to the table below for more [Agent span attributes](/docs/llm-tracing/advanced-features/span-types#agent-span).
 
-
 - `"confident.agent.name"` (of type `str`) used for updating Agent span name
 - [Optional] `"confident.agent.available_tools"` (of type `list[str]`) used for updating Agent span available tools
 - [Optional] `"confident.agent.agent_handoffs"` (of type `list[str]`) used for updating Agent span agent handoffs
@@ -1233,19 +1234,27 @@ with tracer.start_as_current_span("agent_span") as span:
     span.set_attribute("confident.agent.name", "agent_span")
     span.set_attribute("confident.agent.available_tools", ["llm_agent", "retriever_span", "tool_span"])
     span.set_attribute("confident.agent.agent_handoffs", ["llm_agent", "retriever_span", "tool_span"])
-    
+
     span.set_attribute("confident.span.input", json.dumps({"input": "input"}))
     span.set_attribute("confident.span.output", json.dumps({"output": "output"}))
 ```
 
 ```typescript
 span.setAttributes({
-    "confident.span.type": "agent",
-    "confident.agent.name": "agent_span",
-    "confident.agent.available_tools": ["llm_agent", "retriever_span", "tool_span"],
-    "confident.agent.agent_handoffs": ["llm_agent", "retriever_span", "tool_span"],
-    "confident.span.input": `{"input": input}`,
-    "confident.span.output": `{"output": input}`,
+  "confident.span.type": "agent",
+  "confident.agent.name": "agent_span",
+  "confident.agent.available_tools": [
+    "llm_agent",
+    "retriever_span",
+    "tool_span",
+  ],
+  "confident.agent.agent_handoffs": [
+    "llm_agent",
+    "retriever_span",
+    "tool_span",
+  ],
+  "confident.span.input": `{"input": input}`,
+  "confident.span.output": `{"output": input}`,
 });
 ```
 
@@ -1305,11 +1314,11 @@ with tracer.start_as_current_span("tool_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.type": "tool",
-    "confident.tool.name": "tool name",
-    "confident.tool.description": "tool description",
-    "confident.span.input": `{"input": "input"}`,
-    "confident.span.output": `{"output": "output"}`,
+  "confident.span.type": "tool",
+  "confident.tool.name": "tool name",
+  "confident.tool.description": "tool description",
+  "confident.span.input": `{"input": "input"}`,
+  "confident.span.output": `{"output": "output"}`,
 });
 ```
 
@@ -1368,12 +1377,12 @@ with tracer.start_as_current_span("retriever_span") as span:
 
 ```typescript
 span.setAttributes({
-    "confident.span.type": "retriever",
-    "confident.retriever.embedder": "embedder",
-    "confident.span.input": input,
-    "confident.retriever.retrieval_context": ["asd", "asd"],
-    "confident.retriever.top_k": 10,
-    "confident.retriever.chunk_size": 10,
+  "confident.span.type": "retriever",
+  "confident.retriever.embedder": "embedder",
+  "confident.span.input": input,
+  "confident.retriever.retrieval_context": ["asd", "asd"],
+  "confident.retriever.top_k": 10,
+  "confident.retriever.chunk_size": 10,
 });
 ```
 
@@ -1406,4 +1415,5 @@ span.SetAttribute("confident.retriever.retrieval_context", new string[] { "asd",
 span.SetAttribute("confident.retriever.top_k", 10);
 span.SetAttribute("confident.retriever.chunk_size", 10);
 ```
+
 </CodeBlocks>

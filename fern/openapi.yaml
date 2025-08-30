@@ -1273,18 +1273,28 @@ components:
             - name
         activated:
           type: boolean
+          default: true
           description: "This determines if the metric is activated. Only activated metrics are used for evaluations. Non-activated metrics are skipped."
         threshold:
           type: number
           minimum: 0
           maximum: 1
-          description: "This determines the threshold for the metric which determines if the metric passes or fails depending on if the metric score is above or below the threshold."
+          default: 0.5
+          description: "This determines the threshold for the metric which determines if the metric passes or fails depending on if the metric score is equal or greater than the threshold."
         includeReason:
           type: boolean
+          default: true
           description: "This determines if the reason for the metric score should be generated during evaluations."
         strictMode:
           type: boolean
+          default: false
           description: "This determines if the metric is in strict mode. Metrics in strict mode output a binary score of 0 or 1, indicating pass or fail, as opposed to a continuous score from 0 to 1."
+        sampleRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: "This determines the probability of the metric being ran for evaluation."
     required:
       - metric
 
