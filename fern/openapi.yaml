@@ -881,81 +881,81 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
-  # /v1/prompts/{alias}/versions:
-  #   get:
-  #     x-fern-server-name: Confident AI
-  #     tags:
-  #       - Prompt
-  #     summary: List Versions
-  #     operationId: getPromptVersions
-  #     description: Retrieves a list of all versions associated with a given prompt `alias`.
-  #     responses:
-  #       "200":
-  #         description: ""
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/PromptVersionsResponse"
-  #             example:
-  #               success: true
-  #               data:
-  #                 promptVersions:
-  #                   - id: "prm_xyz456"
-  #                     version: "00.00.01"
-  #                     commitMessage: "Initial commit"
-  #               deprecated: false
+  /v1/prompts/{alias}/versions:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: List Versions
+      operationId: getPromptVersions
+      description: Retrieves a list of all versions associated with a given prompt `alias`.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptVersionsResponse"
+              example:
+                success: true
+                data:
+                  promptVersions:
+                    - id: "prm_xyz456"
+                      version: "00.00.01"
+                      commitMessage: "Initial commit"
+                deprecated: false
 
-  # /v1/test-runs/{testRunId}:
-  #   get:
-  #     x-fern-server-name: Confident AI
-  #     tags:
-  #       - Evaluation
-  #     summary: Retrieve Test Run
-  #     operationId: getTestRun
-  #     description: Retrieves a list of test cases and their respective metrics from a test run.
-  #     responses:
-  #       "200":
-  #         description: ""
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/TestRunResponse"
-  #             example:
-  #               success: true
-  #               data:
-  #                 metricsScores:
-  #                   - metric: "Answer Correctness"
-  #                     scores: [0]
-  #                     passes: 0
-  #                     fails: 1
-  #                     errors: 0
-  #                 testCases:
-  #                   - id: "TEST-CASE-ID"
-  #                     name: "Test Case 1"
-  #                     input: "What's the capital of France?"
-  #                     expectedOutput: "Paris"
-  #                     actualOutput: "San Francisco"
-  #                     success: false
-  #                     context: ["The capital of France is Paris."]
-  #                     retrievalContext: ["The capital of France is Paris."]
-  #                     metricsData:
-  #                       - id: "METRIC-ID"
-  #                         score: 0
-  #                         reason: "The capital of France is Paris."
-  #                         projectId: "PROJECT-ID"
-  #                         success: false
-  #                         created_at: "2025-01-15T10:30:00Z"
-  #                         evaluated_at: "2025-01-15T10:30:00Z"
-  #                         threshold: 0.5
-  #                         evaluationModel: "gpt-4.1"
-  #                         strictMode: false
-  #                         skipped: false
-  #                         evaluationCost: 0
-  #                         name: "Answer Correctness"
-  #                         verboseLogs: "..."
-  #                         testCaseId: "TEST-CASE-ID"
-  #                         testRunId: "TEST-RUN-ID"
-  #               deprecated: false
+  /v1/test-runs/{testRunId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Retrieve Test Run
+      operationId: getTestRun
+      description: Retrieves a list of test cases and their respective metrics from a test run.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRunResponse"
+              example:
+                success: true
+                data:
+                  metricsScores:
+                    - metric: "Answer Correctness"
+                      scores: [0]
+                      passes: 0
+                      fails: 1
+                      errors: 0
+                  testCases:
+                    - id: "TEST-CASE-ID"
+                      name: "Test Case 1"
+                      input: "What's the capital of France?"
+                      expectedOutput: "Paris"
+                      actualOutput: "San Francisco"
+                      success: false
+                      context: ["The capital of France is Paris."]
+                      retrievalContext: ["The capital of France is Paris."]
+                      metricsData:
+                        - id: "METRIC-ID"
+                          score: 0
+                          reason: "The capital of France is Paris."
+                          projectId: "PROJECT-ID"
+                          success: false
+                          created_at: "2025-01-15T10:30:00Z"
+                          evaluated_at: "2025-01-15T10:30:00Z"
+                          threshold: 0.5
+                          evaluationModel: "gpt-4.1"
+                          strictMode: false
+                          skipped: false
+                          evaluationCost: 0
+                          name: "Answer Correctness"
+                          verboseLogs: "..."
+                          testCaseId: "TEST-CASE-ID"
+                          testRunId: "TEST-RUN-ID"
+                deprecated: false
 
   /v1/annotation:
     post:
