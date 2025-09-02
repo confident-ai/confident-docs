@@ -881,7 +881,7 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
-/v1/prompts/{alias}/versions:
+  /v1/prompts/{alias}/versions:
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -904,7 +904,7 @@ paths:
                       version: "00.00.01"
                       commitMessage: "Initial commit"
                 deprecated: false
-      
+
   /v1/test-runs/{testRunId}:
     get:
       x-fern-server-name: Confident AI

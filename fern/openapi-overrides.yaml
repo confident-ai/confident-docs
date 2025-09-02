@@ -324,7 +324,7 @@ paths:
           description: This is the ID of the test run to retrieve.
           example: "TEST-RUN-ID"
 
-/v1/prompts/{alias}/versions:
+  /v1/prompts/{alias}/versions:
     get:
       parameters:
         - in: header
