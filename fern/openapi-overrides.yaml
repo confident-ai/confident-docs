@@ -315,7 +315,7 @@ paths:
           schema:
             type: string
           description: The ID of the test run to retrieve
-          example: "test_run_123"
+          example: "TEST-RUN-ID"
         - in: header
           name: CONFIDENT_API_KEY
           required: true
