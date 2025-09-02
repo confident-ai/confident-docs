@@ -889,13 +889,6 @@ paths:
       summary: Retrieve Test Run
       operationId: getTestRun
       description: Retrieves a list of test cases and their respective metrics from a test run.
-      parameters:
-        - in: path
-          name: testRunId
-          required: true
-          schema:
-            type: string
-          description: This is the ID of the test run to retrieve.
       responses:
         "200":
           description: ""
