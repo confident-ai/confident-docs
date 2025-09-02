@@ -881,29 +881,29 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
-  /v1/prompts/{alias}/versions:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Prompt
-      summary: List Versions
-      operationId: getPromptVersions
-      description: Retrieves a list of all versions associated with a given prompt `alias`.
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PromptVersionsResponse"
-              example:
-                success: true
-                data:
-                  promptVersions:
-                    - id: "prm_xyz456"
-                      version: "00.00.01"
-                      commitMessage: "Initial commit"
-                deprecated: false
+  # /v1/prompts/{alias}/versions:
+  #   get:
+  #     x-fern-server-name: Confident AI
+  #     tags:
+  #       - Prompt
+  #     summary: List Versions
+  #     operationId: getPromptVersions
+  #     description: Retrieves a list of all versions associated with a given prompt `alias`.
+  #     responses:
+  #       "200":
+  #         description: ""
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/PromptVersionsResponse"
+  #             example:
+  #               success: true
+  #               data:
+  #                 promptVersions:
+  #                   - id: "prm_xyz456"
+  #                     version: "00.00.01"
+  #                     commitMessage: "Initial commit"
+  #               deprecated: false
 
   /v1/test-runs/{testRunId}:
     get:
