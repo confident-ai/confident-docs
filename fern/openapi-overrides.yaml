@@ -309,13 +309,6 @@ paths:
   /v1/test-runs/{testRunId}:
     get:
       parameters:
-        - in: path
-          name: testRunId
-          required: true
-          schema:
-            type: string
-          description: This is the ID of the test run to retrieve.
-          example: "TEST-RUN-ID"
         - in: header
           name: CONFIDENT_API_KEY
           required: true
@@ -323,6 +316,31 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+        - in: path
+          name: testRunId
+          required: true
+          schema:
+            type: string
+          description: This is the ID of the test run to retrieve.
+          example: "TEST-RUN-ID"
+
+/v1/prompts/{alias}/versions:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: alias
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
 
   /v1/annotation:
     post:
