@@ -899,9 +899,10 @@ paths:
               example:
                 success: true
                 data:
-                  id: "prm_xyz456"
-                  version: "00.00.01"
-                  commitMessage: "Initial commit"
+                  promptVersions:
+                    - id: "prm_xyz456"
+                      version: "00.00.01"
+                      commitMessage: "Initial commit"
                 deprecated: false
 
   /v1/annotation:
@@ -2717,9 +2718,15 @@ components:
           type: boolean
           description: This is true if the prompt versions were successfully retrieved.
         data:
-          type: array
-          items:
-            $ref: "#/components/schemas/PromptVersion"
+          type: object
+          additionalProperties: false
+          properties:
+            promptVersions:
+              type: array
+              items:
+                $ref: "#/components/schemas/PromptVersion"
+          required:
+            - promptVersions
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
