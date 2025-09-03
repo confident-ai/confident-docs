@@ -8,7 +8,9 @@ slug: llm-tracing/advanced-features/attributes
 Attributes are like [`metadata`](/docs/llm-tracing/advanced-features/metadata) but specific to different span `type`s.
 
 <Tip>
-Setting attributes will make the tracing UI easier to navigate on Confident AI, but is by no means required. You also cannot set attributes for custom [span types](/docs/llm-tracing/advanced-features/span-types).
+  Setting attributes will make the tracing UI easier to navigate on Confident
+  AI, but is by no means required. You also cannot set attributes for custom
+  [span types](/docs/llm-tracing/advanced-features/span-types).
 </Tip>
 
 ## Set Attributes At Runtime
@@ -16,14 +18,12 @@ Setting attributes will make the tracing UI easier to navigate on Confident AI, 
 Attributes are set at runtime using update functions specific to each span type:
 
 <Tabs>
-    <Tab title="Python" language="python">
-        - `update_llm_span`
-        - `update_retriever_span`
-    </Tab>
-    <Tab title="TypeScript" language="typescript">
-        - `updateLlmSpan`
-        - `updateRetrieverSpan`
-    </Tab>
+  <Tab title="Python" language="python">
+    - `update_llm_span` - `update_retriever_span`
+  </Tab>
+  <Tab title="TypeScript" language="typescript">
+    - `updateLlmSpan` - `updateRetrieverSpan`
+  </Tab>
 </Tabs>
 
 These functions update the attributes for the **CURRENT** span of the component to which the `@observe` decorator is applied. For example, `update_retriever_span` will update the attributes for `inner_function`.
@@ -81,13 +81,16 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
 
 <Tabs>
     <Tab title="Python" language="python">
-        ```python title="main.py" {6}
+        ```python title="main.py" {8}
         from deepeval.tracing import observe, update_llm_span
         
         @observe(type="llm", model="gpt-4.1")
-        def generate_response(prompt):
-            output = "Generated response to: " + prompt
+        def generate_response(input):
+            prompt = Prompt(alias="My Prompt")
+            prompt.pull("00.00.01")
+            output = "Generated response to: " + input
             update_llm_span(
+                prompt=prompt,
                 input_token_count=10,
                 output_token_count=25,
                 cost_per_input_token=0.01,
@@ -99,6 +102,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
         There are **SIX** optional parameters for `update_llm_span`:
 
         - [Optional] `model`: The model used, of type `str`.
+        - [Optional] `prompt`: The prompt of type `Prompt`, which must be pulled prior to updating the span.
         - [Optional] `input_token_count`: The number of tokens of type `float` in the input.
         - [Optional] `output_token_count`: The number of tokens of type `float` in the generated response.
         - [Optional] `cost_per_input_token`: The cost per input token of type `float`.
@@ -135,9 +139,9 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
 
 </Tabs>
 
-
 <Note>
-The model and per-token costs can be set in the `@observe` decorator, but will be overridden if set in `update_llm_span`.
+  The model and per-token costs can be set in the `@observe` decorator, but will
+  be overridden if set in `update_llm_span`.
 </Note>
 
 ### Retriever attributes
@@ -170,17 +174,17 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {5}
             import { observe, updateRetrieverSpan } from '@deepeval-ts/tracing';
-            
+
             const retrieveDocuments = (query: string): string[] => {
                 const fetchedDocuments = ["doc1", "doc2"];
-                updateRetrieverSpan({ 
-                    embedder: "text-embedding-ada-002", 
-                    chunkSize: 10, 
-                    topK: 5 
+                updateRetrieverSpan({
+                    embedder: "text-embedding-ada-002",
+                    chunkSize: 10,
+                    topK: 5
                 });
                 return fetchedDocuments;
             };
-            
+
             const observeDocuments = observe({ type: "retriever", embedder: "text-embedding-ada-002", fn: retrieveDocuments });
             ```
 
@@ -191,4 +195,5 @@ Retriever attributes track the `embedder`, `top_k`, and `chunk_size` in RAG pipe
             - [Optional] `topK`: The number of text chunks retrieved of type `int` from the vector store.
 
     </Tab>
+
 </Tabs>
