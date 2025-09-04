@@ -1,0 +1,92 @@
+---
+subtitle: Learn how domain experts can contribute to LLM evals
+slug: human-in-the-loop/introduction
+---
+
+## Overview
+
+Confident AI offers end users and internal annotators to leave human annotations on traces, spans, and threads monitored. Confident AI provides a centralized place for even non-technical teams to:
+
+- [Annotate datasets](/docs/llm-evaluation/dataset-management/create-goldens)
+- Keep track of end user feedback
+- Align metrics with human judgement
+- Leave annotations for other stakeholders to internall review
+
+Without real humans giving feedback to an LLM system, evals are no better than vibe-coding.
+
+<Tip>
+  Human-in-the-loop is one of the most important workflows in an LLM evaluation
+  pipeline. This is because LLM evals automate and scale human judgements, and
+  not replaces them.
+</Tip>
+
+## Rating Systems
+
+You can mix and match two rating systems on Confident AI:
+
+<CardGroup cols={2}>
+  <Card
+    title="Thums Up/Down"
+    icon="fa-light thumbs-up"
+    iconType="solid"
+  >
+
+    Either 0 or 1, nothing else.
+
+  </Card>
+  <Card
+    title="Five Star Rating"
+    icon="fa-light star"
+    iconType="solid"
+  >
+
+    Ranges from 1 - 5, inclusive.
+
+  </Card>
+</CardGroup>
+
+You'll learn how to configure both rating systems via the Evals API or UI in the following sections.
+
+## Leaving Annotations
+
+There are two ways to leave annotations on Confident AI:
+
+<CardGroup cols={2}>
+  <Card
+    title="End-User Feedback"
+    icon="users"
+    iconType="solid"
+    href="/docs/llm-evaluation/quickstart"
+  >
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Must be sent through Evals API
+    - Python and Typescript DeepEval available
+
+    **Suitable for:** Those with custom feedback collection UIs that are user facing
+
+  </Card>
+  <Card
+    title="Internal Feedback"
+    icon="user-tie"
+    iconType="solid"
+    href="/llm-tracing/introduction"
+  >
+
+    <div className='absolute top-4 right-4'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+    - Can only be left on the UI
+    - Available on traces, spans, and threads
+
+    **Suitable for:** Internal domain experts, QA teams, PMs, that need to surface judgements to stakeholders
+
+  </Card>
+</CardGroup>
+
+## Single vs Multi-Turn Annotations
+
+Single-turn annotation refers to an annotation that is left on a trace **or** span, while multi-turn refers to annotations on a thread. The only difference between a single and multi-turn annotation is single-turn annotation accepts an optional **expected output**, while a multi-turn one accepts an optional **expected outcome**.

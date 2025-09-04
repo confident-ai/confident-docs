@@ -1,0 +1,107 @@
+---
+subtitle: 5 min quickstart guide for LLM evaluation
+slug: human-in-the-loop/collect-feedback
+---
+
+## Overview
+
+Confident AI allows you to collect feedback from end users that are interacting with you LLM app. End user feedback can be left on:
+
+- Traces
+- Spans, and
+- Threads
+
+When you send an annotation of a user feedback, you'll get the opportunity to incorperate them into a dataset.
+
+<Tip>
+  User feedback can be ingested via the Evals API, or DeepEval for those using
+  python or typescript.
+</Tip>
+
+## How It Works
+
+To collect feedback, you need to:
+
+- Setup a custom UI for users to enter their rating (thumbs up/down or 5 star system), and optionally expected outcome/output, and explanation
+- Either collect the trace UUID, span UUID, or thread ID you'd like to leave feedback for
+- Send the feedback to Confident AI via the Evals API
+
+Since the thread ID is something **you provide** ([click here](/docs/llm-tracing/advanced-features/threads) if unsure) during LLM tracing, it is generally easier to setup feedback collection on threads than on traces and spans.
+
+## Collect Single-Turn Feedback
+
+<Steps>
+
+<Step title="Get UUID from trace/span">
+
+This examples shows how to get the trace UUID within a traced LLM app, with a commented out example for span UUID as well.
+
+```python main.py {7,19,21} maxLines={24}
+from openai import OpenAI
+from deepeval.tracing import observe
+from deepeval.tracing.context import current_trace_context, current_span_context
+
+client = OpenAI()
+
+TRACE_UUID = None
+# SPAN_UUID = None
+
+@observe()
+def llm_app(query: str) -> str:
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    ).choices[0].message.content
+
+    current_trace = current_trace_context.get()
+    # current_span = current_span_context.get()
+    TRACE_UUID = current_trace.uuid
+    # SPAN_UUID = current_span.uuid
+    return
+```
+
+<Note>
+  You'll need to find a way to save the UUIDs somewhere to use it later.
+</Note>
+
+</Step>
+
+<Step title="Send annotation for trace/span">
+
+In a separate workflow, possibly after a user has clicked a thumbs up/down button, post the annotation to the Evals API:
+
+```python
+from deepeval.annotation import send_annotation
+
+send_annotation(
+    trace_uuid=TRACE_UUID,
+    rating=1,
+    # span_uuid=SPAN_UUID, # you can only set trace_uuid or span_uuid
+)
+```
+
+<Warning icon="fa-light star">
+
+For a 5 star rating system, you can configure it by setting the `type` argument:
+
+```python main.py {6}
+from deepeval.annotation.api import AnnotationType
+from deepeval.annotation import send_annotation
+
+send_annotation(
+    trace_uuid=TRACE_UUID,
+    type=AnnotationType.FIVE_STAR_RATING,
+    rating=5
+    # span_uuid=SPAN_UUID, # you can only set trace_uuid or span_uuid
+)
+```
+
+</Warning>
+
+</Step>
+
+</Steps>
+
+## Collect Multi-Turn Feedback
