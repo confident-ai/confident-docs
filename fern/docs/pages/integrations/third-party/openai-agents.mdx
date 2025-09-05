@@ -120,13 +120,13 @@ If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-ve
 
 ```python main.py {1, 8}
 from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
-from deepeval.prompts import Prompt
+from deepeval.prompt import Prompt
 
 add_trace_processor(DeepEvalTracingProcessor())
 
 prompt = Prompt(alias="My Prompt")
 prompt.pull(version="00.00.01")
-agent = Agent(name="Assistant", instructions=prompt.interpolate(), prompt=prompt)
+agent = Agent(name="Assistant", instructions=prompt.interpolate(), deepeval_prompt=prompt)
 
 result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
 ```
