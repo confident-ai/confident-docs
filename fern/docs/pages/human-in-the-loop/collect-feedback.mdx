@@ -11,7 +11,7 @@ Confident AI allows you to collect feedback from end users that are interacting 
 - Spans, and
 - Threads
 
-When you send an annotation of a user feedback, you'll get the opportunity to incorperate them into a dataset.
+When you send an annotation of a user feedback, you'll get the opportunity to incoporate them into a dataset.
 
 <Tip>
   User feedback can be ingested via the Evals API, or DeepEval for those using
@@ -34,33 +34,122 @@ Since the thread ID is something **you provide** ([click here](/docs/llm-tracing
 
 <Step title="Get UUID from trace/span">
 
-This examples shows how to get the trace UUID within a traced LLM app, with a commented out example for span UUID as well.
+Get the UUID of the trace or span you want to collect feedback for from the current trace or span context.
 
-```python main.py {7,19,21} maxLines={24}
+<Tabs>
+<Tab title="Python">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```python Trace {6,15,16} maxLines={24}
 from openai import OpenAI
 from deepeval.tracing import observe
-from deepeval.tracing.context import current_trace_context, current_span_context
+from deepeval.tracing.context import current_trace_context
 
 client = OpenAI()
-
 TRACE_UUID = None
-# SPAN_UUID = None
 
 @observe()
 def llm_app(query: str) -> str:
     return client.chat.completions.create(
         model="gpt-4o",
-        messages=[
-            {"role": "user", "content": query}
-        ]
+        messages=[{"role": "user", "content": query}]
     ).choices[0].message.content
 
     current_trace = current_trace_context.get()
-    # current_span = current_span_context.get()
     TRACE_UUID = current_trace.uuid
-    # SPAN_UUID = current_span.uuid
     return
 ```
+
+</CodeBlock>
+
+<CodeBlock>
+
+```python Span {6,15,16} maxLines={24}
+from openai import OpenAI
+from deepeval.tracing import observe
+from deepeval.tracing.context import current_span_context
+
+client = OpenAI()
+SPAN_UUID = None
+
+@observe()
+def llm_app(query: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    )
+
+    current_span = current_span_context.get()
+    SPAN_UUID = current_span.uuid
+    return response.choices[0].message.content
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+<Tab title="Typescript">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```typescript Trace {5,14,15} maxLines={24}
+import { OpenAI } from "openai";
+import { observe, getCurrentTrace } from "deepeval-ts";
+
+const client = new OpenAI();
+let TRACE_UUID: string | null = null;
+
+const llm_app = async (query: string): Promise<string> => {
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+
+  const currentTrace = getCurrentTrace();
+  TRACE_UUID = currentTrace.uuid;
+  return completion.choices[0].message.content;
+};
+
+const observedLlmApp = observe({ fn: llm_app });
+```
+
+</CodeBlock>
+
+<CodeBlock>
+
+```typescript Span {5,14,15} maxLines={24}
+import { OpenAI } from "openai";
+import { observe, getCurrentSpan } from "deepeval-ts";
+
+const client = new OpenAI();
+let SPAN_UUID: string | null = null;
+
+const llm_app = async (query: string): Promise<string> => {
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+
+  const currentSpan = getCurrentSpan();
+  SPAN_UUID = currentSpan.uuid;
+  return completion.choices[0].message.content;
+};
+
+const observedLlmApp = observe({ fn: llm_app });
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+</Tabs>
 
 <Note>
   You'll need to find a way to save the UUIDs somewhere to use it later.
@@ -68,11 +157,19 @@ def llm_app(query: str) -> str:
 
 </Step>
 
-<Step title="Send annotation for trace/span">
+<Step title="Send annotation for thread">
 
-In a separate workflow, possibly after a user has clicked a thumbs up/down button, post the annotation to the Evals API:
+In a separate workflow, post the feedback to the Evals API using the UUIDs you collected.
 
-```python
+<Tabs>
+
+<Tab title="Python">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```python Thumbs Rating
 from deepeval.annotation import send_annotation
 
 send_annotation(
@@ -80,13 +177,14 @@ send_annotation(
     rating=1,
     # span_uuid=SPAN_UUID, # you can only set trace_uuid or span_uuid
 )
+
 ```
 
-<Warning icon="fa-light star">
+</CodeBlock>
 
-For a 5 star rating system, you can configure it by setting the `type` argument:
+<CodeBlock>
 
-```python main.py {6}
+```python 5 Star Rating
 from deepeval.annotation.api import AnnotationType
 from deepeval.annotation import send_annotation
 
@@ -98,10 +196,199 @@ send_annotation(
 )
 ```
 
-</Warning>
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+<Tab title="Typescript">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```typescript Thumbs Rating
+import { sendAnnotation } from "deepeval-ts";
+
+sendAnnotation({
+  traceUuid: TRACE_UUID,
+  rating: 1,
+  // spanUuid: SPAN_UUID, // you can only set traceUuid or spanUuid
+});
+```
+
+</CodeBlock>
+
+<CodeBlock>
+
+```typescript 5 Star Rating
+import { sendAnnotation, AnnotationType } from "deepeval-ts";
+
+sendAnnotation({
+  traceUuid: TRACE_UUID,
+  type: AnnotationType.FIVE_STAR_RATING,
+  rating: 5,
+  // spanUuid: SPAN_UUID, // you can only set traceUuid or spanUuid
+});
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+</Tabs>
+
+<Tip>You can send either a thumbs up/down rating or a 5 star rating.</Tip>
 
 </Step>
 
 </Steps>
 
 ## Collect Multi-Turn Feedback
+
+<Steps>
+
+<Step title="Setup thread ID">
+
+Define a thread ID and configure your traced LLM app to associate all related traces to this thread.
+
+<Tabs>
+<Tab title="Python">
+
+```python main.py {5, 13} maxLines={24}
+from openai import OpenAI
+from deepeval.tracing import observe
+
+client = OpenAI()
+THREAD_ID = "YOUR-THREAD-ID"
+
+@observe()
+def llm_app(query: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    )
+    update_current_trace(thread_id=THREAD_ID)
+    return response.choices[0].message.content
+```
+
+</Tab>
+<Tab title="Typescript">
+
+```typescript index.ts {5,12} maxLines={24}
+import { OpenAI } from "openai";
+import { observe, updateCurrentTrace } from "deepeval-ts";
+
+const client = new OpenAI();
+const THREAD_ID = "YOUR-THREAD-ID";
+
+const llm_app = async (query: string): Promise<string> => {
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  updateCurrentTrace({ threadId: THREAD_ID });
+  return completion.choices[0].message.content;
+};
+
+const observedLlmApp = observe({ fn: llm_app });
+observedLlmApp("Write me a poem.");
+```
+
+</Tab>
+</Tabs>
+
+<Note>
+  Since thread IDs are user-defined, you just set one when you start the
+  conversation and reuse it across calls.
+</Note>
+
+</Step>
+
+<Step title="Send annotation for trace/span">
+
+Post the thread-level feedback to the Evals API using the thread IDs you defined.
+
+<Tabs>
+
+<Tab title="Python">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```python Thumbs Rating
+from deepeval.annotation import send_annotation
+
+send_annotation(
+    thread_id=THREAD_ID,
+    rating=1,
+)
+
+```
+
+</CodeBlock>
+
+<CodeBlock>
+
+```python 5 Star Rating
+from deepeval.annotation.api import AnnotationType
+from deepeval.annotation import send_annotation
+
+send_annotation(
+    thread_id=THREAD_ID,
+    type=AnnotationType.FIVE_STAR_RATING,
+    rating=5
+)
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+<Tab title="Typescript">
+
+<CodeBlocks>
+
+<CodeBlock>
+
+```typescript Thumbs Rating
+import { sendAnnotation } from "deepeval-ts";
+
+sendAnnotation({
+  threadId: THREAD_ID,
+  rating: 1,
+});
+```
+
+</CodeBlock>
+
+<CodeBlock>
+
+```typescript 5 Star Rating
+import { sendAnnotation, AnnotationType } from "deepeval-ts";
+
+sendAnnotation({
+  threadId: THREAD_ID,
+  type: AnnotationType.FIVE_STAR_RATING,
+  rating: 5,
+});
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+</Tabs>
+
+<Info>
+  As with the single-turn feedback, you can send either a thumbs up/down rating
+  or a 5 star rating.
+</Info>
+
+</Step>
+
+</Steps>

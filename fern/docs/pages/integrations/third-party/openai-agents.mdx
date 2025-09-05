@@ -86,6 +86,71 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ## Advanced Usage
 
+### Logging Threads
+
+Chat threads are also automatically logged to Confident AI when a `group_id` is provided in your OpenAI Agent workflow.
+
+```python main.py {4, 11}
+from agents import Agent, Runner, trace, add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+thread_id = "unique_thread_id"
+
+async def main():
+    agent = Agent(name="Assistant", instructions="Reply very concisely.")
+
+    with trace(workflow_name="Conversation", group_id=thread_id):
+        # First turn
+        result = await Runner.run(agent, "What city is the Golden Gate Bridge in?")
+        print(result.final_output)
+        # San Francisco
+
+        # Second turn
+        new_input = result.to_input_list() + [{"role": "user", "content": "What state is it in?"}]
+        result = await Runner.run(agent, new_input)
+        print(result.final_output)
+        # California
+```
+
+### Logging Prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, replace your OpenAI `Agent` with deepeval's wrapper and pass your `Prompt` object to the `Agent`.
+
+```python main.py {1, 8}
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
+from deepeval.prompt import Prompt
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+prompt = Prompt(alias="My Prompt")
+prompt.pull(version="00.00.01")
+agent = Agent(name="Assistant", instructions=prompt.interpolate(), deepeval_prompt=prompt)
+
+result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+### Logging Trace Attributes
+
+Replace OpenAI Agent's `Runner` with DeepEval's wrapper to log trace attributes, which makes it easy to view and analyze traces on Confident AI.
+
+```python main.py {1}
+from deepeval.openai_agents import DeepEvalTracingProcessor, Runner
+from deepeval.prompts import Prompt
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+```
+
 ### Streaming Responses
 
 Confident AI handles both asynchronous workflows and streamed responses. The following example shows how to trace streamed responses with OpenAI Agents.
@@ -115,30 +180,119 @@ async def main():
 asyncio.run(main())
 ```
 
-### Logging Threads
+## Evals Usage
 
-Chat threads are also automatically logged to Confident AI when a `group_id` is provided in your OpenAI Agent workflow.
+### Online evals
 
-```python main.py {4, 11}
-from agents import Agent, Runner, trace, add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor
+You can run [online evals](/docs/llm-evaluation/online-evals) on your OpenAI Agent, which will run evaluations on all incoming traces on Confident AI’s servers. This is the recommended approach, especially if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI Agent.
+
+<Accordion title='Click to see supported metrics for OpenAI Agents'>
+
+Confident AI supports evaluating the input-output pairs of OpenAI Agent spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
+
+- [Answer Relevancy](https://www.confident-ai.com/docs/metrics/single-turn/answer-relevancy-metric)
+- [Task Completion](https://www.confident-ai.com/docs/metrics/single-turn/task-completion-metric)
+- [GEval](https://deepeval.com/docs/metrics-llm-evals)
+- [Bias](https://www.confident-ai.com/docs/metrics/single-turn/bias-metric)
+- [Toxicity](https://www.confident-ai.com/docs/metrics/single-turn/toxicity-metric)
+
+<Info>
+  If you're looking to use other metrics, setup Confident AI's [native
+  tracing](/docs/llm-tracing/introduction) instead.
+</Info>
+
+</Accordion>
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+
+<Tabs>
+
+<Tab title="Trace">
+
+Replace your Pydantic `Runner` with DeepEval’s and your supply the metric collection name to `Runner` to run evals on the trace level.
+
+```python main.py maxLines=100 focus={2, 11}
+from agents import add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor, Runner
 
 add_trace_processor(DeepEvalTracingProcessor())
 
-thread_id = "unique_thread_id"
-
-async def main():
-    agent = Agent(name="Assistant", instructions="Reply very concisely.")
-
-    with trace(workflow_name="Conversation", group_id=thread_id):
-        # First turn
-        result = await Runner.run(agent, "What city is the Golden Gate Bridge in?")
-        print(result.final_output)
-        # San Francisco
-
-        # Second turn
-        new_input = result.to_input_list() + [{"role": "user", "content": "What state is it in?"}]
-        result = await Runner.run(agent, new_input)
-        print(result.final_output)
-        # California
+# Replace with your agent code
+agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+result = Runner.run_sync(
+    agent,
+    "Write a haiku about recursion in programming.",
+    metric_collection="<trace-metric-collection>",
+)
 ```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent` to run evals on the LLM span level.
+
+```python main.py maxLines=100 focus={2, 10}
+from agents import add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+# Replace with your agent code
+agent = Agent(
+    name="Assistant",
+    instructions="You are a helpful assistant",
+    metric_collection="<llm-span-metric-collection>",
+)
+result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+Replace the `function_tool` decorator with DeepEval's wrapper, and provide the metric collection name to run evals on the tool span level.
+
+```python main.py maxLines=100 focus={2, 6}
+from agents import add_trace_processor
+from deepeval.openai_agents import DeepEvalTracingProcessor, function_tool
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+@function_tool(metric_collection="<tool-span-metric-collection>")
+def poet(city: str) -> str:
+    """Writes a poem about a city"""
+    return "Recursion whispers, A mirror inside a loop. Endless paths unfold."
+
+# Replace with your agent code
+agent = Agent(name="Assistant", instructions="You are a helpful assistant", tools=[poet])
+result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  All incoming traces and spans will now be evaluated using metrics from your
+  metric collection.
+</Success>
+
+</Step>
+</Steps>
