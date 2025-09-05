@@ -218,6 +218,14 @@ navigation:
                 path: docs/pages/llm-tracing/advanced-features/users.mdx
                 icon: fa-light fa-user
             icon: fa-light fa-layer-group
+      - section: Human-in-the-Loop
+        contents:
+          - page: Introduction
+            path: docs/pages/human-in-the-loop/introduction.mdx
+            icon: fa-light fa-info-circle
+          - page: Collect Feedback
+            path: docs/pages/human-in-the-loop/collect-feedback.mdx
+            icon: fa-light fa-user-check
       - section: Project Settings
         contents:
           - page: Invite Team Members
