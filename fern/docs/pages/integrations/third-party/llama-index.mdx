@@ -30,7 +30,7 @@ Login to Confident AI using your Confident API key.
 <CodeBlock language="bash">
 
 ```bash
-deepeval login
+export CONFIDENT_API_KEY="<your-confident-api-key>"
 ```
 
 </CodeBlock>
@@ -176,7 +176,9 @@ answer_relevancy_metric = AnswerRelevancyMetric(
 </Step>
 
 <Warning>
-  Similar to online evals, you can only run end-to-end evals on metrics that don't require `retrieval_context`, `context`, `expected_output`, or `expected_tools` for evaluation.
+  Similar to online evals, you can only run end-to-end evals on metrics that
+  don't require `retrieval_context`, `context`, `expected_output`, or
+  `expected_tools` for evaluation.
 </Warning>
 
 <Step title="Run evals">
@@ -238,9 +240,9 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Allama-index-1080.mp4"
-  controls
-  autoPlay
-/>
+  <video
+    src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Allama-index-1080.mp4"
+    controls
+    autoPlay
+  />
 </Frame>

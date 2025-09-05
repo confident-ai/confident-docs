@@ -30,7 +30,7 @@ Login to Confident AI using your Confident API key.
 <CodeBlock language="bash">
 
 ```bash
-deepeval login
+export CONFIDENT_API_KEY="<your-confident-api-key>"
 ```
 
 </CodeBlock>
@@ -327,12 +327,10 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
-  controls
-  autoPlay
-  playsInline
-/>
+  <video
+    src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
+    controls
+    autoPlay
+    playsInline
+  />
 </Frame>
-
-
