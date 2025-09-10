@@ -226,6 +226,20 @@ navigation:
           - page: Collect Feedback
             path: docs/pages/human-in-the-loop/collect-feedback.mdx
             icon: fa-light fa-user-check
+      - section: Red Teaming
+        contents:
+          - page: Introduction
+            path: docs/pages/red-teaming/introduction.mdx
+            icon: fa-light fa-user-secret
+          - page: Quickstart
+            path: docs/pages/red-teaming/quickstart.mdx
+            icon: fa-light fa-crosshairs
+          - page: Risk Profiles
+            path: docs/pages/red-teaming/risk-profile.mdx
+            icon: fa-light fa-triangle-exclamation
+          - page: Frameworks & Policies
+            path: docs/pages/red-teaming/framework-policies.mdx
+            icon: fa-light fa-shield-check
       - section: Project Settings
         contents:
           - page: Invite Team Members
