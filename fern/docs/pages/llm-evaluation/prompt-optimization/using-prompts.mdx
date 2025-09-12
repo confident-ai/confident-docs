@@ -456,7 +456,7 @@ sequenceDiagram
 
 ### Customize Refresh Rate
 
-By default, the cache is refetched every 60 seconds. You can override this behavior by setting the `refresh` parameter to a different value.
+By default, the cache is refetched every 60 seconds, where DeepEval will automatically update the cached prompt with the up-to-date version from Confident AI. This can be overridden by setting the `refresh` parameter to a different value. Fetching is done asynchronously, so it will not block your application.
 
 <Tabs>
 
