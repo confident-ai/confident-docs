@@ -402,3 +402,124 @@ This will automatically attribute the prompt used to the LLM span.
 </Step>
 
 </Steps>
+
+## Prompt Caching
+
+Confident AI automatically caches prompts on the client side to **minimize API call latency and ensure prompt availability**, which is especially useful in production environments.
+
+<Tabs>
+
+<Tab title="Cache" language="mermaid">
+
+```mermaid
+sequenceDiagram
+    participant App as Your Application
+    participant DeepEval as DeepEval
+    participant Cache as DeepEval Cache
+    participant API as Confident AI API
+
+    App->>DeepEval: Pull Prompt
+    DeepEval->>Cache: Check cache
+    Cache-->>DeepEval: Cached Prompt Data
+    DeepEval-->>App: Prompt Data
+    Note over Cache,API: Refetching (every 60s)
+    Cache->>API: GET /v1/prompts
+    API-->>Cache: Update Prompt Cache
+
+    %%{init: {'theme':'default', 'themeVariables': {'noteBkgColor': '#e0f2fe', 'noteBorderColor': '#0284c7', 'noteTextColor': '#0c4a6e'}}}%%
+```
+
+</div>
+
+</Tab>
+
+<Tab title="No Cache" language="mermaid">
+
+<div style="border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; background-color: #fafafa;">
+
+```mermaid
+sequenceDiagram
+    participant App as Your Application
+    participant DeepEval as DeepEval
+    participant Cache as DeepEval Cache
+    participant API as Confident AI API
+
+    Note over App,API: Caching Disabled (refresh=0)
+    App->>DeepEval: Pull Prompt
+    DeepEval->>Cache: Bypass cache
+    Cache->>API: GET /v1/prompts
+    API-->>Cache: Prompt Data
+    Cache-->>DeepEval: Prompt Data
+    DeepEval-->>App: Prompt Data
+    Note over Cache,API: Direct API call every time
+
+    %%{init: {'theme':'default', 'themeVariables': {'noteBkgColor': '#e0f2fe', 'noteBorderColor': '#0284c7', 'noteTextColor': '#0c4a6e'}}}%%
+```
+
+</div>
+
+</Tab>
+
+</Tabs>
+
+By default, the cache is refetched every 60 seconds. You can override this behavior by setting the `refresh` parameter to a different value.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py {4}
+from deepeval.prompt import Prompt
+
+# pull latest version
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(refresh=60)
+interpolated_prompt = prompt.interpolate(name="Joe")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts {4}
+import { Prompt } from "deepeval-ts";
+
+// pull latest version
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull({ refresh: 60 });
+const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+```
+
+</Tab>
+
+</Tabs>
+
+To disable caching, you can set `refresh=0`. This will force an API call every time you pull the prompt, which is particularly useful for development and testing.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py {4}
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(refresh=0)
+interpolated_prompt = prompt.interpolate(name="Joe")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts {4}
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull({ refresh: 0 });
+const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+```
+
+</Tab>
+
+</Tabs>
