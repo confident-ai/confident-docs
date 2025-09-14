@@ -124,7 +124,7 @@ navigation:
             icon: fa-light fa-bucket
           - section: All Metrics
             collapsed: false
-            icon: fa-light fa-list-check
+            icon: fa-light fa-list
             contents:
               - section: Single-Turn
                 icon: fa-light fa-arrow-turn-down-right
@@ -226,6 +226,19 @@ navigation:
           - page: Collect Feedback
             path: docs/pages/human-in-the-loop/collect-feedback.mdx
             icon: fa-light fa-user-check
+          - page: Leave Annotations on UI
+            path: docs/pages/human-in-the-loop/annotation-queues.mdx
+            icon: fa-light fa-list-check
+          # - section: Leave Annotations on UI
+          #   icon: fa-light fa-pen-to-square
+          #   collapsed: false
+          #   contents:
+          #     - page: Annotate as a Standalone Task
+          #       path: docs/pages/human-in-the-loop/adhoc-annotations.mdx
+          #       icon: fa-light fa-eye
+          #     - page: Annotation Queues
+          #       path: docs/pages/human-in-the-loop/annotation-queues.mdx
+          #       icon: fa-light fa-list-check
       - section: Red Teaming
         contents:
           - page: Introduction
