@@ -245,32 +245,28 @@ After instrumenting your Pydantic AI pass the metric collection name to the resp
 <Tabs>
 
 <Tab title="Trace">
-Pass the `trace_metric_collection` parameter to the `run_sync` (or `run` for async mode) method.
+Pass the `metric_collection` parameter to the `run_sync` (or `run` for async mode) method.
 
-```python main.py focus={11}
+```python main.py focus={9} maxLines=100
 from pydantic_ai import Agent
-
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 instrument_pydantic_ai()
 
-agent = Agent("openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence."
-)
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
+
 result = agent.run_sync(
     "What are the LLMs?",
-    trace_metric_collection="test_collection_1"
+    metric_collection="test_collection_1"
 )
-print(result)
 ```
 </Tab>
 
-<Tab title="Agent">
+<Tab title="Agent Span">
 
 Pass the `agent_metric_collection` parameter to the `Agent` constructor.
 
-```python main.py focus={8}
+```python main.py focus={7} maxLines=100
 from pydantic_ai import Agent
-
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 instrument_pydantic_ai()
 
@@ -278,20 +274,16 @@ agent = Agent("openai:gpt-4o-mini",
     system_prompt="Be concise, reply with one sentence.",
     agent_metric_collection="test_collection_1"
 )
-result = agent.run_sync(
-    "What are the LLMs?",
-)
-print(result)
+result = agent.run_sync("What are the LLMs?")
 ```
 </Tab>
 
-<Tab title="LLM">
+<Tab title="LLM Span">
 
 Pass the `llm_metric_collection` parameter to the `Agent` constructor.
 
-```python main.py focus={8}
+```python main.py focus={7} maxLines=100
 from pydantic_ai import Agent
-
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 instrument_pydantic_ai()
 
@@ -299,20 +291,16 @@ agent = Agent("openai:gpt-4o-mini",
     system_prompt="Be concise, reply with one sentence.",
     llm_metric_collection="test_collection_1"
 )
-result = agent.run_sync(
-    "What are the LLMs?",
-)
-print(result)
+result = agent.run_sync("What are the LLMs?")
 ```
 </Tab>
 
-<Tab title="Tool">
+<Tab title="Tool Span">
 
 Use the `observe` decorator to pass the `metric_collection` parameter to the tool span.
 
-```python main.py focus={3, 8}
+```python main.py focus={2, 7-11, 14} maxLines=100
 from pydantic_ai import Agent
-
 from deepeval.tracing import observe
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 
@@ -329,20 +317,17 @@ agent = Agent(
     system_prompt="You are a helpful weather agent.",
 )
 result = agent.run_sync("What is the weather in London?",)
-print(result)
 ```
 </Tab>
 
 </Tabs>
 
 </Step>
-</Steps>
-
-
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
   collection.
 </Success>
+</Steps>
 
 ### End-to-end evals
 
@@ -375,12 +360,15 @@ Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your Py
 <Tabs>
 <Tab title="Asynchronous">
 
-```python main.py focus={1-2, 8-24} maxLines=100
+```python main.py maxLines=100
 import asyncio
-from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai, Agent
+from pydantic_ai import Agent
 
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai()
+
 agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
 
 answer_relavancy_metric = AnswerRelevancyMetric()
