@@ -39,18 +39,6 @@ agent = Agent(
 
 result = agent.run_sync("What are the LLMs?")
 print(result)
-time.sleep(10) # wait for the trace to be posted
-
-# Running agent in async mode
-
-# import asyncio
-# async def main():
-#     result = await agent.run("What are the LLMs?")
-#     print(result)
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
-#     time.sleep(10)
 ```
 
 </Step>
@@ -68,6 +56,10 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 </Step>
 
 </Steps>
+
+<Note>
+The examples mentioned in this documentation are for synchronous mode. For asynchronous mode, you can use the `run` method instead of `run_sync`. All the other code remains the same.
+</Note>
 
 ### Trace attributes
 
@@ -188,34 +180,111 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent`.
+You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
 
-```python main.py maxLines=100 focus={2, 12}
-import time
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai, Agent
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
+After instrumenting your Pydantic AI pass the metric collection name to the respective componens:
+
+<Tabs>
+
+<Tab title="Trace">
+Pass the `trace_metric_collection` parameter to the `run_sync` (or `run` for async mode) method.
+
+```python main.py focus={11}
+from pydantic_ai import Agent
+
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence."
+)
+result = agent.run_sync(
+    "What are the LLMs?",
+    trace_metric_collection="test_collection_1"
+)
+print(result)
+```
+</Tab>
+
+<Tab title="Agent">
+
+Pass the `agent_metric_collection` parameter to the `Agent` constructor.
+
+```python main.py focus={8}
+from pydantic_ai import Agent
+
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    agent_metric_collection="test_collection_1"
+)
+result = agent.run_sync(
+    "What are the LLMs?",
+)
+print(result)
+```
+</Tab>
+
+<Tab title="LLM">
+
+Pass the `llm_metric_collection` parameter to the `Agent` constructor.
+
+```python main.py focus={8}
+from pydantic_ai import Agent
+
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    llm_metric_collection="test_collection_1"
+)
+result = agent.run_sync(
+    "What are the LLMs?",
+)
+print(result)
+```
+</Tab>
+
+<Tab title="Tool">
+
+Use the `observe` decorator to pass the `metric_collection` parameter to the tool span.
+
+```python main.py focus={3, 8}
+from pydantic_ai import Agent
+
+from deepeval.tracing import observe
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai()
+
+@observe(type="tool", metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    """Gets the weather for a given city."""
+    return f"I don't know the weather for {city}."
 
 agent = Agent(
     "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence.",
+    tools=[get_weather],
+    system_prompt="You are a helpful weather agent.",
 )
-
-result = agent.run_sync(
-    "What are the LLMs?",
-    metric_collection="test_collection_1",
-)
-
+result = agent.run_sync("What is the weather in London?",)
 print(result)
-time.sleep(10) # wait for the trace to be posted
 ```
+</Tab>
+
+</Tabs>
+
+</Step>
+</Steps>
+
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
   collection.
 </Success>
-
-</Step>
-</Steps>
 
 ### End-to-end evals
 
