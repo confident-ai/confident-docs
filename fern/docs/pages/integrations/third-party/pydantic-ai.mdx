@@ -127,6 +127,38 @@ time.sleep(10) # wait for the trace to be posted
 </Info>
 </Accordion>
 
+## Advanced Usage
+
+### Logging Prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, instrument your Pydantic AI `Agent` with your Confident AI API key and pass your `Prompt` object to the `Agent`.
+
+```python main.py focus={3, 7-8, 13}
+from pydantic_ai import Agent
+
+from deepeval.prompt import Prompt
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+prompt = Prompt(alias="asd")
+prompt.pull(version="00.00.01")
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    llm_prompt=prompt,
+)
+
+result = agent.run_sync("What are the LLMs?")
+print(result)
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
 ## Evals Usage
 
 ### Online evals
