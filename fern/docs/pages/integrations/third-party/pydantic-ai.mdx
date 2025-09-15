@@ -208,6 +208,27 @@ result = agent.run_sync(
 </Info>
 </Accordion>
 
+### Streaming Responses
+
+You can also trace streamed responses with Pydantic AI.
+
+```python main.py focus={4-10} maxLines=100
+import asyncio
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
+
+async def main():
+    user_prompt = 'What will the weather be like in Paris on Tuesday?'
+    async with agent.run_stream(user_prompt) as run:
+        async for output in run.stream_text():
+            print(f'[Output] {output}')
+
+asyncio.run(main())
+```
 
 ## Evals Usage
 
