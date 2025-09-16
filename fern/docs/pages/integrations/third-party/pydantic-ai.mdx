@@ -25,11 +25,32 @@ pip install pydantic-ai sdk -U deepeval
 
 Instrument Pydantic AI with your Confident AI API key using `instrument_pydantic_ai`.
 
-```python main.py {4,5} maxLines=15
-import time
-from pydantic_ai import Agent
+<Tabs>
 
+<Tab title="Synchronous">
+
+```python main.py {4} maxLines=100
+from pydantic_ai import Agent
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+)
+result = agent.run_sync("What are the LLMs?")
+```
+
+</Tab>
+
+<Tab title="Asynchronous">
+
+```python main.py {5} maxLines=100
+import asyncio
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
 instrument_pydantic_ai(api_key="<your-confident-api-key>")
 
 agent = Agent(
@@ -37,21 +58,15 @@ agent = Agent(
     system_prompt="Be concise, reply with one sentence.",
 )
 
-result = agent.run_sync("What are the LLMs?")
-print(result)
-time.sleep(10) # wait for the trace to be posted
+async def execute_agent():
+    return await agent.run("What are the LLMs?")
 
-# Running agent in async mode
-
-# import asyncio
-# async def main():
-#     result = await agent.run("What are the LLMs?")
-#     print(result)
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
-#     time.sleep(10)
+result = asyncio.run(execute_agent())
 ```
+
+</Tab>
+
+</Tabs>
 
 </Step>
 
@@ -69,13 +84,65 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
+## Advanced Usage
+
+### Logging Prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `Agent`.
+
+```python main.py focus={2, 7-8, 13}
+from pydantic_ai import Agent
+from deepeval.prompt import Prompt
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai()
+
+prompt = Prompt(alias="asd")
+prompt.pull(version="00.00.01")
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    llm_prompt=prompt,
+)
+
+result = agent.run_sync("What are the LLMs?")
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+### Logging Threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Pass the `thread_id` to the `run_sync` or `run` method.
+
+```python main.py focus={13}
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence."
+)
+
+result = agent.run_sync(
+    "What are the LLMs?",
+    thread_id="test_thread_id_1",
+)
+```
+
 ### Trace attributes
 
-To set trace attributes for Pydantic, replace your `Agent` with DeepEval's, and supply `trace_attributes` to `run_sync` (or `run` for async mode).
+Other trace attributes can also be passed to the `run_sync` or `run` method.
 
-```python main.py maxLines=21 focus={3, 12-16}
-import time
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai, Agent
+```python main.py maxLines=100 focus={12-16}
+from pydantic_ai import Agent
+
 instrument_pydantic_ai(api_key="<your-confident-api-key>")
 
 agent = Agent(
@@ -85,15 +152,12 @@ agent = Agent(
 
 result = agent.run_sync(
     "What are the LLMs?",
-    trace_name="test_trace_name_1",
-    trace_tags=["test_tag_1", "test_tag_2"],
-    trace_metadata={"test_key_1": "test_value_1"},
-    trace_thread_id="test_thread_id_1",
-    trace_user_id="test_user_id_1",
+    name="Name of Trace",
+    tags=["Tag 1", "Tag 2"],
+    metadata={"Key": "Value"},
+    thread_id="thread_21",
+    user_id="user_21",
 )
-
-print(result)
-time.sleep(10) # wait for the trace to be posted
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -127,6 +191,49 @@ time.sleep(10) # wait for the trace to be posted
 </Info>
 </Accordion>
 
+### Streaming Responses
+
+You can also trace streamed responses with Pydantic AI.
+
+```python main.py
+import asyncio
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
+
+async def main():
+    user_prompt = 'What will the weather be like in Paris on Tuesday?'
+    async with agent.run_stream(user_prompt) as run:
+        async for output in run.stream_text():
+            print(f'[Output] {output}')
+
+asyncio.run(main())
+```
+
+### Verbose Tracing
+
+Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's built-in ability to log traces in more detail by specifying `otlp=True`.
+
+<Warning>
+  Evals for Pydantic AI are **NOT supported** when using verbose tracing.
+</Warning>
+
+```python main.py focus={4-7} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(
+    api_key="<your-confident-api-key>",
+    otlp=True,
+)
+
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
+result = agent.run_sync("What are the LLMs?")
+```
+
 ## Evals Usage
 
 ### Online evals
@@ -156,33 +263,99 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent`.
+You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
 
-```python main.py maxLines=100 focus={2, 12}
-import time
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai, Agent
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
+After instrumenting your Pydantic AI pass the metric collection name to the respective componens:
 
-agent = Agent(
-    "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence.",
-)
+<Tabs>
+
+<Tab title="Trace">
+Pass the `metric_collection` parameter to the `run_sync` (or `run` for async mode) method.
+
+```python main.py focus={9} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
 
 result = agent.run_sync(
     "What are the LLMs?",
-    metric_collection="test_collection_1",
+    metric_collection="test_collection_1"
 )
-
-print(result)
-time.sleep(10) # wait for the trace to be posted
 ```
 
+</Tab>
+
+<Tab title="Agent Span">
+
+Pass the `agent_metric_collection` parameter to the `Agent` constructor.
+
+```python main.py focus={7} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    agent_metric_collection="test_collection_1"
+)
+result = agent.run_sync("What are the LLMs?")
+```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+Pass the `llm_metric_collection` parameter to the `Agent` constructor.
+
+```python main.py focus={7} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+instrument_pydantic_ai()
+
+agent = Agent("openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    llm_metric_collection="test_collection_1"
+)
+result = agent.run_sync("What are the LLMs?")
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+Use the `observe` decorator to pass the `metric_collection` parameter to the tool span.
+
+```python main.py focus={2, 7-11, 14} maxLines=100
+from pydantic_ai import Agent
+from deepeval.tracing import observe
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai()
+
+@observe(type="tool", metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    """Gets the weather for a given city."""
+    return f"I don't know the weather for {city}."
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    tools=[get_weather],
+    system_prompt="You are a helpful weather agent.",
+)
+result = agent.run_sync("What is the weather in London?",)
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
   collection.
 </Success>
-
-</Step>
 </Steps>
 
 ### End-to-end evals
@@ -206,7 +379,8 @@ answer_relevancy = AnswerRelevancyMetric(
 </Step>
 
 <Warning>
-  Similar to online evals, you can only run end-to-end evals on metrics that evaluate the input and actual output of your Pydantic agent.
+  Similar to online evals, you can only run end-to-end evals on metrics that
+  evaluate the input and actual output of your Pydantic agent.
 </Warning>
 
 <Step title="Run evals">
@@ -216,24 +390,19 @@ Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your Py
 <Tabs>
 <Tab title="Asynchronous">
 
-```python main.py focus={1-2, 8-24} maxLines=100
+```python main.py maxLines=100
 import asyncio
+from pydantic_ai import Agent
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai, Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+from deepeval.dataset import EvaluationDataset, Golden
 
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
+instrument_pydantic_ai()
+
 agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
 
 answer_relavancy_metric = AnswerRelevancyMetric()
-
-from deepeval.dataset import EvaluationDataset, Golden
-
-dataset = EvaluationDataset(
-    goldens=[
-        Golden(input="What's 7 * 8?"),
-        Golden(input="What's 7 * 6?"),
-    ]
-)
+dataset = EvaluationDataset(goldens=[Golden(input="What's 7 * 8?"), Golden(input="What's 7 * 6?")])
 
 for golden in dataset.evals_iterator():
     task = asyncio.create_task(agent.run(
@@ -259,10 +428,11 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Apydantic-1080.mp4"
-  controls
-  autoPlay
-  playsInline
-/>
+  <video
+    src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Apydantic-1080.mp4"
+    controls
+    autoPlay
+    playsInline
+  />
 </Frame>
+````
