@@ -27,8 +27,27 @@ Instrument Pydantic AI with your Confident AI API key using `instrument_pydantic
 
 <Tabs>
 
-<Tab title="Sync">
-```python main.py {4} maxLines=100 
+<Tab title="Synchronous">
+
+```python main.py {4} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(api_key="<your-confident-api-key>")
+
+agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+)
+result = agent.run_sync("What are the LLMs?")
+```
+
+</Tab>
+
+<Tab title="Asynchronous">
+
+```python main.py {5} maxLines=100
+import asyncio
 from pydantic_ai import Agent
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 
@@ -39,28 +58,12 @@ agent = Agent(
     system_prompt="Be concise, reply with one sentence.",
 )
 
-result = agent.run_sync("What are the LLMs?")
-```
-</Tab>
-
-<Tab title="Async">
-```python main.py {5} maxLines=100
-import asyncio
-from pydantic_ai import Agent
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
-
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
-
-agent = Agent(
-    "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence."
-)
-
 async def execute_agent():
     return await agent.run("What are the LLMs?")
 
 result = asyncio.run(execute_agent())
 ```
+
 </Tab>
 
 </Tabs>
@@ -80,26 +83,6 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 </Step>
 
 </Steps>
-
-## Verbose logging 
-Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's in-built ability to log verbose information. 
-
-```python main.py focus={4-7} maxLines=100
-from pydantic_ai import Agent
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
-
-instrument_pydantic_ai(
-  api_key="<your-confident-api-key>"
-  otlp=True
-)
-
-agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
-result = agent.run_sync("What are the LLMs?")
-```
-
-<Warning>
-  Evals for Pydantic AI are NOT supported when using verbose logging.
-</Warning>
 
 ## Advanced Usage
 
@@ -134,7 +117,7 @@ result = agent.run_sync("What are the LLMs?")
 
 ### Logging Threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads). Pass the `thread_id` to the `run_sync` (or `run` for async mode) method.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Pass the `thread_id` to the `run_sync` or `run` method.
 
 ```python main.py focus={13}
 from pydantic_ai import Agent
@@ -155,7 +138,7 @@ result = agent.run_sync(
 
 ### Trace attributes
 
-Other trace attributes can also be passed to the `run_sync` (or `run` for async mode) method.
+Other trace attributes can also be passed to the `run_sync` or `run` method.
 
 ```python main.py maxLines=100 focus={12-16}
 from pydantic_ai import Agent
@@ -230,6 +213,27 @@ async def main():
 asyncio.run(main())
 ```
 
+### Verbose Tracing
+
+Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's built-in ability to log traces in more detail by specifying `otlp=True`.
+
+<Warning>
+  Evals for Pydantic AI are **NOT supported** when using verbose tracing.
+</Warning>
+
+```python main.py focus={4-7} maxLines=100
+from pydantic_ai import Agent
+from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+
+instrument_pydantic_ai(
+    api_key="<your-confident-api-key>",
+    otlp=True,
+)
+
+agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
+result = agent.run_sync("What are the LLMs?")
+```
+
 ## Evals Usage
 
 ### Online evals
@@ -280,6 +284,7 @@ result = agent.run_sync(
     metric_collection="test_collection_1"
 )
 ```
+
 </Tab>
 
 <Tab title="Agent Span">
@@ -297,6 +302,7 @@ agent = Agent("openai:gpt-4o-mini",
 )
 result = agent.run_sync("What are the LLMs?")
 ```
+
 </Tab>
 
 <Tab title="LLM Span">
@@ -314,6 +320,7 @@ agent = Agent("openai:gpt-4o-mini",
 )
 result = agent.run_sync("What are the LLMs?")
 ```
+
 </Tab>
 
 <Tab title="Tool Span">
@@ -339,6 +346,7 @@ agent = Agent(
 )
 result = agent.run_sync("What is the weather in London?",)
 ```
+
 </Tab>
 
 </Tabs>
@@ -371,7 +379,8 @@ answer_relevancy = AnswerRelevancyMetric(
 </Step>
 
 <Warning>
-  Similar to online evals, you can only run end-to-end evals on metrics that evaluate the input and actual output of your Pydantic agent.
+  Similar to online evals, you can only run end-to-end evals on metrics that
+  evaluate the input and actual output of your Pydantic agent.
 </Warning>
 
 <Step title="Run evals">
@@ -384,24 +393,16 @@ Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your Py
 ```python main.py maxLines=100
 import asyncio
 from pydantic_ai import Agent
-
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+from deepeval.dataset import EvaluationDataset, Golden
 
 instrument_pydantic_ai()
 
 agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
 
 answer_relavancy_metric = AnswerRelevancyMetric()
-
-from deepeval.dataset import EvaluationDataset, Golden
-
-dataset = EvaluationDataset(
-    goldens=[
-        Golden(input="What's 7 * 8?"),
-        Golden(input="What's 7 * 6?"),
-    ]
-)
+dataset = EvaluationDataset(goldens=[Golden(input="What's 7 * 8?"), Golden(input="What's 7 * 6?")])
 
 for golden in dataset.evals_iterator():
     task = asyncio.create_task(agent.run(
@@ -427,10 +428,11 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Apydantic-1080.mp4"
-  controls
-  autoPlay
-  playsInline
-/>
+  <video
+    src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Apydantic-1080.mp4"
+    controls
+    autoPlay
+    playsInline
+  />
 </Frame>
+````
