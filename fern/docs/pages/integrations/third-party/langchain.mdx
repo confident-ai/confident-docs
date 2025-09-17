@@ -32,7 +32,6 @@ Login to Confident AI using your Confident API key.
 ```bash
 deepeval login
 ```
-
 </CodeBlock>
 
 <CodeBlock language="python">
@@ -41,9 +40,13 @@ deepeval login
 import deepeval
 
 deepeval.login("<your-confident-api-key>")
-
 ```
+</CodeBlock>
 
+<CodeBlock title="Env" language="bash">
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
 </CodeBlock>
 
 </CodeBlocks>
@@ -85,8 +88,6 @@ result = agent_executor.invoke(
     {"input": "What is 8 multiplied by 6?"},
     config={"callbacks": [CallbackHandler()]},
 )
-
-print(result)
 ```
 
 <Note>
@@ -107,41 +108,23 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 </Step>
 
 </Steps>
+## Advanced Features
 
-### Trace attributes
+### Set trace attributes
 
-You can also set custom trace attributes in your `CallbackHandler` for each invocation:
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application. 
 
-```python main.py maxLines=29 focus={20-26}
-from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from deepeval.integrations.langchain import CallbackHandler
+For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
 
-@tool
-def multiply(a: int, b: int) -> int:
-    """Returns the product of two numbers"""
-    return a * b
+You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
-llm = ChatOpenAI(model="gpt-4o-mini")
-agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])
-agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
-agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
-
+```python main.py maxLines=100
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},
-    config={"callbacks": [CallbackHandler(
-      name="Name of Trace",
-      tags=["Tag 1", "Tag 2"],
-      metadata={"Key": "Value"},
-      thread_id="your-thread-id",
-      user_id="your-user-id",
-    )]},
+    {"input": "What is 8 multiplied by 6?"},   
+    config={
+        "callbacks": [CallbackHandler(thread_id="123")]
+    },
 )
-
-print(result)
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -175,17 +158,40 @@ print(result)
 </Info>
 </Accordion>
 
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
+
+```python main.py
+from langchain_openai import ChatOpenAI
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="<prompt-alias>")
+prompt.pull(version="00.00.01")
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini", 
+    metadata={"prompt": prompt}
+)
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+
 ## Evals Usage
 
 ### Online evals
-
-You can run [online evals](/docs/llm-tracing/evaluations) on your LangGraph agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 
 <Step title="Create metric collection">
 
-Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent.
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
   <video
@@ -196,22 +202,27 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 </Frame>
 
 <Warning>
-  Your metric collection should only contain the **task completion metric**,
-  which is the only supported metric for LangChain.
+  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
 </Warning>
 
 </Step>
 
 <Step title="Run evals">
 
-Provide your metric collection name to `CallbackHandler`.
+Set the `metric_collection` name to evaluate various components of your LangChain application.
 
-```python main.py maxLines=28 focus={20-22}
+<Tabs>
+
+<Tab title="Agent Span">
+This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
+
+```python main.py {23} maxLines=100 
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 from deepeval.integrations.langchain import CallbackHandler
 
 @tool
@@ -224,16 +235,120 @@ agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful a
 agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
 agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
 
-result = agent_executor.invoke({"input": "What is 8 multiplied by 6?"},
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},   
     config={
-        "callbacks": [CallbackHandler(
-            metric_collection="<metric-collection-with-task-completion>",
-          )]
+        "callbacks": [
+          CallbackHandler(metric_collection="<metric_collection_name>")
+        ]
     },
 )
-
-print(result)
 ```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+For LLM spans, you can set the `metric_collection` name in the `metadata` parameter of the language model instance.
+
+```python main.py {15}
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from deepeval.integrations.langchain import CallbackHandler
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+llm = ChatOpenAI(
+  model="gpt-4o-mini", 
+  metadata={"metric_collection": "<metric_collection_name>"}
+)
+
+agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])
+agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
+
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},   
+    config={
+        "callbacks": [
+          CallbackHandler(metric_collection="<metric_collection_name>")
+        ]
+    },
+)
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
+
+<Note>
+  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the metric collection.
+</Note>
+
+<CodeBlocks>
+
+<CodeBlock title="Using @tool">
+```python {8,10}
+# from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from deepeval.integrations.langchain import CallbackHandler
+
+from deepeval.integrations.langchain import tool
+
+@tool(metric_collection="test_collection_1")
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+
+llm = ChatOpenAI(
+  model="gpt-4o-mini", 
+  metadata={"metric_collection": "<metric_collection_name>"}
+)
+
+agent_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful assistant that can perform mathematical operations."), ("human", "{input}"), MessagesPlaceholder("agent_scratchpad")])
+agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
+
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},   
+    config={
+        "callbacks": [
+          CallbackHandler(metric_collection="<metric_collection_name>")
+        ]
+    },
+)
+```
+</CodeBlock>
+
+<CodeBlock title="Using @observe">
+```python
+from deepeval.tracing import observe
+from deepeval.integrations.langchain import CallbackHandler
+
+@observe(type="tool", metric_collection="test_collection_1")
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+```
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+
+</Tabs>
+
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
