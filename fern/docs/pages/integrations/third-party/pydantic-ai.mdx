@@ -215,7 +215,7 @@ asyncio.run(main())
 
 ### Verbose Tracing
 
-Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's built-in ability to log traces in more detail by specifying `otlp=True`.
+Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's built-in ability to log traces in more detail by specifying `otel=True`.
 
 <Warning>
   Evals for Pydantic AI are **NOT supported** when using verbose tracing.
@@ -227,7 +227,7 @@ from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 
 instrument_pydantic_ai(
     api_key="<your-confident-api-key>",
-    otlp=True,
+    otel=True,
 )
 
 agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
@@ -327,7 +327,14 @@ result = agent.run_sync("What are the LLMs?")
 
 Use the `observe` decorator to pass the `metric_collection` parameter to the tool span.
 
-```python main.py focus={2, 7-11, 14} maxLines=100
+<Note>
+`metric_collection` and `metrics` can be passed even if you are using `@agent.tool` [decorator](https://ai.pydantic.dev/tools/).
+</Note>
+
+<CodeBlocks>
+
+<CodeBlock title="Using @observe decorator">
+```python focus={2, 7-11, 14} maxLines=100
 from pydantic_ai import Agent
 from deepeval.tracing import observe
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
@@ -346,6 +353,22 @@ agent = Agent(
 )
 result = agent.run_sync("What is the weather in London?",)
 ```
+
+</CodeBlock>
+
+<CodeBlock title="Using @tool decorator">
+```python
+instrument_pydantic_ai()
+  
+weather_agent = Agent("openai:gpt-4o-mini",deps_type=Deps, ...)
+
+@weather_agent.tool(metric_collection="test_collection_1")
+async def get_lat_lng(ctx: RunContext[Deps], location_description: str) -> LatLng:
+  ...
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
