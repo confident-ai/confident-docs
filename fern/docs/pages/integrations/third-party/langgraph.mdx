@@ -43,8 +43,14 @@ import deepeval
 deepeval.login("<your-confident-api-key>")
 
 ```
-
 </CodeBlock>
+
+<CodeBlock title="Env" language="bash">
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
+</CodeBlock>
+
 
 </CodeBlocks>
 
@@ -54,8 +60,9 @@ deepeval.login("<your-confident-api-key>")
 
 Provide DeepEval's `CallbackHandler` to your LangGraph agent's invoke method.
 
-```python main.py {3,19} maxLines=25
+```python main.py {4,20} maxLines=25
 from langgraph.prebuilt import create_react_agent
+from langchain_openai import ChatOpenAI
 
 from deepeval.integrations.langchain import CallbackHandler
 
@@ -63,20 +70,18 @@ def get_weather(city: str) -> str:
     """Returns the weather in a city"""
     return f"It's always sunny in {city}!"
 
+llm = ChatOpenAI(model="gpt-4o-mini")
+
 agent = create_react_agent(
-    model="openai:gpt-4o-mini",
+    model=llm,
     tools=[get_weather],
     prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
-    input={
-        "messages": [{"role": "user", "content": "what is the weather in sf"}]
-    },
-    config={"callbacks": [CallbackHandler()]},
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={"callbacks": [CallbackHandler()]}
 )
-
-print(result)
 ```
 
 <Note>
@@ -98,31 +103,23 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-### Trace attributes
+## Advanced Features
 
-You can also set custom trace attributes in your `CallbackHandler` for each agent invocation:
+### Setting Trace Attributes
 
-```python main.py focus={11-17} maxLines=20
-from langgraph.prebuilt import create_react_agent
-from deepeval.integrations.langchain import CallbackHandler
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application. 
 
-def get_weather(city: str) -> str:
-    """Returns the weather in a city"""
-    return f"It's always sunny in {city}!"
+For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
 
-agent = create_react_agent(model="openai:gpt-4o-mini", tools=[get_weather], prompt="You are a helpful assistant")
+You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
-result = agent.invoke(input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={"callbacks": [CallbackHandler(
-      name="Name of Trace",
-      tags=["Tag 1", "Tag 2"],
-      metadata={"Key": "Value"},
-      thread_id="your-thread-id",
-      user_id="your-user-id",
-    )]},
+```python main.py maxLines=100
+result = agent_executor.invoke(
+    {"input": "What is 8 multiplied by 6?"},   
+    config={
+        "callbacks": [CallbackHandler(thread_id="123")]
+    },
 )
-
-print(result)
 ```
 
 <Accordion title='View Trace Attributes'>
@@ -156,57 +153,214 @@ print(result)
 </Info>
 </Accordion>
 
+### Logging Prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
+
+```python main.py
+from langchain_openai import ChatOpenAI
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="<prompt-alias>")
+prompt.pull(version="00.00.01")
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini", 
+    metadata={"prompt": prompt}
+)
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
 ## Evals Usage
-
 ### Online evals
-
-You can run [online evals](/docs/llm-tracing/evaluations) on your LangGraph agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 
 <Step title="Create metric collection">
 
-Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent.
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
   <video
     src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    autoPlay
     controls
+    autoPlay
   />
 </Frame>
 
 <Warning>
-  Your metric collection should only contain the **task completion metric**,
-  which is the only supported metric for LangGraph.
+  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
 </Warning>
 
 </Step>
 
 <Step title="Run evals">
 
-Provide your metric collection name to `CallbackHandler`.
+Set the `metric_collection` name to evaluate various components of your LangChain application.
 
-```python main.py focus={12-14} maxLines=18
+<Tabs>
+
+<Tab title="Agent Span">
+This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
+
+```python main.py {22} maxLines=100 
+from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
+
 from deepeval.integrations.langchain import CallbackHandler
 
 def get_weather(city: str) -> str:
     """Returns the weather in a city"""
     return f"It's always sunny in {city}!"
 
-agent = create_react_agent(model="openai:gpt-4o-mini", tools=[get_weather], prompt="You are a helpful assistant")
+llm = ChatOpenAI(model="gpt-4o-mini")
 
-result = agent.invoke(input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={
-        "callbacks": [CallbackHandler(
-          metric_collection="<metric-collection-with-task-completion>"
-        )]
-    },
+agent = create_react_agent(
+    model=llm,
+    tools=[get_weather],
+    prompt="You are a helpful assistant",
 )
 
-print(result)
+result = agent.invoke(
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={
+        "callbacks": [
+            CallbackHandler(metric_collection="task_completion")
+        ],
+    },
+)
 ```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+For LLM spans, you can set the `metric_collection` name in the `metadata` parameter of the language model instance.
+
+```python main.py {12}
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
+
+from deepeval.integrations.langchain import CallbackHandler
+
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    metadata={"metric_collection": "test_collection_1"}
+)
+
+agent = create_react_agent(
+    model=llm,
+    tools=[get_weather],
+    prompt="You are a helpful assistant",
+)
+
+result = agent.invoke(
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={
+        "callbacks": [
+            CallbackHandler(metric_collection="task_completion")
+        ],
+    },
+)
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
+
+<Note>
+  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the metric collection.
+</Note>
+
+
+<CodeBlocks>
+
+<CodeBlock title="Using @tool">
+```python {4,6}
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
+
+from deepeval.integrations.langchain import CallbackHandler, tool
+
+@tool(metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    metadata={"metric_collection": "test_collection_1"}
+)
+
+agent = create_react_agent(
+    model=llm,
+    tools=[get_weather],
+    prompt="You are a helpful assistant",
+)
+
+result = agent.invoke(
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={
+        "callbacks": [
+            CallbackHandler(metric_collection="task_completion")
+        ],
+    },
+)
+```
+</CodeBlock>
+
+<CodeBlock title="Using @observe">
+```python {5,7}
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
+
+from deepeval.integrations.langchain import CallbackHandler
+from deepeval.tracing import observe
+
+@observe(type="tool", metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    metadata={"metric_collection": "test_collection_1"}
+)
+
+agent = create_react_agent(
+    model=llm,
+    tools=[get_weather],
+    prompt="You are a helpful assistant",
+)
+
+result = agent.invoke(
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={
+        "callbacks": [
+            CallbackHandler(metric_collection="task_completion")
+        ],
+    },
+)
+```
+</CodeBlock>
+
+</CodeBlocks>
+
+</Tab>
+
+</Tabs>
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
