@@ -287,16 +287,24 @@ result = agent_executor.invoke(
 
 <Tab title="Tool Span">
 
-For tool spans, you can set the `metric_collection` name in the `metric_collection` parameter of the tool decorator imported from `deepeval.integrations.langchain`.
+For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
 
-```python main.py {2,9}
+<Note>
+  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the metric collection.
+</Note>
+
+<CodeBlocks>
+
+<CodeBlock title="Using @tool">
+```python {8,10}
 # from langchain_core.tools import tool
-from deepeval.integrations.langchain import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from deepeval.integrations.langchain import CallbackHandler
+
+from deepeval.integrations.langchain import tool
 
 @tool(metric_collection="test_collection_1")
 def multiply(a: int, b: int) -> int:
@@ -321,17 +329,21 @@ result = agent_executor.invoke(
     },
 )
 ```
-<Note>
-  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the `metric_collection` name.
-  ```python
-  from deepeval.tracing import observe
+</CodeBlock>
 
-  @observe(type="tool", metric_collection="test_collection_1")
-  def multiply(a: int, b: int) -> int:
-      """Returns the product of two numbers"""
-      return a * b
-  ```
-</Note>
+<CodeBlock title="Using @observe">
+```python
+from deepeval.tracing import observe
+from deepeval.integrations.langchain import CallbackHandler
+
+@observe(type="tool", metric_collection="test_collection_1")
+def multiply(a: int, b: int) -> int:
+    """Returns the product of two numbers"""
+    return a * b
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
