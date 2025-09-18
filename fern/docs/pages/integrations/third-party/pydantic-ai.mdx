@@ -90,20 +90,21 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `Agent`.
 
-```python main.py focus={2, 7-8, 13}
+```python main.py focus={2, 7-9, 13-14}
 from pydantic_ai import Agent
 from deepeval.prompt import Prompt
 from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
 
 instrument_pydantic_ai()
 
-prompt = Prompt(alias="asd")
+prompt = Prompt(alias="my-prompt")
 prompt.pull(version="00.00.01")
+system_prompt = prompt.interpolate(name="John")
 
 agent = Agent(
     "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence.",
-    llm_prompt=prompt,
+    system_prompt=system_prompt,
+    llm_prompt=prompt, # for logging the prompt in the span
 )
 
 result = agent.run_sync("What are the LLMs?")
