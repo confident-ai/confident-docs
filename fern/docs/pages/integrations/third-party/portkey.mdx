@@ -41,7 +41,12 @@ import deepeval
 
 deepeval.login("<your-confident-api-key>")
 ```
+</CodeBlock>
 
+<CodeBlock title="Env" language="bash">
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
 </CodeBlock>
 
 </CodeBlocks>
@@ -50,7 +55,7 @@ deepeval.login("<your-confident-api-key>")
 
 <Step title="Configure Portkey">
 
-To begin tracing your OpenAI calls as a component in your application, import OpenAI from DeepEval instead.
+To begin tracing your Portkey LLM calls as a component in your application, import Portkey from DeepEval instead.
 
 <Tabs>
   <Tab title="Chat Completions">
@@ -80,7 +85,7 @@ response = client.chat.completions.create(
 </Note>
 </Step>
 
-<Step title="Run OpenAI">
+<Step title="Run Portkey">
 
 Invoke your agent by executing the script:
 
@@ -92,4 +97,69 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Step>
 
+</Steps>
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-tracing/evaluations) on your Portkey LLM calls, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your application is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your Pydantic agent.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+<Warning>
+  Your metric collection must only contain metrics that only evaluate the input
+  and actual output of your Pydantic agent.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Provide metric collection name to DeepEval's Portkey client in the `metric_collection` parameter of the `chat.completions.create` method.
+
+<Tabs>
+
+<Tab title="LLM Span">
+Pass the `metric_collection` parameter to the `run_sync` (or `run` for async mode) method.
+
+```python main.py {14} maxLines=100
+import os
+from deepeval.integrations.portkey import Portkey
+
+config = {
+    "provider": 'openai',
+    "api_key": os.getenv("OPENAI_API_KEY")
+}
+
+client = Portkey(config = config)
+
+response = client.chat.completions.create(
+    messages=[{"role": "user", "content": "Hello, how are you?"}],
+    model="gpt-4o",
+    metric_collection="<metric_collection_name>"
+)
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+<Success>
+  All incoming traces will now be evaluated using metrics from your metric
+  collection.
+</Success>
 </Steps>
