@@ -1,10 +1,95 @@
 ---
 slug: integrations/third-party/portkey
-subtitle: Use Confident AI for LLM observability and evals for Portkey
+subtitle: Portkey AI serves as a unified interface for interacting LLMs
 ---
 
 ## Overview
 
-Confident AI lets you trace and evaluate Portkey calls, whether standalone or used as a component within a larger application.
+Confident AI lets you trace and evaluate Portkey LLM calls, whether standalone or used as a component within a larger application.
 
 ## Tracing Quickstart
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval portkey-ai
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure Portkey">
+
+To begin tracing your OpenAI calls as a component in your application, import OpenAI from DeepEval instead.
+
+<Tabs>
+  <Tab title="Chat Completions">
+
+```python main.py {2}
+import os
+from deepeval.integrations.portkey import Portkey
+
+config = {
+    "provider": 'openai',
+    "api_key": os.getenv("OPENAI_API_KEY")
+}
+
+client = Portkey(config = config)
+
+response = client.chat.completions.create(
+    messages=[{"role": "user", "content": "Hello, how are you?"}],
+    model="gpt-4o"
+)
+```
+
+</Tab>
+</Tabs>
+
+<Note>
+  DeepEval's Portkey client traces `chat.completions.create` method.
+</Note>
+</Step>
+
+<Step title="Run OpenAI">
+
+Invoke your agent by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
