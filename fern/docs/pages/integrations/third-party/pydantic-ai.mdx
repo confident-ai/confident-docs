@@ -88,13 +88,14 @@ If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-ve
 from deepeval.prompt import Prompt
 from deepeval.integration.pydantic_ai import Agent
 
-prompt = Prompt(alias="asd")
+prompt = Prompt(alias="my-prompt")
 prompt.pull(version="00.00.01")
+system_prompt = prompt.interpolate(name="John")
 
 agent = Agent(
     "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence.",
-    llm_prompt=prompt,
+    system_prompt=system_prompt,
+    llm_prompt=prompt, # for logging the prompt in the span
 )
 
 result = agent.run_sync("What are the LLMs?")
