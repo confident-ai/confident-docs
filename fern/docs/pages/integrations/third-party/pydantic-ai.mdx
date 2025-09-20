@@ -20,7 +20,7 @@ subtitle: Use Confident AI for LLM observability and evals for PydanticAI
     Use DeepEval's Pydantic AI `Agent` to trace the LLM operations. 
     <Tabs>
       <Tab title="Synchronous">
-        ```python main.py
+        ```python main.py {1}
         from deepeval.integration.pydantic_ai import Agent
 
         agent = Agent(
@@ -32,7 +32,7 @@ subtitle: Use Confident AI for LLM observability and evals for PydanticAI
         ```
       </Tab>
       <Tab title="Asynchronous">
-        ```python main.py
+        ```python main.py {2}
         import asyncio
         from deepeval.integrations.pydantic_ai import Agent
 
@@ -45,6 +45,26 @@ subtitle: Use Confident AI for LLM observability and evals for PydanticAI
             return await agent.run("What are the LLMs?")
 
         result = asyncio.run(execute_agent())
+        ```
+      </Tab>
+      <Tab title="Streaming">
+        ```python main.py {2}
+        import asyncio
+        from deepeval.integrations.pydantic_ai import Agent
+
+        agent = Agent(
+            "openai:gpt-4o-mini",
+            system_prompt="Be concise, reply with one sentence.",
+        )
+
+        async def execute_agent_stream():
+          async with agent.run_stream("What is the weather in London?") as result:
+              async for chunk in result.stream_text(delta=True):
+                  print(chunk, end="", flush=True)
+              final = await result.get_output()
+              print("\n\nFinal:", final)
+        
+        asyncio.run(execute_agent_stream())
         ```
       </Tab>
     </Tabs>
@@ -90,41 +110,134 @@ result = agent.run_sync("What are the LLMs?")
 
 Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Pass the `thread_id` to the `run_sync` or `run` method.
 
-```python main.py focus={13}
-from deepeval.integration.pydantic_ai import Agent
+<CodeBlocks>
+  <CodeBlock title="Synchronous">
+    ```python {10}
+    from deepeval.integration.pydantic_ai import Agent
 
-agent = Agent(
-    "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence."
-)
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence."
+    )
 
-result = agent.run_sync(
-    "What are the LLMs?",
-    thread_id="test_thread_id_1",
-)
-```
+    result = agent.run_sync(
+        "What are the LLMs?",
+        thread_id="test_thread_id_1",
+    )
+    ```
+  </CodeBlock>
+  <CodeBlock title="Asynchronous">
+    ```python {9}
+    from deepeval.integration.pydantic_ai import Agent
+
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence."
+    )
+
+    async def execute_agent():
+        return await agent.run("What are the LLMs?", thread_id="test_thread_id_1")
+
+    result = asyncio.run(execute_agent())
+    ```
+  </CodeBlock>
+  <CodeBlock title="Streaming">
+    ```python {9}
+    from deepeval.integration.pydantic_ai import Agent
+
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence."
+    )
+
+    async def execute_agent_stream():
+      async with agent.run_stream("What are the LLMs?", thread_id="test_thread_id_1") as result:
+          async for chunk in result.stream_text(delta=True):
+              print(chunk, end="", flush=True)
+          final = await result.get_output()
+          print("\n\nFinal:", final)
+
+    asyncio.run(execute_agent_stream())
+    ```
+  </CodeBlock>
+</CodeBlocks>
 
 ### Trace attributes
 
-Other trace attributes can also be passed to the `run_sync` or `run` method.
+Other trace attributes can also be passed to the `run_sync`, `run` or `run_stream` method.
 
-```python main.py maxLines=100 focus={12-16}
-from deepeval.integration.pydantic_ai import Agent
+<CodeBlocks>
+  <CodeBlock title="Synchronous">
+    ```python focus={11-15}
+    from deepeval.integration.pydantic_ai import Agent
 
-agent = Agent(
-    "openai:gpt-4o-mini",
-    system_prompt="Be concise, reply with one sentence.",
-)
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence.",
+    )
 
-result = agent.run_sync(
-    user_prompt="What are the LLMs?",
-    name="Name of Trace",
-    tags=["Tag 1", "Tag 2"],
-    metadata={"Key": "Value"},
-    thread_id="thread_21",
-    user_id="user_21",
-)
-```
+    result = agent.run_sync(
+        user_prompt="What are the LLMs?",
+        
+        name="Name of Trace",
+        tags=["Tag 1", "Tag 2"],
+        metadata={"Key": "Value"},
+        thread_id="thread_1",
+        user_id="user_1",
+    )
+    ```
+  </CodeBlock>
+  <CodeBlock title="Asynchronous">
+    ```python focus={12-16}
+    import asyncio
+    from deepeval.integration.pydantic_ai import Agent
+
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence.",
+    )
+
+    async def execute_agent():
+        return await agent.run(
+          user_prompt="What are the LLMs?",
+          thread_id="test_thread_id_1",
+          name="Name of Trace",
+          tags=["Tag 1", "Tag 2"],
+          metadata={"Key": "Value"},
+          user_id="user_1",
+        )
+
+    result = asyncio.run(execute_agent())
+    ```
+  </CodeBlock>
+  <CodeBlock title="Streaming">
+    ```python focus={11-15}
+    from deepeval.integration.pydantic_ai import Agent
+
+    agent = Agent(
+        "openai:gpt-4o-mini",
+        system_prompt="Be concise, reply with one sentence.",
+    )
+
+    async def execute_agent_stream():
+      async with agent.run_stream(
+        user_prompt="What are the LLMs?", 
+        thread_id="test_thread_id_1",
+        name="Name of Trace",
+        tags=["Tag 1", "Tag 2"],
+        metadata={"Key": "Value"},
+        user_id="user_1",
+      ) as result:
+          
+          async for chunk in result.stream_text(delta=True):
+              print(chunk, end="", flush=True)
+          final = await result.get_output()
+          print("\n\nFinal:", final)
+
+    asyncio.run(execute_agent_stream())
+    ```
+  </CodeBlock>
+</CodeBlocks>
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
@@ -157,34 +270,36 @@ result = agent.run_sync(
 </Info>
 </Accordion>
 
-### Streaming Responses
+<Accordion title='Passing trace attributes `Agent` constructor'>
+  ```python
+  from deepeval.integration.pydantic_ai import Agent
 
-You can also trace streamed responses with Pydantic AI.
+  agent = Agent(
+    "openai:gpt-4o-mini",
+    system_prompt="Be concise, reply with one sentence.",
+    
+    trace_name="Name of Trace",
+    trace_tags=["Tag 1", "Tag 2"],
+    trace_metadata={"Key": "Value"},
+    trace_thread_id="thread_1",
+    trace_user_id="user_1",
+  )
 
-```python main.py
-import asyncio
-from pydantic_ai import Agent
-from deepeval.integrations.pydantic_ai import instrument_pydantic_ai
+  result = agent.run_sync("What are the LLMs?")
+  ```
 
-instrument_pydantic_ai(api_key="<your-confident-api-key>")
+  <Note>
+    All the attributes (such as `name`, `tags`, `metadata`, `thread_id`, `user_id`) that passed in the `run_sync`, `run` or `run_stream` method can will override the subsequent attributes passed in the `Agent` constructor with `trace_` prefix.
+  </Note>
+</Accordion>
 
-agent = Agent("openai:gpt-4o-mini", system_prompt="Be concise, reply with one sentence.")
-
-async def main():
-    user_prompt = 'What will the weather be like in Paris on Tuesday?'
-    async with agent.run_stream(user_prompt) as run:
-        async for output in run.stream_text():
-            print(f'[Output] {output}')
-
-asyncio.run(main())
-```
 
 ### Verbose Tracing
 
 Since Confident AI has an Opentelemetry compatible endpoint, you can use Pydantic AI's built-in ability to log traces in more detail by instrumenting Pydantic AI.
 
 <Warning>
-  Evals for Pydantic AI are **NOT supported** when using verbose tracing.
+  Attributes and Evals for Pydantic AI are **NOT supported** when using verbose tracing.
 </Warning>
 
 ```python main.py
@@ -255,7 +370,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent
 
       <Tab title="LLM Span">
         Pass the `llm_metric_collection` parameter to the `Agent` constructor.
-        ```python main.py focus={7} maxLines=100
+        ```python main.py
         from deepeval.integrations.pydantic_ai import Agent
 
         agent = Agent("openai:gpt-4o-mini",
