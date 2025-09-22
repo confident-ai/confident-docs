@@ -54,9 +54,8 @@ deepeval.login("<your-confident-api-key>")
 
 Add DeepEval's trace processor to OpenAI Agents.
 
-```python main.py {4}
-from agents import Agent, Runner, add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor
+```python main.py {1,3}
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent, Runner
 
 add_trace_processor(DeepEvalTracingProcessor())
 
@@ -86,49 +85,56 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ## Advanced Usage
 
-### Logging Threads
-
-Chat threads are also automatically logged to Confident AI when a `group_id` is provided in your OpenAI Agent workflow.
-
-```python main.py {4, 11}
-from agents import Agent, Runner, trace, add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor
-
-add_trace_processor(DeepEvalTracingProcessor())
-
-thread_id = "unique_thread_id"
-
-async def main():
-    agent = Agent(name="Assistant", instructions="Reply very concisely.")
-
-    with trace(workflow_name="Conversation", group_id=thread_id):
-        # First turn
-        result = await Runner.run(agent, "What city is the Golden Gate Bridge in?")
-        print(result.final_output)
-        # San Francisco
-
-        # Second turn
-        new_input = result.to_input_list() + [{"role": "user", "content": "What state is it in?"}]
-        result = await Runner.run(agent, new_input)
-        print(result.final_output)
-        # California
-```
-
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, replace your OpenAI `Agent` with deepeval's wrapper and pass your `Prompt` object to the `Agent`.
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `Agent`.
 
-```python main.py {1, 8}
-from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
+```python main.py
+from deepeval.openai_agents import Agent, Runner
 from deepeval.prompt import Prompt
+from deepeval.openai_agents import DeepEvalTracingProcessor
+
+from agents import add_trace_processor
 
 add_trace_processor(DeepEvalTracingProcessor())
 
-prompt = Prompt(alias="My Prompt")
+prompt = Prompt(alias="asd")
 prompt.pull(version="00.00.01")
-agent = Agent(name="Assistant", instructions=prompt.interpolate(), deepeval_prompt=prompt)
 
-result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+spanish_agent = Agent(
+    name="Spanish agent",
+    instructions=prompt.interpolate(),
+    confident_prompt=prompt,
+)
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+
+### Logging Threads
+
+Chat threads are also automatically logged to Confident AI when a `thread_id` is provided in your OpenAI Agent workflow.
+
+```python main.py
+import asyncio
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent, Runner
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+
+async def main():
+    result = await Runner.run(
+        agent, input="Hola, ¿cómo estás?",
+        metric_collection="test_collection_1",
+        tags=["test"],
+        thread_id="test",
+    )
+asyncio.run(main())
 ```
 
 <Note>
@@ -139,43 +145,46 @@ result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
 
 ### Logging Trace Attributes
 
-Replace OpenAI Agent's `Runner` with DeepEval's wrapper to log trace attributes, which makes it easy to view and analyze traces on Confident AI.
+Logging trace attributes lets you set certain attributes for each trace when invoking your OpenAI Agent workflow.
 
-```python main.py {1}
-from deepeval.openai_agents import DeepEvalTracingProcessor, Runner
-from deepeval.prompts import Prompt
+```python main.py
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent, Runner
 
 add_trace_processor(DeepEvalTracingProcessor())
 
 agent = Agent(name="Assistant", instructions="You are a helpful assistant")
-result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+
+async def main():
+    result = await Runner.run(
+        agent, input="Hola, ¿cómo estás?",
+        metric_collection="test_collection_1",
+        tags=["test"],
+        thread_id="test",
+        name="test_name",
+        metadata={"test_metadata_key": "test_metadata_value"},
+        user_id="test_user_id",
+    )
 ```
 
 ### Streaming Responses
 
 Confident AI handles both asynchronous workflows and streamed responses. The following example shows how to trace streamed responses with OpenAI Agents.
 
-```python main.py {6}
-from deepeval.openai_agents import DeepEvalTracingProcessor
-from openai.types.responses import ResponseTextDeltaEvent
-from agents import Agent, Runner, add_trace_processor
+```python main.py
 import asyncio
-
+from deepeval.openai_agents import Runner, Agent, DeepEvalTracingProcessor
+from agents import add_trace_processor
 add_trace_processor(DeepEvalTracingProcessor())
 
-async def streaming_agent():
-    agent = Agent(
-        name="Joker",
-        instructions="You are a helpful assistant.",
-    )
-    result = Runner.run_streamed(agent, input="Please tell me 5 jokes.")
-    async for event in result.stream_events():
-        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-            print(event.data.delta, end="", flush=True)
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+)
 
 async def main():
-    tasks = [streaming_agent() for _ in range(5)]
-    await asyncio.gather(*tasks)
+    result = Runner.run_streamed(weather_agent, "What's the weather in UK?", thread_id="test")
+    async for chunk in result.stream_events():
+        print(chunk, end="", flush=True)
 
 asyncio.run(main())
 ```
@@ -228,19 +237,25 @@ You can run evals at both the trace and span level. We recommend creating separa
 
 Replace your Pydantic `Runner` with DeepEval’s and your supply the metric collection name to `Runner` to run evals on the trace level.
 
-```python main.py maxLines=100 focus={2, 11}
+```python main.py
+import asyncio
+from deepeval.openai_agents import Runner, Agent, DeepEvalTracingProcessor
 from agents import add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor, Runner
-
 add_trace_processor(DeepEvalTracingProcessor())
 
-# Replace with your agent code
-agent = Agent(name="Assistant", instructions="You are a helpful assistant")
-result = Runner.run_sync(
-    agent,
-    "Write a haiku about recursion in programming.",
-    metric_collection="<trace-metric-collection>",
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
 )
+
+async def main():
+    result = await Runner.run(
+        weather_agent, "What's the weather in UK?", thread_id="test",
+        metric_collection="test_collection_1",
+    )
+    print(result.final_output)
+
+asyncio.run(main())
 ```
 
 </Tab>
@@ -249,19 +264,27 @@ result = Runner.run_sync(
 
 Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent` to run evals on the LLM span level.
 
-```python main.py maxLines=100 focus={2, 10}
+```python main.py
+import asyncio
+from deepeval.openai_agents import Runner, Agent, DeepEvalTracingProcessor
 from agents import add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
 
 add_trace_processor(DeepEvalTracingProcessor())
 
-# Replace with your agent code
-agent = Agent(
-    name="Assistant",
-    instructions="You are a helpful assistant",
-    metric_collection="<llm-span-metric-collection>",
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    llm_metric_collection="test_collection_1",
 )
-result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+
+async def main():
+    result = await Runner.run(
+        weather_agent, "What's the weather in UK?", thread_id="test",
+        metric_collection="test_collection_1",
+    )
+    print(result.final_output)
+
+asyncio.run(main())
 ```
 
 </Tab>
@@ -270,20 +293,32 @@ result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
 
 Replace the `function_tool` decorator with DeepEval's wrapper, and provide the metric collection name to run evals on the tool span level.
 
-```python main.py maxLines=100 focus={2, 6}
+```python main.py
+import asyncio
+from deepeval.openai_agents import Runner, Agent, function_tool, DeepEvalTracingProcessor
 from agents import add_trace_processor
-from deepeval.openai_agents import DeepEvalTracingProcessor, function_tool
 
 add_trace_processor(DeepEvalTracingProcessor())
 
-@function_tool(metric_collection="<tool-span-metric-collection>")
-def poet(city: str) -> str:
-    """Writes a poem about a city"""
-    return "Recursion whispers, A mirror inside a loop. Endless paths unfold."
+@function_tool(metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    return "The weather in " + city + " is sunny."
 
-# Replace with your agent code
-agent = Agent(name="Assistant", instructions="You are a helpful assistant", tools=[poet])
-result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    llm_metric_collection="test_collection_1",
+    tools=[get_weather],
+)
+
+async def main():
+    result = await Runner.run(
+        weather_agent, "What's the weather in London?", thread_id="test",
+        metric_collection="test_collection_1",
+    )
+    print(result.final_output)
+
+asyncio.run(main())
 ```
 
 </Tab>
