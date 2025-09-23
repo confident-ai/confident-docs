@@ -189,24 +189,40 @@ async def main():
 asyncio.run(main())
 ```
 
-<Accordion title='Setting `group_id` and `metadata` for multiple runs in a single trace'>
-  You can set a trace attribute for multiple runs in a single trace. This will help you group related traces together and set metadata for all the runs in the trace.
-  - `group_id` will become Trace's ID.
-  - `metadata` will become Trace's metadata.
+## Setting trace attributes using agent's `trace` context
 
-  ```python main.py
-  async def main1():
+You can set a trace attribute for multiple runs in a single trace. This will help you group related traces together and set metadata for all the runs in the trace.
+- `group_id` will become the thread ID.
+- `metadata` will become Trace's metadata.
+
+```python main.py
+async def main1():
+  with trace(workflow_name="test_workflow_1", group_id="test_group_id_1", metadata={"test_metadata_1": "test_metadata_1"}):
+      user_query = "What's the weather like in London today?"
+      response_2 = await Runner.run(weather_agent, user_query, metric_collection="test_collection_1")
+      response_1 = await Runner.run(triage_agent, "Hola, ¿cómo estás?", metric_collection="test_collection_1")
+```
+
+<Note>
+  - Grouping of all the runs will only work if either `group_id` or `metadata`, or both are set.
+  - If `thread_id` or `metadata` is set for an individual run, it will override the trace's `group_id` or `metadata` that was set in the `trace` block.
+</Note>
+
+### Trace input and output
+In general the trace input and output will be same as input and output of agent's run. However, if you are using `trace` context to set the trace attributes, the trace input will be the **input of the first run** and the trace output will be the **output of the last run**.
+
+If you want to set custom input and output for the trace, you can use the `update_current_trace` function.
+
+```python main.py
+from deepeval.tracing.context import update_current_trace
+
+async def main1():
     with trace(workflow_name="test_workflow_1", group_id="test_group_id_1", metadata={"test_metadata_1": "test_metadata_1"}):
         user_query = "What's the weather like in London today?"
+        response_1 = await Runner.run(triage_agent, "Hola, ¿cómo estás?", metric_collection="test_collection_1")
         response_2 = await Runner.run(weather_agent, user_query, metric_collection="test_collection_1")
-        response_1 = await Runner.run(triage_agent, "Hola, ¿cómo estás?", metric_collection="test_collection_1", thread_id="test")
-  ```
-
-  <Note>
-    - Grouping of all the runs will only work if either `group_id` or `metadata`, or both are set.
-    - If `thread_id` or `metadata` is set for an individual run, it will override the trace's `group_id` or `metadata` that was set in the `trace` block.
-  </Note>
-</Accordion>
+        update_current_trace(input="initial input", output="final output")
+```
 
 ## Evals Usage
 
