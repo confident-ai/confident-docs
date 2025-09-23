@@ -86,7 +86,7 @@ This examples goes through a **single-turn**, **end-to-end** evaluation example 
 
 <Tabs>
 
-<Tab title="Local Evals">
+<Tab title="Python">
 
 Running evals locally executes metrics on your machine and uploads results to Confident AI. This gives full control over custom metrics but always requires code, making it less friendly for non-technical users.
 
@@ -104,7 +104,7 @@ It is mandatory to create a dataset for a proper evaluation workflow.
 
 <Tabs>
 
-<Tab title="On the platform">
+<Tab title="Platform">
 You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
 
 <Frame caption="Create Dataset on Confident AI" background="subtle">
@@ -121,7 +121,7 @@ You can create one in the UI under **Project** > **Datasets**, and upload golden
 
 </Tab>
 
-<Tab title="Using DeepEval">
+<Tab title="Code">
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset, Golden
@@ -210,7 +210,124 @@ python main.py
 
 </Tab>
 
-<Tab title="Remote Evals">
+<Tab title="TypeScript">
+
+Running evals locally executes metrics on your machine and uploads results to Confident AI. This gives full control over custom metrics but always requires code, making it less friendly for non-technical users.
+
+<Steps>
+
+  <Step title="Create a dataset">
+
+It is mandatory to create a dataset for a proper evaluation workflow.
+
+<Note>
+  If a dataset is not possible for your team at this point, setup LLM tracing to
+  run ad-hoc evaluations without a dataset instead. Confident AI will generate
+  datasets for you automatically this way.
+</Note>
+
+<Tabs>
+
+<Tab title="Platform">
+You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
+
+<Frame caption="Create Dataset on Confident AI" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:create-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+</Tab>
+
+<Tab title="Code">
+
+```typescript index.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+async function createDataset() {
+  // goldens are what makes up your dataset
+  const goldens = [new Golden({ input: "What's the weather like in SF?" })];
+  // create dataset
+  const dataset = new EvaluationDataset({ goldens });
+  // save to Confident AI
+  await dataset.push({ alias: "YOUR-DATASET-ALIAS" });
+}
+
+createDataset().catch(console.error);
+```
+
+Done ✅. You should now see your dataset on the platform.
+
+</Tab>
+
+</Tabs>
+
+  </Step>
+
+<Step title="Create a metric collection">
+
+Create a metric collection under **Project** > **Metrics** > **Collections** with the metrics you wish to use for evals.
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/metrics:create-collection-4k.mp4"
+  type="video/mp4"
+/>
+</Step>
+
+  <Step title="Create a test run">
+  
+A test run is a benchmark/snapshot of your LLM app's performance at any point in time. You'll need to:
+
+- Convert all goldens in your dataset into test cases, then
+- Use the metric collection you've created to evaluate each test case
+
+```typescript index.ts
+import { EvaluationDataset, LLMTestCase, Golden, evaluate } from "deepeval-ts";
+
+async function runEvaluation() {
+  // Pull from Confident AI
+  const dataset = new EvaluationDataset();
+  await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+  // Create test cases
+  for (const golden of dataset.goldens as Golden[]) {
+    const testCase = new LLMTestCase({
+      input: golden.input,
+      actualOutput: await llmApp(golden.input), // Replace with your LLM app
+    });
+    dataset.addTestCase(testCase);
+  }
+
+  // Run an evaluation
+  await evaluate({
+    llmTestCases: dataset.testCases,
+    metricCollection: "YOUR-METRIC-COLLECTION-NAME",
+  });
+}
+
+runEvaluation().catch(console.error);
+```
+
+Lastly, run `index.ts` to run your first single-turn, end-to-end evaluation:
+
+```bash
+tsx index.ts
+```
+
+✅ Done. You just created a first test run with a sharable testing report auto-generated on Confident AI.
+
+      </Step>
+
+  </Steps>
 
 </Tab>
 
