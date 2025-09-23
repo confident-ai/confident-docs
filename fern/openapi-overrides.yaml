@@ -306,7 +306,7 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/test-runs/{testRunId}:
+  /v1/prompts/{alias}/versions/{versionId}:
     get:
       parameters:
         - in: header
@@ -316,13 +316,43 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
-        - in: path
-          name: testRunId
+        - name: alias
+          in: path
           required: true
           schema:
             type: string
-          description: This is the ID of the test run to retrieve.
-          example: "TEST-RUN-ID"
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: versionId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The version ID of the prompt.
+          example: "PROMPT-VERSION-ID"
+    put:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: versionId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The version ID of the prompt.
+          example: "PROMPT-VERSION-ID"
 
   /v1/prompts/{alias}/versions:
     get:

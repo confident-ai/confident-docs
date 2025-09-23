@@ -801,14 +801,14 @@ paths:
                     id: "TRACE-ID"
                   deprecated: false
 
-  /v1/prompts:
+  /v1/prompts/{alias}/versions/{versionId}:
     get:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
       summary: Pull Prompts
       operationId: getPrompt
-      description: Retrieves a prompt with `promptVersionId` and `interpolationType` from your Confident AI account.
+      description: Retrieves a prompt with `alias` and `versionId` from your Confident AI account.
       responses:
         "200":
           description: ""
@@ -816,25 +816,73 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPromptResponse"
+              example:
+                success: true
+                data:
+                  id: "prv_abc123"
+                  text: "Hello, {{name}}!"
+                  type: "TEXT"
+                  interpolationType: "FSTRING"
+                  outputType: "TEXT"
+                  modelSettings:
+                    provider: "OPENAI"
+                    name: "gpt-4o"
+                    temperature: 0.7
+                deprecated: false
+
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Update Prompts
+      operationId: updatePrompt
+      description: Updates an existing prompt version with the specified alias and version id.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePromptRequest"
+            examples:
+              Text-Prompt:
+                text: "Updated hello, {{name}}!"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
+                modelSettings:
+                  provider: "OPENAI"
+                  name: "gpt-4o"
+                  temperature: 0.7
+              List-Prompt:
+                messages:
+                  - role: user
+                    content: "What is the updated weather like in {{city}}?"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
+                modelSettings:
+                  provider: "OPENAI"
+                  name: "gpt-4o"
+                  temperature: 0.7
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePromptResponse"
               examples:
                 Text-Prompt:
                   success: true
                   data:
-                    promptVersionId: "prv_abc123"
-                    text: "Hello, {{name}}!"
-                    type: "TEXT"
-                    interpolationType: "FSTRING"
+                    id: "prv_xyz456"
                   deprecated: false
                 List-Prompt:
                   success: true
                   data:
-                    promptVersionId: "prvl_def456"
-                    messages:
-                      - role: user
-                        content: "What is the weather like in {{city}}?"
-                    type: "LIST"
-                    interpolationType: "FSTRING"
+                    id: "prvl_xyz456"
                   deprecated: false
+
+  /v1/prompts:
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -854,12 +902,14 @@ paths:
                 alias: "Prompt Name"
                 text: "Hello, {{name}}!"
                 interpolationType: "FSTRING"
+                outputType: "TEXT"
               List-Prompt:
                 alias: "Prompt Name"
                 messages:
                   - role: user
                     content: "What is the weather like in {{city}}?"
                 interpolationType: "FSTRING"
+                outputType: "TEXT"
       responses:
         "200":
           description: ""
@@ -878,7 +928,7 @@ paths:
                   success: true
                   data:
                     id: "prm_xyz456"
-                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
+                    link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
   /v1/prompts/{alias}/versions:
@@ -2688,21 +2738,167 @@ components:
           description: The list of messages that make up the prompt. Supply this only if you are creating a list-based prompt.
         interpolationType:
           type: string
-          enum: [FSTRING, HANDLEBARS]
+          enum: [MUSTACHE, MUSTACHE_WITH_SPACE, FSTRING, DOLLAR_BRACKETS]
           default: FSTRING
-          description: The type of interpolation format used in the prompt to insert dynamic variables, which can be either f-string or handlebars.
+          description: The type of interpolation format used in the prompt to insert dynamic variables.
+        modelSettings:
+          $ref: "#/components/schemas/ModelSettings"
+          description: This is the model settings for the prompt.
+        outputType:
+          type: string
+          enum: [TEXT, JSON, SCHEMA]
+          default: TEXT
+          description: The type of output expected from the prompt.
+        outputSchema:
+          $ref: "#/components/schemas/OutputSchema"
+          description: This is the output schema definition when outputType is SCHEMA.
       required:
         - alias
+
+    ModelSettings:
+      type: object
+      additionalProperties: false
+      properties:
+        provider:
+          $ref: "#/components/schemas/EvaluationModelProvider"
+          description: This is the model provider for evaluation.
+        name:
+          type: string
+          description: This is the name of the model.
+        temperature:
+          type: number
+          format: float
+          description: This controls randomness in the model's output. Higher values make output more random.
+        maxTokens:
+          type: integer
+          description: This is the maximum number of tokens to generate.
+        topP:
+          type: number
+          format: float
+          description: This controls diversity via nucleus sampling. Lower values focus on more likely tokens.
+        frequencyPenalty:
+          type: number
+          format: float
+          description: This is the penalty for tokens based on their frequency in the text so far.
+        presencePenalty:
+          type: number
+          format: float
+          description: This is the penalty for tokens based on whether they appear in the text so far.
+        stopSequence:
+          type: array
+          items:
+            type: string
+          description: This is the sequences where the model will stop generating further tokens.
+        reasoningEffort:
+          type: string
+          enum: [MINIMAL, LOW, MEDIUM, HIGH]
+          description: This is the level of reasoning effort for the model.
+        verbosity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          description: This is the verbosity level for model output.
+
+    OutputSchema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: This is the name of the output schema.
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutputSchemaField"
+          description: This is the array of fields that define the output schema structure.
+      required:
+        - fields
+
+    OutputSchemaField:
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the unique identifier for the schema field.
+        name:
+          type: string
+          description: This is the name of the schema field.
+        type:
+          type: string
+          enum: [OBJECT, STRING, FLOAT, INTEGER, BOOLEAN, NULL]
+          description: This is the data type for schema fields.
+        required:
+          type: boolean
+          default: false
+          description: This indicates whether the field is required in the output.
+        parentId:
+          type: string
+          description: This is the ID of the parent field for nested structures.
+      required:
+        - id
+        - type
+
+    UpdatePromptRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          description: This is the text content of the prompt. Supply this only if you are updating a text-based prompt.
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PromptMessage"
+          description: This is the list of messages that make up the prompt. Supply this only if you are updating a list-based prompt.
+        interpolationType:
+          type: string
+          enum: [MUSTACHE, MUSTACHE_WITH_SPACE, FSTRING, DOLLAR_BRACKETS]
+          description: This is the type of interpolation format used in the prompt to insert dynamic variables.
+        modelSettings:
+          $ref: "#/components/schemas/ModelSettings"
+          description: This is the model settings for the prompt.
+        outputType:
+          type: string
+          enum: [TEXT, JSON, SCHEMA]
+          description: This is the type of output expected from the prompt.
+        outputSchema:
+          $ref: "#/components/schemas/OutputSchema"
+          description: This is the output schema definition when outputType is SCHEMA.
+
+    UpdatePromptResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the prompt was successfully updated.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: This is the id of the updated prompt version, not to be confused with the alias you supplied or version number.
+          required:
+            - id
+            - message
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    EvaluationModelProvider:
+      type: string
+      enum: [OPENAI, ANTHROPIC]
+      description: This is the provider of the evaluation model.
 
     PromptMessage:
       type: object
       properties:
         role:
           type: string
-          description: The role of the message, which can be user, assistant, system, or developer.
+          description: This is the role of the message, which can be user, assistant, system, or developer.
         content:
           type: string
-          description: The text content of the message.
+          description: This is the text content of the message.
       required:
         - role
         - content
@@ -2716,7 +2912,7 @@ components:
         data:
           type: object
           properties:
-            promptVersionId:
+            id:
               description: This is the id of the prompt version generated by Confident AI, not to be confused with the alias you supplied or version number.
               type: string
             text:
@@ -2732,13 +2928,26 @@ components:
               type: string
               enum: [TEXT, LIST]
             interpolationType:
-              description: This is the type of interpolation format used in the prompt to insert dynamic variables, which can be either f-string or handlebars.
               type: string
-              enum: [FSTRING, HANDLEBARS]
+              enum: [MUSTACHE, MUSTACHE_WITH_SPACE, FSTRING, DOLLAR_BRACKETS]
+              description: The type of interpolation format used in the prompt to insert dynamic variables.
+            modelSettings:
+              $ref: "#/components/schemas/ModelSettings"
+              description: This is the model settings for the prompt.
+            outputType:
+              type: string
+              enum: [TEXT, JSON, SCHEMA]
+              description: The type of output expected from the prompt.
+            outputSchema:
+              $ref: "#/components/schemas/OutputSchema"
+              description: This is the output schema definition when outputType is SCHEMA.
           required:
-            - promptVersionId
+            - id
             - type
             - interpolationType
+            - modelSettings
+            - outputType
+
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
