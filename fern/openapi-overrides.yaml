@@ -274,28 +274,6 @@ paths:
           example: "<PROJECT-API-KEY>"
 
   /v1/prompts:
-    get:
-      parameters:
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
-        - in: query
-          name: alias
-          required: true
-          schema:
-            type: string
-          description: The unique alias of the prompt.
-        - in: query
-          name: version
-          required: false
-          schema:
-            type: string
-          example: "1.2.3"
-          description: The version of the prompt you want to pull.
     post:
       parameters:
         - in: header
