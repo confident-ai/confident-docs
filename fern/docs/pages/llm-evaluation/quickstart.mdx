@@ -86,11 +86,17 @@ This examples goes through a **single-turn**, **end-to-end** evaluation example 
 
 <Tabs>
 
-<Tab title="Python">
-
-Running evals locally executes metrics on your machine and uploads results to Confident AI. This gives full control over custom metrics but always requires code, making it less friendly for non-technical users.
+<Tab title="Python" language="python">
 
 <Steps>
+
+  <Step title="Login with API key">
+
+```bash
+export CONFIDENT_API_KEY="confident_us..."
+```
+
+  </Step>
 
   <Step title="Create a dataset">
 
@@ -104,7 +110,7 @@ It is mandatory to create a dataset for a proper evaluation workflow.
 
 <Tabs>
 
-<Tab title="Platform">
+<Tab title="On Platform">
 You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
 
 <Frame caption="Create Dataset on Confident AI" background="subtle">
@@ -210,11 +216,17 @@ python main.py
 
 </Tab>
 
-<Tab title="TypeScript">
-
-Running evals locally executes metrics on your machine and uploads results to Confident AI. This gives full control over custom metrics but always requires code, making it less friendly for non-technical users.
+<Tab title="TypeScript" language="typescript">
 
 <Steps>
+
+  <Step title="Login with API key">
+
+```bash
+export CONFIDENT_API_KEY="confident_us..."
+```
+
+  </Step>
 
   <Step title="Create a dataset">
 
@@ -228,7 +240,7 @@ It is mandatory to create a dataset for a proper evaluation workflow.
 
 <Tabs>
 
-<Tab title="Platform">
+<Tab title="On Platform">
 You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
 
 <Frame caption="Create Dataset on Confident AI" background="subtle">
@@ -290,7 +302,7 @@ A test run is a benchmark/snapshot of your LLM app's performance at any point in
 - Convert all goldens in your dataset into test cases, then
 - Use the metric collection you've created to evaluate each test case
 
-```typescript index.ts
+```typescript index.ts maxLines=24
 import { EvaluationDataset, LLMTestCase, Golden, evaluate } from "deepeval-ts";
 
 async function runEvaluation() {
