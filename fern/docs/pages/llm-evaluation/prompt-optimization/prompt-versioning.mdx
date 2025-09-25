@@ -128,4 +128,16 @@ For example:
 
 ```
 
+Apart from variables, Confident AI also supports [jinja templates](https://realpython.com/primer-on-jinja-templating/), which would allow you to render more complex logic such as conditional if/else blocks, as well as for loops:
+
+```python
+"""
+{% if is_admin %}
+Welcome back, mighty admin {{ name }}!
+{% else %}
+Hello {{ name }}, you have regular access.
+{% endif %}
+"""
+```
+
 In the next section, we'll show you how to work with prompts you've created on Confident AI.
