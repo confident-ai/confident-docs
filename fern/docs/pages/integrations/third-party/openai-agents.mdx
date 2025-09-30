@@ -258,6 +258,9 @@ Confident AI supports evaluating the input-output pairs of OpenAI Agent spans an
 <Step title="Run evals">
 
 You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+<Warning>
+  Agent span metrics are currently only supported for `Runner.run` and `Runner.run_sync`.
+</Warning>
 
 <Tabs>
 
