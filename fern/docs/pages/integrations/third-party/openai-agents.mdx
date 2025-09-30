@@ -106,27 +106,6 @@ with trace(workflow_name="test_workflow_1", metadata={"test_metadata_1": "test_m
     result = await Runner.run(weather_agent, user_query, metric_collection="test_collection_1")
 ```
 
-### Overriding trace attributes
-
-If you want to override the input, output, or any other attribute for the current trace, you can use the `update_current_trace` function:
-
-```python main.py
-...
-from deepeval.tracing.context import update_current_trace
-
-async def main1():
-    with trace(workflow_name="test_workflow_1", metadata={"test_metadata_1": "test_metadata_1"}):
-        response_1 = await Runner.run(weather_agent, "Hola, ¿cómo estás?")
-        
-        update_current_trace(
-          name="New name",
-          input="New input",
-          output="New output",
-          metadata={"New key": "New value"}
-        )
-
-```
-
 ### Streaming responses
 
 Confident AI handles both asynchronous workflows and streamed responses. The following example shows how to trace streamed responses with OpenAI Agents.
@@ -157,13 +136,13 @@ If you are using `trace` context to set the trace attributes, the trace attribut
 If you want to set override the input, output, or any other attribute for the current trace, you can use the `update_current_trace` function:
 
 ```python main.py
+...
 from deepeval.tracing.context import update_current_trace
 
 async def main1():
-    with trace(workflow_name="test_workflow_1", group_id="test_group_id_1", metadata={"test_metadata_1": "test_metadata_1"}):
-        user_query = "What's the weather like in London today?"
-        response_1 = await Runner.run(triage_agent, "Hola, ¿cómo estás?", metric_collection="test_collection_1")
-        response_2 = await Runner.run(weather_agent, user_query, metric_collection="test_collection_1")
+    with trace(workflow_name="test_workflow_1", metadata={"test_metadata_1": "test_metadata_1"}):
+        response_1 = await Runner.run(weather_agent, "Hola, ¿cómo estás?")
+        
         update_current_trace(
           name="New name",
           input="New input",
@@ -208,3 +187,173 @@ The `thread_id` and `metadata` will ALSO override the `trace` context's `group_i
   features](/docs/llm-tracing/introduction) on Confident AI.
 </Info>
 </Accordion>
+
+### Logging prompts
+
+If you are managing prompts[/docs/llm-evaluation/prompt-optimization/prompt-versioning] on Confident AI and wish to log them, pass your `Prompt` object to the DeepEval's `Agent` wrapper.
+
+```python main.py
+from agents import Runner
+from deepeval.prompt import Prompt
+from deepeval.openai_agents import DeepEvalTracingProcessor, Agent
+
+from agents import add_trace_processor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+prompt = Prompt(alias="<prompt-alias>")
+prompt.pull(version="00.00.01")
+
+spanish_agent = Agent(
+    name="Spanish agent",
+    instructions=prompt.interpolate(),
+    confident_prompt=prompt,
+)
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-evaluation/online-evals) on your OpenAI Agent, which will run evaluations on all incoming traces on Confident AI’s servers. This is the recommended approach, especially if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI Agent.
+
+<Accordion title='Click to see supported metrics for OpenAI Agents'>
+
+Confident AI supports evaluating the input-output pairs of OpenAI Agent spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
+
+- [Answer Relevancy](https://www.confident-ai.com/docs/metrics/single-turn/answer-relevancy-metric)
+- [Task Completion](https://www.confident-ai.com/docs/metrics/single-turn/task-completion-metric)
+- [GEval](https://deepeval.com/docs/metrics-llm-evals)
+- [Bias](https://www.confident-ai.com/docs/metrics/single-turn/bias-metric)
+- [Toxicity](https://www.confident-ai.com/docs/metrics/single-turn/toxicity-metric)
+
+<Info>
+  If you're looking to use other metrics, setup Confident AI's [native
+  tracing](/docs/llm-tracing/introduction) instead.
+</Info>
+
+</Accordion>
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+
+<Tabs>
+
+<Tab title="Agent Span">
+
+Replace your `Agent` with DeepEval's and supply the metric collection name to run evals on the agent span level.
+
+```python main.py
+import asyncio
+from agents import Runner, add_trace_processor
+
+from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+add_trace_processor(DeepEvalTracingProcessor())
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it."
+    agent_metric_collection="test_collection_1",
+)
+
+async def main():
+    result = await Runner.run(weather_agent, "What's the weather in UK?")
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent` to run evals on the LLM span level.
+
+```python main.py
+import asyncio
+from agents import Runner, add_trace_processor
+
+from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    llm_metric_collection="test_collection_1",
+)
+
+async def main():
+    result = await Runner.run(weather_agent, "What's the weather in UK?")
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+Replace the `function_tool` decorator with DeepEval's wrapper, and provide the metric collection name to run evals on the tool span level.
+
+```python main.py
+import asyncio
+from agents import Agent, Runner, add_trace_processor
+
+from deepeval.openai_agents import function_tool, DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+@function_tool(metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    return "The weather in " + city + " is sunny."
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    llm_metric_collection="test_collection_1",
+    tools=[get_weather],
+)
+
+async def main():
+    result = await Runner.run(
+        weather_agent, "What's the weather in London?", thread_id="test",
+        metric_collection="test_collection_1",
+    )
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  All incoming traces and spans will now be evaluated using metrics from your
+  metric collection.
+</Success>
+
+</Step>
+</Steps>
