@@ -35,7 +35,7 @@ There are two types of prompts you can create:
 
 In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
 
-<Info title="Example">
+<Info title="Prompt Example">
 Suppose you have a prompt with the alias `MyPrompt`. This prompt can have multiple versions, such as `0.0.1`, `0.0.2`, ..., up to `1.0.0`.
 
 ```mermaid
@@ -50,6 +50,25 @@ flowchart TD
 </Info>
 
 A **prompt version** represents a different variation of the same prompt. Each `version` is an iteration or improvement of the original prompt, serving the same purpose but with adjustments—similar to how software versions evolve over time.
+
+<Info title="Prompt Version Example">
+
+In addition to the prompt, each prompt version can optionally include the model settings, output type, and output schema.
+
+```mermaid
+flowchart LR
+    PV["Version 1.0.0"]
+    PV --> PT["Prompt"]
+    PV --> MS["Model Settings"]
+    PV --> OT["Output Type"]
+    PV --> OS["Output Schema"]
+    PT --> |"Text or Messages"| PT1["You are a helpful assistant..."]
+    MS --> |"Temperature, Top-P, etc."| MS1["temperature: 0.7"]
+    OT --> |"Response Format"| OT1["JSON, Text, Schema"]
+    OS --> |"Structured Output Schema"| OS1["{ name: string }"]
+```
+
+</Info>
 
 ## Create a Prompt Version
 
