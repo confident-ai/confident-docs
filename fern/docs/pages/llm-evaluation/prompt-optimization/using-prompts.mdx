@@ -330,6 +330,19 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Steps>
 
+## Pull Prompts By Label
+
+Previously we saw how we can pull a prompt by supplying the version number. You can also "deploy" a prompt using a **label**, which allows you to select a specific version without defaulting to the latest one:
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(label="staging")
+```
+
+You must manually label each prompt version. Click here to learn how to do so.
+
 ## Logging Prompts in Traces
 
 <Steps>
@@ -403,7 +416,7 @@ This will automatically attribute the prompt used to the LLM span.
 
 </Steps>
 
-## Prompt Caching
+## Prompt caching
 
 Confident AI automatically caches prompts on the client side to **minimize API call latency and ensure prompt availability**, which is especially useful in production environments.
 
@@ -454,7 +467,7 @@ sequenceDiagram
 
 </Tabs>
 
-### Customize Refresh Rate
+### Customize refresh rate
 
 By default, the cache is refetched every 60 seconds, where DeepEval will automatically update the cached prompt with the up-to-date version from Confident AI. This can be overridden by setting the `refresh` parameter to a different value. Fetching is done asynchronously, so it will not block your application.
 

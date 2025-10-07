@@ -152,3 +152,28 @@ Shopping List:
 <Note>Jinja interpolated prompts are only available for Python users.</Note>
 
 In the next section, we'll show you how to work with prompts you've created on Confident AI.
+
+## Labelling Prompt Versions
+
+You can also label different versions of your prompt in the **Version History** page so no code changes are required to "deploy" a new version into a certain environment.
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:label-versions.mp4"
+  type="video/mp4"
+/>
+
+<Info>
+
+The next section will dive deeper into this topic but this is how you can pull a prompt via its label in python:
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(label="staging")
+```
+
+</Info>
