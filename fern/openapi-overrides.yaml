@@ -355,7 +355,7 @@ paths:
           schema:
             type: string
           description: The version number of the prompt.
-          example: "PROMPT-VERSION-ID"
+          example: "PROMPT-VERSION"
     put:
       parameters:
         - in: header
@@ -372,13 +372,13 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: versionId
+        - name: version
           in: path
           required: true
           schema:
             type: string
-          description: The version ID of the prompt.
-          example: "PROMPT-VERSION-ID"
+          description: The version number of the prompt.
+          example: "PROMPT-VERSION"
 
   /v1/prompts/{alias}/versions:
     get:
