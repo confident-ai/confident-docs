@@ -801,13 +801,117 @@ paths:
                     id: "TRACE-ID"
                   deprecated: false
 
-  /v1/prompts/{alias}/versions/{versionId}:
+  /v1/prompts/{alias}/labels/{label}:
     get:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
-      summary: Pull Prompts
-      operationId: getPrompt
+      summary: Pull Prompts By Label
+      operationId: getPromptByLabel
+      description: Retrieves a prompt with `alias` and `label` from your Confident AI account.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPromptResponse"
+              examples:
+                Text-Example:
+                  value:
+                    success: true
+                    data:
+                      id: "prv_abc123"
+                      version: "00.00.02"
+                      label: "my-label"
+                      text: "Hello, {{name}}!"
+                      type: "TEXT"
+                      interpolationType: "FSTRING"
+                      outputType: "TEXT"
+                      modelSettings:
+                        provider: "OPEN_AI"
+                        name: "gpt-4o"
+                        temperature: 0.7
+                    deprecated: false
+                Message-Example:
+                  value:
+                    success: false
+                    data:
+                      id: "prv_abc123"
+                      version: "00.00.02"
+                      label: "my-label"
+                      messages: 
+                        - role: system
+                          content: "Hello, {{name}}"
+                      type: "LIST"
+                      interpolationType: "FSTRING"
+                      outputType: "TEXT"
+                      modelSettings:
+                        provider: "OPEN_AI"
+                        name: "gpt-4o"
+                        temperature: 0.7
+                    deprecated: false
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Update Prompts By Label
+      operationId: updatePromptByLabel
+      description: Updates an existing prompt version with the specified alias and version id.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePromptRequest"
+            examples:
+              Text-Prompt:
+                text: "Updated hello, {{name}}!"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
+                modelSettings:
+                  provider: "OPEN_AI"
+                  name: "gpt-4o"
+                  temperature: 0.7
+              List-Prompt:
+                messages:
+                  - role: user
+                    content: "What is the updated weather like in {{city}}?"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
+                modelSettings:
+                  provider: "OPEN_AI"
+                  name: "gpt-4o"
+                  temperature: 0.7
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePromptResponse"
+              examples:
+                Text-Prompt:
+                  success: true
+                  data:
+                    id: "prv_xyz456"
+                    message: Prompt version updated successfully
+                  deprecated: false
+                List-Prompt:
+                  success: true
+                  data:
+                    id: "prvl_xyz456"
+                    message: Prompt version updated successfully
+                  deprecated: false
+
+  /v1/prompts/{alias}/versions/{version}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Pull Prompts By Version
+      operationId: getPromptByVersion
       description: Retrieves a prompt with `alias` and `versionId` from your Confident AI account.
       responses:
         "200":
@@ -816,25 +920,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPromptResponse"
-              example:
-                success: true
-                data:
-                  id: "prv_abc123"
-                  text: "Hello, {{name}}!"
-                  type: "TEXT"
-                  interpolationType: "FSTRING"
-                  outputType: "TEXT"
-                  modelSettings:
-                    provider: "OPENAI"
-                    name: "gpt-4o"
-                    temperature: 0.7
-                deprecated: false
+              examples:
+                Test-Example:
+                  value:
+                    success: true
+                    data:
+                      id: "prv_abc123"
+                      version: "00.00.01"
+                      text: "Hello, {{name}}!"
+                      type: "TEXT"
+                      interpolationType: "FSTRING"
+                      outputType: "TEXT"
+                      modelSettings:
+                        provider: "OPEN_AI"
+                        name: "gpt-4o"
+                        temperature: 0.7
+                    deprecated: false
+                Message-Example:
+                  value:
+                    success: false
+                    data:
+                      id: "prv_abc123"
+                      version: "00.00.02"
+                      messages: 
+                        - role: system
+                          content: "Hello, {{name}}"
+                      type: "LIST"
+                      interpolationType: "FSTRING"
+                      outputType: "TEXT"
+                      modelSettings:
+                        provider: "OPEN_AI"
+                        name: "gpt-4o"
+                        temperature: 0.7
+                    deprecated: false
 
     put:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
-      summary: Update Prompts
+      summary: Update Prompts By Version
       operationId: updatePrompt
       description: Updates an existing prompt version with the specified alias and version id.
       requestBody:
@@ -850,7 +974,7 @@ paths:
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
                 modelSettings:
-                  provider: "OPENAI"
+                  provider: "OPEN_AI"
                   name: "gpt-4o"
                   temperature: 0.7
               List-Prompt:
@@ -860,7 +984,7 @@ paths:
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
                 modelSettings:
-                  provider: "OPENAI"
+                  provider: "OPEN_AI"
                   name: "gpt-4o"
                   temperature: 0.7
       responses:
@@ -875,11 +999,13 @@ paths:
                   success: true
                   data:
                     id: "prv_xyz456"
+                    message: Prompt version updated successfully
                   deprecated: false
                 List-Prompt:
                   success: true
                   data:
                     id: "prvl_xyz456"
+                    message: Prompt version updated successfully
                   deprecated: false
 
   /v1/prompts:
@@ -2874,6 +3000,9 @@ components:
             id:
               type: string
               description: This is the id of the updated prompt version, not to be confused with the alias you supplied or version number.
+            message:
+              type: string
+              description: A message that acknowledges that the prompt update was successful
           required:
             - id
             - message
@@ -2887,7 +3016,7 @@ components:
 
     EvaluationModelProvider:
       type: string
-      enum: [OPENAI, ANTHROPIC]
+      enum: [OPEN_AI, ANTHROPIC]
       description: This is the provider of the evaluation model.
 
     PromptMessage:
@@ -2915,6 +3044,12 @@ components:
             id:
               description: This is the id of the prompt version generated by Confident AI, not to be confused with the alias you supplied or version number.
               type: string
+            version:
+              type: string
+              description: The version number of the prompt.
+            label:
+              type: string
+              description: The user-defined label for a specific version of the prompt.
             text:
               description: This is the text content of the prompt, which is null if the prompt is a list prompt.
               type: string
@@ -2943,11 +3078,72 @@ components:
               description: This is the output schema definition when outputType is SCHEMA.
           required:
             - id
+            - version
             - type
             - interpolationType
             - modelSettings
             - outputType
 
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    GetPromptResponseByLabel:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the prompt was successfully retrieved.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: This is the id of the prompt version generated by Confident AI, not to be confused with the alias you supplied or version number.
+            version:
+              type: string
+              description: The version number of the prompt.
+            label:
+              type: string
+              description: The user-defined label for a specific version of the prompt.
+            text:
+              description: This is the text content of the prompt, which is null if the prompt is a list prompt.
+              type: string
+            messages:
+              description: This is the list of messages associated with the prompt, which is null if the prompt is a text prompt.
+              type: array
+              items:
+                $ref: "#/components/schemas/PromptMessage"
+            type:
+              type: string
+              enum: [TEXT, LIST]
+              description: This is the type of the prompt, which can be either simple text or a list of messages.
+            interpolationType:
+              type: string
+              enum: [MUSTACHE, MUSTACHE_WITH_SPACE, FSTRING, DOLLAR_BRACKETS]
+              description: The type of interpolation format used in the prompt to insert dynamic variables.
+            modelSettings:
+              $ref: "#/components/schemas/ModelSettings"
+              description: This is the model settings for the prompt.
+            outputType:
+              type: string
+              enum: [TEXT, JSON, SCHEMA]
+              description: The type of output expected from the prompt.
+            outputSchema:
+              $ref: "#/components/schemas/OutputSchema"
+              description: This is the output schema definition when outputType is SCHEMA.
+          required:
+            - id
+            - version
+            - label
+            - type
+            - interpolationType
+            - modelSettings
+            - outputType
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
