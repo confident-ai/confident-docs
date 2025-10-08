@@ -284,7 +284,7 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/prompts/{alias}/versions/{versionId}:
+  /v1/prompts/{alias}/labels/{label}:
     get:
       parameters:
         - in: header
@@ -301,12 +301,60 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: versionId
+        - name: label
           in: path
           required: true
           schema:
             type: string
-          description: The version ID of the prompt.
+          description: The label name of the prompt.
+          example: "PROMPT-LABEL"
+    put:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: label
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The label name of the prompt.
+          example: "PROMPT-LABEL"
+
+  /v1/prompts/{alias}/versions/{version}:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The version number of the prompt.
           example: "PROMPT-VERSION-ID"
     put:
       parameters:
