@@ -236,6 +236,53 @@ with trace(
 
 ## Evals Usage
 
+### Online evals
+If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+<Warning>
+  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
+</Warning>
+
+</Step>
+
+<Step title="Run evals">
+
+Set the `llm_metric_collection` name in the `trace` context when invoking your OpenAI client to evaluate Llm Spans.
+
+```python main.py
+from deepeval.openai import OpenAI
+
+client = OpenAI()
+
+with trace(llm_metric_collection="test_collection_1"):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+
+</Step>
+
+</Steps>
+
+
 ### End-to-end evals
 
 Confident AI allows you to run [end-to-end evals](/llm-evaluation/single-turn/end-to-end) on your OpenAI client to evaluate your OpenAI calls directly. This is recommended if you are testing your OpenAI calls in isolation.
