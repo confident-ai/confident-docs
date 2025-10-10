@@ -345,7 +345,7 @@ dataset.pull("your-dataset-alias")
 for golden in dataset.evals_iterator():
     # run OpenAI client
     with trace(
-        metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
         expected_output=golden.output,
     ):
         client.chat.completions.create(
@@ -374,7 +374,7 @@ dataset.pull("your-dataset-alias")
 for golden in dataset.evals_iterator():
     # run OpenAI client
     with trace(
-        metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
         expected_output=golden.output,
     ):
         client.responses.create(
@@ -387,56 +387,64 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Async Chat Completions">
 
-```python main.py {1,20}
+```python main.py
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
 import asyncio
 
-client = AsyncOpenAI()
+async_client = AsyncOpenAI()
+
+async def openai_llm_call(input):
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.output,
+    ):
+        return await async_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful chatbot. Always generate a string response."},
+                {"role": "user", "content": input},
+            ],
+        )
+
 
 dataset = EvaluationDataset()
 dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
-    # add OpenAI client task
-    task = asyncio.create_task(
-        client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": golden.input}
-            ],
-            metrics=[AnswerRelevancyMetric(), BiasMetric()]
-        )
-    )
+    task = asyncio.create_task(openai_llm_call(golden.input))
     dataset.evaluate(task)
 ```
 
 </Tab>
 <Tab title="Async Responses">
 
-```python main.py {1,18}
+```python main.py
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
 import asyncio
 
-client = AsyncOpenAI()
+async_client = AsyncOpenAI()
+
+async def openai_llm_call(input):
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.output,
+    ):
+        return await async_client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=input,  
+        )
+
 
 dataset = EvaluationDataset()
 dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
-    # add OpenAI client task
-    task = asyncio.create_task(
-        client.responses.create(
-            model="gpt-4o",
-            instructions="You are a helpful assistant.",
-            input=golden.input,
-            metrics=[AnswerRelevancyMetric(), BiasMetric()]
-        )
-    )
+    task = asyncio.create_task(openai_llm_call(golden.input))
     dataset.evaluate(task)
 ```
 
