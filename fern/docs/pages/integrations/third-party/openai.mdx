@@ -57,61 +57,44 @@ To begin tracing your OpenAI calls as a component in your application, import Op
 <Tabs>
   <Tab title="Chat Completions">
 
-```python main.py {2, 7}
-import time
+```python main.py {1}
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace_manager
 
 client = OpenAI()
 
-@observe()
-def generate_response(input: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4.1",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": input},
-        ],
-    )
-    return response
-
-response = generate_response("What is the weather in Tokyo?")
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is the weather in France?"},
+    ],
+)
 ```
 
 </Tab>
 <Tab title="Responses">
 
-```python main.py {2, 7}
-import time
+```python main.py {1}
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace_manager
 
 client = OpenAI()
 
-@observe()
-def generate_response(input: str) -> str:
-    response = client.responses.create(
-        model="gpt-4.1",
-        instructions="You are a helpful assistant.",
-        input=input,
-    )
-    return response
-
-response = generate_response("What is the weather in Tokyo?")
+response = client.responses.create(
+    model="gpt-4o-mini",
+    instructions="You are a helpful assistant.",
+    input="What is the weather in France?",
+)
 ```
 
 </Tab>
 <Tab title="Async Chat Completions">
 
-```python main.py {3, 8}
-import time
+```python main.py {2}
 import asyncio
 from deepeval.openai import AsyncOpenAI
-from deepeval.tracing import observe, trace_manager
 
 client = AsyncOpenAI()
 
-@observe()
 async def generate_response(input: str) -> str:
     response = await client.chat.completions.create(
         model="gpt-4.1",
@@ -122,30 +105,27 @@ async def generate_response(input: str) -> str:
     )
     return response
 
-response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+response = asyncio.run(generate_response("What is the weather in France?"))
 ```
 
 </Tab>
 <Tab title="Async Responses">
 
-```python main.py {3, 8}
-import time
+```python main.py {2}
 import asyncio
 from deepeval.openai import AsyncOpenAI
-from deepeval.tracing import observe, trace_manager
 
 client = AsyncOpenAI()
 
-@observe()
 async def generate_response(input: str) -> str:
     response = await client.responses.create(
-        model="gpt-4.1",
+        model="gpt-4o-mini",
         instructions="You are a helpful assistant.",
         input=input,
     )
     return response
 
-response = asyncio.run(generate_response("What is the weather in Tokyo?"))
+response = asyncio.run(generate_response("What is the weather in France?"))
 ```
 
 </Tab>
@@ -170,7 +150,158 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
+## Advanced Usage
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.prompt import Prompt
+from deepeval.tracing import trace
+
+prompt = Prompt(alias="my-prompt")
+prompt.pull(version="00.00.01")
+
+client = OpenAI()
+
+with trace(prompt=prompt):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": prompt.interpolate(name="Jhon")}, # should be a string system prompt
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+
+### Logging threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+client = OpenAI()
+
+with trace(thread_id="test_thread_id_1"):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+
+### Other trace attributes
+
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your OpenAI client.
+
+For example, `user_id` can be used to enable user analytics. You can learn more about [user id](/docs/llm-tracing/advanced-features/users) here. Similarly, you can set the `metadata` to attach any metadata to the trace.
+
+You can set these attributes in the `trace` context when invoking your OpenAI client.
+
+```python main.py maxLines=100
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+client = OpenAI()
+
+with trace(
+    thread_id="test_thread_id_1",
+    metadata={"test_metadata_1": "test_metadata_1"},
+):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+<Note>
+  This override the trace attributes that were set using `update_current_trace` method.
+</Note>
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/advanced-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/advanced-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/advanced-features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/advanced-features/users).
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
 ## Evals Usage
+
+### Online evals
+If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI agent. Copy the name of the metric collection.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+Set the `llm_metric_collection` name in the `trace` context when invoking your OpenAI client to evaluate Llm Spans.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+client = OpenAI()
+
+with trace(llm_metric_collection="test_collection_1"):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+
+</Step>
+
+</Steps>
+
 
 ### End-to-end evals
 
@@ -192,7 +323,7 @@ task_completion = AnswerRelevancyMetric(
 
 <Warning>
   You can only run end-to-end evals on OpenAI using metrics that evaluate
-  `input`, `output`, or `tools_called`.
+  `input`, `output`, or `tools_called`. You can pass parameters like `expected_output`, `expected_tools`, `context` and `retrieval_context` to the `trace` context.
 </Warning>
 
 </Step>
@@ -204,10 +335,11 @@ Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_ite
 <Tabs>
 <Tab title="Chat Completions">
 
-```python main.py {1,18}
+```python main.py
 from deepeval.openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.dataset import EvaluationDataset
+from deepeval.tracing import trace
 
 client = OpenAI()
 
@@ -216,92 +348,108 @@ dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
     # run OpenAI client
-    client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": golden.input}
-        ],
-        metrics=[AnswerRelevancyMetric(), BiasMetric()]
-    )
-```
-
-</Tab>
-<Tab title="Responses">
-
-```python main.py {1,16}
-from deepeval.openai import OpenAI
-from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import EvaluationDataset, Golden
-
-client = OpenAI()
-
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
-
-for golden in dataset.evals_iterator():
-    # run OpenAI client
-    client.responses.create(
-        model="gpt-4o",
-        instructions="You are a helpful assistant.",
-        input=golden.input,
-        metrics=[AnswerRelevancyMetric(), BiasMetric()]
-    )
-```
-
-</Tab>
-<Tab title="Async Chat Completions">
-
-```python main.py {1,20}
-from deepeval.openai import AsyncOpenAI
-from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
-from deepeval.dataset import EvaluationDataset, Golden
-import asyncio
-
-client = AsyncOpenAI()
-
-dataset = EvaluationDataset()
-dataset.pull("your-dataset-alias")
-
-for golden in dataset.evals_iterator():
-    # add OpenAI client task
-    task = asyncio.create_task(
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.expected_output,
+    ):
         client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": golden.input}
             ],
-            metrics=[AnswerRelevancyMetric(), BiasMetric()]
         )
-    )
+```
+
+</Tab>
+<Tab title="Responses">
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import trace
+
+client = OpenAI()
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    # run OpenAI client
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.expected_output,
+    ):
+        client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=golden.input,
+        )
+```
+
+</Tab>
+<Tab title="Async Chat Completions">
+
+```python main.py
+import asyncio
+from deepeval.openai import AsyncOpenAI
+from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
+from deepeval.dataset import EvaluationDataset
+from deepeval.tracing import trace
+
+async_client = AsyncOpenAI()
+
+async def openai_llm_call(input):
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.expected_output,
+    ):
+        return await async_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful chatbot. Always generate a string response."},
+                {"role": "user", "content": input},
+            ],
+        )
+
+dataset = EvaluationDataset()
+dataset.pull("your-dataset-alias")
+
+for golden in dataset.evals_iterator():
+    task = asyncio.create_task(openai_llm_call(golden.input))
     dataset.evaluate(task)
 ```
 
 </Tab>
 <Tab title="Async Responses">
 
-```python main.py {1,18}
+```python main.py
+import asyncio
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
-import asyncio
+from deepeval.tracing import trace
 
-client = AsyncOpenAI()
+async_client = AsyncOpenAI()
+
+async def openai_llm_call(input):
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.expected_output,
+    ):
+        return await async_client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=input,  
+        )
+
 
 dataset = EvaluationDataset()
 dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
-    # add OpenAI client task
-    task = asyncio.create_task(
-        client.responses.create(
-            model="gpt-4o",
-            instructions="You are a helpful assistant.",
-            input=golden.input,
-            metrics=[AnswerRelevancyMetric(), BiasMetric()]
-        )
-    )
+    task = asyncio.create_task(openai_llm_call(golden.input))
     dataset.evaluate(task)
 ```
 
@@ -353,24 +501,28 @@ Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_ite
 <Tabs>
   <Tab title="Chat Completions">
 
-```python {1, 24}
+```python
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace_manager
-from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import observe, trace
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
 
 client = OpenAI()
 
 @observe()
 def generate_response(input: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4.1",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": input},
-        ],
-        metrics=[answer_relevancy]
-    )
-    return response
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric()],
+        expected_output=golden.output,
+    ):
+        response = client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": input},
+            ],
+        )
+        return response
 
 # Create dataset
 dataset = EvaluationDataset()
@@ -384,22 +536,26 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Responses">
 
-```python {1, 22}
+```python
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace_manager
-from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import observe, trace
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import EvaluationDataset
 
 client = OpenAI()
 
 @observe()
 def generate_response(input: str) -> str:
-    response = client.responses.create(
-        model="gpt-4.1",
-        instructions="You are a helpful assistant.",
-        input=input,
-        metrics=[answer_relevancy]
-    )
-    return response
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric()],
+        expected_output=golden.expected_output,
+    ):
+        response = client.responses.create(
+            model="gpt-4.1",
+            instructions="You are a helpful assistant.",
+            input=input,
+        )
+        return response
 
 # Create dataset
 dataset = EvaluationDataset()
@@ -413,25 +569,29 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Async Chat Completions">
 
-```python {2, 25}
-import asyncio
-from deepeval.openai import AsyncOpenAI
-from deepeval.tracing import observe, trace_manager
-from deepeval.dataset import EvaluationDataset, Golden
+```python
+from deepeval.openai import OpenAI
+from deepeval.tracing import observe, trace
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
 
-client = AsyncOpenAI()
+client = OpenAI()
 
 @observe()
-async def generate_response(input: str) -> str:
-    response = await client.chat.completions.create(
-        model="gpt-4.1",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": input},
-        ],
-        metrics=[answer_relevancy]
-    )
-    return response
+def generate_response(input: str) -> str:
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric()],
+        expected_output=golden.expected_output,
+    ):
+        response = client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": input},
+            ],
+        )
+        return response
+
 
 # Create dataset
 dataset = EvaluationDataset()
@@ -439,30 +599,33 @@ dataset.pull("your-dataset-alias")
 
 # Run component-level evaluation
 for golden in dataset.evals_iterator():
-    task = asyncio.create_task(generate_response(golden.input))
-    dataset.evaluate(task)
+    generate_response(golden.input)
 ```
 
 </Tab>
 <Tab title="Async Responses">
 
-```python {2, 23}
+```python
 import asyncio
 from deepeval.openai import AsyncOpenAI
-from deepeval.tracing import observe, trace_manager
-from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import observe, trace
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.dataset import EvaluationDataset
 
 client = AsyncOpenAI()
 
 @observe()
 async def generate_response(input: str) -> str:
-    response = await client.responses.create(
-        model="gpt-4.1",
-        instructions="You are a helpful assistant.",
-        input=input,
-        metrics=[answer_relevancy]
-    )
-    return response
+    with trace(
+        llm_metrics=[AnswerRelevancyMetric()],
+        expected_output=golden.expected_output,
+    ):
+        response = await client.responses.create(
+            model="gpt-4.1",
+            instructions="You are a helpful assistant.",
+            input=input,
+        )
+        return response
 
 # Create dataset
 dataset = EvaluationDataset()
