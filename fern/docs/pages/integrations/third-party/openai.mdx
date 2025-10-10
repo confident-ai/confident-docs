@@ -154,11 +154,12 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the ConfidentInstrumentationSettings.
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context.
 
 ```python main.py
 from deepeval.openai import OpenAI
 from deepeval.prompt import Prompt
+from deepeval.tracing import trace
 
 prompt = Prompt(alias="my-prompt")
 prompt.pull(version="00.00.01")
@@ -174,11 +175,30 @@ with trace(prompt=prompt):
 
 ```
 
-### Set trace attributes
+### Logging threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+with trace(thread_id="test_thread_id_1"):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": prompt.interpolate(name="Jhon")}, # String system prompt
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+
+```
+
+### Other trace attributes
 
 Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your OpenAI client.
 
-For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
+For example, `user_id` can be used to enable user analytics. You can learn more about [user id](/docs/llm-tracing/advanced-features/users) here. Similarly, you can set the `metadata` to attach any metadata to the trace.
 
 You can set these attributes in the `trace` context when invoking your OpenAI client.
 
@@ -197,7 +217,6 @@ with trace(
             {"role": "user", "content": "Hello, how are you?"},
         ],
     )
-
 ```
 <Note>
   This override the trace attributes that were set using `update_current_trace` method.
@@ -253,10 +272,6 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
   />
 </Frame>
 
-<Warning>
-  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
-</Warning>
-
 </Step>
 
 <Step title="Run evals">
@@ -265,6 +280,7 @@ Set the `llm_metric_collection` name in the `trace` context when invoking your O
 
 ```python main.py
 from deepeval.openai import OpenAI
+from deepeval.tracing import trace
 
 client = OpenAI()
 
@@ -303,7 +319,7 @@ task_completion = AnswerRelevancyMetric(
 
 <Warning>
   You can only run end-to-end evals on OpenAI using metrics that evaluate
-  `input`, `output`, or `tools_called`.
+  `input`, `output`, or `tools_called`. You can pass parameters like `expected_output`, `expected_tools`, `context` and `retrieval_context` to the `trace` context.
 </Warning>
 
 </Step>
@@ -315,10 +331,11 @@ Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_ite
 <Tabs>
 <Tab title="Chat Completions">
 
-```python main.py {1,18}
+```python main.py {1,13-16}
 from deepeval.openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import trace
 
 client = OpenAI()
 
@@ -327,23 +344,27 @@ dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
     # run OpenAI client
-    client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": golden.input}
-        ],
-        metrics=[AnswerRelevancyMetric(), BiasMetric()]
-    )
+    with trace(
+        metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.output,
+    ):
+        client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": golden.input}
+            ],
+        )
 ```
 
 </Tab>
 <Tab title="Responses">
 
-```python main.py {1,16}
+```python main.py {1,13-16}
 from deepeval.openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
+from deepeval.tracing import trace
 
 client = OpenAI()
 
@@ -352,12 +373,15 @@ dataset.pull("your-dataset-alias")
 
 for golden in dataset.evals_iterator():
     # run OpenAI client
-    client.responses.create(
-        model="gpt-4o",
-        instructions="You are a helpful assistant.",
-        input=golden.input,
-        metrics=[AnswerRelevancyMetric(), BiasMetric()]
-    )
+    with trace(
+        metrics=[AnswerRelevancyMetric(), BiasMetric()],
+        expected_output=golden.output,
+    ):
+        client.responses.create(
+            model="gpt-4o",
+            instructions="You are a helpful assistant.",
+            input=golden.input,
+        )
 ```
 
 </Tab>
