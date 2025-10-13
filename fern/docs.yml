@@ -373,3 +373,6 @@ logo:
   light: docs/assets/docs-dark-logo.svg
   height: 18
   href: https://www.confident-ai.com
+
+metadata:
+  canonical-host: "www.confident-ai.com"
