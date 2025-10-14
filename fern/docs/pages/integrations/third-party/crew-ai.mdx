@@ -68,14 +68,205 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-### View on Confident AI
+## Advanced Usage
 
-You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+### Logging threads
 
-<Frame>
-<video
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/end-to-end%3Acrewai-4k-no-zoom.mp4"
-  controls
-  autoPlay
-/>
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Set the `thread_id` in the `trace` context and call `crew.kickoff` within the context.
+
+```python main.py {7}
+...
+with trace(thread_id="crewai_run_1"):
+    crew.kickoff({"city": "London"})
+```
+
+### Logging metadata
+
+You can also set the `metadata` in the `trace` context.
+
+```python main.py {7}
+...
+with trace(metadata={"test_metadata_1": "test_metadata_1"}):
+    crew.kickoff({"city": "London"})
+```
+
+### Other trace attributes
+
+Additionally, you can set the `name`, `tags` and `user_id` in the `trace` context.
+
+```python main.py {7}
+...
+with trace(name="crewai_run_1", tags=["crewai"], user_id="crewai_user_1"):
+    crew.kickoff({"city": "London"})
+```
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/advanced-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/advanced-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/advanced-features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/advanced-features/users).
+</ParamField>
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-evaluation/online-evals) on your OpenAI Agent, which will run evaluations on all incoming traces on Confident AI’s servers. This is the recommended approach, especially if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI Agent.
+
+<Accordion title='Click to see supported metrics for OpenAI Agents'>
+
+Confident AI supports evaluating the input-output pairs of OpenAI Agent spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
+
+- [Answer Relevancy](https://www.confident-ai.com/docs/metrics/single-turn/answer-relevancy-metric)
+- [Task Completion](https://www.confident-ai.com/docs/metrics/single-turn/task-completion-metric)
+- [GEval](https://deepeval.com/docs/metrics-llm-evals)
+- [Bias](https://www.confident-ai.com/docs/metrics/single-turn/bias-metric)
+- [Toxicity](https://www.confident-ai.com/docs/metrics/single-turn/toxicity-metric)
+
+<Info>
+  If you're looking to use other metrics, setup Confident AI's [native
+  tracing](/docs/llm-tracing/introduction) instead.
+</Info>
+
+</Accordion>
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
 </Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+
+<Warning>
+  Agent span metrics are currently only supported for `Runner.run` and
+  `Runner.run_sync`.
+</Warning>
+
+<Tabs>
+
+<Tab title="Trace">
+
+Replace your `Agent` with DeepEval's and supply the metric collection name to run evals on the agent span level.
+
+```python main.py {10}
+import asyncio
+from agents import Runner, add_trace_processor
+from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    agent_metric_collection="test_collection_1",
+)
+
+async def main():
+    result = await Runner.run(weather_agent, "What's the weather in UK?")
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+
+<Tab title="LLM Span">
+
+Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent` to run evals on the LLM span level.
+
+```python main.py {10}
+import asyncio
+from agents import Runner, add_trace_processor
+from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    llm_metric_collection="test_collection_1",
+)
+
+async def main():
+    result = await Runner.run(weather_agent, "What's the weather in UK?")
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+Replace the `function_tool` decorator with DeepEval's wrapper, and provide the metric collection name to run evals on the tool span level.
+
+```python main.py {7}
+import asyncio
+from agents import Agent, Runner, add_trace_processor
+from deepeval.openai_agents import function_tool, DeepEvalTracingProcessor
+
+add_trace_processor(DeepEvalTracingProcessor())
+
+@function_tool(metric_collection="test_collection_1")
+def get_weather(city: str) -> str:
+    return "The weather in " + city + " is sunny."
+
+weather_agent = Agent(
+    name="Weather Agent",
+    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
+    tools=[get_weather],
+)
+
+async def main():
+    result = await Runner.run(weather_agent, "What's the weather in UK?")
+    print(result.final_output)
+
+asyncio.run(main())
+```
+
+</Tab>
+</Tabs>
+
+<Success>
+  All incoming traces and spans will now be evaluated using metrics from your
+  metric collection.
+</Success>
+
+</Step>
+</Steps>
