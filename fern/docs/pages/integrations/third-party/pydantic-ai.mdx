@@ -303,6 +303,47 @@ Other trace attributes can also be passed to the `ConfidentInstrumentationSettin
 </Info>
 </Accordion>
 
+### Sending annotations
+
+Send human annotations on the threads or traces on Confident AI. Learn more about [sending annotations](/docs/human-in-the-loop/collect-feedback).
+
+<Tabs>
+  <Tab title="Traces">
+    ```python
+    from deepeval.tracing import trace
+    from deepeval.annotation import send_annotation
+    ...
+
+    TRACE_UUID = None
+    with trace() as current_trace:
+        result = agent.run_sync("What are the LLMs?")
+        TRACE_UUID = current_trace.uuid # you can save this to use it later
+    
+    send_annotation(
+        trace_uuid=TRACE_UUID,
+        rating=1,
+    )
+
+    ```
+  </Tab>
+  <Tab title="Threads">
+    ```python
+    from deepeval.tracing import trace
+    from deepeval.annotation import send_annotation
+    ...
+
+    THREAD_ID = "test_thread_id_1"
+    with trace(thread_id=THREAD_ID) as current_trace:
+        result = agent.run_sync("What are the LLMs?")
+
+    send_annotation(
+        thread_id=THREAD_ID,
+        rating=1,
+    )
+    ```
+  </Tab>
+</Tabs>
+
 ## Evals Usage
 
 ### Online evals
