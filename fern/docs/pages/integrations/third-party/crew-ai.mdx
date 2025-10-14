@@ -171,95 +171,140 @@ Confident AI supports evaluating the input-output pairs of OpenAI Agent spans an
 
 <Step title="Run evals">
 
-You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+Run evaluations on the various components of your CrewAI application by setting the `metric_collection` to the DeepEval's wrapper for CrewAI.
 
 <Warning>
-  Agent span metrics are currently only supported for `Runner.run` and
-  `Runner.run_sync`.
+The current CrewAI integration supports metrics with parameters that evaluate **input** and **actual output** in addition to the **Task Completion** metric.
 </Warning>
 
 <Tabs>
 
 <Tab title="Trace">
+To evaluate the trace level, set the `trace_metric_collection` to the DeepEval's `trace` context.
 
-Replace your `Agent` with DeepEval's and supply the metric collection name to run evals on the agent span level.
+```python main.py
+from crewai import Task, Crew, Agent
 
-```python main.py {10}
-import asyncio
-from agents import Runner, add_trace_processor
-from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+from deepeval.tracing import trace
+from deepeval.integrations.crewai import instrument_crewai
+instrument_crewai()
 
-add_trace_processor(DeepEvalTracingProcessor())
-
-weather_agent = Agent(
-    name="Weather Agent",
-    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
-    agent_metric_collection="test_collection_1",
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
 )
 
-async def main():
-    result = await Runner.run(weather_agent, "What's the weather in UK?")
-    print(result.final_output)
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
 
-asyncio.run(main())
+crew = Crew(agents=[agent], tasks=[task])
+
+with trace(trace_metric_collection="test_collection_1"):
+    result = crew.kickoff({"input": "What are the LLMs?"})
+    print(result)
 ```
 
+</Tab>
+
+<Tab title="Crew Span">
+
+To evaluate the crew span level, set the `metric_collection` to the DeepEval's `Crew` wrapper.
+
+```python main.py
+from crewai import Task, Agent
+
+from deepeval.integrations.crewai import Crew
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task], metric_collection="test_collection_1")
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
+</Tab>
+
+<Tab title="Agent Span">
+
+To evaluate the agent span level, set the `metric_collection` to the DeepEval's `Agent` wrapper.
+
+```python main.py
+from crewai import Task, Crew
+
+from deepeval.integrations.crewai import Agent
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metric_collection="test_collection_1",
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task])
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
 </Tab>
 
 <Tab title="LLM Span">
 
-Replace your Pydantic `Agent` with DeepEval’s and your supply the metric collection name to `Agent` to run evals on the LLM span level.
+To evaluate the llm span level, set the `metric_collection` to the DeepEval's `LLM` wrapper.
 
-```python main.py {10}
-import asyncio
-from agents import Runner, add_trace_processor
-from deepeval.openai_agents import Agent, DeepEvalTracingProcessor
+```python main.py
+from crewai import Task, Crew, Agent
 
-add_trace_processor(DeepEvalTracingProcessor())
+from deepeval.integrations.crewai import LLM
+from deepeval.integrations.crewai import instrument_crewai
 
-weather_agent = Agent(
-    name="Weather Agent",
-    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
-    llm_metric_collection="test_collection_1",
+instrument_crewai()
+
+llm = LLM(
+    model="gpt-4o-mini",
+    metric_collection="test_collection_1",
 )
 
-async def main():
-    result = await Runner.run(weather_agent, "What's the weather in UK?")
-    print(result.final_output)
-
-asyncio.run(main())
-```
-
-</Tab>
-
-<Tab title="Tool Span">
-
-Replace the `function_tool` decorator with DeepEval's wrapper, and provide the metric collection name to run evals on the tool span level.
-
-```python main.py {7}
-import asyncio
-from agents import Agent, Runner, add_trace_processor
-from deepeval.openai_agents import function_tool, DeepEvalTracingProcessor
-
-add_trace_processor(DeepEvalTracingProcessor())
-
-@function_tool(metric_collection="test_collection_1")
-def get_weather(city: str) -> str:
-    return "The weather in " + city + " is sunny."
-
-weather_agent = Agent(
-    name="Weather Agent",
-    instructions="You are a weather agent. You are given a question about the weather and you need to answer it.",
-    tools=[get_weather],
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    llm=llm,
 )
 
-async def main():
-    result = await Runner.run(weather_agent, "What's the weather in UK?")
-    print(result.final_output)
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
 
-asyncio.run(main())
+crew = Crew(agents=[agent], tasks=[task])
+
+result = crew.kickoff({"input": "What are the LLMs?"})
 ```
-
 </Tab>
 </Tabs>
 
