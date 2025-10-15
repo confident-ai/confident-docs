@@ -75,8 +75,6 @@ To begin tracing your Portkey LLM calls as a component in your application, impo
             {"role": "user", "content": "What is Portkey"}
             ],
         )
-
-        print(response.choices[0].message.content)
         ```
     </Tab>
     <Tab title="Async Chat Completions">
@@ -100,19 +98,44 @@ To begin tracing your Portkey LLM calls as a component in your application, impo
             ],
         )
 
-        print(response.choices[0].message.content)
-
         asyncio.run(main())        
         ```
     </Tab>
     <Tab title="Responses">
         ```python main.py
-        
+        from deepeval.openai import OpenAI
+        from portkey_ai import PORTKEY_GATEWAY_URL
+
+        portkey = OpenAI(
+            base_url = PORTKEY_GATEWAY_URL,
+            api_key = "<PORTKEY_API_KEY>"
+        )
+
+        response = portkey.responses.create(
+            model = "@slug/<model>",
+            instructions = "You are a helpful assistant.",
+            input = "What is Portkey"
+        )
         ```
     </Tab>
     <Tab title="Async Responses">
         ```python main.py
-        
+        from deepeval.openai import AsyncOpenAI
+        from portkey_ai import PORTKEY_GATEWAY_URL
+
+        portkey = AsyncOpenAI(
+            base_url = PORTKEY_GATEWAY_URL,
+            api_key = "<PORTKEY_API_KEY>"
+        )
+
+        async def main():
+            response = await portkey.responses.create(
+                model = "@slug/<model>",
+                instructions = "You are a helpful assistant.",
+                input = "What is Portkey"
+            )
+
+        asyncio.run(main())
         ```
     </Tab>
 </Tabs>
