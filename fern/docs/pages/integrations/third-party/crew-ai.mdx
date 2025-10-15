@@ -68,14 +68,249 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
-### View on Confident AI
+## Advanced Usage
 
-You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+### Logging threads
 
-<Frame>
-<video
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/end-to-end%3Acrewai-4k-no-zoom.mp4"
-  controls
-  autoPlay
-/>
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Set the `thread_id` in the `trace` context and call `crew.kickoff` within the context.
+
+```python main.py {7}
+...
+with trace(thread_id="crewai_run_1"):
+    crew.kickoff({"city": "London"})
+```
+
+### Logging metadata
+
+You can also set the `metadata` in the `trace` context.
+
+```python main.py {7}
+...
+with trace(metadata={"test_metadata_1": "test_metadata_1"}):
+    crew.kickoff({"city": "London"})
+```
+
+### Other trace attributes
+
+Additionally, you can set the `name`, `tags` and `user_id` in the `trace` context.
+
+```python main.py {7}
+...
+with trace(name="crewai_run_1", tags=["crewai"], user_id="crewai_user_1"):
+    crew.kickoff({"city": "London"})
+```
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/advanced-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/advanced-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/advanced-features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/advanced-features/users).
+</ParamField>
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-evaluation/online-evals) on your OpenAI Agent, which will run evaluations on all incoming traces on Confident AI’s servers. This is the recommended approach, especially if your agent is in production.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI Agent.
+
+<Accordion title='Click to see supported metrics for OpenAI Agents'>
+
+Confident AI supports evaluating the input-output pairs of OpenAI Agent spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
+
+- [Answer Relevancy](https://www.confident-ai.com/docs/metrics/single-turn/answer-relevancy-metric)
+- [Task Completion](https://www.confident-ai.com/docs/metrics/single-turn/task-completion-metric)
+- [GEval](https://deepeval.com/docs/metrics-llm-evals)
+- [Bias](https://www.confident-ai.com/docs/metrics/single-turn/bias-metric)
+- [Toxicity](https://www.confident-ai.com/docs/metrics/single-turn/toxicity-metric)
+
+<Info>
+  If you're looking to use other metrics, setup Confident AI's [native
+  tracing](/docs/llm-tracing/introduction) instead.
+</Info>
+
+</Accordion>
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
 </Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+Run evaluations on the various components of your CrewAI application by setting the `metric_collection` to the DeepEval's wrapper for CrewAI.
+
+<Warning>
+The current CrewAI integration supports metrics with parameters that evaluate **input** and **actual output** in addition to the **Task Completion** metric.
+</Warning>
+
+<Tabs>
+
+<Tab title="Trace">
+To evaluate the trace level, set the `trace_metric_collection` to the DeepEval's `trace` context.
+
+```python main.py
+from crewai import Task, Crew, Agent
+
+from deepeval.tracing import trace
+from deepeval.integrations.crewai import instrument_crewai
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task])
+
+with trace(trace_metric_collection="test_collection_1"):
+    result = crew.kickoff({"input": "What are the LLMs?"})
+```
+
+</Tab>
+
+<Tab title="Crew Span">
+
+To evaluate the crew span level, set the `metric_collection` to the DeepEval's `Crew` wrapper.
+
+```python main.py
+from crewai import Task, Agent
+
+from deepeval.integrations.crewai import Crew
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task], metric_collection="test_collection_1")
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
+</Tab>
+
+<Tab title="Agent Span">
+
+To evaluate the agent span level, set the `metric_collection` to the DeepEval's `Agent` wrapper.
+
+```python main.py
+from crewai import Task, Crew
+
+from deepeval.integrations.crewai import Agent
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    metric_collection="test_collection_1",
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task])
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
+</Tab>
+
+<Tab title="LLM Span">
+
+To evaluate the llm span level, set the `metric_collection` to the DeepEval's `LLM` wrapper.
+
+```python main.py
+from crewai import Task, Crew, Agent
+
+from deepeval.integrations.crewai import LLM
+from deepeval.integrations.crewai import instrument_crewai
+
+instrument_crewai()
+
+llm = LLM(
+    model="gpt-4o-mini",
+    metric_collection="test_collection_1",
+)
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    llm=llm,
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task])
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
+</Tab>
+</Tabs>
+
+<Success>
+  All incoming traces and spans will now be evaluated using metrics from your
+  metric collection.
+</Success>
+
+</Step>
+</Steps>
