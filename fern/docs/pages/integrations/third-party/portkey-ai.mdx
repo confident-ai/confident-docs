@@ -1,0 +1,247 @@
+---
+slug: integrations/third-party/portkey
+subtitle: Portkey AI serves as a unified interface for interacting LLMs
+---
+
+## Overview
+
+Confident AI lets you trace and evaluate Portkey LLM calls, whether standalone or used as a component within a larger application.
+
+## Tracing Quickstart
+<Steps>
+
+<Step title="Install Dependencies">
+
+Run the following command to install the required packages:
+
+```bash
+pip install -U deepeval portkey-ai
+```
+
+</Step>
+
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock language="bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+```
+</CodeBlock>
+
+<CodeBlock title="Env" language="bash">
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Configure Portkey">
+
+To begin tracing your Portkey LLM calls as a component in your application, import OpenAI and use the `PORTKEY_GATEWAY_URL` to trace the calls.
+
+<Tabs>
+    <Tab title="Chat Completions">
+        ```python main.py
+        from deepeval.openai import OpenAI
+        from portkey_ai import PORTKEY_GATEWAY_URL
+
+        portkey = OpenAI(
+        base_url = PORTKEY_GATEWAY_URL,
+        api_key = "<PORTKEY_API_KEY>"
+        )
+
+        response = portkey.chat.completions.create(
+            model = "@slug/<model>",
+            messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "What is Portkey"}
+            ],
+        )
+
+        print(response.choices[0].message.content)
+        ```
+    </Tab>
+    <Tab title="Async Chat Completions">
+        ```python main.py
+        import asyncio
+
+        from deepeval.openai import AsyncOpenAI
+        from portkey_ai import PORTKEY_GATEWAY_URL
+
+        portkey = AsyncOpenAI(
+            base_url = PORTKEY_GATEWAY_URL,
+            api_key = "<PORTKEY_API_KEY>"
+        )
+
+        async def main():
+        response = await portkey.chat.completions.create(
+            model = "@slug/<model>",
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "What is Portkey"}
+            ],
+        )
+
+        print(response.choices[0].message.content)
+
+        asyncio.run(main())        
+        ```
+    </Tab>
+    <Tab title="Responses">
+        ```python main.py
+        
+        ```
+    </Tab>
+    <Tab title="Async Responses">
+        ```python main.py
+        
+        ```
+    </Tab>
+</Tabs>
+
+<Note>
+  DeepEval's Portkey client traces `chat.completions.create` method.
+</Note>
+</Step>
+
+<Step title="Run Portkey">
+
+Invoke your agent by executing the script:
+
+```bash
+python main.py
+```
+
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` to the `create` method.
+
+```python main.py
+from portkey_ai import PORTKEY_GATEWAY_URL
+
+from deepeval.openai import OpenAI
+from deepeval.prompt import Prompt
+from deepeval.tracing import trace
+
+portkey = OpenAI(
+  base_url = PORTKEY_GATEWAY_URL,
+  api_key = "<PORTKEY_API_KEY>"
+)
+
+prompt = Prompt(alias="my_prompt")
+prompt.pull(version="00.00.01")
+
+with trace(prompt=prompt):
+  response = portkey.chat.completions.create(
+      model = "@slug/<model>",
+      messages = [
+        {"role": "system", "content": prompt.interpolate(name="John")}, # string system prompt
+        {"role": "user", "content": "What is Portkey"}
+      ],
+  )
+
+print(response.choices[0].message.content)
+```
+
+### Logging threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+from portkey_ai import PORTKEY_GATEWAY_URL
+
+portkey = OpenAI(
+  base_url = PORTKEY_GATEWAY_URL,
+  api_key = "<PORTKEY_API_KEY>"
+)
+
+with trace(thread_id="test_thread_id_1"):
+  response = portkey.chat.completions.create(
+      model = "@slug/<model>",
+      messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is Portkey"}
+      ],
+  )
+
+print(response.choices[0].message.content)
+```
+
+<Note>
+  This is an example of using `STRING` type prompt interpolation.
+</Note>
+
+
+## Evals Usage
+
+### Online evals
+If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI agent. Copy the name of the metric collection.
+
+<Frame caption="Create metric collection">
+  <video
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
+    controls
+    autoPlay
+  />
+</Frame>
+
+</Step>
+
+<Step title="Run evals">
+
+Set the `llm_metric_collection` name in the `trace` context when invoking your OpenAI client to evaluate Llm Spans.
+
+```python main.py
+from deepeval.openai import OpenAI
+from deepeval.tracing import trace
+
+client = OpenAI()
+
+with trace(llm_metric_collection="test_collection_1"):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello, how are you?"},
+        ],
+    )
+```
+
+</Step>
+
+</Steps>
