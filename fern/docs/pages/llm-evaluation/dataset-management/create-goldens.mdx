@@ -73,6 +73,24 @@ dataset.push(alias="YOUR-DATASET-ALIAS")
 
 For **multi-turn** datasets, push multi-turn goldens:
 
+<Tabs>
+<Tab title="With Turns" language="turns">
+```python main.py
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+from deepeval.test_case import Turn
+
+goldens = [
+    ConversationalGolden(
+        scenario="Angry user asking for a refund.",
+        turns=[Turn(role="user", content="Give me my money!")]
+    )
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+dataset.push(alias="YOUR-DATASET-ALIAS")
+```
+</Tab>
+<Tab title="Without Turns" language="no-turns">
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
@@ -81,12 +99,14 @@ dataset = EvaluationDataset(goldens=goldens)
 
 dataset.push(alias="YOUR-DATASET-ALIAS")
 ```
+</Tab>
+</Tabs>
 
 </Tab>
 
 <Tab title="Typescript" language="typescript">
  
- For **single-turn** datasets, push single-turn goldens:
+For **single-turn** datasets, push single-turn goldens:
 
 ```ts index.ts
 import { EvaluationDataset, Golden } from "deepeval-ts";
@@ -99,16 +119,35 @@ dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 
 For **multi-turn** datasets, push multi-turn goldens:
 
+<Tabs>
+<Tab title="With Turns" language="turns">
 ```ts index.ts
-import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+import { EvaluationDataset, ConversationalGolden, Turn } from "deepeval-ts";
 
 const goldens = [
-  new ConversationalGolden({ scenario: "Angry user asking for a refund." }),
+    new ConversationalGolden({
+        scenario: "Angry user asking for a refund.",
+        turns: [new Turn(role: "user", content: "Where's my money!?")]
+    }),
 ];
 const dataset = new EvaluationDataset({ goldens });
 
 dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 ```
+</Tab>
+<Tab title="Without Turns" language="no-turns">
+```ts index.ts
+import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+
+const goldens = [
+    new ConversationalGolden({ scenario: "Angry user asking for a refund." }),
+];
+const dataset = new EvaluationDataset({ goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS" });
+```
+</Tab>
+</Tabs>
 
 </Tab>
 
@@ -145,6 +184,23 @@ dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 
 For **multi-turn** datasets, queue multi-turn goldens:
 
+<Tabs>
+<Tab title="With Turns" language="turns">
+```python main.py
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+
+goldens = [
+    ConversationalGolden(
+        scenario="Angry user asking for a refund.",
+        turns=[Turn(role="user", content="Give me my money!")]
+    )
+]
+dataset = EvaluationDataset()
+
+dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
+```
+</Tab>
+<Tab title="Without Turns" language="no-turns">
 ```python main.py
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
@@ -153,6 +209,8 @@ dataset = EvaluationDataset()
 
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
 ```
+</Tab>
+</Tabs>
 
 </Tab>
 
@@ -171,16 +229,35 @@ dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
 
 For **multi-turn** datasets, queue multi-turn goldens:
 
+<Tabs>
+<Tab title="With Turns" language="turns">
 ```ts index.ts
 import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
 
 const goldens = [
-  new ConversationalGolden({ scenario: "User asking for refund." }),
+    new ConversationalGolden({
+        scenario: "Angry user asking for a refund.",
+        turns: [new Turn(role: "user", content: "Where's my money!?")]
+    }),
 ];
 const dataset = new EvaluationDataset();
 
 dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
 ```
+</Tab>
+<Tab title="Without Turns" language="no-turns">
+```ts index.ts
+import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+
+const goldens = [
+    new ConversationalGolden({ scenario: "User asking for refund." }),
+];
+const dataset = new EvaluationDataset();
+
+dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens });
+```
+</Tab>
+</Tabs>
 
 </Tab>
 
