@@ -19,6 +19,23 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
+  /v1/test-runs/{testRunId}:
+    get:
+      parameters:
+        - in: path
+          name: testRunId
+          required: true
+          schema:
+            type: string
+          description: The id of the test run you want to retrieve.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
   /v1/metric-collections/{id}:
     put:
       parameters:
