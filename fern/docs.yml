@@ -331,15 +331,19 @@ navigation:
           - page: LlamaIndex
             path: docs/pages/integrations/third-party/llama-index.mdx
             icon: fa-light fa-horse-head
-          - page: LiteLLM
-            path: docs/pages/integrations/third-party/litellm.mdx
-            icon: fa-light fa-train
           - page: Crew AI
             path: docs/pages/integrations/third-party/crew-ai.mdx
             icon: fa-light fa-user-group
+      - section: LLM Gateways
+        collapsed: true
+        contents:
+          - page: LiteLLM
+            path: docs/pages/integrations/third-party/litellm.mdx
+            icon: fa-light fa-train
           - page: Portkey
             path: docs/pages/integrations/third-party/portkey-ai.mdx
             icon: fa-light fa-hexagon
+
 
 navbar-links:
   - type: minimal
