@@ -20,19 +20,19 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
             from openai import OpenAI
-            
+
             client = OpenAI()
-            
+
             @observe()
             def llm_app(query: str):
                 res = client.chat.completions.create(
                     model="gpt-4o",
                     messages=[{"role": "user", "content": query}]
                 ).choices[0].message.content
-            
+
                 update_current_trace(thread_id="your-thread-id", input=query, output=res)
                 return res
-            
+
             llm_app("Write me a poem.")
             ```
 
@@ -41,16 +41,16 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
     </Tab>
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {11}
-            import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+            import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
             import OpenAI from 'openai';
-            
+
             const llmApp = (query: string) => {
                 const openai = new OpenAI();
                 const res = openai.chat.completions.create({
                     model: "gpt-4o",
                     messages: [ { role: "user", content: query } ]
                 }).choices[0].message.content;
-                
+
                 updateCurrentTrace({ threadId: "your-thread-id", input: query, output: res });
                 return res;
             };

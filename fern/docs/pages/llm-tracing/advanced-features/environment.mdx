@@ -43,7 +43,7 @@ Alternatively, you can set the environment directly in code:
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {4}
             import OpenAI from 'openai';
-            import { observe, traceManager } from '@deepeval-ts/tracing';
+            import { observe, traceManager } from 'deepeval-ts/tracing';
 
             traceManager.configure({ environment: "production" });
             const openai = new OpenAI();

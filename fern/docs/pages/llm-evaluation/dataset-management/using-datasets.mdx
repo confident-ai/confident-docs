@@ -117,8 +117,7 @@ console.log(dataset.goldens);
 Then loop through your dataset of goldens to create a list of test cases:
 
 ```ts index.ts focus={7-13}
-import { EvaluationDataset } from "deepeval-ts";
-import { LLMTestCase } from "deepeval-ts";
+import { EvaluationDataset, LLMTestCase } from "deepeval-ts";
 
 dataset = new EvaluationDataset();
 dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
