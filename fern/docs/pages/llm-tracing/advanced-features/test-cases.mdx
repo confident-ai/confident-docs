@@ -68,8 +68,8 @@ You can set span-level test case parameters in the `update_current_span` functio
     </Tab>
     <Tab title="TypeScript" language="typescript">
             ```js title="index.ts" {5}
-            import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
-            import { ToolCall } from "@deepeval-ts/test-case";
+            import { observe, updateCurrentSpan } from "deepeval-ts/tracing";
+            import { ToolCall } from "deepeval-ts";
 
             const toolCallingAgent = (query: string) => {
                 updateCurrentSpan({
@@ -125,7 +125,7 @@ You can set trace-level test case parameters in the `update_current_trace` funct
     <Tab title="TypeScript" language="typescript">
             ```js title="index.ts" {21}
             import OpenAI from "openai";
-            import { observe, updateCurrentTrace } from "@deepeval-ts/tracing";
+            import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
 
             const client = new OpenAI();
 

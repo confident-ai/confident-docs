@@ -33,7 +33,7 @@ You can name a trace at runtime by providing the `name` paramter in `update_curr
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {7}
             import OpenAI from 'openai';
-            import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+            import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
 
             const openai = new OpenAI();
 
@@ -81,7 +81,7 @@ The default name for a span is the name of the function/method you're decorating
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {7}
             import OpenAI from 'openai';
-            import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+            import { observe, updateCurrentSpan } from 'deepeval-ts/tracing';
 
             const openai = new OpenAI();
 

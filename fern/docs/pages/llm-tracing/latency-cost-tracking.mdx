@@ -48,7 +48,7 @@ def generate_response(prompt: str) -> str:
 ```
 
 ```typescript {6,7,15,16}
-import { observe, updateLlmSpan } from "@deepeval-ts/tracing";
+import { observe, updateLlmSpan } from "deepeval-ts/tracing";
 
 const generateResponse = (prompt: string): string => {
   const output = "Generated response";
@@ -91,7 +91,7 @@ def generate_response(prompt: str) -> str:
 ```
 
 ```typescript {14}
-import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
+import { observe, updateCurrentSpan } from "deepeval-ts/tracing";
 
 const generateResponse = (prompt: string): string => {
   const output = "Generated response";
@@ -171,7 +171,7 @@ def generate_response(prompt: str) -> str:
 <Tab title="TypeScript">
 
 ```typescript title="index.ts" {14}
-import { observe, updateCurrentSpan } from "@deepeval-ts/tracing";
+import { observe, updateCurrentSpan } from "deepeval-ts/tracing";
 
 const generateResponse = (prompt: string): string => {
   const output = "Generated response";
@@ -237,7 +237,7 @@ def generate_response(prompt: str) -> str:
 <Tab title="TypeScript">
 
 ```typescript title="index.ts" {6,7,15,16}
-import { observe, updateLlmSpan } from "@deepeval-ts/tracing";
+import { observe, updateLlmSpan } from "deepeval-ts/tracing";
 
 const generateResponse = (prompt: string): string => {
   const output = "Generated response";

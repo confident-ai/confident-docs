@@ -66,7 +66,7 @@ You'll also need to use `update_current_span` with an `LLMTestCase` at runtime t
 
     <Tab title="TypeScript" language="typescript">
     ```typescript title="index.ts" {1,5,13}
-    import { observe, updateCurrentSpan } from '@deepeval-ts/tracing';
+    import { observe, updateCurrentSpan } from 'deepeval-ts/tracing';
 
     const generate = async (prompt: string): Promise<string> => {
     updateCurrentSpan({
@@ -132,7 +132,7 @@ Similar to evals for spans, you would also provide a `metricCollection` name, bu
 
     <Tab title="TypeScript" language="typescript">
     ```typescript title="index.ts" {5,13}
-    import { observe, updateCurrentTrace } from '@deepeval-ts/tracing';
+    import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
 
     const generate = async (prompt: string): Promise<string> => {
     updateCurrentTrace({

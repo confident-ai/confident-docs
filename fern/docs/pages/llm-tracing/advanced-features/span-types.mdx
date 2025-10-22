@@ -34,7 +34,7 @@ The most flexible `type` out of all (and the default type if `type` is not provi
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript
-        import { observe } from '@deepeval-ts/tracing';
+        import { observe } from 'deepeval-ts/tracing';
         
         const ragPipeline = (query: string): string => {
             // Implementation
@@ -83,13 +83,13 @@ An LLM span represents a call to a language model. It tracks the input, output, 
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
-        import { observe } from '@deepeval-ts/tracing';
-        
+        import { observe } from 'deepeval-ts/tracing';
+
         const generateResponse = (prompt: string): string => {
             // Implementation
             return "";
         };
-        
+
         const observedGenerateResponse = observe({
             type: "llm",
             model: "gpt-4",
@@ -105,7 +105,7 @@ An LLM span represents a call to a language model. It tracks the input, output, 
         - [Optional] `costPerOutputToken`: A float specifying the cost per output token. Defaulted to None.
         - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the decorated function.
         - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics in the [here](/docs/llm-tracing/evaluations#online-evaluations).
-        
+
     </Tab>
 </Tabs>
 
@@ -123,7 +123,7 @@ A Retriever span represents a component that fetches relevant information from a
         ```python title="main.py"
         from deepeval.tracing import observe
         from typing import List
-        
+
         @observe(type="retriever", embedder="text-embedding-ada-002")
         def retrieve_documents(query: str) -> List[str]:
             pass
@@ -131,13 +131,13 @@ A Retriever span represents a component that fetches relevant information from a
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
-        import { observe } from '@deepeval-ts/tracing';
-        
+        import { observe } from 'deepeval-ts/tracing';
+
         const retrieveDocuments = (query: string): string[] => {
             // Implementation
             return [];
         };
-        
+
         const observedRetrieveDocuments = observe({
             type: "retriever",
             embedder: "text-embedding-ada-002",
@@ -162,7 +162,7 @@ A Tool span represents a function that an agent can call to perform a specific t
     <Tab title="Python" language="python">
         ```python title="main.py"
         from deepeval.tracing import observe
-        
+
         @observe(type="tool")
         def web_search(query: str) -> str:
             pass
@@ -170,13 +170,13 @@ A Tool span represents a function that an agent can call to perform a specific t
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
-        import { observe } from '@deepeval-ts/tracing';
-        
+        import { observe } from 'deepeval-ts/tracing';
+
         const webSearch = (query: string): string => {
             // Implementation
             return "";
         };
-        
+
         const observedWebSearch = observe({
             type: "tool",
             fn: webSearch
@@ -200,7 +200,7 @@ An Agent span represents an autonomous entity that can make decisions and intera
     <Tab title="Python" language="python">
         ```python title="main.py"
         from deepeval.tracing import observe
-        
+
         @observe(
             type="agent",
             available_tools=["search", "calculator"],
@@ -221,13 +221,13 @@ An Agent span represents an autonomous entity that can make decisions and intera
     </Tab>
     <Tab title="TypeScript" language="typescript">
         ```typescript title="index.ts"
-        import { observe } from '@deepeval-ts/tracing';
-        
+        import { observe } from 'deepeval-ts/tracing';
+
         const supervisorAgent = (query: string): string => {
             // Implementation
             return "";
         };
-        
+
         const observedSupervisorAgent = observe({
             type: "agent",
             availableTools: ["search", "calculator"],

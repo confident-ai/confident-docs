@@ -157,7 +157,7 @@ In a later section, you'll learn how to create [spans that are LLM specific](/do
 
         <CodeBlocks>
           ```js title="In code"
-          import { traceManager } from '@deepeval-ts/tracing';
+          import { traceManager } from 'deepeval-ts/tracing';
 
           traceManager.configure({
               confidentApiKey: "YOUR-API-KEY"
@@ -174,7 +174,7 @@ In a later section, you'll learn how to create [spans that are LLM specific](/do
 
           ```ts title="index.ts" focus={2,13,16}
           import OpenAI from 'openai';
-          import { observe } from '@deepeval-ts/tracing';
+          import { observe } from 'deepeval-ts/tracing';
 
           const llmApp = async (query: string) => {
             const openai = new OpenAI();

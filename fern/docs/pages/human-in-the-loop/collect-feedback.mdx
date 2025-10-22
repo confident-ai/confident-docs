@@ -100,7 +100,7 @@ def llm_app(query: str) -> str:
 
 ```typescript Trace {5,14,15} maxLines={24}
 import { OpenAI } from "openai";
-import { observe, getCurrentTrace } from "deepeval-ts";
+import { observe, getCurrentTrace } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
 let TRACE_UUID: string | null = null;
@@ -125,7 +125,7 @@ const observedLlmApp = observe({ fn: llm_app });
 
 ```typescript Span {5,14,15} maxLines={24}
 import { OpenAI } from "openai";
-import { observe, getCurrentSpan } from "deepeval-ts";
+import { observe, getCurrentSpan } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
 let SPAN_UUID: string | null = null;
@@ -278,7 +278,7 @@ def llm_app(query: str) -> str:
 
 ```typescript index.ts {5,12} maxLines={24}
 import { OpenAI } from "openai";
-import { observe, updateCurrentTrace } from "deepeval-ts";
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
 const THREAD_ID = "YOUR-THREAD-ID";
