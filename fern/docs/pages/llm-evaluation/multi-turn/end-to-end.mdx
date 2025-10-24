@@ -174,17 +174,18 @@ for golden in dataset.goldens:
 <Tab title="Typescript" language="typescript">
 
 ```ts index.ts focus={6-12}
-import { EvaluationDataset, LLMTestCase, Golden } from "deepeval-ts";
+import { ConversationalGolden, ConversationSimulator, EvaluationDataset } from "deepeval-ts";
 
 const dataset = new EvaluationDataset();
-await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 const simulator = new ConversationSimulator({ modelCallback: chatbotCallback });
-const testCases = simulator.simulate({
-  conversationalGoldens: dataset.goldens,
+const testCases = await simulator.simulate({
+  conversationalGoldens: dataset.goldens as ConversationalGolden[],
 });
+
 for (const testCase of testCases) {
-  dataset.add_test_case(testCase);
+  dataset.addTestCase(testCase);
 }
 ```
 
@@ -215,10 +216,13 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 <Tab title="Typescript" language="typescript">
 
 ```ts index.ts
-import { evaluate } from "deepeval-ts";
+import { ConversationalTestCase, evaluate, EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 evaluate({
-  conversationalTestCases: dataset.testCases,
+  conversationalTestCases: dataset.testCases as ConversationalTestCase[],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```

@@ -49,8 +49,8 @@ Alternatively, you can set the sampling rate directly in code:
             const openai = new OpenAI();
             traceManager.configure({ sampleRate: 0.5 });
 
-            const llmApp = (query: string) => {
-                const response = openai.chat.completions.create({
+            const llmApp = async (query: string) => {
+                const response = await openai.chat.completions.create({
                     model: "gpt-4o",
                     messages: [{ role: "user", content: query }]
                 });

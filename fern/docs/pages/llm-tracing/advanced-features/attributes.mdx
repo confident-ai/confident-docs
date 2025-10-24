@@ -61,7 +61,7 @@ These functions update the attributes for the **CURRENT** span of the component 
                         },
                     });
                     observedInnerFunction();
-                };
+                },
             })
             ```
     </Tab>
@@ -111,7 +111,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
     </Tab>
     <Tab title="TypeScript" language="typescript">
             ```typescript title="index.ts" {5}
-            import { observe, updateLlmSpan } from 'deepeval-ts/tracing';
+            import { observe, updateLlmSpan } from "deepeval-ts/tracing";
 
             const generateResponse = (prompt: string) => {
                 const output = "Generated response";
@@ -124,7 +124,11 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
                 return output;
             };
 
-            const obsetveResponse = observe({ type: "llm", model: "gpt-4", fn: generateResponse });
+            const obsetveResponse = observe({
+                type: "llm",
+                model: "gpt-4",
+                fn: generateResponse,
+            });
             ```
 
         There are **SIX** optional parameters for `updateLlmSpan`:

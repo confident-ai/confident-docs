@@ -266,7 +266,7 @@ async function createDataset() {
   // goldens are what makes up your dataset
   const goldens = [new Golden({ input: "What's the weather like in SF?" })];
   // create dataset
-  const dataset = new EvaluationDataset({ goldens });
+  const dataset = new EvaluationDataset({ goldens: goldens });
   // save to Confident AI
   await dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 }
@@ -321,7 +321,7 @@ async function runEvaluation() {
 
   // Run an evaluation
   await evaluate({
-    llmTestCases: dataset.testCases,
+    llmTestCases: dataset.testCases as LLMTestCase[],
     metricCollection: "YOUR-METRIC-COLLECTION-NAME",
   });
 }
