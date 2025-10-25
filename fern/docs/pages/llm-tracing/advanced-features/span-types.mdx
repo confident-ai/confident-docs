@@ -231,7 +231,7 @@ An Agent span represents an autonomous entity that can make decisions and intera
         const observedSupervisorAgent = observe({
             type: "agent",
             availableTools: ["search", "calculator"],
-            handoffAgents: ["research_agent", "math_agent"],
+            agentHandoffs: ["research_agent", "math_agent"],
             fn: supervisorAgent
         });
         ```

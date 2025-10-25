@@ -40,11 +40,11 @@ Tags are applied at the trace level, making them visible for all spans within th
             import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
             import OpenAI from 'openai';
 
-            const llmApp = (query: string) => {
+            const llmApp = async (query: string) => {
                 updateCurrentTrace({ tags: ["Causal Chit-Chat"] });
 
                 const openai = new OpenAI();
-                const response = openai.chat.completions.create({
+                const response = await openai.chat.completions.create({
                     model: "gpt-4o",
                     messages: [ { role: "user", content: query } ]
                 });

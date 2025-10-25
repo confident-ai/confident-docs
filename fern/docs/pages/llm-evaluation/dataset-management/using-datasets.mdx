@@ -104,7 +104,7 @@ First use the `.pull()` method:
 ```ts index.ts
 import { EvaluationDataset } from "deepeval-ts";
 
-dataset = new EvaluationDataset();
+const dataset = new EvaluationDataset();
 dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 console.log(dataset.goldens);
@@ -117,17 +117,18 @@ console.log(dataset.goldens);
 Then loop through your dataset of goldens to create a list of test cases:
 
 ```ts index.ts focus={7-13}
-import { EvaluationDataset, LLMTestCase } from "deepeval-ts";
+import { EvaluationDataset, Golden, LLMTestCase } from "deepeval-ts";
 
-dataset = new EvaluationDataset();
+const dataset = new EvaluationDataset();
 dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
-for (const golden of dataset.goldens) {
+for (const golden of dataset.goldens as Golden[]) {
   const testCase = new LLMTestCase({
     input: golden.input,
     actualOutput: llmApp(golden.input),
     // map any additional fields here
   });
+
   dataset.addTestCase(testCase);
 }
 ```
@@ -136,10 +137,17 @@ for (const golden of dataset.goldens) {
   For **multi-turn** datasets, you will create `ConversationalTestCase`s instead:
 
 ```ts index.ts
-import { ConversationalTestCase } from "deepeval-ts";
+import { ConversationalGolden, ConversationSimulator, EvaluationDataset } from "deepeval-ts";
 
-for (const golden of dataset.goldens) {
-  const testCase = simulate(golden); // simulate conversation
+const dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+const simulator = new ConversationSimulator({ modelCallback: chatbotCallback });
+const testCases = await simulator.simulate({
+  conversationalGoldens: dataset.goldens as ConversationalGolden[],
+});
+
+for (const testCase of testCases) {
   dataset.addTestCase(testCase);
 }
 ```
@@ -153,9 +161,15 @@ for (const golden of dataset.goldens) {
 By calling `.addTestCase()` in the previous step, each time you run evaluate Confident AI will automatically associate any created test run with your dataset:
 
 ```ts
-import { evaluate } from "deepeval-ts";
+import { ConversationalTestCase, EvaluationDataset, evaluate } from "deepeval-ts";
 
-evaluate({ conversationalTestCases: dataset.testCases, metrics: [...]});
+const dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+evaluate({
+  conversationalTestCases: dataset.testCases as ConversationalTestCase[],
+  metrics: [...],
+});
 ```
 
 </Step>

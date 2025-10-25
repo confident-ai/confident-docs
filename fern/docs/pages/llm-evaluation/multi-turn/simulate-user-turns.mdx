@@ -142,13 +142,17 @@ conversational_test_cases = simulator.simulate(conversational_goldens=dataset.go
 Only remote simluation is available in typescript.
 
 ```ts index.ts
-import { ConversationSimulator } from "deepeval-ts";
+import { ConversationalGolden, ConversationSimulator, EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
 const simulator = new ConversationSimulator({
   modelCallback: chatbotCallback,
 });
-const results1 = await simulator.simulate({
-  conversationalGoldens: dataset.goldens,
+
+const results = await simulator.simulate({
+  conversationalGoldens: dataset.goldens as ConversationalGolden[],
 });
 ```
 
@@ -320,14 +324,23 @@ conversation_golden = ConversationalGolden(
 ```ts index.ts
 import { ConversationalGolden, Turn } from "deepeval-ts";
 
+const firstTurn = new Turn({
+  role: "user",
+  content: "Hi",
+});
+const secondTurn = new Turn({
+  role: "assistant",
+  content: "Hello! How can I help you today?",
+});
+const thirdTurn = new Turn({
+  role: "user",
+  content: "I want to purchase a VIP ticket to a cold play concert.",
+});
+
 const conversationGolden = new ConversationalGolden({
   scenario: "Andy Byron wants to purchase a VIP ticket to a cold play concert.",
   userDescription: "Andy Byron is the CEO of Astronomer.",
-  turns: [
-    new Turn({ role: "user", content: "Hi" }),
-    new Turn({ role: "assistant", content: "Hello! How can I help you today?" }),
-    new Turn({ role: "user", content: "I want to purchase a VIP ticket to a cold play concert." }),
-  ],
+  turns: [firstTurn, secondTurn, thirdTurn],
 });
 ```
 

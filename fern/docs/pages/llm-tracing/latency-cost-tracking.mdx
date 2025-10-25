@@ -52,10 +52,10 @@ import { observe, updateLlmSpan } from "deepeval-ts/tracing";
 
 const generateResponse = (prompt: string): string => {
   const output = "Generated response";
-  updateLlmSpan(
+  updateLlmSpan({
     inputTokenCount: 10,
     outputTokenCount: 20,
-  );
+  });
   return output;
 };
 

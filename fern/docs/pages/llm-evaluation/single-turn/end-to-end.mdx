@@ -313,6 +313,7 @@ for (const golden of dataset.goldens as Golden[]) {
     input: golden.input,
     actualOutput: llmApp(golden.input),
   });
+
   dataset.addTestCase(testCase);
 }
 ```
@@ -344,10 +345,12 @@ evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
 <Tab title="Typescript" language="typescript">
 
 ```ts index.ts
-import { evaluate } from "deepeval-ts";
+import { evaluate, EvaluationDataset, LLMTestCase } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
 
 evaluate({
-  llmTestCases: dataset.testCases,
+  llmTestCases: dataset.testCases as LLMTestCase[],
   metricCollection: "YOUR-COLLECTION-NAME",
 });
 ```
