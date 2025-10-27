@@ -103,20 +103,21 @@ import { OpenAI } from "openai";
 import { observe, getCurrentTrace } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
-let TRACE_UUID: string | null = null;
 
-const llm_app = async (query: string): Promise<string> => {
+let TRACE_UUID;
+
+const llmApp = async (query: string): Promise<string | null> => {
   const completion = await client.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: query }],
   });
 
   const currentTrace = getCurrentTrace();
-  TRACE_UUID = currentTrace.uuid;
+  TRACE_UUID = currentTrace?.uuid;
   return completion.choices[0].message.content;
 };
 
-const observedLlmApp = observe({ fn: llm_app });
+const observedLlmApp = observe({ fn: llmApp });
 ```
 
 </CodeBlock>
@@ -128,20 +129,20 @@ import { OpenAI } from "openai";
 import { observe, getCurrentSpan } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
-let SPAN_UUID: string | null = null;
+let SPAN_UUID;
 
-const llm_app = async (query: string): Promise<string> => {
+const llmApp = async (query: string): Promise<string | null> => {
   const completion = await client.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: query }],
   });
 
   const currentSpan = getCurrentSpan();
-  SPAN_UUID = currentSpan.uuid;
+  SPAN_UUID = currentSpan?.uuid;
   return completion.choices[0].message.content;
 };
 
-const observedLlmApp = observe({ fn: llm_app });
+const observedLlmApp = observe({ fn: llmApp });
 ```
 
 </CodeBlock>
@@ -276,23 +277,24 @@ def llm_app(query: str) -> str:
 </Tab>
 <Tab title="Typescript">
 
-```typescript index.ts {5,12} maxLines={24}
+```typescript index.ts {5,14} maxLines={24}
 import { OpenAI } from "openai";
 import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
 
 const client = new OpenAI();
 const THREAD_ID = "YOUR-THREAD-ID";
 
-const llm_app = async (query: string): Promise<string> => {
+const llmApp = async (query: string): Promise<string | null> => {
   const completion = await client.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: query }],
   });
+
   updateCurrentTrace({ threadId: THREAD_ID });
   return completion.choices[0].message.content;
 };
 
-const observedLlmApp = observe({ fn: llm_app });
+const observedLlmApp = observe({ fn: llmApp });
 observedLlmApp("Write me a poem.");
 ```
 

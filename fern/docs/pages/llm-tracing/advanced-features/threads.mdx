@@ -44,15 +44,16 @@ You can use the `update_current_trace` function to set the `thread_id` within tr
             import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
             import OpenAI from 'openai';
 
-            const llmApp = (query: string) => {
+            const llmApp = async (query: string) => {
                 const openai = new OpenAI();
-                const res = openai.chat.completions.create({
+                const response = await openai.chat.completions.create({
                     model: "gpt-4o",
                     messages: [ { role: "user", content: query } ]
-                }).choices[0].message.content;
+                });
+                const data = response.choices[0].message.content;
 
-                updateCurrentTrace({ threadId: "your-thread-id", input: query, output: res });
-                return res;
+                updateCurrentTrace({ threadId: "your-thread-id", input: query, output: data });
+                return response;
             };
 
             const observedLlmApp = observe({ fn: llmApp });
