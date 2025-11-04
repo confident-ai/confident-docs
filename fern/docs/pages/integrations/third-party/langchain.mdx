@@ -207,7 +207,7 @@ You can set these attributes in the `CallbackHandler` when invoking your LangCha
 
 <CodeBlocks>
 
-<CodeBlock>
+<CodeBlock language="python">
 ```python main.py {4}
 result = agent_executor.invoke(
     {"input": "What is 8 multiplied by 6?"},
@@ -263,6 +263,9 @@ const handler = new DeepEvalCallbackHandler({
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```python main.py
 from langchain_openai import ChatOpenAI
 from deepeval.prompt import Prompt
@@ -275,6 +278,26 @@ llm = ChatOpenAI(
     metadata={"prompt": prompt}
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts
+import { ChatOpenAI } from "@langchain/openai";
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "<prompt-alias>" });
+prompt.pull({ version: "00.00.01" });
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  metadata: {
+    prompt: prompt,
+  },
+});
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 <Note>
   Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
