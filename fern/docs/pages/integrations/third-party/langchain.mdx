@@ -205,14 +205,28 @@ For example, `thread_id` and `user_id` are used to group related traces together
 
 You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
-```python main.py maxLines=100
+<CodeBlocks>
+
+<CodeBlock>
+```python main.py {4}
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [CallbackHandler(thread_id="123")]
     },
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts {2}
+const handler = new DeepEvalCallbackHandler({
+  threadId: "123",
+});
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
