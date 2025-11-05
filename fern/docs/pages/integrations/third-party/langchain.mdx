@@ -15,9 +15,21 @@ subtitle: Use Confident AI for LLM observability and evals for LangChain
 
 Run the following command to install the required packages:
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```bash
 pip install -U deepeval langchain langchain-openai
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```bash
+npm install langchain @langchain/core
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 </Step>
 
@@ -28,14 +40,12 @@ Login to Confident AI using your Confident API key.
 <CodeBlocks>
 
 <CodeBlock language="bash">
-
 ```bash
 deepeval login
 ```
 </CodeBlock>
 
 <CodeBlock language="python">
-
 ```python
 import deepeval
 
@@ -57,6 +67,9 @@ export CONFIDENT_API_KEY="<your-confident-api-key>"
 
 Provide DeepEval's `CallbackHandler` to your LangChain application's invoke method.
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```python main.py {7,29} maxLines=32
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -89,19 +102,94 @@ result = agent_executor.invoke(
     config={"callbacks": [CallbackHandler()]},
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts {9,11} maxLines=32
+import { ChatOpenAI } from "@langchain/openai";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { DynamicStructuredTool } from "@langchain/core/tools";
+import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
+
+import { DeepEvalCallbackHandler } from "deepeval-ts/integrations";
+
+const handler = new DeepEvalCallbackHandler({});
+
+const multiplyTool = new DynamicStructuredTool({
+  name: "multiply",
+  description: "Returns the product of two numbers",
+  schema: {
+    a: { type: "number", description: "The first number" },
+    b: { type: "number", description: "The second number" },
+  },
+  func: async ({ a, b }: { a: number; b: number }) => a * b,
+});
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  temperature: 0,
+});
+
+const agentPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "You are a helpful assistant that can perform mathematical operations.",
+  ],
+  ["human", "{input}"],
+  new MessagesPlaceholder("agent_scratchpad"),
+]);
+
+const agent = await createToolCallingAgent({
+  llm,
+  tools: [multiplyTool],
+  prompt: agentPrompt,
+});
+
+const agentExecutor = new AgentExecutor({
+  agent,
+  tools: [multiplyTool],
+  verbose: true,
+});
+
+const main = async () => {
+  const result = await agentExecutor.invoke(
+    { input: "What is 8 multiplied by 6?" },
+    { callbacks: [handler] }
+  );
+};
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 <Note>
-  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
+  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html) or LangChain.js' [`BaseCallbackHandler`](https://v03.api.js.langchain.com/classes/_langchain_core.callbacks_base.BaseCallbackHandler.html).
 </Note>
+
 </Step>
 
 <Step title="Run LangChain">
 
 Invoke your application by executing the script:
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```bash
 python main.py
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```bash
+npx ts-node index.ts
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
@@ -118,14 +206,28 @@ For example, `thread_id` and `user_id` are used to group related traces together
 
 You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
-```python main.py maxLines=100
+<CodeBlocks>
+
+<CodeBlock language="python">
+```python main.py {4}
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [CallbackHandler(thread_id="123")]
     },
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts {2}
+const handler = new DeepEvalCallbackHandler({
+  threadId: "123",
+});
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
@@ -162,6 +264,9 @@ result = agent_executor.invoke(
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```python main.py
 from langchain_openai import ChatOpenAI
 from deepeval.prompt import Prompt
@@ -174,6 +279,26 @@ llm = ChatOpenAI(
     metadata={"prompt": prompt}
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts
+import { ChatOpenAI } from "@langchain/openai";
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "<prompt-alias>" });
+prompt.pull({ version: "00.00.01" });
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  metadata: {
+    prompt: prompt,
+  },
+});
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 <Note>
   Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
@@ -185,6 +310,7 @@ llm = ChatOpenAI(
 ## Evals Usage
 
 ### Online evals
+
 If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
@@ -214,9 +340,13 @@ Set the `metric_collection` name to evaluate various components of your LangChai
 <Tabs>
 
 <Tab title="Agent Span">
+
 This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
 
-```python main.py {23} maxLines=100 
+<CodeBlocks>
+
+<CodeBlock language="python">
+```python main.py {23} maxLines=100
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -244,13 +374,81 @@ result = agent_executor.invoke(
     },
 )
 ```
+</CodeBlock>
+
+<CodeBlock language="typescript">
+```typescript index.ts {12} maxLines=100
+import { ChatOpenAI } from "@langchain/openai";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { DynamicStructuredTool } from "@langchain/core/tools";
+import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
+
+import { DeepEvalCallbackHandler } from "deepeval-ts/integrations";
+
+const handler = new DeepEvalCallbackHandler({
+  metricCollection: "<metric_collection_name>",
+});
+
+const multiplyTool = new DynamicStructuredTool({
+  name: "multiply",
+  description: "Returns the product of two numbers",
+  schema: {
+    a: { type: "number", description: "The first number" },
+    b: { type: "number", description: "The second number" },
+  },
+  func: async ({ a, b }: { a: number; b: number }) => a * b,
+});
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+});
+
+const agentPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "You are a helpful assistant that can perform mathematical operations.",
+  ],
+  ["human", "{input}"],
+  new MessagesPlaceholder("agent_scratchpad"),
+]);
+
+const agent = await createToolCallingAgent({
+  llm,
+  tools: [multiplyTool],
+  prompt: agentPrompt,
+});
+
+const agentExecutor = new AgentExecutor({
+  agent,
+  tools: [multiplyTool],
+  verbose: true,
+});
+
+const main = async () => {
+  const result = await agentExecutor.invoke(
+    { input: "What is 8 multiplied by 6?" },
+    { callbacks: [handler] }
+  );
+
+  console.log(result);
+};
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
 <Tab title="LLM Span">
 
-For LLM spans, you can set the `metric_collection` name in the `metadata` parameter of the language model instance.
+For LLM spans, you can set the `metric_collection` or `metricCollection` name in the `metadata` parameter of the language model instance.
 
+<CodeBlocks>
+
+<CodeBlock language="python">
 ```python main.py {15}
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -265,7 +463,7 @@ def multiply(a: int, b: int) -> int:
     return a * b
 
 llm = ChatOpenAI(
-  model="gpt-4o-mini", 
+  model="gpt-4o-mini",
   metadata={"metric_collection": "<metric_collection_name>"}
 )
 
@@ -274,7 +472,7 @@ agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
 agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
 
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [
           CallbackHandler(metric_collection="<metric_collection_name>")
@@ -282,6 +480,72 @@ result = agent_executor.invoke(
     },
 )
 ```
+</CodeBlock>
+
+<CodeBlock>
+```typescript index.ts {25,26,27}
+import { ChatOpenAI } from "@langchain/openai";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { DynamicStructuredTool } from "@langchain/core/tools";
+import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
+
+import { DeepEvalCallbackHandler } from "deepeval-ts/integrations";
+
+const handler = new DeepEvalCallbackHandler({});
+
+const multiplyTool = new DynamicStructuredTool({
+  name: "multiply",
+  description: "Returns the product of two numbers",
+  schema: {
+    a: { type: "number", description: "The first number" },
+    b: { type: "number", description: "The second number" },
+  },
+  func: async ({ a, b }: { a: number; b: number }) => a * b,
+});
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  metadata: {
+    metricCollection: "<metric_collection_name>",
+  },
+});
+
+const agentPrompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    "You are a helpful assistant that can perform mathematical operations.",
+  ],
+  ["human", "{input}"],
+  new MessagesPlaceholder("agent_scratchpad"),
+]);
+
+const agent = await createToolCallingAgent({
+  llm,
+  tools: [multiplyTool],
+  prompt: agentPrompt,
+});
+
+const agentExecutor = new AgentExecutor({
+  agent,
+  tools: [multiplyTool],
+  verbose: true,
+});
+
+const main = async () => {
+  const result = await agentExecutor.invoke(
+    { input: "What is 8 multiplied by 6?" },
+    { callbacks: [handler] }
+  );
+
+  console.log(result);
+};
+```
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
@@ -312,7 +576,7 @@ def multiply(a: int, b: int) -> int:
     return a * b
 
 llm = ChatOpenAI(
-  model="gpt-4o-mini", 
+  model="gpt-4o-mini",
   metadata={"metric_collection": "<metric_collection_name>"}
 )
 
@@ -321,7 +585,7 @@ agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
 agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
 
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [
           CallbackHandler(metric_collection="<metric_collection_name>")
