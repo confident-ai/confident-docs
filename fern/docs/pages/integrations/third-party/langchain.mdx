@@ -16,18 +16,13 @@ subtitle: Use Confident AI for LLM observability and evals for LangChain
 Run the following command to install the required packages:
 
 <CodeBlocks>
-
-<CodeBlock language="python">
-```bash
+```python title="Python"
 pip install -U deepeval langchain langchain-openai
 ```
-</CodeBlock>
 
-<CodeBlock language="typescript">
-```bash
+```typescript title="TypeScript"
 npm install langchain @langchain/core
 ```
-</CodeBlock>
 
 </CodeBlocks>
 
@@ -39,24 +34,30 @@ Login to Confident AI using your Confident API key.
 
 <CodeBlocks>
 
-<CodeBlock language="bash">
+<CodeBlock title="Env" language="bash">
+
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
+
+</CodeBlock>
+
+<CodeBlock language="bash" title="Bash">
+
 ```bash
 deepeval login
 ```
+
 </CodeBlock>
 
 <CodeBlock language="python">
+
 ```python
 import deepeval
 
 deepeval.login("<your-confident-api-key>")
 ```
-</CodeBlock>
 
-<CodeBlock title="Env" language="bash">
-```bash
-export CONFIDENT_API_KEY="<your-confident-api-key>"
-```
 </CodeBlock>
 
 </CodeBlocks>
@@ -67,10 +68,11 @@ export CONFIDENT_API_KEY="<your-confident-api-key>"
 
 Provide DeepEval's `CallbackHandler` to your LangChain application's invoke method.
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```python main.py {7,29} maxLines=32
+
+```python Python {7,29} maxLines=32
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -102,10 +104,12 @@ result = agent_executor.invoke(
     config={"callbacks": [CallbackHandler()]},
 )
 ```
+
 </CodeBlock>
 
 <CodeBlock language="typescript">
-```typescript index.ts {9,11} maxLines=32
+
+```typescript TypeScript {9,11} maxLines=32
 import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
@@ -161,12 +165,16 @@ const main = async () => {
   );
 };
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
 
 <Note>
-  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html) or LangChain.js' [`BaseCallbackHandler`](https://v03.api.js.langchain.com/classes/_langchain_core.callbacks_base.BaseCallbackHandler.html).
+  DeepEval's `CallbackHandler` extends LangChain's
+  [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html)
+  or LangChain.js'
+  [`BaseCallbackHandler`](https://v03.api.js.langchain.com/classes/_langchain_core.callbacks_base.BaseCallbackHandler.html).
 </Note>
 
 </Step>
@@ -175,18 +183,22 @@ const main = async () => {
 
 Invoke your application by executing the script:
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```bash
+
+```python
 python main.py
 ```
+
 </CodeBlock>
 
 <CodeBlock language="typescript">
-```bash
-npx ts-node index.ts
+
+```typescript
+npx ts-node
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -200,16 +212,17 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Set trace attributes
 
-Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application. 
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application.
 
 For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
 
 You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```python main.py {4}
+
+```python Python {4}
 result = agent_executor.invoke(
     {"input": "What is 8 multiplied by 6?"},
     config={
@@ -217,14 +230,17 @@ result = agent_executor.invoke(
     },
 )
 ```
+
 </CodeBlock>
 
 <CodeBlock language="typescript">
-```typescript index.ts {2}
+
+```typescript TypeScript {2}
 const handler = new DeepEvalCallbackHandler({
   threadId: "123",
 });
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -264,10 +280,11 @@ const handler = new DeepEvalCallbackHandler({
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```python main.py
+
+```python Python
 from langchain_openai import ChatOpenAI
 from deepeval.prompt import Prompt
 
@@ -275,14 +292,16 @@ prompt = Prompt(alias="<prompt-alias>")
 prompt.pull(version="00.00.01")
 
 llm = ChatOpenAI(
-    model="gpt-4o-mini", 
+    model="gpt-4o-mini",
     metadata={"prompt": prompt}
 )
 ```
+
 </CodeBlock>
 
 <CodeBlock language="typescript">
-```typescript index.ts
+
+```typescript TypeScript
 import { ChatOpenAI } from "@langchain/openai";
 import { Prompt } from "deepeval-ts";
 
@@ -296,6 +315,7 @@ const llm = new ChatOpenAI({
   },
 });
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -305,7 +325,6 @@ const llm = new ChatOpenAI({
   Be sure to **pull the prompt** before logging it, otherwise the prompt will
   not be visible on Confident AI.
 </Note>
-
 
 ## Evals Usage
 
@@ -328,7 +347,8 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 </Frame>
 
 <Warning>
-  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
+  The current LangChain integration supports metrics that only evaluate `Input`
+  and `Actual Output` in addition to the **Task Completion** metric.
 </Warning>
 
 </Step>
@@ -337,16 +357,17 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 Set the `metric_collection` name to evaluate various components of your LangChain application.
 
-<Tabs>
+<Tabs group="eval-method">
 
 <Tab title="Agent Span">
 
 This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```python main.py {23} maxLines=100
+
+```python Python {23} maxLines=100
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -366,7 +387,7 @@ agent = create_tool_calling_agent(llm, [multiply], agent_prompt)
 agent_executor = AgentExecutor(agent=agent, tools=[multiply], verbose=True)
 
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [
           CallbackHandler(metric_collection="<metric_collection_name>")
@@ -374,10 +395,12 @@ result = agent_executor.invoke(
     },
 )
 ```
+
 </CodeBlock>
 
 <CodeBlock language="typescript">
-```typescript index.ts {12} maxLines=100
+
+```typescript TypeScript {12} maxLines=100
 import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
@@ -436,6 +459,7 @@ const main = async () => {
   console.log(result);
 };
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -446,10 +470,11 @@ const main = async () => {
 
 For LLM spans, you can set the `metric_collection` or `metricCollection` name in the `metadata` parameter of the language model instance.
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock language="python">
-```python main.py {15}
+
+```python Python {15}
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -480,10 +505,12 @@ result = agent_executor.invoke(
     },
 )
 ```
+
 </CodeBlock>
 
-<CodeBlock>
-```typescript index.ts {25,26,27}
+<CodeBlock language="typescript">
+
+```typescript TypeScript {25,26,27}
 import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
@@ -543,6 +570,7 @@ const main = async () => {
   console.log(result);
 };
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -554,12 +582,14 @@ const main = async () => {
 For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
 
 <Note>
-  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the metric collection.
+  If your application does not use `@tool` decorator, you can also use
+  `@observe` decorator from `deepeval.tracing` to set the metric collection.
 </Note>
 
-<CodeBlocks>
+<CodeBlocks >
 
 <CodeBlock title="Using @tool">
+
 ```python {8,10}
 # from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -593,9 +623,11 @@ result = agent_executor.invoke(
     },
 )
 ```
+
 </CodeBlock>
 
 <CodeBlock title="Using @observe">
+
 ```python
 from deepeval.tracing import observe
 from deepeval.integrations.langchain import CallbackHandler
@@ -605,6 +637,7 @@ def multiply(a: int, b: int) -> int:
     """Returns the product of two numbers"""
     return a * b
 ```
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -612,7 +645,6 @@ def multiply(a: int, b: int) -> int:
 </Tab>
 
 </Tabs>
-
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
@@ -654,7 +686,7 @@ Provide your metrics to the `CallbackHandler`. Then, use the dataset's `evals_it
 <Tabs>
 <Tab title="Synchronous">
 
-```python main.py focus={16-34} maxLines=34
+```python Python focus={16-34} maxLines=34
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from deepeval.metrics import TaskCompletionMetric
@@ -694,7 +726,7 @@ for golden in dataset.evals_iterator():
 </Tab>
 <Tab title="Asynchronous">
 
-```python main.py focus={1, 17-34} maxLines=34
+```python Python focus={1, 17-34} maxLines=34
 import asyncio
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
