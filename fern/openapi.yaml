@@ -1387,6 +1387,458 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /v1/annotation-queues:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: List Annotation Queues
+      operationId: listAnnotationQueues
+      description: Retrieves all annotation queues for your project with filtering and pagination.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: limit
+          schema:
+            type: string
+          description: Maximum number of queues to return (default 50)
+        - in: query
+          name: offset
+          schema:
+            type: string
+          description: Number of queues to skip (default 0)
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [TRACE, SPAN, THREAD, GOLDEN, TEST_RUN]
+          description: Filter by queue type
+        - in: query
+          name: searchTerm
+          schema:
+            type: string
+          description: Search queues by name
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAnnotationQueuesResponse"
+              example:
+                queues:
+                  - id: "queue-uuid-1"
+                    name: "Trace Review Queue"
+                    type: "TRACE"
+                    createdAt: "2025-11-12T10:00:00Z"
+                    updatedAt: "2025-11-12T11:00:00Z"
+                    completedItems: 45
+                    totalItems: 100
+                    completionPercentage: 45
+                  - id: "queue-uuid-2"
+                    name: "Span Quality Check"
+                    type: "SPAN"
+                    createdAt: "2025-11-11T09:00:00Z"
+                    updatedAt: "2025-11-12T10:00:00Z"
+                    completedItems: 20
+                    totalItems: 50
+                    completionPercentage: 40
+                total: 2
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Create Annotation Queue
+      operationId: createAnnotationQueue
+      description: Creates a new annotation queue for organizing traces, spans, or threads for review.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnnotationQueue"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateAnnotationQueueResponse"
+              example:
+                success: true
+                data:
+                  id: "queue-uuid"
+                  name: "My Review Queue"
+                  type: "TRACE"
+                  createdAt: "2025-11-12T10:00:00Z"
+                  updatedAt: "2025-11-12T10:00:00Z"
+
+  /v1/annotation-queues/{queueId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Get Annotation Queue
+      operationId: getAnnotationQueue
+      description: Retrieves a specific annotation queue with statistics.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue to retrieve.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAnnotationQueueResponse"
+              example:
+                annotationQueue:
+                  id: "queue-uuid"
+                  name: "Trace Review Queue"
+                  type: "TRACE"
+                  createdAt: "2025-11-12T10:00:00Z"
+                  updatedAt: "2025-11-12T11:00:00Z"
+                  completedItems: 45
+                  totalItems: 100
+                  completionPercentage: 45
+        "404":
+          description: Queue not found
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Update Annotation Queue
+      operationId: updateAnnotationQueue
+      description: Updates an annotation queue's name.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAnnotationQueue"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateAnnotationQueueResponse"
+              example:
+                success: true
+                message: "Annotation queue updated successfully"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Delete Annotation Queue
+      operationId: deleteAnnotationQueue
+      description: Deletes an annotation queue and all its items.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue to delete.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteAnnotationQueueResponse"
+              example:
+                success: true
+                message: "Annotation queue successfully deleted"
+
+  /v1/annotation-queues/{queueId}/queue:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Add Items to Queue
+      operationId: addItemsToQueue
+      description: Batch add traces, spans, or threads to an annotation queue. Only items matching the queue type are accepted.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue to add items to.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddItemsToQueue"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddItemsToQueueResponse"
+              example:
+                success: true
+                message: "Items successfully added to queue"
+                data:
+                  addedCount: 8
+                  skippedCount: 2
+
+  /v1/annotation-queues/{queueId}/items:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: List Queue Items
+      operationId: listQueueItems
+      description: Retrieves all items in a queue with filtering by completion status.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue.
+        - in: query
+          name: limit
+          schema:
+            type: string
+          description: Maximum number of items to return (default 50)
+        - in: query
+          name: offset
+          schema:
+            type: string
+          description: Number of items to skip (default 0)
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [all, completed, pending]
+            default: all
+          description: Filter by completion status
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListQueueItemsResponse"
+              example:
+                items:
+                  - id: "item-uuid-1"
+                    traceUuid: "trace-uuid-1"
+                    addedAt: "2025-11-12T10:00:00Z"
+                    completed: false
+                    assignedToEmail: "user@example.com"
+                  - id: "item-uuid-2"
+                    spanUuid: "span-uuid-1"
+                    addedAt: "2025-11-12T10:01:00Z"
+                    completed: true
+                    assignedToEmail: null
+                total: 2
+
+  /v1/annotation-queues/{queueId}/next:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Get Next Items
+      operationId: getNextItems
+      description: Retrieves the next uncompleted items from the queue for annotation.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue.
+        - in: query
+          name: count
+          schema:
+            type: string
+            default: "1"
+          description: Number of items to retrieve (1-100)
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetNextItemsResponse"
+              example:
+                items:
+                  - id: "item-uuid-1"
+                    queueItemId: "item-uuid-1"
+                    type: "TRACE"
+                    traceUuid: "trace-uuid-1"
+                    addedAt: "2025-11-12T10:00:00Z"
+                    completed: false
+                    assignedToEmail: null
+                    data:
+                      uuid: "trace-uuid-1"
+                      input: "User question"
+                      output: "AI response"
+                      created_at: "2025-11-12T09:00:00Z"
+                count: 1
+
+  /v1/annotation-queues/{queueId}/annotate:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Batch Annotate Items
+      operationId: batchAnnotateItems
+      description: Create annotations for multiple queue items in a single request.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchAnnotateItems"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchAnnotateItemsResponse"
+              example:
+                success: true
+                message: "Annotations created successfully"
+                data:
+                  annotationsCreated: 5
+                  itemsMarkedCompleted: 5
+
+  /v1/annotation-queues/{queueId}/progress:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Get Queue Progress
+      operationId: getQueueProgress
+      description: Retrieves detailed progress statistics for an annotation queue.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: queueId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetQueueProgressResponse"
+              example:
+                queueId: "queue-uuid"
+                queueName: "Trace Review Queue"
+                queueType: "TRACE"
+                statistics:
+                  totalItems: 100
+                  completedItems: 45
+                  pendingItems: 55
+                  assignedItems: 60
+                  completionPercentage: 45
+                assignmentBreakdown:
+                  "user1@example.com":
+                    assigned: 30
+                    completed: 25
+                  "user2@example.com":
+                    assigned: 30
+                    completed: 20
+
 components:
   schemas:
     Metric:
@@ -4020,3 +4472,306 @@ components:
           description: Error message describing what went wrong.
       required:
         - message
+
+    # Annotation Queue Schemas
+    CreateAnnotationQueue:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          description: The name of the annotation queue
+        type:
+          type: string
+          enum: [TRACE, SPAN, THREAD, GOLDEN, TEST_RUN]
+          description: The type of items this queue will contain
+
+    UpdateAnnotationQueue:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The new name for the annotation queue
+
+    AddItemsToQueue:
+      type: object
+      properties:
+        traceUuids:
+          type: array
+          items:
+            type: string
+          description: Array of trace UUIDs to add (for TRACE queues)
+        spanUuids:
+          type: array
+          items:
+            type: string
+          description: Array of span UUIDs to add (for SPAN queues)
+        threadIds:
+          type: array
+          items:
+            type: string
+          description: Array of thread IDs to add (for THREAD queues)
+
+    BatchAnnotateItems:
+      type: object
+      required:
+        - annotations
+      properties:
+        annotations:
+          type: array
+          items:
+            type: object
+            required:
+              - queueItemId
+              - rating
+            properties:
+              queueItemId:
+                type: string
+                description: The ID of the queue item to annotate
+              rating:
+                type: integer
+                minimum: -1
+                maximum: 1
+                description: Thumbs rating (-1 = down, 0 = neutral, 1 = up)
+              type:
+                type: string
+                default: "THUMBS_RATING"
+                description: The type of annotation
+              name:
+                type: string
+                default: "Default"
+                description: The name of the annotation
+              expectedOutcome:
+                type: string
+                description: The expected outcome
+              expectedOutput:
+                type: string
+                description: The expected output
+              explanation:
+                type: string
+                description: Explanation for the rating
+              flagged:
+                type: boolean
+                default: false
+                description: Whether the item is flagged for review
+        markAsCompleted:
+          type: boolean
+          default: true
+          description: Whether to mark the queue items as completed
+
+    ListAnnotationQueuesResponse:
+      type: object
+      properties:
+        queues:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              type:
+                type: string
+              createdAt:
+                type: string
+                format: date-time
+              updatedAt:
+                type: string
+                format: date-time
+              completedItems:
+                type: integer
+              totalItems:
+                type: integer
+              completionPercentage:
+                type: integer
+        total:
+          type: integer
+
+    CreateAnnotationQueueResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    GetAnnotationQueueResponse:
+      type: object
+      properties:
+        annotationQueue:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            completedItems:
+              type: integer
+            totalItems:
+              type: integer
+            completionPercentage:
+              type: integer
+
+    UpdateAnnotationQueueResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    DeleteAnnotationQueueResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    AddItemsToQueueResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            addedCount:
+              type: integer
+            skippedCount:
+              type: integer
+
+    ListQueueItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              traceUuid:
+                type: string
+              spanUuid:
+                type: string
+              threadId:
+                type: string
+              addedAt:
+                type: string
+                format: date-time
+              completed:
+                type: boolean
+              assignedToEmail:
+                type: string
+        total:
+          type: integer
+
+    GetNextItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              queueItemId:
+                type: string
+              type:
+                type: string
+              traceUuid:
+                type: string
+              spanUuid:
+                type: string
+              threadId:
+                type: string
+              addedAt:
+                type: string
+                format: date-time
+              completed:
+                type: boolean
+              assignedToEmail:
+                type: string
+              data:
+                type: object
+                additionalProperties: true
+        count:
+          type: integer
+
+    BatchAnnotateItemsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            annotationsCreated:
+              type: integer
+            itemsMarkedCompleted:
+              type: integer
+
+    GetQueueProgressResponse:
+      type: object
+      properties:
+        queueId:
+          type: string
+        queueName:
+          type: string
+        queueType:
+          type: string
+        statistics:
+          type: object
+          properties:
+            totalItems:
+              type: integer
+            completedItems:
+              type: integer
+            pendingItems:
+              type: integer
+            assignedItems:
+              type: integer
+            completionPercentage:
+              type: integer
+        assignmentBreakdown:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              assigned:
+                type: integer
+              completed:
+                type: integer
+
