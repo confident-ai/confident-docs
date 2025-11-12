@@ -32,6 +32,10 @@ tags:
     description: Run your evals using API
     externalDocs:
       description: Learn about prompts
+  - name: Annotations
+    description: Annotations API
+    externalDocs:
+      description: Learn about annotations
 
 paths:
   /v1/metrics:
@@ -1129,14 +1133,103 @@ paths:
                           verboseLogs: "..."
                 deprecated: false
 
-  /v1/annotation:
+  /v1/annotations:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: List Annotations
+      operationId: listAnnotations
+      description: Retrieves annotations from your Confident AI project with optional filtering.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: traceUuid
+          schema:
+            type: string
+          description: Filter annotations by trace UUID.
+        - in: query
+          name: spanUuid
+          schema:
+            type: string
+          description: Filter annotations by span UUID.
+        - in: query
+          name: threadId
+          schema:
+            type: string
+          description: Filter annotations by thread ID.
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [THUMBS_RATING, FIVE_STAR_RATING]
+          description: Filter annotations by type.
+        - in: query
+          name: minRating
+          schema:
+            type: string
+          description: Filter annotations with minimum rating (inclusive).
+        - in: query
+          name: maxRating
+          schema:
+            type: string
+          description: Filter annotations with maximum rating (inclusive).
+        - in: query
+          name: flagged
+          schema:
+            type: string
+            enum: ["true", "false"]
+          description: Filter annotations by flagged status.
+        - in: query
+          name: limit
+          schema:
+            type: string
+            default: "50"
+          description: Maximum number of annotations to return (default 50).
+        - in: query
+          name: offset
+          schema:
+            type: string
+            default: "0"
+          description: Number of annotations to skip (default 0).
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAnnotationsResponse"
+              example:
+                annotations:
+                  - id: "annotation-uuid-1"
+                    rating: 1
+                    type: "THUMBS_RATING"
+                    name: "annotation-name"
+                    expectedOutput: "Expected response content"
+                    expectedOutcome: "Expected behavior description"
+                    explanation: "Why this rating was given"
+                    flagged: false
+                    createdAt: "2025-11-12T10:30:00Z"
+                    traceUuid: "trace-uuid"
+                    spanUuid: "span-uuid"
+                    threadId: "thread-id"
+                    testCaseId: "test-case-id"
+                total: 150
+                limit: 50
+                offset: 0
     post:
       x-fern-server-name: Confident AI
       tags:
         - Annotations
       summary: Create Annotation
       operationId: createAnnotation
-      description: Dummy create annotation endpoint to surface in docs.
+      description: Creates a new annotation for a trace, span, or thread in your Confident AI project.
       parameters:
         - in: header
           name: CONFIDENT_API_KEY
@@ -1197,6 +1290,102 @@ paths:
                   data:
                     id: "ANNOTATION-ID"
                   deprecated: false
+
+  /v1/annotations/{annotationId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Get Annotation
+      operationId: getAnnotation
+      description: Retrieves a specific annotation by its ID.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: annotationId
+          required: true
+          schema:
+            type: string
+          description: The ID of the annotation to retrieve.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAnnotationResponse"
+              example:
+                annotation:
+                  id: "annotation-uuid"
+                  rating: 1
+                  type: "THUMBS_RATING"
+                  name: "annotation-name"
+                  expectedOutput: "Expected response content"
+                  expectedOutcome: "Expected behavior description"
+                  explanation: "Why this rating was given"
+                  flagged: false
+                  createdAt: "2025-11-12T10:30:00Z"
+                  traceUuid: "trace-uuid"
+                  spanUuid: "span-uuid"
+                  threadId: "thread-id"
+                  testCaseId: "test-case-id"
+        "404":
+          description: Annotation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotations
+      summary: Update Annotation
+      operationId: updateAnnotation
+      description: Updates an existing annotation.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: annotationId
+          required: true
+          schema:
+            type: string
+          description: The ID of the annotation to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAnnotation"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateAnnotationResponse"
+              example:
+                success: true
+                data:
+                  id: "ANNOTATION-ID"
+                deprecated: false
+        "404":
+          description: Annotation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   schemas:
@@ -3744,3 +3933,90 @@ components:
         - metric
         - passes
         - scores
+
+    ListAnnotationsResponse:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation"
+          description: List of annotations matching the filter criteria.
+        total:
+          type: integer
+          description: Total number of annotations matching the filter criteria.
+        limit:
+          type: integer
+          description: Maximum number of annotations returned in this response.
+        offset:
+          type: integer
+          description: Number of annotations skipped in this response.
+      required:
+        - annotations
+        - total
+        - limit
+        - offset
+
+    GetAnnotationResponse:
+      type: object
+      properties:
+        annotation:
+          $ref: "#/components/schemas/Annotation"
+      required:
+        - annotation
+
+    UpdateAnnotation:
+      type: object
+      description: Request schema to update an existing annotation.
+      properties:
+        rating:
+          type: number
+          description: Updated rating score. Must be 0 or 1 for THUMBS_RATING, 1-5 for FIVE_STAR_RATING.
+        type:
+          type: string
+          enum: [THUMBS_RATING, FIVE_STAR_RATING]
+          description: Updated annotation type.
+        expectedOutput:
+          type: string
+          description: Updated expected output for trace/span annotations.
+        expectedOutcome:
+          type: string
+          description: Updated expected outcome for thread annotations.
+        explanation:
+          type: string
+          description: Updated explanation for the annotation.
+        flagged:
+          type: boolean
+          description: Updated flagged status.
+
+    UpdateAnnotationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the annotation was successfully updated.
+        data:
+          type: object
+          description: This maps to the id of the updated annotation.
+          properties:
+            id:
+              type: string
+              description: This is the id of the updated annotation.
+          required:
+            - id
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+        - message
