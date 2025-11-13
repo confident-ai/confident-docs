@@ -331,6 +331,108 @@ paths:
                     id: "COLLECTION-ID"
                   deprecated: false
 
+  /v1/metric-data/direct:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metrics
+      summary: Post Evaluated Metrics Directly
+      operationId: postMetricDataDirect
+      description: Post evaluation metric data directly to existing traces, spans, threads, or test cases without creating new test cases. Supports batch posting of multiple metrics.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectMetricData"
+            examples:
+              Trace-Metrics:
+                summary: Post metrics to a trace
+                value:
+                  traceUuid: "trace-uuid-123"
+                  metricData:
+                    - name: "Correctness"
+                      score: 0.85
+                      success: true
+                      threshold: 0.7
+                      strictMode: false
+                      reason: "Response was accurate and aligned with expected output"
+                      evaluationModel: "gpt-4"
+                      evaluationCost: 0.002
+                    - name: "Relevancy"
+                      score: 0.92
+                      success: true
+                      threshold: 0.7
+                      strictMode: false
+                      reason: "Response was highly relevant to the user query"
+              Span-Metrics:
+                summary: Post metrics to a span
+                value:
+                  spanUuid: "span-uuid-456"
+                  metricData:
+                    - name: "Answer Relevancy"
+                      score: 0.78
+                      success: true
+                      threshold: 0.7
+                      strictMode: false
+              Thread-Metrics:
+                summary: Post metrics to a thread
+                value:
+                  threadId: "thread-id-789"
+                  metricData:
+                    - name: "Conversation Quality"
+                      score: 0.88
+                      success: true
+                      threshold: 0.75
+                      strictMode: false
+                      reason: "Conversation flow was natural and coherent"
+              TestCase-Metrics:
+                summary: Post metrics to a test case
+                value:
+                  testCaseId: 12345
+                  metricData:
+                    - name: "Faithfulness"
+                      score: 0.95
+                      success: true
+                      threshold: 0.8
+                      strictMode: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DirectMetricDataResponse"
+              example:
+                success: true
+                message: "Metric data successfully created"
+                data:
+                  metricsCreated: 2
+        "404":
+          description: Entity not found or does not belong to project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: "Trace with UUID 'trace-123' not found or does not belong to this project"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: "Must provide exactly one entity ID: traceUuid, spanUuid, threadId, testCaseId, or conversationalTestCaseId"
+
   /v1/datasets/{alias}:
     get:
       x-fern-server-name: Confident AI
@@ -4774,4 +4876,87 @@ components:
                 type: integer
               completed:
                 type: integer
+
+    # Metric Data Schemas
+    MetricDataItem:
+      type: object
+      required:
+        - name
+        - success
+        - threshold
+        - strictMode
+      properties:
+        name:
+          type: string
+          description: The name of the metric (e.g., "Correctness", "Relevancy")
+        score:
+          type: number
+          description: The metric score (optional, typically 0-1)
+        success:
+          type: boolean
+          description: Whether the metric evaluation passed
+        threshold:
+          type: number
+          description: The threshold used for evaluation
+        strictMode:
+          type: boolean
+          description: Whether strict mode was enabled
+        reason:
+          type: string
+          description: Explanation for the metric result
+        evaluationModel:
+          type: string
+          description: The model used for evaluation (e.g., "gpt-4")
+        evaluationCost:
+          type: number
+          description: Cost of the evaluation in USD
+        verboseLogs:
+          type: string
+          description: Detailed logs from the evaluation
+        error:
+          type: string
+          description: Error message if evaluation failed
+
+    DirectMetricData:
+      type: object
+      required:
+        - metricData
+      properties:
+        metricData:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricDataItem"
+          description: Array of metric data items to post
+        traceUuid:
+          type: string
+          description: UUID of the trace to attach metrics to (mutually exclusive with other entity IDs)
+        spanUuid:
+          type: string
+          description: UUID of the span to attach metrics to (mutually exclusive with other entity IDs)
+        threadId:
+          type: string
+          description: ID of the thread to attach metrics to (mutually exclusive with other entity IDs)
+        testCaseId:
+          type: integer
+          description: ID of the test case to attach metrics to (mutually exclusive with other entity IDs)
+        conversationalTestCaseId:
+          type: string
+          description: ID of the conversational test case to attach metrics to (mutually exclusive with other entity IDs)
+
+    DirectMetricDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the operation was successful
+        message:
+          type: string
+          description: Success message
+        data:
+          type: object
+          properties:
+            metricsCreated:
+              type: integer
+              description: Number of metric data items created
+
 
