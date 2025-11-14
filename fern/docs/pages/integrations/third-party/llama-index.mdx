@@ -90,6 +90,86 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
+## Advanced Usage
+
+### Logging threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+
+```python main.py
+from deepeval.tracing import trace
+...
+async def llm_app(input: str):
+    with trace(thread_id="test_thread_id_1"):
+      return await agent.run(input)
+```
+
+### Logging metadata
+
+You can also set the `metadata` in the `trace` context.
+
+```python main.py
+from deepeval.tracing import trace
+...
+async def llm_app(input: str):
+    with trace(metadata={"key": "value"}):
+      return await agent.run(input)
+```
+
+`trace` also allows you to set the `name`, `tags` and `user_id` in the `trace` context.
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/advanced-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/advanced-features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/advanced-features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/advanced-features/users).
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them in the Llm Span, pass your `Prompt` object to the `LlmSpanContext` in the `trace` context.
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.tracing.trace_context import LlmSpanContext
+
+prompt = Prompt(alias="<prompt-alias>")
+prompt.pull(version="00.00.01")
+
+...
+
+async def llm_app(input: str):
+    with trace(llm_span_context=LlmSpanContext(prompt=prompt)):
+      return await agent.run(input)
+
+```
+
+
 ## Evals Usage
 
 ### Online evals
@@ -119,14 +199,21 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
+Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex's agent and llm spans. Set the `metric_collection` name in the `trace` context when invoking your LlamaIndex agent.
 
-```python main.py maxLines=100 focus={5,17}
-import asyncio
+<Tabs>
+
+<Tab title="Agent Span">
+```python main.py
 from llama_index.llms.openai import OpenAI
-import llama_index.core.instrumentation as instrument
+from llama_index.core.agent import FunctionAgent
+
+from deepeval.tracing import trace
+from deepeval.tracing.trace_context import AgentSpanContext
+
 from deepeval.integrations.llama_index import instrument_llama_index
-from deepeval.integrations.llama_index import FunctionAgent
+import llama_index.core.instrumentation as instrument
+from deepeval.metrics import TaskCompletionMetric
 
 instrument_llama_index(instrument.get_dispatcher())
 
@@ -134,18 +221,59 @@ def multiply(a: float, b: float) -> float:
     """Useful for multiplying two numbers."""
     return a * b
 
+
 agent = FunctionAgent(
     tools=[multiply],
     llm=OpenAI(model="gpt-4o-mini"),
     system_prompt="You are a helpful assistant that can perform calculations.",
-    metric_collection="<your-metric-collection-name>",
 )
 
-async def llm_app(input: str):
-    return await agent.run(input)
 
-asyncio.run(llm_app("What is 3 * 12?"))
+async def llm_app(input: str):
+    agent_span_context = AgentSpanContext(
+        metrics=[TaskCompletionMetric()],
+    )
+    with trace(agent_span_context=agent_span_context):
+        await agent.run(input)
 ```
+</Tab>
+
+<Tab title="Llm Span">
+```python main.py
+from llama_index.llms.openai import OpenAI
+from llama_index.core.agent import FunctionAgent
+
+from deepeval.tracing import trace
+from deepeval.tracing.trace_context import LlmSpanContext
+
+from deepeval.integrations.llama_index import instrument_llama_index
+import llama_index.core.instrumentation as instrument
+from deepeval.metrics import AnswerRelevancyMetric
+
+instrument_llama_index(instrument.get_dispatcher())
+
+def multiply(a: float, b: float) -> float:
+    """Useful for multiplying two numbers."""
+    return a * b
+
+
+agent = FunctionAgent(
+    tools=[multiply],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant that can perform calculations.",
+)
+
+
+async def llm_app(input: str):
+    llm_span_context = LlmSpanContext(
+        metrics=[AnswerRelevancyMetric()],
+    )
+    with trace(llm_span_context=llm_span_context):
+        await agent.run(input)
+```
+</Tab>
+
+</Tabs>
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
@@ -186,16 +314,20 @@ Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your Ll
 <Tabs>
 <Tab title="Asynchronous">
 
-```python main.py focus={6,19, 25-33} maxLines=100
+```python main.py maxLines=100
 import asyncio
+
 from llama_index.llms.openai import OpenAI
+from llama_index.core.agent import FunctionAgent
 import llama_index.core.instrumentation as instrument
+
 from deepeval.integrations.llama_index import instrument_llama_index
+from deepeval.tracing.trace_context import AgentSpanContext
 from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.integrations.llama_index import FunctionAgent
+from deepeval.tracing import trace
 
 instrument_llama_index(instrument.get_dispatcher())
-answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
+
 
 def multiply(a: float, b: float) -> float:
     """Useful for multiplying two numbers."""
@@ -205,21 +337,16 @@ agent = FunctionAgent(
     tools=[multiply],
     llm=OpenAI(model="gpt-4o-mini"),
     system_prompt="You are a helpful assistant that can perform calculations.",
-    metrics=[answer_relevancy_metric],
 )
+
+answer_relevancy_metric = AnswerRelevancyMetric()
 
 async def llm_app(input: str):
-    return await agent.run(input)
-
-from deepeval.dataset import EvaluationDataset, Golden
-
-dataset = EvaluationDataset(
-    goldens=[Golden(input="What is 3 * 12?"), Golden(input="What is 4 * 13?")]
-)
-
-for golden in dataset.evals_iterator():
-    task = asyncio.create_task(llm_app(golden.input))
-    dataset.evaluate(task)
+    agent_span_context = AgentSpanContext(
+        metrics=[answer_relevancy_metric],
+    )
+    with trace(agent_span_context=agent_span_context):
+        return await agent.run(input)
 ```
 
 </Tab>
