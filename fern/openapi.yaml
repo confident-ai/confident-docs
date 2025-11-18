@@ -3856,6 +3856,9 @@ components:
           type: enum
           enum: [THUMBS_RATING, FIVE_STAR_RATING]
           description: This is the type of annotation, which can be either thumbs rating or five star rating.
+        name:
+          type: string
+          description: The name of the annotation.
         expectedOutcome:
           type: string
           description: This is the annotated expected outcome, for conversation annotations.
@@ -3868,6 +3871,22 @@ components:
         flagged:
           type: boolean
           description: This determines if the annotation is flagged.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the annotation was created.
+        traceUuid:
+          type: string
+          description: The UUID of the trace associated with this annotation, if applicable.
+        spanUuid:
+          type: string
+          description: The UUID of the span associated with this annotation, if applicable.
+        threadId:
+          type: string
+          description: The ID of the thread associated with this annotation, if applicable.
+        testCaseId:
+          type: string
+          description: The ID of the test case associated with this annotation, if applicable.
       required:
         - id
         - rating
@@ -4371,6 +4390,7 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
+          description: Contains the list of annotations and pagination information.
           properties:
             annotations:
               type: array
@@ -4403,9 +4423,11 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
+          description: Contains the annotation information.
           properties:
             annotation:
               $ref: "#/components/schemas/Annotation"
+              description: The annotation details.
           required:
             - annotation
       required:
@@ -4499,28 +4521,40 @@ components:
                 properties:
                   id:
                     type: string
+                    description: The unique identifier of the annotation queue.
                   name:
                     type: string
+                    description: The name of the annotation queue.
                   type:
                     type: string
+                    enum: [TRACE, SPAN, THREAD, GOLDEN, TEST_RUN]
+                    description: The type of items this queue contains.
                   createdAt:
                     type: string
                     format: date-time
+                    description: The timestamp when the annotation queue was created.
                   updatedAt:
                     type: string
                     format: date-time
+                    description: The timestamp when the annotation queue was last updated.
                   completedItems:
                     type: integer
+                    description: The number of items in the queue that have been completed.
                   totalItems:
                     type: integer
+                    description: The total number of items in the queue.
                   completionPercentage:
                     type: integer
+                    description: The percentage of items completed in the queue (0-100).
             total:
               type: integer
+              description: The total number of annotation queues matching the filter criteria.
             limit:
               type: integer
+              description: The maximum number of annotation queues returned in this response.
             offset:
               type: integer
+              description: The number of annotation queues skipped in this response.
           required:
             - annotationQueues
             - total
@@ -4535,11 +4569,19 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates if the annotation queue was successfully created.
         data:
           type: object
+          description: Contains the created annotation queue information.
           properties:
             id:
               type: string
+              description: The unique identifier of the newly created annotation queue.
+          required:
+            - id
+      required:
+        - success
+        - data
 
     GetAnnotationQueueResponse:
       type: object
@@ -4549,41 +4591,60 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
+          description: Contains the annotation queue information.
           properties:
             annotationQueue:
               type: object
+              description: The annotation queue details with comprehensive statistics.
               properties:
                 id:
                   type: string
+                  description: The unique identifier of the annotation queue.
                 name:
                   type: string
+                  description: The name of the annotation queue.
                 type:
                   type: string
+                  enum: [TRACE, SPAN, THREAD, GOLDEN, TEST_RUN]
+                  description: The type of items this queue contains.
                 createdAt:
                   type: string
                   format: date-time
+                  description: The timestamp when the annotation queue was created.
                 updatedAt:
                   type: string
                   format: date-time
+                  description: The timestamp when the annotation queue was last updated.
+                testRunId:
+                  type: string
+                  description: The ID of the test run associated with this queue, if applicable.
                 completedItems:
                   type: integer
+                  description: The number of items in the queue that have been completed.
                 totalItems:
                   type: integer
+                  description: The total number of items in the queue.
                 pendingItems:
                   type: integer
+                  description: The number of items in the queue that are still pending completion.
                 completionPercentage:
                   type: integer
+                  description: The percentage of items completed in the queue (0-100).
                 assignedItems:
                   type: integer
+                  description: The number of items in the queue that have been assigned to users.
                 assignmentBreakdown:
                   type: object
+                  description: A breakdown of assignments by user email, showing how many items are assigned to each user and how many they have completed.
                   additionalProperties:
                     type: object
                     properties:
                       assigned:
                         type: integer
+                        description: The number of items assigned to this user.
                       completed:
                         type: integer
+                        description: The number of items completed by this user.
           required:
             - annotationQueue
       required:
@@ -4595,11 +4656,19 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates if the annotation queue was successfully deleted.
         data:
           type: object
+          description: Contains the deleted annotation queue information.
           properties:
             id:
               type: string
+              description: The unique identifier of the deleted annotation queue.
+          required:
+            - id
+      required:
+        - success
+        - data
 
     ListQueueItemsResponse:
       type: object
@@ -4609,27 +4678,40 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
+          description: Contains the list of queue items.
           properties:
             items:
               type: array
+              description: List of items in the annotation queue.
               items:
                 type: object
+                description: A single item in the annotation queue.
                 properties:
                   id:
                     type: string
+                    description: The unique identifier of the queue item.
                   traceUuid:
                     type: string
+                    description: The UUID of the trace associated with this queue item, if applicable.
                   spanUuid:
                     type: string
+                    description: The UUID of the span associated with this queue item, if applicable.
                   threadId:
                     type: string
+                    description: The ID of the thread associated with this queue item, if applicable.
+                  testCaseId:
+                    type: string
+                    description: The ID of the test case associated with this queue item, if applicable.
                   addedAt:
                     type: string
                     format: date-time
+                    description: The timestamp when this item was added to the queue.
                   completed:
                     type: boolean
+                    description: Whether this queue item has been completed.
                   assignedToEmail:
                     type: string
+                    description: The email address of the user assigned to this queue item, if any.
           required:
             - items
       required:
@@ -4677,11 +4759,19 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates if the annotation was successfully created for the queue item.
         data:
           type: object
+          description: Contains the created annotation information.
           properties:
             id:
               type: string
+              description: The unique identifier of the created annotation.
+          required:
+            - id
+      required:
+        - success
+        - data
 
     # Metric Data Schemas
     MetricDataItem:
