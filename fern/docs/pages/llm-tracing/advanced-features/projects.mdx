@@ -1,0 +1,83 @@
+---
+subtitle: Send traces to different projects on Confident AI
+slug: llm-tracing/advanced-features/projects
+---
+
+## Overview
+
+You can specify which project each trace should be sent to by setting the `confident_api_key`. This is especially useful when you need to separate traces to different projects within the same llm application.
+
+<Callout>
+  The **Confident API key** is unique to each project and can be found in your
+  project settings on Confident AI.
+</Callout>
+
+## Set Projects At Runtime
+
+<Tabs>
+    <Tab title="Python" language="python">
+
+        You can use the `update_current_trace` function to set the `confident_api_key` for a specific trace.
+
+            ```python title="main.py" {14,16}
+            from deepeval.tracing import observe, update_current_trace
+            from openai import OpenAI
+
+            client = OpenAI()
+
+            @observe()
+            def llm_app(query: str):
+                res = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+
+                if query == "Write me a poem.":
+                    update_current_trace(confident_api_key="confident-api-key-1")
+                else:
+                    update_current_trace(confident_api_key="confident-api-key-2")
+                return res
+
+            llm_app("Write me a poem.")
+            ```
+
+<Note>
+  `confident_api_key` overrides the `CONFIDENT_API_KEY` environment variable.
+</Note>
+
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+
+        You can use the `updateCurrentTrace` function to set the `confidentApiKey` for a specific trace.
+
+            ```typescript title="index.ts" {12,14}
+            import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';
+            import OpenAI from 'openai';
+
+            const llmApp = async (query: string) => {
+                const openai = new OpenAI();
+                const res = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                })
+
+                if (query === "Write me a poem.") {
+                    updateCurrentTrace({ confidentApiKey: "confident-api-key-1" });
+                } else {
+                    updateCurrentTrace({ confidentApiKey: "confident-api-key-2" });
+                }
+
+                return res.choices[0].message.content;
+            };
+
+            const observedLlmApp = observe({fn: llmApp});
+            observedLlmApp("Write me a poem.");
+            ```
+
+<Note>
+  `confidentApiKey` overrides the `CONFIDENT_API_KEY` environment variable.
+</Note>
+
+    </Tab>
+
+</Tabs>
