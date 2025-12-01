@@ -199,6 +199,9 @@ navigation:
               - page: Name
                 path: docs/pages/llm-tracing/advanced-features/name.mdx
                 icon: fa-light fa-signature
+              - page: Projects
+                path: docs/pages/llm-tracing/advanced-features/projects.mdx
+                icon: fa-light fa-layer-group
               - page: Sampling
                 path: docs/pages/llm-tracing/advanced-features/sampling.mdx
                 icon: fa-light fa-percent
@@ -343,7 +346,6 @@ navigation:
           - page: Portkey
             path: docs/pages/integrations/third-party/portkey-ai.mdx
             icon: fa-light fa-hexagon
-
 
 navbar-links:
   - type: minimal
