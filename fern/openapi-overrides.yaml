@@ -414,3 +414,40 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
+
+  /v1/projects:
+    get:
+      parameters:
+        - in: header
+          name: confident-api-key
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: confident-api-key
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/projects/{projectId}:
+    put:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to update.
+        - in: header
+          name: confident-api-key
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"

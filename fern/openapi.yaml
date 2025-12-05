@@ -40,6 +40,10 @@ tags:
     description: Annotation Queues API
     externalDocs:
       description: Learn about annotation queues
+  - name: Projects
+    description: Projects API
+    externalDocs:
+      description: Learn about projects
 
 paths:
   /v1/metrics:
@@ -169,6 +173,112 @@ paths:
               example:
                 success: true
                 deprecated: false
+
+  /v1/projects:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: List Projects
+      operationId: listProjects
+      description: Retrieves all projects within your organization.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProjectsResponse"
+              example:
+                success: true
+                data:
+                  projects:
+                    - id: "clxxxxx"
+                      name: "Production App"
+                      description: "Main production application"
+                      organizationId: "clxxxxx"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                    - id: "clxxxxx"
+                      name: "Staging Environment"
+                      description: null
+                      organizationId: "clxxxxx"
+                      created_at: "2024-12-03T15:30:00.000Z"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Create Project
+      operationId: createProject
+      description: Creates a new project within your organization.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProject"
+            example:
+              name: "New Project"
+              description: "This is a new project for testing"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateProjectResponse"
+              example:
+                success: true
+                data:
+                  project:
+                    id: "clxxxxx"
+                    name: "New Project"
+                    description: "This is a new project for testing"
+                    organizationId: "clxxxxx"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    
+
+  /v1/projects/{projectId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Update Project
+      operationId: updateProject
+      description: Updates an existing project's name or description.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to update
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProject"
+            example:
+              name: "Updated Project Name"
+              description: "Updated description"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProjectResponse"
+              example:
+                success: true
+                data:
+                  project:
+                    id: "clxxxxx"
+                    name: "Updated Project Name"
+                    description: "Updated description"
+                    organizationId: "clxxxxx"
+                    created_at: "2024-12-04T23:00:00.000Z"
 
   /v1/batch-metrics:
     post:
@@ -4854,5 +4964,97 @@ components:
             metricsCreated:
               type: integer
               description: Number of metric data items created
+
+    # Projects Schemas
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the project
+        name:
+          type: string
+          description: Name of the project
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the project
+        organizationId:
+          type: string
+          description: ID of the organization this project belongs to
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the project was created
+
+    GetProjectsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            projects:
+              type: array
+              description: List of projects in the organization
+              items:
+                $ref: "#/components/schemas/Project"
+      required:
+        - success
+        - data
+
+    CreateProject:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the project (must be unique within the organization)
+        description:
+          type: string
+          description: Optional description of the project
+      required:
+        - name
+
+    CreateProjectResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            project:
+              $ref: "#/components/schemas/Project"
+      required:
+        - success
+        - data
+
+    UpdateProject:
+      type: object
+      properties:
+        name:
+          type: string
+          description: New name for the project
+        description:
+          type: string
+          description: New description for the project
+
+    UpdateProjectResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            project:
+              $ref: "#/components/schemas/Project"
+      required:
+        - success
+        - data
 
 
