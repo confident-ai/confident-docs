@@ -236,7 +236,6 @@ paths:
                     description: "This is a new project for testing"
                     organizationId: "clxxxxx"
                     created_at: "2024-12-04T23:00:00.000Z"
-                    
 
   /v1/projects/{projectId}:
     put:
@@ -523,6 +522,27 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
                 Custom-Columns:
                   link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Delete Dataset
+      operationId: deleteDataset
+      description: |
+        Permanently deletes a dataset and all its associated data.
+
+        **Warning:** This action cannot be undone. All goldens or conversational goldens in the dataset will be deleted.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteDatasetResponse"
+              example:
+                success: true
+                data:
+                  id: "dataset-id"
 
   /v1/evaluate:
     post:
@@ -953,12 +973,12 @@ paths:
                     deprecated: false
                 Message-Example:
                   value:
-                    success: false
+                    success: true
                     data:
                       id: "prv_abc123"
                       version: "00.00.02"
                       label: "my-label"
-                      messages: 
+                      messages:
                         - role: system
                           content: "Hello, {{name}}"
                       type: "LIST"
@@ -1060,7 +1080,7 @@ paths:
                     data:
                       id: "prv_abc123"
                       version: "00.00.02"
-                      messages: 
+                      messages:
                         - role: system
                           content: "Hello, {{name}}"
                       type: "LIST"
@@ -1256,7 +1276,7 @@ paths:
       operationId: listAnnotations
       description: |
         Retrieves a paginated list of annotations from your Confident AI project. Annotations are user feedback on traces, spans, or threads that include ratings, expected outputs/outcomes, explanations, and flags.
-        
+
         Use query parameters to filter annotations by trace UUID, span UUID, thread ID, type, rating range, or flagged status. Results are returned in descending order by creation date with pagination support.
       parameters:
         - in: header
@@ -1409,7 +1429,7 @@ paths:
               deprecated: false
       description: |
         Creates a new annotation for a trace, span, or thread in your Confident AI project. Annotations capture human feedback including ratings, expected outputs/outcomes, explanations, and flags.
-        
+
         **Important validation rules:**
         - For traces and spans: Use `expectedOutput` (not `expectedOutcome`)
         - For threads: Use `expectedOutcome` (not `expectedOutput`)
@@ -1446,7 +1466,7 @@ paths:
       operationId: getAnnotation
       description: |
         Retrieves a specific annotation by its unique ID. Returns the complete annotation details including rating, type, expected output/outcome, explanation, flagged status, and associated trace/span/thread identifiers.
-        
+
         This endpoint verifies that the annotation belongs to your project before returning it.
       parameters:
         - in: header
@@ -1496,7 +1516,7 @@ paths:
       operationId: updateAnnotation
       description: |
         Updates an existing annotation's properties such as rating, type, expected output/outcome, explanation, or flagged status.
-        
+
         **Validation rules:**
         - Thread annotations cannot have `expectedOutput` (use `expectedOutcome` instead)
         - Trace/span annotations cannot have `expectedOutcome` (use `expectedOutput` instead)
@@ -1555,7 +1575,7 @@ paths:
       operationId: listAnnotationQueues
       description: |
         Retrieves all annotation queues in your project with statistics and pagination support. Each queue includes completion metrics, item counts, and assignment breakdowns.
-        
+
         Filter results by queue type (TRACE, SPAN, THREAD, GOLDEN, TEST_RUN) or search by name. Queues are returned in descending order by creation date.
       parameters:
         - in: header
@@ -1653,14 +1673,14 @@ paths:
       operationId: createAnnotationQueue
       description: |
         Creates a new annotation queue for organizing traces, spans, threads, golden datasets, or test runs for systematic review and annotation.
-        
+
         **Queue types:**
         - `TRACE`: Queue for reviewing complete trace executions
         - `SPAN`: Queue for reviewing individual spans within traces
         - `THREAD`: Queue for reviewing conversation threads
         - `GOLDEN`: Queue for creating golden datasets
         - `TEST_RUN`: Queue for reviewing test run results
-        
+
         Queue names must be unique within your project.
       parameters:
         - in: header
@@ -1697,7 +1717,7 @@ paths:
       operationId: getAnnotationQueue
       description: |
         Retrieves detailed information about a specific annotation queue including comprehensive statistics.
-        
+
         Returns queue metadata, completion metrics (total items, completed items, pending items, completion percentage), and assignment breakdowns showing how many items are assigned to each user and their completion status.
       parameters:
         - in: header
@@ -1751,7 +1771,7 @@ paths:
       operationId: deleteAnnotationQueue
       description: |
         Permanently deletes an annotation queue and all its associated queue items.
-        
+
         **Warning:** This action cannot be undone. All queue items (assignments and completion status) will be deleted. However, any annotations created from this queue will remain in your project.
       parameters:
         - in: header
@@ -1788,7 +1808,7 @@ paths:
       operationId: listQueueItems
       description: |
         Retrieves all items in an annotation queue with pagination and optional filtering by completion status.
-        
+
         Use the `completed` query parameter to filter for pending items (`false`) or completed items (`true`). Omit this parameter to retrieve all items regardless of completion status. Items are returned in ascending order by the time they were added to the queue.
       parameters:
         - in: header
@@ -1882,7 +1902,7 @@ paths:
       operationId: annotateItem
       description: |
         Creates an annotation for a single queue item. This endpoint automatically associates the annotation with the correct trace, span, or thread based on the queue item.
-        
+
         **Validation rules:**
         - For thread items: Use `expectedOutcome` (not `expectedOutput`)
         - For trace/span items: Use `expectedOutput` (not `expectedOutcome`)
@@ -2723,6 +2743,22 @@ components:
           description: "This is a list of conversational goldens to push. If you are pushing a single-turn dataset, this should be `null`."
       required:
         - finalized
+
+    DeleteDatasetResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the dataset was successfully deleted."
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "This is the ID of the deleted dataset."
+      required:
+        - success
+        - data
 
     CreateOrUpdateGoldenRequestData:
       type: object
@@ -4827,7 +4863,6 @@ components:
       required:
         - success
         - data
-        
 
     AnnotateItem:
       type: object
@@ -5056,5 +5091,3 @@ components:
       required:
         - success
         - data
-
-
