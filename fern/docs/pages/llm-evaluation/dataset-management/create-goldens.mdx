@@ -80,15 +80,16 @@ from deepeval.dataset import EvaluationDataset, ConversationalGolden
 from deepeval.test_case import Turn
 
 goldens = [
-    ConversationalGolden(
-        scenario="Angry user asking for a refund.",
-        turns=[Turn(role="user", content="Give me my money!")]
-    )
+ConversationalGolden(
+scenario="Angry user asking for a refund.",
+turns=[Turn(role="user", content="Give me my money!")]
+)
 ]
 dataset = EvaluationDataset(goldens=goldens)
 
 dataset.push(alias="YOUR-DATASET-ALIAS")
-```
+
+````
 </Tab>
 <Tab title="Without Turns" language="no-turns">
 ```python main.py
@@ -98,7 +99,8 @@ goldens = [ConversationalGolden(scenario="Angry user asking for a refund.")]
 dataset = EvaluationDataset(goldens=goldens)
 
 dataset.push(alias="YOUR-DATASET-ALIAS")
-```
+````
+
 </Tab>
 </Tabs>
 
@@ -125,20 +127,21 @@ For **multi-turn** datasets, push multi-turn goldens:
 import { EvaluationDataset, ConversationalGolden, Turn } from "deepeval-ts";
 
 const firstTurn = new Turn({
-  role: "user",
-  content: "Where's my money!?",
+role: "user",
+content: "Where's my money!?",
 });
 
 const goldens = [
-  new ConversationalGolden({
-    scenario: "Angry user asking for a refund.",
-    turns: [firstTurn],
-  }),
+new ConversationalGolden({
+scenario: "Angry user asking for a refund.",
+turns: [firstTurn],
+}),
 ];
 const dataset = new EvaluationDataset({ goldens: goldens });
 
 dataset.push({ alias: "YOUR-DATASET-ALIAS" });
-```
+
+````
 </Tab>
 <Tab title="Without Turns" language="no-turns">
 ```ts index.ts
@@ -152,7 +155,8 @@ const goldens = [conversationalGolden];
 const dataset = new EvaluationDataset({ goldens: goldens });
 
 dataset.push({ alias: "YOUR-DATASET-ALIAS" });
-```
+````
+
 </Tab>
 </Tabs>
 
@@ -160,11 +164,17 @@ dataset.push({ alias: "YOUR-DATASET-ALIAS" });
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Single-Turn" />
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Single-Turn"
+/>
 
 For **multi-turn** datasets, push multi-turn goldens:
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Multi-Turn" />
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Multi-Turn"
+/>
 
 </Tab>
 
@@ -197,15 +207,16 @@ For **multi-turn** datasets, queue multi-turn goldens:
 from deepeval.dataset import EvaluationDataset, ConversationalGolden
 
 goldens = [
-    ConversationalGolden(
-        scenario="Angry user asking for a refund.",
-        turns=[Turn(role="user", content="Give me my money!")]
-    )
+ConversationalGolden(
+scenario="Angry user asking for a refund.",
+turns=[Turn(role="user", content="Give me my money!")]
+)
 ]
 dataset = EvaluationDataset()
 
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
-```
+
+````
 </Tab>
 <Tab title="Without Turns" language="no-turns">
 ```python main.py
@@ -215,7 +226,8 @@ goldens = [ConversationalGolden(scenario="User asking for a refund.")]
 dataset = EvaluationDataset()
 
 dataset.queue(alias="YOUR-DATASET-ALIAS", goldens=goldens)
-```
+````
+
 </Tab>
 </Tabs>
 
@@ -245,15 +257,16 @@ import { EvaluationDataset, ConversationalGolden, Turn } from "deepeval-ts";
 
 const firstTurn = new Turn({ role: "user", content: "Where's my money!?" });
 const conversationalGolden = new ConversationalGolden({
-  scenario: "Angry user asking for a refund.",
-  turns: [firstTurn],
+scenario: "Angry user asking for a refund.",
+turns: [firstTurn],
 });
 
 const goldens = [conversationalGolden];
 const dataset = new EvaluationDataset();
 
 dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens: goldens });
-```
+
+````
 </Tab>
 <Tab title="Without Turns" language="no-turns">
 ```ts index.ts
@@ -267,7 +280,8 @@ const goldens = [conversationalGolden];
 const dataset = new EvaluationDataset();
 
 dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens: goldens });
-```
+````
+
 </Tab>
 </Tabs>
 
@@ -277,11 +291,17 @@ dataset.queue({ alias: "YOUR-DATASET-ALIAS", goldens: goldens });
 
 You need to set the `overwrite` attribute to `false` to queue your `golden`s.
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Single-Turn" />
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Single-Turn"
+/>
 
 For **multi-turn** datasets, queue multi-turn goldens:
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Multi-Turn" />
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Multi-Turn"
+/>
 
 </Tab>
 
@@ -333,7 +353,10 @@ const multiturnGolden = new ConversationalGolden({
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}" example="Custom-Columns" />
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Custom-Columns"
+/>
 
 </Tab>
 
@@ -354,3 +377,58 @@ You can also assign goldens to different team members for review and annotation.
 />
 
 </Frame>
+
+## Delete Dataset
+
+You can delete a dataset directly on the platform.
+
+<Warning>
+  This action cannot be undone. All goldens or conversational goldens in the
+  dataset will be permanently deleted.
+</Warning>
+
+<Frame caption="Delete Dataset on Confident AI" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:delete-4k.mp4"
+  type="video/mp4"
+/>
+
+</Frame>
+
+You can also do it programmatically through the Evals API.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.delete(alias="YOUR-DATASET-ALIAS")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+dataset.delete({ alias: "YOUR-DATASET-ALIAS" });
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="DELETE /v1/datasets/{alias}" />
+
+</Tab>
+
+</Tabs>
