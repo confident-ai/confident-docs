@@ -1,5 +1,5 @@
 ---
-subtitle: Create and manage diferent versions of your prompts
+subtitle: Create and manage different versions of your prompts
 slug: llm-evaluation/prompt-optimization/prompt-versioning
 ---
 
@@ -104,19 +104,26 @@ editing it. Alternately, you can create a prompt version from code.
 ```python
 from deepeval.prompt import Prompt, PromptMessage
 
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(messages=[PromptMessage(role="...", content="...")])
-
-````
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  messages_template=[PromptMessage(role="...", content="...")]
+)
+prompt.version = "1.0.0"
+prompt.push()
+```
 </Tab>
 
 <Tab title="Text" language="python">
 ```python
 from deepeval.prompt import Prompt
 
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(text="...")
-````
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  text="..."
+)
+prompt.version = "1.0.0"
+prompt.push()
+```
 
 </Tab>
 
@@ -213,7 +220,7 @@ You can update your prompt templates in code by specifying the prompt `alias` an
 from deepeval.prompt import Prompt, PromptVersion
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="00.00.01", messages=[PromptVersion(role="...", content="...")])
+prompt.update(version="1.0.0", messages=[PromptVersion(role="...", content="...")])
 
 ```
 
@@ -225,7 +232,7 @@ prompt.update(version="00.00.01", messages=[PromptVersion(role="...", content=".
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="00.00.01", text="...")
+prompt.update(version="1.0.0", text="...")
 
 ```
 
@@ -239,7 +246,7 @@ from deepeval.prompt import Prompt, ModelSettings, InterpolationType, OutputType
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.update(
-    version="00.00.01",
+    version="1.0.0",
     model_settings=ModelSettings(model="gpt-4o-mini"),
     interpolation_type=InterpolationType.FSTRING,
     output_type=OutputType.TEXT,

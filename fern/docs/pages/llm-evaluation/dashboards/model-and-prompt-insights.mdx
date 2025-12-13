@@ -43,7 +43,7 @@ prompt.pull()
 evaluate(
     test_cases=[LLMTestCase(input="...", actual_output="...")],
     metrics=[AnswerRelevancyMetric()],
-    hyperparameters={"System Prompt": prompt}
+    hyperparameters={"Prompt": prompt}
 )
 ```
 
@@ -55,7 +55,7 @@ evaluate(
 evaluate({
   hyperparameters: {
     Model: "YOUR-MODEL",
-    "Prompt Version": "YOUR-PROMPT-VERSION",
+    "Prompt": prompt,
   },
   llmTestCases: [...],
   metricCollection: "YOUR-COLLECTION-NAME",
@@ -135,7 +135,7 @@ prompt.pull()
 
 @deepeval.log_hyperparameters()
 def hyperparameters():
-    return {"System Prompt": prompt, "Model": "YOUR-MODEL-NAME"}
+    return {"Prompt": prompt, "Model": "YOUR-MODEL-NAME"}
 ```
 
 Now everytime when you run `deepeval test run`, every test file will be ran as unit-tests while logging parameters as part of your test run. Go to the [next section](/docs/llm-evaluation/unit-testing-cicd) to learn more about unit-testing in CI/CD.
