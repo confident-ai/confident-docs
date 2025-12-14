@@ -338,7 +338,7 @@ navigation:
             path: docs/pages/integrations/third-party/crew-ai.mdx
             icon: fa-light fa-user-group
       - section: LLM Gateways
-        collapsed: true
+        collapsed: false
         contents:
           - page: LiteLLM
             path: docs/pages/integrations/third-party/litellm.mdx

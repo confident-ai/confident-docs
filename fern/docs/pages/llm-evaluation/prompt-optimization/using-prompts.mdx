@@ -32,6 +32,16 @@ prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull()
 ```
 
+<Tip>
+  By default, Confident AI will return the latest version of your prompt.
+  However, you can also specify the `version` to override this behavior.
+
+```python
+prompt.pull(version="00.00.01")
+```
+
+</Tip>
+
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
@@ -43,44 +53,29 @@ const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
 await prompt.pull();
 ```
 
-</Tab>
-
-<Tab title="curL" language="curl">
-  <EndpointRequestSnippet endpoint="GET /v1/prompts" />
-</Tab>
-
-</Tabs>
-
 <Tip>
   By default, Confident AI will return the latest version of your prompt.
   However, you can also specify the `version` to override this behavior.
+
+```typescript
+await prompt.pull({ version: "00.00.01" });
+```
+
 </Tip>
+
+</Tab>
+
+<Tab title="curL" language="curl">
+  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+</Tab>
+
+</Tabs>
 
 </Step>
 
 <Step title="Interpolate variables">
 
-Now that you have your prompt template, interpolate any dynamic variables you may have defined in your prompt version. For example, if this is your prompt version:
-
-<Tabs>
-
-<Tab title="Messages" language="messages">
-
-```json
-{
-  "role": "system",
-  "content": "You are a helpful assistant called {{ name }}. Speak normally like a human."
-}
-```
-
-And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "Joe") would give you this prompt that is ready for use:
-
-```json
-{
-  "role": "system",
-  "content": "You are a helpful assistant called Joe. Speak normally like a human."
-}
-```
+Now that you have your prompt template, interpolate any dynamic variables you may have defined in your prompt version.
 
 <Tabs>
 
@@ -112,6 +107,28 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 </Tab>
 
 </Tabs>
+
+For example, if this is your prompt version:
+
+<Tabs>
+
+<Tab title="Messages" language="messages">
+
+```json
+{
+  "role": "system",
+  "content": "You are a helpful assistant called {{ name }}. Speak normally like a human."
+}
+```
+
+And your interpolation type is `{{ variable }}`, interpolating the name (e.g. "Joe") would give you this prompt that is ready for use:
+
+```json
+{
+  "role": "system",
+  "content": "You are a helpful assistant called Joe. Speak normally like a human."
+}
+```
 
 </Tab>
 
@@ -343,80 +360,7 @@ prompt.pull(label="staging")
 
 You must manually label each prompt version. [Click here](/docs/llm-evaluation/prompt-optimization/prompt-versioning) to learn how to do so.
 
-## Logging Prompts in Traces
-
-<Steps>
-
-<Step title="Setup tracing">
-
-Attach the `@observe` decorator to functions/methods that make up your agent, and specify type `llm` for your LLM-calling functions.
-
-```python main.py {4}
-from deepeval.tracing import observe
-
-@observe(type="llm", model="gpt-4.1")
-def your_llm_component():
-    ...
-```
-
-<Tip>
-  Specifying the type is necessary because logging prompts is only available for
-  LLM spans.
-</Tip>
-
-</Step>
-
-<Step title="Pull and interpolate prompt">
-
-Pull and interpolate the prompt version to use it for LLM generation.
-
-```python main.py {8,9}
-from deepeval.tracing import observe
-from deepeval.prompt import Prompt
-from openai import OpenAI
-
-@observe(type="llm", model="gpt-4.1")
-def your_llm_component():
-    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-    prompt.pull()
-    interpolated_prompt = prompt.interpolate(name="Joe")
-    response = OpenAI().chat.completions.create(model="gpt-4o-mini", messages=interpolated_prompt)
-    return response.choices[0].message.content
-```
-
-</Step>
-
-<Step title="Execute your function">
-
-Then simply provide the prompt to the `update_llm_span` function.
-
-```python main.py {11}
-from deepeval.tracing import observe, update_llm_span
-from deepeval.prompt import Prompt
-from openai import OpenAI
-
-@observe(type="llm", model="gpt-4.1")
-def your_llm_component():
-    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-    prompt.pull()
-    interpolated_prompt = prompt.interpolate(name="Joe")
-    response = OpenAI().chat.completions.create(model="gpt-4o-mini", messages=interpolated_prompt)
-    update_llm_span(prompt=prompt)
-    return response.choices[0].message.content
-```
-
-<Info>
-  Remember to pull the prompt before updating the span, otherwise the prompt
-  will not be logged.
-</Info>
-
-This will automatically attribute the prompt used to the LLM span.
-
-</Step>
-
-</Steps>
-
-## Prompt caching
+## How Are Prompts Pulled?
 
 Confident AI automatically caches prompts on the client side to **minimize API call latency and ensure prompt availability**, which is especially useful in production environments.
 
@@ -530,4 +474,78 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 </Tab>
 
 </Tabs>
-````
+
+## Log Prompts During Tracing
+
+Associating prompts with [LLM traces and spans](/docs/llm-tracing/introduction) is a great way to determine which prompts performs best in production.
+
+<Steps>
+
+<Step title="Setup tracing">
+
+Attach the `@observe` decorator to functions/methods that make up your agent, and specify type `llm` for your LLM-calling functions.
+
+```python main.py {4}
+from deepeval.tracing import observe
+
+@observe(type="llm", model="gpt-4.1")
+def your_llm_component():
+    ...
+```
+
+<Tip>
+  Specifying the type is necessary because logging prompts is only available for
+  LLM spans.
+</Tip>
+
+</Step>
+
+<Step title="Pull and interpolate prompt">
+
+Pull and interpolate the prompt version to use it for LLM generation.
+
+```python main.py {8,9}
+from deepeval.tracing import observe
+from deepeval.prompt import Prompt
+from openai import OpenAI
+
+@observe(type="llm", model="gpt-4.1")
+def your_llm_component():
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+    prompt.pull()
+    interpolated_prompt = prompt.interpolate(name="Joe")
+    response = OpenAI().chat.completions.create(model="gpt-4o-mini", messages=interpolated_prompt)
+    return response.choices[0].message.content
+```
+
+</Step>
+
+<Step title="Execute your function">
+
+Then simply provide the prompt to the `update_llm_span` function.
+
+```python main.py {11}
+from deepeval.tracing import observe, update_llm_span
+from deepeval.prompt import Prompt
+from openai import OpenAI
+
+@observe(type="llm", model="gpt-4.1")
+def your_llm_component():
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+    prompt.pull()
+    interpolated_prompt = prompt.interpolate(name="Joe")
+    response = OpenAI().chat.completions.create(model="gpt-4o-mini", messages=interpolated_prompt)
+    update_llm_span(prompt=prompt)
+    return response.choices[0].message.content
+```
+
+<Info>
+  Remember to pull the prompt before updating the span, otherwise the prompt
+  will not be logged.
+</Info>
+
+This will automatically attribute the prompt used to the LLM span.
+
+</Step>
+
+</Steps>

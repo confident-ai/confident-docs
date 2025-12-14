@@ -388,28 +388,26 @@ Tell Confident AI the configurations used in your LLM app during the evaluation.
 Simply add a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function:
 
 ```python
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+
 evaluate(
     hyperparameters={
         "Model": "YOUR-MODEL",
-        "Prompt Version": "YOUR-PROMPT-VERSION"
+        "Prompt Version": prompt # An instance of your Prompt
     },
     test_cases=[...],
     metrics=[...]
 )
 ```
 
-If you're keeping prompts on Confidnet AI for prompt optimization, you can also provide the prompt object directly:
+<Note>
 
-```python focus={1-4,8}
-evaluate(
-    hyperparameters={
-        "Model": "YOUR-MODEL",
-        "Prompt Version": "YOUR-PROMPT-VERSION"
-    },
-    test_cases=[...],
-    metrics=[...]
-)
-```
+Providing a `Prompt` instance only works if you pulled a prompt version from Confident AI.
+
+</Note>
 
 </Tab>
 
@@ -486,11 +484,6 @@ evaluate({
 
 Similar to the identifer, naming test cases allows you to search and match test cases across different test runs during regression testing.
 
-<Note>
-  By default, Confident AI will match test cases based on matching inputs, so
-  naming test cases is not strictly required for regression testing.
-</Note>
-
 <Tabs>
 
 <Tab title="Python" language="python">
@@ -525,3 +518,6 @@ evaluate({
 </Tab>
 
 </Tabs>
+
+By default, Confident AI will match test cases based on matching inputs, so
+naming test cases is not strictly required for regression testing.
