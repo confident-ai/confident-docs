@@ -174,111 +174,6 @@ paths:
                 success: true
                 deprecated: false
 
-  /v1/projects:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Projects
-      summary: List Projects
-      operationId: listProjects
-      description: Retrieves all projects within your organization.
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetProjectsResponse"
-              example:
-                success: true
-                data:
-                  projects:
-                    - id: "clxxxxx"
-                      name: "Production App"
-                      description: "Main production application"
-                      organizationId: "clxxxxx"
-                      created_at: "2024-12-04T23:00:00.000Z"
-                    - id: "clxxxxx"
-                      name: "Staging Environment"
-                      description: null
-                      organizationId: "clxxxxx"
-                      created_at: "2024-12-03T15:30:00.000Z"
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Projects
-      summary: Create Project
-      operationId: createProject
-      description: Creates a new project within your organization.
-      requestBody:
-        required: true
-        description: ""
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateProject"
-            example:
-              name: "New Project"
-              description: "This is a new project for testing"
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreateProjectResponse"
-              example:
-                success: true
-                data:
-                  project:
-                    id: "clxxxxx"
-                    name: "New Project"
-                    description: "This is a new project for testing"
-                    organizationId: "clxxxxx"
-                    created_at: "2024-12-04T23:00:00.000Z"
-
-  /v1/projects/{projectId}:
-    put:
-      x-fern-server-name: Confident AI
-      tags:
-        - Projects
-      summary: Update Project
-      operationId: updateProject
-      description: Updates an existing project's name or description.
-      parameters:
-        - name: projectId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The unique identifier of the project to update
-      requestBody:
-        required: true
-        description: ""
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateProject"
-            example:
-              name: "Updated Project Name"
-              description: "Updated description"
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateProjectResponse"
-              example:
-                success: true
-                data:
-                  project:
-                    id: "clxxxxx"
-                    name: "Updated Project Name"
-                    description: "Updated description"
-                    organizationId: "clxxxxx"
-                    created_at: "2024-12-04T23:00:00.000Z"
-
   /v1/batch-metrics:
     post:
       x-fern-server-name: Confident AI
@@ -1945,6 +1840,111 @@ paths:
                 success: true
                 data:
                   id: "annotation-uuid"
+
+  /v1/projects:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: List Projects
+      operationId: listProjects
+      description: Retrieves all projects within your organization.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProjectsResponse"
+              example:
+                success: true
+                data:
+                  projects:
+                    - id: "clxxxxx"
+                      name: "Production App"
+                      description: "Main production application"
+                      organizationId: "clxxxxx"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                    - id: "clxxxxx"
+                      name: "Staging Environment"
+                      description: null
+                      organizationId: "clxxxxx"
+                      created_at: "2024-12-03T15:30:00.000Z"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Create Project
+      operationId: createProject
+      description: Creates a new project within your organization.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProject"
+            example:
+              name: "New Project"
+              description: "This is a new project for testing"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateProjectResponse"
+              example:
+                success: true
+                data:
+                  project:
+                    id: "clxxxxx"
+                    name: "New Project"
+                    description: "This is a new project for testing"
+                    organizationId: "clxxxxx"
+                    created_at: "2024-12-04T23:00:00.000Z"
+
+  /v1/projects/{projectId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Update Project
+      operationId: updateProject
+      description: Updates an existing project's name or description.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to update
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProject"
+            example:
+              name: "Updated Project Name"
+              description: "Updated description"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProjectResponse"
+              example:
+                success: true
+                data:
+                  project:
+                    id: "clxxxxx"
+                    name: "Updated Project Name"
+                    description: "Updated description"
+                    organizationId: "clxxxxx"
+                    created_at: "2024-12-04T23:00:00.000Z"
 
 components:
   schemas:
