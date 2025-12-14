@@ -36,7 +36,7 @@ There are two types of prompts you can create:
 In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
 
 <Info title="Example">
-Suppose you have a prompt with the alias `MyPrompt`. This prompt can have multiple versions, such as `0.0.1`, `0.0.2`, ..., up to `1.0.0`.
+Suppose you have a prompt with the alias `MyPrompt`. This prompt can have multiple versions, such as `0.0.1`, `0.0.2`, ..., up to `00.00.01`.
 
 ```mermaid
 flowchart TD
@@ -44,7 +44,7 @@ flowchart TD
     MyPrompt --> V001["Version 0.0.1"]
     MyPrompt --> V002["Version 0.0.2"]
     MyPrompt --> V003[" ... "]
-    MyPrompt --> V100["Version 1.0.0"]
+    MyPrompt --> V100["Version 00.00.01"]
 ```
 
 </Info>
@@ -108,7 +108,6 @@ prompt = Prompt(
   alias="YOUR-PROMPT-ALIAS",
   messages_template=[PromptMessage(role="...", content="...")]
 )
-prompt.version = "1.0.0"
 prompt.push()
 ```
 </Tab>
@@ -121,7 +120,6 @@ prompt = Prompt(
   alias="YOUR-PROMPT-ALIAS",
   text="..."
 )
-prompt.version = "1.0.0"
 prompt.push()
 ```
 
@@ -220,7 +218,7 @@ You can update your prompt templates in code by specifying the prompt `alias` an
 from deepeval.prompt import Prompt, PromptVersion
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="1.0.0", messages=[PromptVersion(role="...", content="...")])
+prompt.update(version="00.00.01", messages=[PromptVersion(role="...", content="...")])
 
 ```
 
@@ -232,7 +230,7 @@ prompt.update(version="1.0.0", messages=[PromptVersion(role="...", content="..."
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="1.0.0", text="...")
+prompt.update(version="00.00.01", text="...")
 
 ```
 
@@ -246,7 +244,7 @@ from deepeval.prompt import Prompt, ModelSettings, InterpolationType, OutputType
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.update(
-    version="1.0.0",
+    version="00.00.01",
     model_settings=ModelSettings(model="gpt-4o-mini"),
     interpolation_type=InterpolationType.FSTRING,
     output_type=OutputType.TEXT,
