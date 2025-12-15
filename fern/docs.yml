@@ -370,17 +370,17 @@ navbar-links:
 
 colors:
   accentPrimary:
-    dark: "#001229"
-    light: "#001229"
+    dark: "#ffffff"
+    light: "#000000"
 
   background:
     dark: "#0E0E13"
     light: "#fdfdfa"
 
 logo:
-  dark: docs/assets/docs-light-logo.svg
-  light: docs/assets/docs-dark-logo.svg
-  height: 18
+  dark: docs/assets/docs-dark-logo.svg
+  light: docs/assets/docs-light-logo.svg
+  height: 52
   href: https://www.confident-ai.com
 
 metadata:
