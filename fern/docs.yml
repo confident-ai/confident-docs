@@ -311,9 +311,14 @@ navigation:
         icon: fa-light fa-plug
       - section: Native Integrations
         contents:
-          - page: OpenTelemetry
-            path: docs/pages/integrations/native/opentelemetry.mdx
+          - section: OpenTelemetry
+            path: docs/pages/integrations/opentelemetry.mdx
             icon: fa-light fa-satellite-dish
+            collapsed: false
+            contents:
+              - page: Distributed Tracing
+                path: docs/pages/integrations/opentelemetry/distributed-tracing.mdx
+                icon: fa-light fa-globe
       - section: Third-Party Integrations
         contents:
           - page: OpenAI
