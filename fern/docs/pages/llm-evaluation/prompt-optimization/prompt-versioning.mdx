@@ -1,5 +1,5 @@
 ---
-subtitle: Create and manage diferent versions of your prompts
+subtitle: Create and manage different versions of your prompts
 slug: llm-evaluation/prompt-optimization/prompt-versioning
 ---
 
@@ -104,19 +104,24 @@ editing it. Alternately, you can create a prompt version from code.
 ```python
 from deepeval.prompt import Prompt, PromptMessage
 
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(messages=[PromptMessage(role="...", content="...")])
-
-````
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  messages_template=[PromptMessage(role="...", content="...")]
+)
+prompt.push()
+```
 </Tab>
 
 <Tab title="Text" language="python">
 ```python
 from deepeval.prompt import Prompt
 
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(text="...")
-````
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  text="..."
+)
+prompt.push()
+```
 
 </Tab>
 

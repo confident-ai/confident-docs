@@ -347,9 +347,24 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Steps>
 
-## Pull Prompts By Label
+## Pull Prompts From Confident AI
 
-Previously we saw how we can pull a prompt by supplying the version number. You can also "deploy" a prompt using a **label**, which allows you to select a specific version without defaulting to the latest one:
+You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `verion` and `label`.
+
+<Tabs>
+
+<Tab title="Version">
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(version="00.00.01")
+```
+
+</Tab>
+
+<Tab title="Label">
 
 ```python main.py
 from deepeval.prompt import Prompt
@@ -358,7 +373,12 @@ prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull(label="staging")
 ```
 
-You must manually label each prompt version. [Click here](/docs/llm-evaluation/prompt-optimization/prompt-versioning) to learn how to do so.
+You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-optimization/prompt-versioning#labelling-prompt-versions) to learn how to do so.
+
+</Tab>
+
+</Tabs>
+
 
 ## How Are Prompts Pulled?
 
@@ -474,6 +494,107 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 </Tab>
 
 </Tabs>
+
+
+## Log Prompts During Evals
+
+You can associate a prompt with your evals to get detailed insights on how each prompt and their versions are performing. It works by:
+
+- Pulling or creating prompts in `deepeval` using the `Prompt` object
+- Logging prompts as hyperparameters in your evaluations
+
+<Steps>
+
+<Step title="Pull prompts">
+
+You should first pull a prompt from Confident AI using alias, version or label.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(version="00.00.01")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull(version="00.00.01");
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}"/>
+</Tab>
+
+</Tabs>
+
+You can now interpolate and use this prompt in your LLM app.
+
+</Step>
+
+<Step title="Logging prompt in `evaluate`">
+
+Now, simply add this prompt as a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+
+```python
+evaluate(
+    ...
+    hyperparameters={
+        "Model": "YOUR-MODEL",
+        "Prompt": prompt,
+    },
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts
+evaluate({
+  ...
+  hyperparameters: {
+    Model: "YOUR-MODEL",
+    "Prompt": prompt,
+  },
+});
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet
+  endpoint="POST /v1/evaluate"
+  example="Logging Parameters"
+/>
+
+</Tab>
+
+</Tabs>
+
+This will automatically attribute the prompt used during this test run, which will allow you get detailed insights in the Confident AI platform.
+
+</Step>
+
+</Steps>
+
 
 ## Log Prompts During Tracing
 
