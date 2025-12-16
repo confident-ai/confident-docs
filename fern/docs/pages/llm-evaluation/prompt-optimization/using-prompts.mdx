@@ -347,7 +347,54 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Steps>
 
-## Pull Prompts From Confident AI
+## Accessing Tools from Prompts
+
+After pulling a prompt, you can access any tools that were defined in the prompt version via the `tools` property. Each tool contains:
+
+- **name**: The name of the tool
+- **description**: A description of what the tool does
+- **input schema**: The JSON schema defining the tool's input parameters
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+
+# Access tools from the prompt
+for tool in prompt.tools:
+    print(f"Tool Name: {tool.name}")
+    print(f"Description: {tool.description}")
+    print(f"Input Schema: {tool.input_schema}")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+
+// Access tools from the prompt
+for (const tool of prompt.tools) {
+  console.log(`Tool Name: ${tool.name}`);
+  console.log(`Description: ${tool.description}`);
+  console.log(`Input Schema: ${JSON.stringify(tool.inputSchema)}`);
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Pull Prompts By Label
 
 You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `verion` and `label`.
 
@@ -378,7 +425,6 @@ You must manually label each prompt version before pulling it. [Click here](/doc
 </Tab>
 
 </Tabs>
-
 
 ## How Are Prompts Pulled?
 
@@ -495,7 +541,6 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 
 </Tabs>
 
-
 ## Log Prompts During Evals
 
 You can associate a prompt with your evals to get detailed insights on how each prompt and their versions are performing. It works by:
@@ -528,13 +573,13 @@ prompt.pull(version="00.00.01")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull(version="00.00.01");
+await prompt.pull((version = "00.00.01"));
 ```
 
 </Tab>
 
 <Tab title="curL" language="curl">
-  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}"/>
+  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
 </Tab>
 
 </Tabs>
@@ -550,7 +595,6 @@ Now, simply add this prompt as a free-form key-value pair to the `hyperparameter
 <Tabs>
 
 <Tab title="Python" language="python">
-
 
 ```python
 evaluate(
@@ -594,7 +638,6 @@ This will automatically attribute the prompt used during this test run, which wi
 </Step>
 
 </Steps>
-
 
 ## Log Prompts During Tracing
 
