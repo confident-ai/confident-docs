@@ -154,19 +154,19 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context.
+If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context using `LlmSpanContext`.
 
 ```python main.py
 from deepeval.openai import OpenAI
 from deepeval.prompt import Prompt
-from deepeval.tracing import trace
+from deepeval.tracing import trace, LlmSpanContext
 
 prompt = Prompt(alias="my-prompt")
 prompt.pull(version="00.00.01")
 
 client = OpenAI()
 
-with trace(prompt=prompt):
+with trace(LlmSpanContext(prompt=prompt)):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
@@ -280,15 +280,17 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Set the `llm_metric_collection` name in the `trace` context when invoking your OpenAI client to evaluate Llm Spans.
+Set the `metric_collection` name in the `trace` context using `LlmSpanContext` when invoking your OpenAI client to evaluate Llm Spans.
 
 ```python main.py
 from deepeval.openai import OpenAI
-from deepeval.tracing import trace
+from deepeval.tracing import trace, LlmSpanContext
 
 client = OpenAI()
 
-with trace(llm_metric_collection="test_collection_1"):
+with trace(
+    LlmSpanContext(metric_collection="test_collection_1")
+):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
@@ -349,8 +351,10 @@ dataset.pull("your-dataset-alias")
 for golden in dataset.evals_iterator():
     # run OpenAI client
     with trace(
-        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric(), BiasMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         client.chat.completions.create(
             model="gpt-4o",
@@ -368,7 +372,7 @@ for golden in dataset.evals_iterator():
 from deepeval.openai import OpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
-from deepeval.tracing import trace
+from deepeval.tracing import trace, LlmSpanContext
 
 client = OpenAI()
 
@@ -378,8 +382,10 @@ dataset.pull("your-dataset-alias")
 for golden in dataset.evals_iterator():
     # run OpenAI client
     with trace(
-        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric(), BiasMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         client.responses.create(
             model="gpt-4o",
@@ -396,14 +402,16 @@ import asyncio
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset
-from deepeval.tracing import trace
+from deepeval.tracing import trace, LlmSpanContext
 
 async_client = AsyncOpenAI()
 
 async def openai_llm_call(input):
     with trace(
-        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric(), BiasMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         return await async_client.chat.completions.create(
             model="gpt-4o",
@@ -429,14 +437,16 @@ import asyncio
 from deepeval.openai import AsyncOpenAI
 from deepeval.metrics import AnswerRelevancyMetric, BiasMetric
 from deepeval.dataset import EvaluationDataset, Golden
-from deepeval.tracing import trace
+from deepeval.tracing import trace, LlmSpanContext
 
 async_client = AsyncOpenAI()
 
 async def openai_llm_call(input):
     with trace(
-        llm_metrics=[AnswerRelevancyMetric(), BiasMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric(), BiasMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         return await async_client.responses.create(
             model="gpt-4o",
@@ -503,7 +513,7 @@ Replace your `OpenAI` client with DeepEval's. Then, use the dataset's `evals_ite
 
 ```python
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace
+from deepeval.tracing import observe, trace, LlmSpanContext
 from deepeval.dataset import EvaluationDataset
 from deepeval.metrics import AnswerRelevancyMetric
 
@@ -512,8 +522,10 @@ client = OpenAI()
 @observe()
 def generate_response(input: str) -> str:
     with trace(
-        llm_metrics=[AnswerRelevancyMetric()],
-        expected_output=golden.output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         response = client.chat.completions.create(
             model="gpt-4.1",
@@ -538,7 +550,7 @@ for golden in dataset.evals_iterator():
 
 ```python
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace
+from deepeval.tracing import observe, trace, LlmSpanContext
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.dataset import EvaluationDataset
 
@@ -547,8 +559,10 @@ client = OpenAI()
 @observe()
 def generate_response(input: str) -> str:
     with trace(
-        llm_metrics=[AnswerRelevancyMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric()],
+            expected_output=golden.expected_output
+        )
     ):
         response = client.responses.create(
             model="gpt-4.1",
@@ -571,7 +585,7 @@ for golden in dataset.evals_iterator():
 
 ```python
 from deepeval.openai import OpenAI
-from deepeval.tracing import observe, trace
+from deepeval.tracing import observe, trace, LlmSpanContext
 from deepeval.dataset import EvaluationDataset
 from deepeval.metrics import AnswerRelevancyMetric
 
@@ -580,8 +594,10 @@ client = OpenAI()
 @observe()
 def generate_response(input: str) -> str:
     with trace(
-        llm_metrics=[AnswerRelevancyMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric()],
+            expected_output=golden.expected_output
+        ),
     ):
         response = client.chat.completions.create(
             model="gpt-4.1",
@@ -608,7 +624,7 @@ for golden in dataset.evals_iterator():
 ```python
 import asyncio
 from deepeval.openai import AsyncOpenAI
-from deepeval.tracing import observe, trace
+from deepeval.tracing import observe, trace, LlmSpanContext
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.dataset import EvaluationDataset
 
@@ -617,8 +633,10 @@ client = AsyncOpenAI()
 @observe()
 async def generate_response(input: str) -> str:
     with trace(
-        llm_metrics=[AnswerRelevancyMetric()],
-        expected_output=golden.expected_output,
+        LlmSpanContext(
+            metrics=[AnswerRelevancyMetric()],
+            expected_output=golden.expected_output
+        )
     ):
         response = await client.responses.create(
             model="gpt-4.1",
