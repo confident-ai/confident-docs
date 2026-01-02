@@ -1,0 +1,40 @@
+---
+subtitle: Generate and manage API keys to authenticate your applications with Confident AI.
+slug: settings/project/api-keys
+description: Learn about API key management
+---
+
+API keys are used to authenticate your applications when interacting with the Confident AI API. Each project can have multiple API keys, allowing you to manage access for different environments or services.
+
+<Note>
+  API keys do not count as a seat or user in your organization. You can create
+  as many API keys as needed without affecting your billing.
+</Note>
+
+## Generate an API Key
+
+To create a new API key:
+
+1. Navigate to **Project Settings** → **API Keys**
+2. Click the **Generate New API Key** button
+3. Enter a descriptive name for the key (e.g., "Production", "Development", "CI/CD Pipeline")
+4. Copy and securely store the key secret—it will only be shown once
+
+## Manage API Keys
+
+To manage an existing API key, click the three-dot menu (⋮) on the right side of the row:
+
+- **Deactivate** — Temporarily disables the key. The key can be reactivated later if needed.
+- **Delete** — Permanently removes the key from your project.
+
+<Warning>
+  Deleting an API key is permanent and cannot be undone. Any applications using
+  that key will immediately lose access to the API.
+</Warning>
+
+## Best Practices
+
+- **Use descriptive names** — Name keys after their purpose (e.g., "GitHub Actions", "Production Server")
+- **Rotate keys regularly** — Generate new keys periodically and phase out old ones
+- **Use separate keys per environment** — Create distinct keys for development, staging, and production
+- **Monitor usage** — Check the "Last Used" column to identify unused keys that can be deactivated or deleted

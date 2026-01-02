@@ -1,0 +1,72 @@
+---
+subtitle: Manage team roles and permissions to control access levels for members in your project.
+slug: settings/project/roles-and-permissions
+description: Learn about roles and permissions management
+---
+
+Roles and permissions let you control what each team member can do within a project.
+
+## Default Roles
+
+Every project comes with three preset roles:
+
+- **Owner** — Full access to all resources in the project.
+- **Manager** — Can manage members and resources.
+- **Member** — Read and write access to resources.
+
+## Custom Roles
+
+You can create custom roles to fit your team's needs. To create a new role:
+
+1. Navigate to **Project Settings** → **Roles & Permissions**
+2. Click **New Role**
+3. Enter a name and description for the role
+4. Assign a policy to the role
+5. Click **Save**
+
+Common custom roles include "Annotator" roles that only allow a certain group of users for read and write access to datasets.
+
+## Custom Policies
+
+Policies define the specific permissions a role has. Each permission controls access to a particular action, like `dataset:read`, `dataset:create`, `golden:update`, or `trace:delete`.
+
+To create a custom policy:
+
+1. Navigate to **Project Settings** → **Roles & Permissions**
+2. Scroll to **Custom Policies** and click **New Policy**
+3. Enter a name for the policy
+4. Select the permissions you want to include
+5. Click **Save**
+
+Once created, you can assign your custom policy to any role.
+
+<Tip>
+  Custom roles are useful for creating specialized access levels—like an
+  Annotator role that can only view and edit datasets, without access to traces
+  or test runs.
+</Tip>
+
+## Permission Syntax
+
+Permissions follow a `resource:action` format. For example, `dataset:read` grants read access to datasets, while `trace:evaluate` allows running evaluations on traces.
+
+**Actions:**
+
+- `create` — Create new resources
+- `read` — View resources
+- `update` — Modify existing resources
+- `delete` — Remove resources
+- `evaluate` — Run evaluations on the resource
+- `assign` — Assign resources to users or queues
+
+**Resources:**
+
+- `dataset`, `golden` — Datasets and their goldens
+- `metric`, `metric_collection` — Metric scores and collections
+- `trace`, `span`, `thread` — Observability data
+- `test_run`, `test_case`, `experiment` — Evaluation runs
+- `prompt`, `prompt_version` — Prompts and their versions
+- `annotation_queue`, `queue_item` — Annotation queues and their items
+- `project_member` — Team member management
+
+Not every resource will have all actions. For example, dataset doens't have `project_member`, while `annotation_queue` doesn't have `evaluate`. You can find the full list of permissions on the roles & permissions page.

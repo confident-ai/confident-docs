@@ -1,0 +1,132 @@
+---
+slug: settings
+description: Configure and manage your project and organization settings on Confident AI
+---
+
+Confident AI provides comprehensive settings to help you configure your workspace exactly how you need it. Settings are organized into two categories based on their scope and impact.
+
+## Overview
+
+Settings in Confident AI are divided into two levels:
+
+1. **Project Settings** — Configure settings that apply to a specific project
+2. **Organization Settings** — Manage settings that apply across all projects in your organization
+
+<Note>
+  Teams focused on org-wide AI adoption—such as Centers of Excellence,
+  innovation teams, or platform teams in large enterprises—will find
+  **Organization Settings** particularly relevant. These settings help manage
+  resources and governance for multiple AI teams across the company.
+</Note>
+
+## Project vs Organization
+
+When you create an account on Confident AI, an **organization** and a **project** within that organization are automatically created for you. Each organization can have multiple **projects** and **users**.
+
+- **Organization** — The top-level container for all your Confident AI resources. Subscription plans and billing are managed at the organization level.
+
+- **Project** — A workspace where data and access permissions are isolated. All data (test cases, metrics, datasets, traces, etc.) is separated at the project level.
+
+<Card
+  title="Learn more about projects"
+  icon="folder"
+  href="/settings/settings/organization/projects"
+>
+  See how to structure your projects and why data separation matters.
+</Card>
+
+## Project Settings
+
+Project settings allow you to customize configurations for individual projects, including team access, evaluation models, and integrations.
+
+<CardGroup cols={3}>
+  <Card
+    title="Manage Team Members"
+    icon="user-plus"
+    href="/settings/project/team-members"
+  >
+    Add team members to your project and manage their access.
+  </Card>
+  <Card title="API Keys" icon="key" href="/settings/project/api-keys">
+    Generate and manage API keys for authentication.
+  </Card>
+  <Card
+    title="Evaluation Models"
+    icon="brain"
+    href="/settings/project/evaluation-models"
+  >
+    Configure the models used for LLM-as-a-judge evaluations.
+  </Card>
+  <Card
+    title="Integrations"
+    icon="puzzle-piece"
+    href="/settings/project/integrations"
+  >
+    Set up Slack, Discord, Teams, or email notifications.
+  </Card>
+  <Card
+    title="AI Connections"
+    icon="plug"
+    href="/settings/project/ai-connections"
+  >
+    Connect your AI provider API keys for evaluations.
+  </Card>
+  <Card title="Alerts" icon="bell" href="/settings/settings/project/alerts">
+    Configure alerts for important project events.
+  </Card>
+  <Card
+    title="Annotation Options"
+    icon="star"
+    href="/settings/project/annotation-options"
+  >
+    Define criteria for human-in-the-loop annotations.
+  </Card>
+  <Card
+    title="Data Retention"
+    icon="trash"
+    href="/settings/project/data-retention"
+  >
+    Manage how long your evaluation data is stored.
+  </Card>
+  <Card
+    title="Roles & Permissions"
+    icon="user-shield"
+    href="/settings/project/roles-and-permissions"
+  >
+    Control access levels for team members.
+  </Card>
+</CardGroup>
+
+## Organization Settings
+
+Organization settings control resources and configurations that apply to all projects within your organization.
+
+<CardGroup cols={3}>
+  <Card
+    title="Projects"
+    icon="folder"
+    href="/settings/settings/organization/projects"
+  >
+    View and manage all projects in your organization.
+  </Card>
+  <Card title="Users" icon="users" href="/settings/settings/organization/users">
+    Manage users and their access across the organization.
+  </Card>
+  <Card title="SSO" icon="lock" href="/settings/settings/organization/sso">
+    Configure Single Sign-On for secure authentication.
+  </Card>
+  <Card
+    title="Model Credentials"
+    icon="key"
+    href="/settings/settings/organization/model-credentials"
+  >
+    Manage API credentials for AI models shared across projects.
+  </Card>
+  <Card
+    title="Feature Access"
+    icon="toggle-on"
+    href="/settings/settings/organization/feature-access"
+  >
+    Control which features are enabled for projects.
+  </Card>
+</CardGroup>

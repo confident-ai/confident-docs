@@ -1,0 +1,51 @@
+---
+title: Single-Sign-On (SSO)
+subtitle: Configure SSO for secure and streamlined authentication across your organization.
+slug: settings/organization/sso
+description: Learn about SSO configuration
+---
+
+SSO lets your team sign in to Confident AI using their existing company accounts. Currently, self-serve SSO setup supports **SAML** only.
+
+If you need a different protocol, reach out to support@confident-ai.com.
+
+## Setting Up SAML SSO
+
+Head to **Organization Settings** → **Settings** → **SSO** tab to get started.
+
+<Steps>
+  <Step title="Select Protocol">Choose SAML from the dropdown.</Step>
+  <Step title="Enter Domain">
+    Enter your company's email domain (e.g., `yourcompany.com`). SSO will apply to users with email addresses on this domain—subdomains aren't included.
+  </Step>
+  <Step title="Configure your Identity Provider">
+    Set up Confident AI as an application in your IdP (Okta, Azure AD, Google Workspace, etc.). Copy these values into your IdP:
+
+    - Assertion Consumer Service (ACS) URL
+    - Entity ID
+    - Name ID Format (Email Address)
+
+  </Step>
+  <Step title="Provide your IdP metadata">
+    After setting up the application in your IdP, it'll give you metadata to enter here:
+
+    - Single Sign-On URL
+    - Issuer/Entity ID
+    - Certificate
+
+  </Step>
+  <Step title="Verify Domain and Activate SSO">
+    Add the provided TXT record to your DNS settings to verify you own the domain. Once verified, SSO goes live.
+  </Step>
+</Steps>
+
+After SSO is activated, users with matching email domains will be able to sign in through your identity provider.
+
+<Warning>
+  There's a known bug where domain verification can fail during self-served SSO.
+  If you run into problems during setup, reach out to support@confident-ai.com.
+</Warning>
+
+## Revoking SSO
+
+If you need to disable SSO, head to **Organization Settings** → **Settings** → **SSO** tab and click **Revoke SSO**. Users will go back to signing in with their email and password. Note that this setup cannot be undone.

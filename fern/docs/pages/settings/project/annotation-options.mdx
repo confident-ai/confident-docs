@@ -1,0 +1,44 @@
+---
+subtitle: Define and manage annotation criteria for human-in-the-loop evaluation workflows in your project.
+slug: settings/project/annotation-options
+description: Learn about annotation option configuration
+---
+
+Enable or disable different human annotation options for your project. These criteria are used **for all annotations** within your project on Confident AI.
+
+<Tip>
+  Disabling criteria helps reduce confusion for users or team members by
+  limiting the annotation options shown in the UI.
+</Tip>
+
+## Configure Annotation Option
+
+By default, both annotation systems are enabled:
+
+- **Five Star Rating** — Rate responses on a 1-5 star scale
+- **Thumbs Up/Down** — Simple binary feedback
+
+You can disable either system (but not both) if you only want to use one. To configure annotation criteria:
+
+1. Navigate to **Project Settings** → **Annotation Criteria**
+2. Enable or disable the scoring system (5 star or thumbs up/down) you want to use
+3. Click **Save** to apply your changes
+
+<Note>
+  Disabling a criteria only hides it from the UI—it does not delete existing
+  annotations for that system. It also does not block API calls or cause
+  existing integrations to error.
+</Note>
+
+## Custom Criteria
+
+You can create custom annotation criteria tailored to your specific evaluation needs. By default, no custom criteria are configured.
+
+To add a custom criteria:
+
+1. Click **Add Custom Criteria**
+2. Enter a unique name for the criteria
+3. Select a criteria type (Five Star Rating or Thumbs Up/Down)
+4. Click **Save**
+
+To delete a custom criteria, click the trash icon next to the criteria you want to remove.

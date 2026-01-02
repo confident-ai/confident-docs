@@ -1,0 +1,57 @@
+---
+subtitle: Configure where your data is stored and processed to meet compliance and regulatory requirements.
+slug: settings/data-residency
+description: Learn about data residency configuration
+---
+
+By default, all data is stored and processed in the **United States of America**. You can however login to EU for your data to be hosted and processed in the **European Union** instead.
+
+Additional data residency options are available on-demand. Contact support@confident-ai.com to ask for the available options.
+
+## Available Regions
+
+| Region | Location       | Requirements          |
+| ------ | -------------- | --------------------- |
+| US     | United States  | Default for all plans |
+| EU     | European Union | Premium plan + add-on |
+| Custom | On-demand      | Contact support       |
+
+## Configuring Data Residency
+
+When using the [Evals API](/docs/api-reference/introduction), you'll need to change the base and OTEL endpoints:
+
+```bash
+export CONFIDENT_BASE_URL="https://eu.api.confident.com"
+export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
+```
+
+Or alternatively, you can run the `set-confident-region` command to switch to for example the EU region:
+
+```bash
+deepeval set-confident-region EU
+```
+
+## On-Premises Hosting
+
+For organizations that require complete control over their data, Confident AI offers on-premises hosting options. This allows you to host Confident AI within your own infrastructure while maintaining full data sovereignty.
+
+<Card
+  title="On-Premises Hosting"
+  icon="server"
+  href="/docs/resources/on-prem-hosting"
+>
+  Learn more about hosting Confident AI on your own infrastructure.
+</Card>
+
+## Compliance & Security
+
+All data processed and stored by Confident AI is encrypted at rest and protected by TLS in transit. We maintain SOC II and HIPAA compliance to meet the most stringent data security requirements.
+
+- **SOC II** — Available for customers on the Team plan and above
+- **HIPAA BAA** — Available for customers on the Team plan and above
+- **GDPR** — Data residency, processing, and handling comply with the General Data Protection Regulation for all customers with data in the EU region
+
+<Tip>
+  For detailed compliance documentation, visit our [Trust
+  Center](https://trust.delve.co/confident-ai).
+</Tip>
