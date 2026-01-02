@@ -9,6 +9,14 @@ subtitle: Use Confident AI for LLM observability and evals for PydanticAI
 
 ## Tracing Quickstart
 
+<Tip>
+For users in the EU region, please set the OTEL endpoint to the EU version as shown below:
+
+```bash
+export CONFIDENT_BASE_OTEL_URL="https://eu.otel.confident-ai.com"
+```
+</Tip>
+
 <Steps>
   <Step title="Install Dependencies">
     Run the following command to install the required packages:
@@ -494,8 +502,8 @@ Running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end) on your 
         answer_relavancy_metric = AnswerRelevancyMetric()
         dataset = EvaluationDataset(goldens=[Golden(input="What's 7 * 8?"), Golden(input="What's 7 * 6?")])
 
-        for golden in dataset.evals_iterator():
-            task = asyncio.create_task(agent.run(golden.input, metrics=[answer_relavancy_metric]))
+        for golden in dataset.evals_iterator(metrics=[answer_relavancy_metric]):
+            task = asyncio.create_task(agent.run(golden.input))
             dataset.evaluate(task)
         ```
       </Tab>
