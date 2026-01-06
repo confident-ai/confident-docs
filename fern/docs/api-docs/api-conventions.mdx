@@ -1,0 +1,130 @@
+---
+title: API Conventions
+subtitle: Understand the status codes, error formats, and response structures returned by the Evals API
+slug: api-reference/api-conventions
+---
+
+## Overview
+
+All Evals API endpoints follow consistent conventions for response formats, status codes, and error handling. This page documents what to expect when making requests to the API.
+
+## Response Format
+
+All API responses follow a consistent JSON structure:
+
+### Success response
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response payload specific to the endpoint
+  },
+  "deprecated": false,
+  "link": "https://app.confident-ai.com/..."
+}
+```
+
+| Field        | Type    | Description                                                                                 |
+| ------------ | ------- | ------------------------------------------------------------------------------------------- |
+| `success`    | boolean | Always `true` for successful requests                                                       |
+| `data`       | object  | The response payload, varies by endpoint                                                    |
+| `deprecated` | boolean | Indicates if this endpoint is deprecated. If `true`, migrate to the recommended alternative |
+| `link`       | string  | (Optional) URL to the created/relevant resource on the Confident AI platform                |
+
+### Error response
+
+```json
+{
+  "success": false,
+  "error": "Error message describing what went wrong",
+  "deprecated": false
+}
+```
+
+| Field        | Type    | Description                                   |
+| ------------ | ------- | --------------------------------------------- |
+| `success`    | boolean | Always `false` for error responses            |
+| `error`      | string  | A human-readable message describing the error |
+| `deprecated` | boolean | Indicates if this endpoint is deprecated      |
+
+## HTTP Status Codes
+
+The Evals API uses standard HTTP status codes to indicate the success or failure of requests.
+
+### Success codes
+
+| Status Code   | Description                             |
+| ------------- | --------------------------------------- |
+| `200 OK`      | The request was successful              |
+| `201 Created` | A new resource was successfully created |
+
+### Client error codes
+
+| Status Code | Name                 | Description                                                                                                                   |
+| ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `400`       | Bad Request          | The request was malformed or contained invalid parameters. Check your request body and query parameters.                      |
+| `401`       | Unauthorized         | Authentication failed. Verify your API key is correct and included in the request headers.                                    |
+| `403`       | Forbidden            | You don't have permission to access this resource. Check your API key permissions and project access.                         |
+| `404`       | Not Found            | The requested resource doesn't exist. Verify the resource ID or path is correct.                                              |
+| `409`       | Conflict             | The request conflicts with the current state of the resource. This often occurs when creating a resource that already exists. |
+| `422`       | Unprocessable Entity | The request was well-formed but contains semantic errors. Check that your data meets all validation requirements.             |
+
+### Server error codes
+
+| Status Code | Name                  | Description                                                                                                                            |
+| ----------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `500`       | Internal Server Error | An unexpected error occurred on our servers. If this persists, contact support.                                                        |
+| `503`       | Maintenance           | The API is temporarily unavailable due to scheduled maintenance. Check our [status page](https://status.confident-ai.com) for updates. |
+
+## Ensure Forward Compatibility
+
+**We may add new fields to the `data` field of API responses at any time without considering it a breaking change.**
+
+To ensure your integration remains stable, **your client should ignore unknown fields** rather than failing when encountering them.
+
+For example, if today an endpoint returns:
+
+```json
+{
+  "success": true,
+  "data": {
+    "testRunId": "abc123"
+  },
+  "deprecated": false
+}
+```
+
+And tomorrow it returns:
+
+```json
+{
+  "success": true,
+  "data": {
+    "testRunId": "abc123",
+    "newField": "some value"
+  },
+  "deprecated": false
+}
+```
+
+Your client should continue to work without modification. Most JSON parsing libraries handle this by default, but be cautious if you're using strict schema validation.
+
+<Tip>
+  When deserializing responses, configure your parser to ignore unknown
+  properties. In Python with Pydantic, use `extra = "ignore"`. In TypeScript,
+  avoid strict object type assertions.
+</Tip>
+
+## Deprecation Notices
+
+When an endpoint is deprecated, responses will include `"deprecated": true`. We recommend:
+
+1. Monitor the `deprecated` field in all responses
+2. Plan to migrate to the recommended alternative before the endpoint is removed
+
+<Warning>
+  Deprecated endpoints will continue to function for a transition period, but
+  may be removed in future API versions. Always migrate to recommended
+  alternatives when you see deprecation notices.
+</Warning>

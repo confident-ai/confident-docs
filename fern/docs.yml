@@ -293,6 +293,9 @@ navigation:
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
+          - page: API Conventions
+            path: docs/api-docs/api-conventions.mdx
+            icon: fa-light fa-book
       - api: API Reference
         flattened: true
         skip-slug: true
