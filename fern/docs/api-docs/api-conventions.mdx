@@ -6,7 +6,23 @@ slug: api-reference/api-conventions
 
 ## Overview
 
-All Evals API endpoints follow consistent conventions for response formats, status codes, and error handling. This page documents what to expect when making requests to the API.
+All API endpoints follow consistent conventions for response formats, status codes, and error handling. This page documents what to expect when making requests to the API.
+
+## Request Headers
+
+All API requests require the following headers:
+
+| Header              | Required | Description                                                                                  |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `CONFIDENT_API_KEY` | Yes      | Your **project/organizatioin API key** for authentication (API key type depends on endpoint) |
+| `Content-Type`      | Yes      | Must be `application/json` for requests with a body                                          |
+
+```bash
+curl -X POST https://api.confident-ai.com/v1/... \
+  -H "CONFIDENT_API_KEY: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
 
 ## Response Format
 

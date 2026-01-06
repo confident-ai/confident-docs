@@ -58,18 +58,15 @@ You can now copy your Organization API Key and use it for authentication.
 
 Project-level authentication provides access to all resources within a specific project — including datasets, prompts, metric collections, traces, and more.
 
-To get your **Project API Key**:
+<Note>
+  Learn how to get your API keys [here.](/docs/settings/project/api-keys)
+</Note>
 
-1. Visit [app.confident-ai.com](https://app.confident-ai.com) and log in.
-2. Select the project you want to work with.
-3. Go to **Project Settings** to view your **Project Name**, **Project ID**, and **Project API Key**.
-
-<Frame caption="Project Settings Page">
-  ![Project API
-  Key](https://confident-docs.s3.us-east-1.amazonaws.com/confident-docs:project-auth.png)
+<Frame caption="Project API Keys">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/settings:project:api-keys.png" />
 </Frame>
 
-Copy the Project API Key to authenticate all project-scoped API calls. You can also integrate with DeepEval by setting the key as an environment variable:
+You can also integrate with DeepEval by setting the key as an environment variable:
 
 ```bash
 export CONFIDENT_API_KEY="confident_us..."
