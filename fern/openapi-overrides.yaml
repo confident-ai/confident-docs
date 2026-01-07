@@ -434,7 +434,7 @@ paths:
     get:
       parameters:
         - in: header
-          name: confident-api-key
+          name: CONFIDENT_API_KEY
           required: true
           description: The organization API key for your Confident AI organization.
           schema:
@@ -443,7 +443,7 @@ paths:
     post:
       parameters:
         - in: header
-          name: confident-api-key
+          name: CONFIDENT_API_KEY
           required: true
           description: The organization API key for your Confident AI organization.
           schema:
@@ -460,7 +460,7 @@ paths:
             type: string
           description: The unique identifier of the project to update.
         - in: header
-          name: confident-api-key
+          name: CONFIDENT_API_KEY
           required: true
           description: The organization API key for your Confident AI organization.
           schema:

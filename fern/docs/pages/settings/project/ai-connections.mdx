@@ -1,0 +1,146 @@
+---
+subtitle: Connect your AI app to run evaluations directly on the platform without code.
+slug: settings/project/ai-connections
+description: Learn about setting up AI connections
+---
+
+AI Connections let you run evaluations directly on the platform by connecting to your AI app via an HTTPS endpoint. Instead of writing code, you can trigger evaluations with a click of a button—Confident AI will call your endpoint with data from your goldens and parse the response.
+
+<Frame caption="Setup AI Connection">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/settings:project:ai-connection.png" />
+</Frame>
+
+## Setting Up an AI Connection
+
+To create an AI connection:
+
+1. Navigate to **Project Settings** → **AI Connections**
+2. Click **New AI Connection**
+3. Give it a unique identifying name
+4. Click **Save**
+
+<Note>
+  Your AI connection won't be usable yet—you still need to configure the
+  endpoint, payload, and at minimum the actual output key path.
+</Note>
+
+## Configuration Parameters
+
+There are several parameters you'll need to configure in order for your AI connection to work.
+
+### Name
+
+Give your AI connection a unique name to identify it within your project.
+
+### AI App Endpoint
+
+Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` requests and returns a JSON response containing the actual output of your AI app.
+
+### Payload
+
+Configure the JSON payload that Confident AI sends to your endpoint. You can customize this to match your API's expected structure using values from your goldens.
+
+Available variables:
+
+| Variable                       | Description                        |
+| ------------------------------ | ---------------------------------- |
+| `golden.input`                 | The input from your golden         |
+| `golden.context`               | The context from your golden       |
+| `conversationalGolden.context` | Context for conversational goldens |
+| `conversationalGolden.turns`   | Turn history for multi-turn evals  |
+| `prompts`                      | A dictionary of prompt versions    |
+
+Example payload:
+
+```json
+{
+  "input": golden.input,
+  "context": golden.context,
+  "conversationalContext": conversationalGolden.context,
+  "prompts": prompts,
+  "turns": conversationalGolden.turns
+}
+```
+
+<Tip>
+  The custom payload feature lets you structure the request to match your
+  existing API contract—no need to modify your AI app to accept a specific
+  format.
+</Tip>
+
+Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary.
+
+### Headers
+
+Add any headers required by your endpoint, such as API keys, authentication tokens, or content type specifications. These headers are sent with every request to your AI app.
+
+### Prompts
+
+Associate prompt versions with your AI connection. When running evaluations, these prompts will be attributed to each test run, letting you trace results back to the prompts used.
+
+The `prompts` variable in your payload is a dictionary where each key maps to an object containing `alias` and `version`:
+
+```json
+{
+  "system": { "alias": "system-prompt", "version": "1.0.0" },
+  "assistant": { "alias": "assistant-prompt", "version": "2.1.0" }
+}
+```
+
+Here's an example of how your Python endpoint might handle the prompts dictionary:
+
+```python
+from deepeval.prompt import Prompt
+
+@app.post("/generate")
+def generate(request: dict):
+    # Pull different prompt versions using their keys
+    system_info = request["prompts"]["system"]
+    assistant_info = request["prompts"]["assistant"]
+
+    system_prompt = Prompt(alias=system_info["alias"]).pull(version=system_info["version"])
+    assistant_prompt = Prompt(alias=assistant_info["alias"]).pull(version=assistant_info["version"])
+
+    # Use the prompts in your generation
+    response = llm.generate(
+        system=system_prompt.text,
+        assistant=assistant_prompt.text,
+        user=request["input"]
+    )
+
+    return {"output": response}
+```
+
+For more details on working with prompts, see [Prompt Versioning](/docs/llm-evaluation/prompt-optimization/prompt-versioning).
+
+### Actual Output Key Path
+
+A list of strings representing the path to the `actual_output` value in your JSON response. This is required for evaluation to work.
+
+For example, if your endpoint returns:
+
+```json
+{
+  "response": {
+    "output": "Hello, world!"
+  }
+}
+```
+
+Set the key path to `["response", "output"]`.
+
+<Warning>
+  You don't need to include `"quotations"` when setting the paths.
+</Warning>
+
+### Retrieval Context Key Path
+
+A list of strings representing the path to the `retrieval_context` value in your JSON response. This is optional and only needed if you're using RAG metrics. The value must be a list of strings.
+
+### Tool Call Key Path
+
+A list of `ToolCall` representing the path to the `tools_called` value in your JSON response. This is optional and only needed if you're using metrics that require a tool call parameter. The value must be a list of `ToolCall`.
+
+## Testing Your Connection
+
+After configuring your AI connection, click **Ping Endpoint** to verify everything is set up correctly. You should receive a `200` status response. If not, check the error message and adjust your configuration accordingly.

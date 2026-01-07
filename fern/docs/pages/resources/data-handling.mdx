@@ -10,13 +10,16 @@ When you initially create an account on Confident AI, an **organization** and a 
 
 <Tip>
   You should create a separate project for each distinct [LLM use
-  case](/docs/llm-use-cases), even when multiple use cases share the same codebase or
-  business logic. This is because the datasets and metrics will be different for
-  each use case.
+  case](/docs/llm-use-cases), even when multiple use cases share the same
+  codebase or business logic. This is because the datasets and metrics will be
+  different for each use case.
 </Tip>
 
 <Frame caption="Data Organization and Separation in Confident AI">
-  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/data-organization.svg" alt="Data Organization in Confident AI"/>
+  <img
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/data-organization.svg"
+    alt="Data Organization in Confident AI"
+  />
 </Frame>
 
 As your organization scales, you can:
@@ -36,11 +39,14 @@ An organization represents the top-level container for all your Confident AI res
 Projects function as separate workspaces within your organization where data and access permissions are isolated. They allow different teams or use cases within your organization to maintain distinct LLM evaluation workflows.
 
 <Info>
-After completing the initial onboarding process once you've [created an account](/docs/getting-started/setup#create-an-account), you will be the sole **user** belonging to your **project** within your **organization**.
+  After completing the initial onboarding process once you've [created an
+  account](/docs/getting-started/setup#create-an-account), you will be the sole
+  **user** belonging to your **project** within your **organization**.
 </Info>
 
 <Frame>
-<div className='flex justify-center items-center'>
+<div className="flex justify-center items-center">
+
 ```mermaid
 graph TD
     ORG[Your Organization] --> PROJ[Your Project]
@@ -48,6 +54,7 @@ graph TD
     USER -. Access .-> PROJ
     PROJ --> DATA[Project Data]
 ```
+
 </div>
 </Frame>
 
@@ -66,22 +73,6 @@ Your datasets and prompts will be preserved as long as you maintain an active ac
 - **Enterprise**: Custom
 
 For extended retention periods, please contact support@confident-ai.com.
-
-## Data Residency
-
-By default, all data is stored and processed in the United States of America. You can also request your data to be hosted and processed in the **European Union** instead however, and you would require to be on a [Premium plan](https://confident-ai.com/pricing) with an add on to do so.
-
-Additional data residency options are available on-demand, contact support@confident-ai.com to ask for the available options.
-
-<Note>
-Using `deepeval` with Confident AI in the EU region is as simple as running this command:
-
-```bash
-deepeval set-confident-region EU
-```
-</Note>
-
-For those that want to host Confident AI on their premises, [click here.](/docs/on-prem-hosting)
 
 ## Data Privacy
 

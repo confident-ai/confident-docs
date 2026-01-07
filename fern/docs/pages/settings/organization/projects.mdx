@@ -1,0 +1,40 @@
+---
+subtitle: View and manage all projects within your organization from a central location.
+slug: settings/organization/projects
+description: Learn about organization project management
+---
+
+View and manage all projects in your organization. Each project card shows the project name and the number of members with access.
+
+## Managing Projects
+
+To manage projects:
+
+1. Navigate to **Organization Settings** → **Projects**
+2. Use the search bar to find a specific project
+3. Click on a project card to open it
+4. Click **Create New Project** to add a new project
+
+## Why Multiple Projects?
+
+Projects provide data isolation within your organization. All data—test cases, metrics, datasets, traces, and more—is separated at the project level. Users from one project cannot access data in projects they don't belong to, even if they're in the same organization.
+
+<Frame caption="Data Organization and Separation in Confident AI">
+  <img
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/data-organization.svg"
+    alt="Data Organization in Confident AI"
+  />
+</Frame>
+
+<Tip>
+  Create a separate project for each distinct AI use case, even when multiple
+  use cases share the same codebase or business logic. This keeps datasets and
+  metrics organized and prevents accidental cross-contamination of evaluation
+  data.
+</Tip>
+
+## Common Project Structures
+
+- **By use case** — One project per AI application (e.g., "Customer Support Bot", "Document Summarizer")
+- **By team** — One project per team working on AI features
+- **By environment** — Separate projects for development, staging, and production evaluations

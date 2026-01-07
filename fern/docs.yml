@@ -29,6 +29,10 @@ tabs:
     slug: integrations
     icon: fa-light fa-plug
     display-name: Integrations
+  settings:
+    slug: settings
+    icon: fa-light fa-gear
+    display-name: Platform Settings
 
 navigation:
   - tab: documentation
@@ -256,17 +260,6 @@ navigation:
           - page: Frameworks & Policies
             path: docs/pages/red-teaming/framework-policies.mdx
             icon: fa-light fa-shield-check
-      - section: Project Settings
-        contents:
-          - page: Invite Team Members
-            path: docs/pages/project-settings/invite-team-members.mdx
-            icon: fa-light fa-user-plus
-          - page: Integrations
-            path: docs/pages/project-settings/integrations.mdx
-            icon: fa-light fa-puzzle-piece
-          - page: Setup LLM Connection
-            path: docs/pages/project-settings/setup-llm-connection.mdx
-            icon: fa-light fa-plug
       - section: Resources
         contents:
           - page: Why Confident AI
@@ -300,6 +293,9 @@ navigation:
           - page: Data Models
             path: docs/api-docs/data-models.mdx
             icon: fa-light fa-table-cells
+          - page: API Conventions
+            path: docs/api-docs/api-conventions.mdx
+            icon: fa-light fa-book
       - api: API Reference
         flattened: true
         skip-slug: true
@@ -351,6 +347,63 @@ navigation:
           - page: Portkey
             path: docs/pages/integrations/third-party/portkey-ai.mdx
             icon: fa-light fa-hexagon
+  - tab: settings
+    layout:
+      - page: Platform Settings
+        path: docs/pages/settings.mdx
+        icon: fa-light fa-gear
+      - page: Data Residency
+        path: docs/pages/settings/data-residency.mdx
+        icon: fa-light fa-globe
+      - page: RBAC
+        path: docs/pages/settings/rbac.mdx
+        icon: fa-light fa-user-shield
+      - section: Project Settings
+        contents:
+          - page: Team Members
+            path: docs/pages/settings/project/team-members.mdx
+            icon: fa-light fa-user-plus
+          - page: API Keys
+            path: docs/pages/settings/project/api-keys.mdx
+            icon: fa-light fa-key
+          - page: Evaluation Models
+            path: docs/pages/settings/project/evaluation-models.mdx
+            icon: fa-light fa-brain
+          - page: Integrations
+            path: docs/pages/settings/project/integrations.mdx
+            icon: fa-light fa-puzzle-piece
+          - page: Alerts
+            path: docs/pages/settings/project/alerts.mdx
+            icon: fa-light fa-bell
+          - page: AI Connections
+            path: docs/pages/settings/project/ai-connections.mdx
+            icon: fa-light fa-globe
+          - page: Annotation Options
+            path: docs/pages/settings/project/annotation-options.mdx
+            icon: fa-light fa-star
+          - page: Data Retention
+            path: docs/pages/settings/project/data-retention.mdx
+            icon: fa-light fa-trash
+          - page: Roles & Permissions
+            path: docs/pages/settings/project/roles-and-permissions.mdx
+            icon: fa-light fa-user-shield
+      - section: Organization Settings
+        contents:
+          - page: Projects
+            path: docs/pages/settings/organization/projects.mdx
+            icon: fa-light fa-folder
+          - page: Users
+            path: docs/pages/settings/organization/users.mdx
+            icon: fa-light fa-users
+          - page: Model Credentials
+            path: docs/pages/settings/organization/model-credentials.mdx
+            icon: fa-light fa-key
+          - page: SSO
+            path: docs/pages/settings/organization/sso.mdx
+            icon: fa-light fa-lock
+          - page: Feature Access
+            path: docs/pages/settings/organization/feature-access.mdx
+            icon: fa-light fa-toggle-on
 
 navbar-links:
   - type: minimal
@@ -380,12 +433,12 @@ colors:
 
   background:
     dark: "#0E0E13"
-    light: "#fdfdfa"
+    light: "#ffffff"
 
 logo:
   dark: docs/assets/docs-dark-logo.svg
   light: docs/assets/docs-light-logo.svg
-  height: 52
+  height: 46
   href: https://www.confident-ai.com
 
 metadata:

@@ -1130,37 +1130,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TestRunResponse"
-              example:
-                success: true
-                data:
-                  metricsScores:
-                    - metric: "Answer Correctness"
-                      scores: [0]
-                      passes: 0
-                      fails: 1
-                      errors: 0
-                  testCases:
-                    - id: "TEST-CASE-ID"
-                      name: "Test Case 1"
-                      input: "What's the capital of France?"
-                      expectedOutput: "Paris"
-                      actualOutput: "San Francisco"
-                      success: false
-                      context: ["The capital of France is Paris."]
-                      retrievalContext: ["The capital of France is Paris."]
-                      metricsData:
-                        - id: "METRIC-ID"
-                          score: 0
-                          reason: "The capital of France is Paris."
+              examples:
+                Single-Turn:
+                  value:
+                    success: true
+                    data:
+                      metricsScores:
+                        - metric: "Answer Correctness"
+                          scores: [0]
+                          passes: 0
+                          fails: 1
+                          errors: 0
+                      traceMetricsScores: []
+                      conversational: false
+                      identifier: "test-run-001"
+                      status: "COMPLETED"
+                      testsPassed: 0
+                      testsFailed: 1
+                      totalTests: 1
+                      runDuration: 1.5
+                      testCases:
+                        - id: "TEST-CASE-ID"
+                          name: "Test Case 1"
+                          input: "What's the capital of France?"
+                          expectedOutput: "Paris"
+                          actualOutput: "San Francisco"
                           success: false
-                          threshold: 0.5
-                          evaluationModel: "gpt-4.1"
-                          strictMode: false
-                          skipped: false
-                          evaluationCost: 0
-                          name: "Answer Correctness"
-                          verboseLogs: "..."
-                deprecated: false
+                          context: ["The capital of France is Paris."]
+                          retrievalContext: ["The capital of France is Paris."]
+                          runDuration: 1.2
+                          evaluationCost: 0.001
+                          metricsData:
+                            - id: "METRIC-ID"
+                              score: 0
+                              reason: "The capital of France is Paris."
+                              success: false
+                              threshold: 0.5
+                              evaluationModel: "gpt-4.1"
+                              strictMode: false
+                              evaluationCost: 0.001
+                              name: "Answer Correctness"
+                              verboseLogs: "..."
+                    deprecated: false
+                Multi-Turn:
+                  value:
+                    success: true
+                    data:
+                      metricsScores:
+                        - metric: "Conversation Completeness"
+                          scores: [0.85]
+                          passes: 1
+                          fails: 0
+                          errors: 0
+                      traceMetricsScores: []
+                      conversational: true
+                      identifier: "test-run-002"
+                      status: "COMPLETED"
+                      testsPassed: 1
+                      testsFailed: 0
+                      totalTests: 1
+                      runDuration: 2.3
+                      testCases:
+                        - id: "CONV-TEST-CASE-ID"
+                          name: "Mount Everest Conversation"
+                          scenario: "User asking about Mount Everest"
+                          expectedOutcome: "Assistant provides accurate height information"
+                          userDescription: "A curious user asking geography questions"
+                          context: ["Mount Everest is 8,848 meters tall."]
+                          success: true
+                          runDuration: 2.1
+                          evaluationCost: 0.002
+                          turns:
+                            - role: "user"
+                              content: "How tall is Mount Everest?"
+                            - role: "assistant"
+                              content: "Mount Everest is approximately 8,848 meters (29,029 feet) tall."
+                          metricsData:
+                            - id: "METRIC-ID"
+                              score: 0.85
+                              reason: "The assistant provided accurate information about Mount Everest's height."
+                              success: true
+                              threshold: 0.7
+                              evaluationModel: "gpt-4.1"
+                              strictMode: false
+                              evaluationCost: 0.002
+                              name: "Conversation Completeness"
+                              verboseLogs: "..."
+                    deprecated: false
 
   /v1/annotations:
     get:
@@ -4436,10 +4492,37 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/MetricScores"
+              description: The aggregated metric scores across all test cases.
             testCases:
               type: array
               items:
-                $ref: "#/components/schemas/TestRunTestCase"
+                oneOf:
+                  - $ref: "#/components/schemas/TestRunTestCase"
+                  - $ref: "#/components/schemas/TestRunConversationalTestCase"
+              description: The test cases in this test run. Will contain either single-turn test cases or conversational test cases, but not both.
+            multiTurn:
+              type: boolean
+              description: Whether this test run contains multi-turn test cases.
+            identifier:
+              type: string
+              description: A unique identifier for the test run.
+            status:
+              type: string
+              enum: ["IN_PROGRESS", "COMPLETED", "ERRORED", "CANCELLED"]
+              description: The current status of the test run.
+            testsPassed:
+              type: number
+              description: The number of test cases that passed.
+            testsFailed:
+              type: number
+              description: The number of test cases that failed.
+            totalTests:
+              type: number
+              description: The total number of test cases in this test run.
+            runDuration:
+              type: number
+              format: float
+              description: The total duration of the test run in seconds.
           required:
             - testCases
             - metricsScores
@@ -4494,11 +4577,110 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MetricsData"
+          description: The metric evaluation results for this test case.
+        comments:
+          type: string
+          description: Any comments associated with this test case.
+        additionalMetadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata associated with this test case.
+        success:
+          type: boolean
+          description: Whether this test case passed all metric thresholds.
+        runDuration:
+          type: number
+          format: float
+          description: The duration of the test case evaluation in seconds.
+        evaluationCost:
+          type: number
+          format: float
+          description: The cost of evaluating this test case.
       required:
         - id
         - name
         - input
-        - metrics
+
+    TestRunConversationalTestCase:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: This is the id of the conversational test case generated by Confident AI.
+        name:
+          type: string
+          description: This is the name of the conversational test case.
+        turns:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestRunTurn"
+          description: The list of turns in the conversation.
+        scenario:
+          type: string
+          description: A description of the conversation context.
+        expectedOutcome:
+          type: string
+          description: The expected outcome or ideal conversation flow.
+        userDescription:
+          type: string
+          description: A description of the user in the conversation.
+        context:
+          type: array
+          items:
+            type: string
+          description: The context provided for the conversation.
+        comments:
+          type: string
+          description: Any comments associated with this test case.
+        additionalMetadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata associated with this test case.
+        metricsData:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricsData"
+          description: The metric evaluation results for this test case.
+        success:
+          type: boolean
+          description: Whether this test case passed all metric thresholds.
+        runDuration:
+          type: number
+          format: float
+          description: The duration of the test case evaluation in seconds.
+        evaluationCost:
+          type: number
+          format: float
+          description: The cost of evaluating this test case.
+      required:
+        - id
+        - name
+        - turns
+
+    TestRunTurn:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: ["user", "assistant"]
+          description: The role of the turn, either user or assistant.
+        content:
+          type: string
+          description: The message content of the turn.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          description: The tools called to generate the LLM response for this turn.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          description: The contexts retrieved to generate the LLM response for this turn.
+      required:
+        - role
+        - content
 
     MetricScores:
       type: object

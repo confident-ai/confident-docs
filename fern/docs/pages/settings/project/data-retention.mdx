@@ -1,0 +1,36 @@
+---
+subtitle: Configure data retention policies to manage how long your evaluation data and traces are stored.
+slug: settings/project/data-retention
+description: Learn about data retention settings
+---
+
+Data retention policies let you control how long different types of data are stored in your project before being automatically deleted. These policies are configured at the project level, so each project can have its own retention settings.
+
+<Frame caption="Data Retention">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/settings:project:data-retention.png" />
+</Frame>
+
+## Configuring Your Retention Policy
+
+To configure data retention:
+
+1. Navigate to **Project Settings** → **Data Retention**
+2. Toggle on **Custom Retention Policy**
+3. Set the retention period (days, months, or years) for each data type
+4. Click **Save** to apply your changes
+
+## How Deletion Works
+
+When data is deleted, any child data associated with it gets deleted too. Here's how the hierarchy works:
+
+- **Test Runs** — Deleting a test run also removes its associated metrics, test cases, traces, spans, and threads.
+- **Threads** — Deleting a thread removes all traces, spans, and metrics within it.
+- **Traces** — Deleting a trace removes its spans and metrics, but leaves the parent thread intact.
+- **Metric Scores** — This only applies to "orphan" metrics that aren't attached to a test run, trace, span, or thread.
+
+For example, if you set your trace retention to 14 days, any traces older than 14 days will be deleted—and all the metrics associated with those traces will be deleted along with them.
+
+<Note>
+  **Datasets** and **Prompts** are never automatically deleted. As long as you
+  have an account, they're safe.
+</Note>

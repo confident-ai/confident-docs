@@ -1,0 +1,51 @@
+---
+subtitle: Configure and manage the evaluation models used for running LLM-as-a-judge metrics in your project.
+slug: settings/project/evaluation-models
+description: Learn about evaluation models configuration
+---
+
+By default, Confident AI provides evaluation models for you to use for all evals run on the platform. You can however customize the evaluation model used to your liking.
+
+<Frame caption="Select Evaluation Model">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/settings:project:evaluation-model.png" />
+</Frame>
+
+## Select An Evaluation Model
+
+To configure your evaluation model:
+
+1. Navigate to **Project Settings** → **Evaluation Model**
+2. Select a **Model Provider** from the dropdown
+3. Select the specific **Model** to use (e.g., gpt-4o)
+4. Click **Save** to apply your changes
+
+<Note>
+  You can only select a provider if you have credentials configured for it. See
+  the sections below to configure your providers.
+</Note>
+
+Alternatively, toggle **Inherit from Organization** to use the model credentials configured at the [organization level](/settings/settings/organization/model-credentials) instead of configuring them per-project.
+
+## Available Providers
+
+There are three categories of providers you can configure. To set up any provider, click the three-dot menu (⋮) on the right side of the row and enter your API key or configuration details.
+
+**Model Providers** — Provide your API key to run evaluations:
+
+- OpenAI
+- Anthropic
+- Gemini
+- X-AI
+- DeepSeek
+- Mistral
+- Perplexity
+
+**Cloud Providers** — Run evaluations using models hosted on your cloud infrastructure:
+
+- Amazon Bedrock
+- Vertex AI
+
+**LLM Gateways** — Connect a gateway to manage tag-based routing credentials:
+
+- Portkey
+- LiteLLM
