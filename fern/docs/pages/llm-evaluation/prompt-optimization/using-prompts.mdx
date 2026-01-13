@@ -345,6 +345,94 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Step>
 
+<Step title="Use model settings and output type">
+
+You can also optionally extract the output type, model settings, and schema from the prompt version.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py {10}
+from deepeval.prompt import Prompt, OutputType
+from openai import OpenAI
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate()
+
+model_settings = prompt.model_settings
+output_type = prompt.output_type
+output_schema = prompt.output_schema
+
+if output_type == OutputType.SCHEMA:
+    response = OpenAI().responses.parse(
+        model=model_settings.model,
+        temperature=model_settings.temperature,
+        input=[{"role": "system", "content": interpolated_prompt}],
+        text_format=output_schema
+    )
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts {11}
+import { Prompt, OutputType } from "deepeval-ts";
+import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate(); // interpolate prompt
+
+const modelSettings = prompt.modelSettings;
+const outputType = prompt.outputType;
+const outputSchema = prompt.outputSchema;
+
+if (outputType === OutputType.SCHEMA) {
+  const openai = new OpenAI();
+  const response = await openai.responses.parse({
+    model: modelSettings.model,
+    input: [{ role: "system", content: interpolatedPrompt }],
+    text: { format: zodTextFormat(outputSchema, "schema") },
+  });
+}
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts" />
+
+```curl
+curl -X POST "https://api.openai.com/v1/responses" \
+  -H "Authorization: Bearer YOUR_OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o-2024-08-06",
+    "input": [
+      { "role": "system", "content": "<YOUR-INTERPOLATED-PROMPT>" }
+    ],
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "response_schema",
+        "schema": <YOUR-OUTPUT-SCHEMA>,
+        "strict": true
+      }
+    }
+  }'
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
 </Steps>
 
 ## Accessing Tools from Prompts
