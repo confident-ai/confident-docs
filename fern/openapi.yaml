@@ -1218,6 +1218,232 @@ paths:
                               verboseLogs: "..."
                     deprecated: false
 
+  /v1/test-runs:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: List Test Runs
+      operationId: listTestRuns
+      description: >-
+        Retrieves a paginated list of test runs for the authorized project.
+        Results can be filtered and sorted by status, dates, conversational (multi-turn) or metrics.
+        Pagination is controlled with `page` and `pageSize`. Filtering and sorting options include `status`, `multiTurn`, `sortField`, and `ascending`.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (must be a positive integer, default is 1).
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Number of items per page (max 100, default is 25).
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [COMPLETED, ERRORED, IN_PROGRESS, CANCELLED]
+          description: Filter test runs by status.
+        - in: query
+          name: multiTurn
+          schema:
+            type: string
+            enum: ["true", "false"]
+          description: Filter for conversational (multi-turn) test runs only ("true" or "false").
+        - in: query
+          name: sortField
+          schema:
+            type: string
+            enum: ["created_at", "run_duration"]
+            default: "created_at"
+          description: Field to sort results by ("created_at" or "run_duration").
+        - in: query
+          name: ascending
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "false"
+          description: Sort ascending (true) or descending (false).
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: datetime
+          description: ISO 8601 start datetime filter (e.g. "2025-12-31T23:59:59Z").
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: datetime
+          description: ISO 8601 end datetime filter (e.g. "2025-12-31T23:59:59Z").
+      responses:
+        "200":
+          description: A paginated list of test runs and total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      testRuns:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: Test run unique identifier.
+                            createdAt:
+                              type: string
+                              format: datetime
+                            identifier:
+                              type: string
+                              nullable: true
+                              description: Optional test run identifier.
+                            status:
+                              type: string
+                              enum: [COMPLETED, ERRORED, IN_PROGRESS, CANCELLED]
+                            multiTurn:
+                              type: boolean
+                              description: Whether the test run is conversational.
+                            testsPassed:
+                              type: integer
+                              nullable: true
+                            testsFailed:
+                              type: integer
+                              nullable: true
+                            totalTests:
+                              type: integer
+                              nullable: true
+                            metricsScores:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  metric:
+                                    type: string
+                                  scores:
+                                    type: array
+                                    items:
+                                      type: number
+                                    nullable: true
+                                  passes:
+                                    type: integer
+                                    nullable: true
+                                  fails:
+                                    type: integer
+                                    nullable: true
+                                  errors:
+                                    type: integer
+                                    nullable: true
+                            runDuration:
+                              type: number
+                              nullable: true
+                            evaluationCost:
+                              type: number
+                              nullable: true
+                            datasetAlias:
+                              type: string
+                              nullable: true
+                            testFile:
+                              type: string
+                              nullable: true
+                            summary:
+                              type: object
+                              nullable: true
+                              properties:
+                                topicSummaries:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      topic:
+                                        type: string
+                                      testCaseIds:
+                                        type: array
+                                        items:
+                                          oneOf:
+                                            - type: integer
+                                            - type: string
+                                      summaryPoints:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            grade:
+                                              type: number
+                                            content:
+                                              type: string
+                                            testCaseIds:
+                                              type: array
+                                              items:
+                                                oneOf:
+                                                  - type: integer
+                                                  - type: string
+                                summaryOverview:
+                                  type: object
+                                  properties:
+                                    summary:
+                                      type: array
+                                      items:
+                                        type: string
+                                    actionItems:
+                                      type: array
+                                      items:
+                                        type: string
+                      totalTestRuns:
+                        type: integer
+                        description: Total number of test runs matching filters.
+                      page:
+                        type: integer
+                        example: 1
+                        description: Current page number.
+                      pageSize:
+                        type: integer
+                        example: 25
+                        description: Page size.
+                required:
+                  - success
+                  - data
+              example:
+                success: true
+                data:
+                  testRuns:
+                    - id: "342bd7a6"
+                      createdAt: "2024-06-01T12:34:56Z"
+                      identifier: "run042"
+                      status: "COMPLETED"
+                      multiTurn: false
+                      testsPassed: 8
+                      testsFailed: 2
+                      totalTests: 10
+                      metricsScores:
+                        - metric: "Answer Correctness"
+                          scores: [0.9, 1.0]
+                          passes: 8
+                          fails: 2
+                          errors: 0
+                      runDuration: 15.2
+                      evaluationCost: 0.254
+                      datasetAlias: "agent"
+                      testFile: "test-file-1.jsonl"
+                      summary: "8/10 passed"
+                  totalTestRuns: 113
+                  page: 1
+                  pageSize: 25
+
   /v1/annotations:
     get:
       x-fern-server-name: Confident AI
