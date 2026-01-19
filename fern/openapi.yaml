@@ -1571,8 +1571,6 @@ paths:
                       createdAt: "2025-11-12T09:15:00Z"
                       threadId: "thread-id-1"
                   total: 150
-
-  /v1/annotation:
     post:
       x-fern-server-name: Confident AI
       tags:
