@@ -1571,34 +1571,6 @@ paths:
                       createdAt: "2025-11-12T09:15:00Z"
                       threadId: "thread-id-1"
                   total: 150
-                  metricsScores:
-                    - metric: "Answer Correctness"
-                      scores: [0]
-                      passes: 0
-                      fails: 1
-                      errors: 0
-                  testCases:
-                    - id: "TEST-CASE-ID"
-                      name: "Test Case 1"
-                      input: "What's the capital of France?"
-                      expectedOutput: "Paris"
-                      actualOutput: "San Francisco"
-                      success: false
-                      context: ["The capital of France is Paris."]
-                      retrievalContext: ["The capital of France is Paris."]
-                      metricsData:
-                        - id: "METRIC-ID"
-                          score: 0
-                          reason: "The capital of France is Paris."
-                          success: false
-                          threshold: 0.5
-                          evaluationModel: "gpt-4.1"
-                          strictMode: false
-                          skipped: false
-                          evaluationCost: 0
-                          name: "Answer Correctness"
-                          verboseLogs: "..."
-                deprecated: false
 
   /v1/annotation:
     post:
