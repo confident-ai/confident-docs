@@ -13,6 +13,24 @@ You can pull a prompt version from Confident AI like how you would pull a datase
 
 You should pull prompts once and save it in memory instead of pulling it everytime you need to use it.
 
+<Tip>
+You can pull and manage your prompts in any project by configuring a `CONFIDENT_API_KEY`.
+
+- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
+- To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
+
+```python
+from deepeval.prompt import Prompt, PromptMessage
+
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  confident_api_key="confident_us...",
+)
+```
+
+When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
+</Tip>
+
 ## Using Prompt Versions
 
 <Steps>
