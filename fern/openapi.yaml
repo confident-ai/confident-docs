@@ -2382,12 +2382,12 @@ components:
                 type: string
                 enum:
                   [
-                    turns,
+                    role,
+                    content,
                     scenario,
+                    toolsCalled,
                     expectedOutcome,
-                    userDescription,
-                    context,
-                    chatbotRole,
+                    retrievalContext,
                   ]
         multiTurn:
           type: boolean

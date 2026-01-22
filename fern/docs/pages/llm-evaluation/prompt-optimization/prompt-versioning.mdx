@@ -58,7 +58,7 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
 1. Create a text or messages prompt
 2. Edit and commit an initial prompt version in the prompt editor
 
-<Tip>A prompt cannot be both a text and message prompt at the same time.</Tip>
+<Note>A prompt cannot be both a text and message prompt at the same time.</Note>
 
 <Tabs>
 
@@ -86,7 +86,7 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
   autoPlay
   loop
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-text-4k.mp4"
+  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-text.mp4"
   type="video/mp4"
 />
 
@@ -98,6 +98,26 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
 
 Don't forget to **commit** an initial version of your prompt after you're done
 editing it. Alternately, you can create a prompt version from code.
+
+<Tip>
+You can manage your prompts in any project by configuring a `CONFIDENT_API_KEY`.
+
+- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
+- To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
+
+```python
+from deepeval.prompt import Prompt, PromptMessage
+
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  messages_template=[PromptMessage(role="...", content="...")],
+  confident_api_key="confident_us...",
+)
+prompt.push()
+```
+
+When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
+</Tip>
 
 <Tabs>
 <Tab title="Messages" language="python">

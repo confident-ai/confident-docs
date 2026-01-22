@@ -11,6 +11,22 @@ In the previous section, we learnt how to [curate datasets](/llm-evaluation/data
 - Associate dataset with test runs
 - Use the `evals_iterator` to run evals on datasets (for python users)
 
+<Tip>
+You can manage your datasets in any project by configuring a `CONFIDENT_API_KEY`.
+
+- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
+- To target a specific project, pass a `confident_api_key` directly when creating the `EvaluationDataset`.
+
+```python
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset(confident_api_key="confident_us...")
+dataset.delete(alias="YOUR-DATASET-ALIAS")
+```
+
+When both are provided, the `confident_api_key` passed to `EvaluationDataset` always takes precedence over the environment variable.
+</Tip>
+
 ## Pull Goldens via Evals API
 
 Datasets are either single or multi-turn, and you should know that pulling a single-turn dataset will give you single-turn goldens, and vice versa.
