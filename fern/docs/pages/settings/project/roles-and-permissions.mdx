@@ -62,15 +62,16 @@ Permissions follow a `resource:action` format. For example, `dataset:read` grant
 - `delete` — Remove resources
 - `evaluate` — Run evaluations on the resource
 - `assign` — Assign resources to users or queues
+- `manage` — Includes `create`, `update`, and `delete`
 
 **Resources:**
 
 - `dataset`, `golden` — Datasets and their goldens
-- `metric`, `metric_collection` — Metric scores and collections
+- `metric`, `metricCollection` — Metric scores and collections
 - `trace`, `span`, `thread` — Observability data
-- `test_run`, `test_case`, `experiment` — Evaluation runs
-- `prompt`, `prompt_version` — Prompts and their versions
-- `annotation_queue`, `queue_item` — Annotation queues and their items
-- `project_member` — Team member management
+- `testRun`, `testCase`, `experiment` — Evaluation runs
+- `prompt`, `promptVersion`, `promptLabel` — Prompts and their versions
+- `annotationQueue`, `queue_item` — Annotation queues and their items
+- `projectMember` — Team member management
 
 Not every resource will have all actions. For example, dataset doens't have `project_member`, while `annotation_queue` doesn't have `evaluate`. You can find the full list of permissions on the roles & permissions page.
