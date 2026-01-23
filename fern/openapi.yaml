@@ -44,6 +44,10 @@ tags:
     description: Projects API
     externalDocs:
       description: Learn about projects
+  - name: Risk Assessments
+    description: Run your red teaming and get reports using API
+    externalDocs:
+      description: Learn about risk assessments
 
 paths:
   /v1/metrics:
@@ -2227,6 +2231,34 @@ paths:
                     description: "Updated description"
                     organizationId: "clxxxxx"
                     created_at: "2024-12-04T23:00:00.000Z"
+
+  /v1/risk-assessments/{riskAssessmentId}/report:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Risk Assessments
+      summary: Download Report
+      operationId: generateRiskAssessmentReport
+      description: Generates or retrieves a PDF report for a specific risk assessment.
+      parameters:
+        - in: path
+          name: riskAssessmentId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the risk assessment.
+      responses:
+        "200":
+          description: The raw PDF bytes of the risk assessment report.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Risk assessment not found.
+        "400":
+          description: Failed to generate report.
 
 components:
   schemas:
