@@ -45,7 +45,7 @@ tags:
     externalDocs:
       description: Learn about projects
   - name: Risk Assessments
-    description: Run your red teaming and get reports using API
+    description: Run red teaming and generate reports using API
     externalDocs:
       description: Learn about risk assessments
 
