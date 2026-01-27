@@ -33,6 +33,10 @@ tabs:
     slug: settings
     icon: fa-light fa-gear
     display-name: Platform Settings
+  on-prem:
+    slug: on-prem
+    icon: fa-light fa-house
+    display-name: Self-Hosting
 
 navigation:
   - tab: documentation
@@ -404,6 +408,53 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+  - tab: on-prem
+    layout:
+      - page: Introduction
+        path: docs/pages/on-prem/introduction.mdx
+        icon: fa-light fa-info-circle
+      - section: AWS Deployment
+        icon: fa-brands fa-amazon
+        contents:
+          - page: Overview
+            path: docs/pages/on-prem/aws/overview.mdx
+            icon: fa-light fa-map
+          - page: Requirements
+            path: docs/pages/on-prem/aws/requirements.mdx
+            icon: fa-light fa-clipboard-list
+          - page: Security & Compliance
+            path: docs/pages/on-prem/aws/security-and-compliance.mdx
+            icon: fa-light fa-shield-check
+          - section: Step-by-step guide
+            collapsed: true
+            icon: fa-light fa-list-check
+            contents:
+              - page: Prerequisites
+                path: docs/pages/on-prem/aws/prerequisites.mdx
+              - page: Configuration
+                path: docs/pages/on-prem/aws/configuration.mdx
+              - page: Provisioning
+                path: docs/pages/on-prem/aws/provisioning.mdx
+              - page: SSL Certificates
+                path: docs/pages/on-prem/aws/ssl-certificates.mdx
+              - page: Bastion Access
+                path: docs/pages/on-prem/aws/bastion-access.mdx
+              - page: Kubernetes Deployment
+                path: docs/pages/on-prem/aws/kubernetes-deployment.mdx
+              - page: Verification
+                path: docs/pages/on-prem/aws/verification.mdx
+      - section: Azure Deployment
+        icon: fa-brands fa-microsoft
+        contents:
+          - page: Overview
+            path: docs/pages/on-prem/azure/overview.mdx
+            icon: fa-light fa-map
+      - section: GCP Deployment
+        icon: fa-brands fa-google
+        contents:
+          - page: Overview
+            path: docs/pages/on-prem/gcp/overview.mdx
+            icon: fa-light fa-map
 
 navbar-links:
   - type: minimal
