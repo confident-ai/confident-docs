@@ -42,13 +42,23 @@ Configure the JSON payload that Confident AI sends to your endpoint. You can cus
 
 Available variables:
 
-| Variable                       | Description                        |
-| ------------------------------ | ---------------------------------- |
-| `golden.input`                 | The input from your golden         |
-| `golden.context`               | The context from your golden       |
-| `conversationalGolden.context` | Context for conversational goldens |
-| `conversationalGolden.turns`   | Turn history for multi-turn evals  |
-| `prompts`                      | A dictionary of prompt versions    |
+| Variable                                   | Description                                    | Type       |
+| ------------------------------------------ | ---------------------------------------------- | ---------- |
+| `golden.input`                             | The input from your golden                     | string     |
+| `golden.actual_output`                     | The actual output from your golden             | string     |
+| `golden.expected_output`                   | The expected output from your golden           | string     |
+| `golden.retrieval_context`                 | The retrieval context from your golden         | string[]   |
+| `golden.context`                           | The context from your golden                   | string[]   |
+| `golden.expected_tools`                    | The expected tools from your golden            | ToolCall[] |
+| `golden.tools_called`                      | The tools called from your golden              | ToolCall[] |
+| `golden.additional_metadata`               | Additional metadata from your golden           | object     |
+| `conversationalGolden.turns`               | Turn history for multi-turn evals              | Turn[]     |
+| `conversationalGolden.context`             | Context for conversational goldens             | string[]   |
+| `conversationalGolden.scenario`            | Scenario for conversational goldens            | string     |
+| `conversationalGolden.expected_outcome`    | Expected outcome for conversational goldens    | string     |
+| `conversationalGolden.user_description`    | User description for conversational goldens    | string     |
+| `conversationalGolden.additional_metadata` | Additional metadata for conversational goldens | object     |
+| `prompts`                                  | A dictionary of prompts                        | object     |
 
 Example payload:
 
@@ -137,9 +147,49 @@ Set the key path to `["response", "output"]`.
 
 A list of strings representing the path to the `retrieval_context` value in your JSON response. This is optional and only needed if you're using RAG metrics. The value must be a list of strings.
 
+For example, if your endpoint returns:
+
+```json
+{
+  "response": {
+    ...
+    "retrieval_context": ["context1", "context2"]
+  }
+}
+```
+
+Set the key path to `["response", "retrieval_context"]`.
+
 ### Tool Call Key Path
 
 A list of `ToolCall` representing the path to the `tools_called` value in your JSON response. This is optional and only needed if you're using metrics that require a tool call parameter. The value must be a list of `ToolCall`.
+
+For example, if your endpoint returns:
+
+```json
+{
+  "response": {
+    ...
+    "tools_called": [
+      {
+        "name": "get_weather",
+        "description": "Get weather for a location",
+        "reasoning": "User asked about the weather in San Francisco",
+        "output": "Sunny, 72°F",
+        "inputParameters": {"location": "San Francisco"}
+      }
+    ]
+  }
+}
+```
+
+Set the key path to `["response", "tools_called"]`.
+
+<Tip>
+  For more information on the structure of a tool call, refer to the [official
+  DeepEval
+  documentation](https://deepeval.com/docs/evaluation-test-cases#tools-called).
+</Tip>
 
 ## Testing Your Connection
 
