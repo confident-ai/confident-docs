@@ -191,6 +191,18 @@ Set the key path to `["response", "tools_called"]`.
   documentation](https://deepeval.com/docs/evaluation-test-cases#tools-called).
 </Tip>
 
+### Request Timeout
+
+Set the maximum time (in seconds) that Confident AI will wait for your endpoint to respond before timing out. This helps prevent evaluations from hanging indefinitely if your AI connection is slow or unresponsive.
+
+- **Minimum**: 1 second
+- **Default**: 60 seconds
+
+<Note>
+  If your AI app performs complex operations or calls external services, you may
+  need to increase the timeout to avoid premature failures.
+</Note>
+
 ## Testing Your Connection
 
 After configuring your AI connection, click **Ping Endpoint** to verify everything is set up correctly. You should receive a `200` status response. If not, check the error message and adjust your configuration accordingly.
