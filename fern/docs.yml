@@ -277,6 +277,9 @@ navigation:
           - page: LLM Use Cases
             path: docs/pages/resources/llm-use-cases.mdx
             icon: fa-light fa-list
+          - page: Changelog
+            path: docs/pages/changelog.mdx
+            icon: fa-light fa-clock-rotate-left
   - tab: api-reference
     layout:
       - section: "Get Started"
