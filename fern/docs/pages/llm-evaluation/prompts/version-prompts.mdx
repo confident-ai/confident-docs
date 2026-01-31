@@ -1,23 +1,32 @@
 ---
 subtitle: Create and manage different versions of your prompts
-slug: llm-evaluation/prompt-optimization/prompt-versioning
+slug: llm-evaluation/prompt-management/version-prompts
 ---
 
 ## Overview
 
 Prompt versioning allows you to optimize and test different versions of your prompts. Managing prompts on Confident AI allows you to:
 
-1. Collaborate and centralize where prompt is stored and edited, even for non-technical team members
+1. Collaborate and centralize where prompts are stored and edited, even for non-technical team members
 2. Pinpoint which version, or even combination of your prompt versions, performed best
+3. Optionally co-locate model settings with prompts to version them as a single unit
 
-There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping on prompts on Confident AI can you fully leverage Confident AI's evaluation features.
+There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping prompts on Confident AI can you fully leverage Confident AI's evaluation features.
 
 <Note>
-  Prompts are a type of hyperparameter on Confident AI. Other include things
+  Prompts are a type of hyperparameter on Confident AI. Others include things
   like models, embedders, top-K, and max tokens. When you run evals against
-  prompts that kept on Confident AI, we can tell you which version performs
-  best, and later automatically optimize it for you.
+  prompts kept on Confident AI, we can tell you which version performs best, and
+  later automatically optimize it for you.
 </Note>
+
+<Tip>
+  **Prompts vs Prompts + Model Settings:** You can use Confident AI purely for
+  prompt versioning — pull your prompts and use them with whatever model you
+  configure in your code. Alternatively, if you want to manage prompts and model
+  configurations together as a single versioned unit, you can attach model
+  settings to prompt versions.
+</Tip>
 
 ## Two Types of Prompts
 
@@ -117,13 +126,11 @@ When both are provided, the `confident_api_key` passed to `Prompt` always takes 
 <Tabs>
 <Tab title="Messages" language="python">
 ```python
-from deepeval.prompt import Prompt, PromptMessage
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage
 
-prompt = Prompt(
-alias="YOUR-PROMPT-ALIAS",
-messages_template=[PromptMessage(role="...", content="...")]
-)
-prompt.push()
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(messages=[PromptMessage(role="...", content="...")])
 
 ````
 </Tab>
@@ -132,32 +139,33 @@ prompt.push()
 ```python
 from deepeval.prompt import Prompt
 
-prompt = Prompt(
-  alias="YOUR-PROMPT-ALIAS",
-  text="..."
-)
-prompt.push()
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(text="...")
 ````
 
 </Tab>
 
 </Tabs>
 
+<Tip>
+  For more advanced push options including model settings and output schemas,
+  see [Automate Prompt
+  Management](/llm-evaluation/prompt-management/automate-prompt-management).
+</Tip>
+
 ## Setting Dynamic Variables
 
-You can include variables that can be interpolated dynamically in your LLM application later on. There are four ways currently for you to include variables:
+You can include variables that can be interpolated dynamically in your LLM application later on. There are five interpolation types available:
 
-- `{variable}`
-- `{{ variable }}`
-- `{{variable}}`
-- `${variable}`
+| Type                  | Syntax           | Example                           |
+| --------------------- | ---------------- | --------------------------------- |
+| `FSTRING`             | `{variable}`     | `Hello, {name}!`                  |
+| `MUSTACHE`            | `{{variable}}`   | `Hello, {{name}}!`                |
+| `MUSTACHE_WITH_SPACE` | `{{ variable }}` | `Hello, {{ name }}!`              |
+| `DOLLAR_BRACKETS`     | `${variable}`    | `Hello, ${name}!`                 |
+| `JINJA`               | `{% ... %}`      | `{% if admin %}Hello!{% endif %}` |
 
-For example, the `{variable}` interpolation type must follow these rules:
-
-1. No spaces in the variable name
-2. Exactly one space between the braces and the variable name
-
-For example:
+Variable names must not contain spaces:
 
 ```python
 # ✅ Correct usage:
@@ -166,15 +174,12 @@ For example:
 "User input: {user_input}"
 
 # ❌ Incorrect usage:
-
 "Hi, my name is {variable name}." # Spaces in variable name
-"Hi, my name is {variable_name }." # Extra spaces around variable name
-
 ```
 
-## Using Conditional Logic
+## Using Conditional Logic (Jinja)
 
-Apart from variables, Confident AI also supports [jinja templates](https://realpython.com/primer-on-jinja-templating/), which would allow you to render more complex logic such as conditional if/else blocks:
+JINJA interpolation supports [jinja templates](https://realpython.com/primer-on-jinja-templating/), which allows you to render more complex logic such as conditional if/else blocks:
 
 ```txt If/Else
 {% if is_admin %}
@@ -224,18 +229,18 @@ prompt.pull(label="staging")
 
 ## Update Prompts
 
-You can update your prompt templates in code by specifying the prompt `alias` and `version`.
+You can update your prompt templates in code by specifying the prompt `alias` and `version`. Use `"latest"` to update the most recent version.
 
 <Tabs>
 
 <Tab title="Messages">
 
 ```python
-from deepeval.prompt import Prompt, PromptVersion
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="00.00.01", messages=[PromptVersion(role="...", content="...")])
-
+prompt.update(version="latest", messages=[PromptMessage(role="...", content="...")])
 ```
 
 </Tab>
@@ -247,22 +252,46 @@ from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.update(version="00.00.01", text="...")
-
 ```
 
 </Tab>
 
 </Tabs>
-You can also update a prompt's model settings, interpolation type, output type, and output schema through the `update` method.
+
+### Updating with Model Settings (Optional)
+
+If you're managing model configuration alongside your prompts, you can also update a prompt's model settings, interpolation type, output type, and output schema through the `update` method.
+
+<Note>
+  Model settings are optional. Most teams only need to version their prompt
+  templates and handle model selection separately in their code. Model settings
+  are useful when you want to treat the prompt + model as a single versioned
+  configuration.
+</Note>
 
 ```python
-from deepeval.prompt import Prompt, ModelSettings, InterpolationType, OutputType
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import (
+    ModelSettings,
+    ModelProvider,
+    PromptInterpolationType,
+    OutputType,
+)
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.update(
     version="00.00.01",
-    model_settings=ModelSettings(model="gpt-4o-mini"),
-    interpolation_type=InterpolationType.FSTRING,
+    model_settings=ModelSettings(
+        provider=ModelProvider.OPEN_AI,
+        name="gpt-4o-mini",
+    ),
+    interpolation_type=PromptInterpolationType.FSTRING,
     output_type=OutputType.TEXT,
 )
 ```
+
+<Tip>
+  For complete documentation on all available model settings and output
+  configurations, see [Automate Prompt
+  Management](/llm-evaluation/prompt-management/automate-prompt-management#model-settings-reference).
+</Tip>

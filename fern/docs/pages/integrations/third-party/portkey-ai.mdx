@@ -8,6 +8,7 @@ subtitle: Portkey AI serves as a unified interface for interacting LLMs
 Confident AI lets you trace and evaluate Portkey LLM calls, whether standalone or used as a component within a larger application.
 
 ## Tracing Quickstart
+
 <Steps>
 
 <Step title="Install Dependencies">
@@ -41,6 +42,7 @@ import deepeval
 
 deepeval.login("<your-confident-api-key>")
 ```
+
 </CodeBlock>
 
 <CodeBlock title="Env" language="bash">
@@ -98,7 +100,7 @@ To begin tracing your Portkey LLM calls as a component in your application, impo
             ],
         )
 
-        asyncio.run(main())        
+        asyncio.run(main())
         ```
     </Tab>
     <Tab title="Responses">
@@ -138,6 +140,7 @@ To begin tracing your Portkey LLM calls as a component in your application, impo
         asyncio.run(main())
         ```
     </Tab>
+
 </Tabs>
 
 <Note>
@@ -163,7 +166,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` to the `create` method.
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` to the `create` method.
 
 ```python main.py
 from portkey_ai import PORTKEY_GATEWAY_URL
@@ -219,14 +222,12 @@ with trace(thread_id="test_thread_id_1"):
 print(response.choices[0].message.content)
 ```
 
-<Note>
-  This is an example of using `STRING` type prompt interpolation.
-</Note>
-
+<Note>This is an example of using `STRING` type prompt interpolation.</Note>
 
 ## Evals Usage
 
 ### Online evals
+
 If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
@@ -236,11 +237,7 @@ If your OpenAI application is in production, and you still want to run evaluatio
 Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
-  <video
-    data-video="integrations.createMetricCollection"
-    controls
-    autoPlay
-  />
+  <video data-video="integrations.createMetricCollection" controls autoPlay />
 </Frame>
 
 </Step>
@@ -287,7 +284,9 @@ task_completion = AnswerRelevancyMetric(
 
 <Warning>
   You can only run end-to-end evals on Portkey using metrics that evaluate
-  `input`, `output`, or `tools_called`. You can pass parameters like `expected_output`, `expected_tools`, `context` and `retrieval_context` to the `trace` context.
+  `input`, `output`, or `tools_called`. You can pass parameters like
+  `expected_output`, `expected_tools`, `context` and `retrieval_context` to the
+  `trace` context.
 </Warning>
 
 </Step>
@@ -415,7 +414,7 @@ async def openai_llm_call(input):
         return await async_client.responses.create(
             model="gpt-4o",
             instructions="You are a helpful assistant.",
-            input=input,  
+            input=input,
         )
 
 
@@ -431,8 +430,8 @@ for golden in dataset.evals_iterator():
 </Tabs>
 
 <Success>
-  This will automatically generate a test run with evaluated Portkey traces using
-  inputs from your dataset.
+  This will automatically generate a test run with evaluated Portkey traces
+  using inputs from your dataset.
 </Success>
 
 </Step>

@@ -6,15 +6,22 @@ slug: llm-evaluation/experiments
 
 ## Overview
 
-You've tested prompts in the Arena. You've run evaluations and gotten test runs. Now it's time to answer the real question: **which version of your AI app is actually better?**
+Now that you've ran your AI app in the Arena (or created a test run), it's time to answer the real question: **which version of your AI app is actually better?**
 
-Experiments let you compare two or more versions of your AI app side-by-side, using the same dataset and metrics. No more guessing, no more "this one feels better" — just data.
+Experiments let you compare two or more versions of your AI app side-by-side, using the same dataset and metrics.
+
+This is fundamentally different from running [single-turn](/llm-evaluation/no-code-evals/single-turn-evals) or [multi-turn](/llm-evaluation/no-code-evals/multi-turn-evals) evaluations:
+
+- **Single/multi-turn evals** produce a single test run — a one-off snapshot of how one version of your AI app performs
+- **Experiments** run the same dataset through multiple versions simultaneously and provide aggregate statistics to declare a winner
+
+Think of it this way: evals answer "how good is this version?" while experiments answer "which version is better?"
 
 [IMAGE: Experiment results comparison view showing multiple test runs]
 
 <Note>
-  Experiments require all test runs to use the **same dataset** and **same
-  metric collection**. This ensures you're comparing apples to apples.
+  Experiments require the **same dataset** and **same metric collection**. This
+  ensures you're comparing apples to apples.
 </Note>
 
 ## How to Experiment
@@ -25,6 +32,12 @@ You can kick off an experiment in two ways:
 - **Existing Test Runs** — you already have test runs and want to compare them retroactively
 
 Either way you'll get the same result, however running experiments from Arena will be the more natural workflow.
+
+<Tip>
+
+It is highly recommended that you only change one independent variable (such as the prompt version) at a time to ensure fair experimentation.
+
+</Tip>
 
 ## Arena Experiments
 
@@ -59,7 +72,7 @@ sequenceDiagram
     Platform-->>You: Side-by-side comparison
 ```
 
-As an example, this for an experiment with 4 contestants, 5 goldens, and 3 metrics, there will be a grand total of 20 (4 x 5) outputs generated and 60 (20 x 3) evaluations total.
+For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, there will be a grand total of 20 (4 x 5) outputs generated and 60 (20 x 3) evaluations total.
 
 <Steps>
   <Step title="Set up contestants">

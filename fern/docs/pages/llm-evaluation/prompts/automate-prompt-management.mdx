@@ -1,0 +1,410 @@
+---
+subtitle: Build automated prompt versioning pipelines via the Evals API
+slug: llm-evaluation/prompt-management/automate-prompt-management
+---
+
+## Overview
+
+Instead of manually creating and updating prompts on the platform, you can automate prompt management via the Evals API. This allows you to:
+
+- Push new prompt versions from your codebase or CI/CD pipeline
+- Update existing prompt versions programmatically
+- Optionally configure model settings to version prompts + models together
+- Integrate prompt versioning into your development workflow
+
+<Note>
+  Most of this page focuses on the core use case: **versioning prompts**. Model
+  settings, output types, and other configurations are optional add-ons for
+  teams who want to manage their entire LLM configuration (prompt + model) as a
+  single versioned unit.
+</Note>
+
+<Tip>
+  If you haven't already, get familiar with [prompt versioning on the
+  platform](/llm-evaluation/prompt-management/version-prompts) to understand the
+  relationship between prompts, versions, and labels.
+</Tip>
+
+## Push Prompt Versions
+
+Push a new version of a prompt to Confident AI. If the prompt alias doesn't exist, it will be created automatically.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+For **message** prompts:
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(
+    messages=[
+        PromptMessage(role="system", content="You are a helpful assistant called {name}."),
+    ]
+)
+```
+
+For **text** prompts:
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(text="You are a helpful assistant called {name}.")
+```
+
+You can also specify the interpolation type:
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptInterpolationType
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(
+    text="You are a helpful assistant called {{name}}.",
+    interpolation_type=PromptInterpolationType.MUSTACHE
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+For **message** prompts:
+
+```ts index.ts
+import { Prompt, PromptMessage } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.push({
+  messages: [
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant called {name}.",
+    }),
+  ],
+});
+```
+
+For **text** prompts:
+
+```ts index.ts
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.push({ text: "You are a helpful assistant called {name}." });
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="POST /v1/prompts" />
+
+</Tab>
+
+</Tabs>
+
+Each push creates a new version automatically. Confident AI handles version numbering for you.
+
+### Push with Model Settings
+
+Model settings are **completely optional**. If you only need to version your prompts, you can skip this section entirely. However, if you want to manage your model configuration alongside your prompts — treating the prompt + model as a single versioned unit — you can include model settings when pushing.
+
+This is useful when:
+
+- You want to ensure a specific prompt always runs with a specific model and parameters
+- You're A/B testing different prompt + model combinations together
+- You want to centralize both prompt and model configuration in one place
+
+For those who need the full prompt + model combo, you can push with model settings and output configurations:
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import (
+    PromptMessage,
+    ModelSettings,
+    ModelProvider,
+    OutputType,
+    ReasoningEffort,
+    Verbosity,
+)
+from pydantic import BaseModel
+
+class ResponseSchema(BaseModel):
+    answer: str
+    confidence: float
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(
+    messages=[
+        PromptMessage(role="system", content="You are a helpful assistant."),
+    ],
+    model_settings=ModelSettings(
+        provider=ModelProvider.OPEN_AI,
+        name="gpt-4o",
+        temperature=0.7,
+        max_tokens=1000,
+        top_p=0.9,
+        frequency_penalty=0.1,
+        presence_penalty=0.1,
+        stop_sequence=["END"],
+        reasoning_effort=ReasoningEffort.MINIMAL,
+        verbosity=Verbosity.LOW,
+    ),
+    output_type=OutputType.SCHEMA,
+    output_schema=ResponseSchema,
+)
+```
+
+## Update Prompt Versions
+
+Update an existing prompt version by specifying the `version` you want to modify. Use `"latest"` to update the most recent version.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+For **message** prompts:
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.update(
+    version="latest",
+    messages=[
+        PromptMessage(role="system", content="Updated system message."),
+    ]
+)
+```
+
+For **text** prompts:
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.update(version="00.00.01", text="Updated prompt text.")
+```
+
+You can also update model settings and output configurations:
+
+```python main.py
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import (
+    PromptMessage,
+    ModelSettings,
+    ModelProvider,
+    PromptInterpolationType,
+    OutputType,
+    ReasoningEffort,
+    Verbosity,
+)
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.update(
+    version="latest",
+    messages=[
+        PromptMessage(role="user", content="Hello, assistant!"),
+        PromptMessage(role="assistant", content="Hello, user!"),
+    ],
+    model_settings=ModelSettings(
+        provider=ModelProvider.OPEN_AI,
+        name="o4-mini",
+        max_tokens=100,
+        temperature=0.7,
+        top_p=0.9,
+        frequency_penalty=0.1,
+        presence_penalty=0.1,
+        stop_sequence=["stop"],
+        verbosity=Verbosity.LOW,
+        reasoning_effort=ReasoningEffort.MINIMAL,
+    ),
+    interpolation_type=PromptInterpolationType.FSTRING,
+    output_type=OutputType.SCHEMA,
+    output_schema=YourSchema,
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+For **message** prompts:
+
+```ts index.ts
+import { Prompt, PromptMessage } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.update({
+  version: "latest",
+  messages: [
+    new PromptMessage({ role: "system", content: "Updated system message." }),
+  ],
+});
+```
+
+For **text** prompts:
+
+```ts index.ts
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.update({
+  version: "00.00.01",
+  text: "Updated prompt text.",
+});
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" />
+
+</Tab>
+
+</Tabs>
+
+<Warning>
+  Updating a prompt version modifies the existing version in place. If you want
+  to preserve the original, push a new version instead.
+</Warning>
+
+## Model Settings Reference
+
+<Note>
+  Model settings are optional. You can version and use prompts without any model
+  configuration — simply pull the prompt and use it with whatever model you
+  choose in your code. Model settings are for teams who want to co-locate their
+  model configuration with their prompts.
+</Note>
+
+When pushing or updating prompts, you can configure model settings with the following fields:
+
+| Field             | Type              | Default   | Description                                         |
+| ----------------- | ----------------- | --------- | --------------------------------------------------- |
+| provider          | `ModelProvider`   | `OPEN_AI` | The model provider (see supported providers below)  |
+| name              | `str`             | `None`    | The model name (e.g., "gpt-4o", "claude-3-opus")    |
+| temperature       | `float`           | `0`       | Controls randomness (0-2)                           |
+| max_tokens        | `int`             | `None`    | Maximum tokens in the response                      |
+| top_p             | `float`           | `1`       | Nucleus sampling parameter                          |
+| frequency_penalty | `float`           | `0`       | Penalize repeated tokens (-2 to 2)                  |
+| presence_penalty  | `float`           | `0`       | Penalize tokens based on presence (-2 to 2)         |
+| stop_sequence     | `List[str]`       | `[]`      | Sequences that stop generation                      |
+| reasoning_effort  | `ReasoningEffort` | `MEDIUM`  | Reasoning effort level (MINIMAL, LOW, MEDIUM, HIGH) |
+| verbosity         | `Verbosity`       | `MEDIUM`  | Output verbosity (LOW, MEDIUM, HIGH)                |
+
+### Supported Model Providers
+
+| Provider      | Description                  |
+| ------------- | ---------------------------- |
+| `OPEN_AI`     | OpenAI (GPT-4, GPT-4o, etc.) |
+| `ANTHROPIC`   | Anthropic (Claude models)    |
+| `GEMINI`      | Google Gemini                |
+| `VERTEX_AI`   | Google Vertex AI             |
+| `BEDROCK`     | Amazon Bedrock               |
+| `AZURE`       | Azure OpenAI                 |
+| `MISTRAL`     | Mistral AI                   |
+| `DEEPSEEK`    | DeepSeek                     |
+| `X_AI`        | xAI (Grok)                   |
+| `MOONSHOT_AI` | Moonshot AI                  |
+| `PERPLEXITY`  | Perplexity                   |
+| `PORTKEY`     | Portkey (gateway)            |
+| `LITE_LLM`    | LiteLLM (gateway)            |
+
+### Output Configuration
+
+You can also configure structured outputs:
+
+| Field         | Type         | Default | Description                                                       |
+| ------------- | ------------ | ------- | ----------------------------------------------------------------- |
+| output_type   | `OutputType` | `TEXT`  | Output format (TEXT, JSON, or SCHEMA)                             |
+| output_schema | `BaseModel`  | `None`  | Pydantic model for structured output (when output_type is SCHEMA) |
+
+**Output Types:**
+
+- `TEXT` - Plain text output
+- `JSON` - JSON formatted output
+- `SCHEMA` - Structured output validated against a Pydantic schema
+
+### Interpolation Types
+
+Specify how variables are interpolated in your prompts:
+
+| Type                  | Syntax           | Example                           |
+| --------------------- | ---------------- | --------------------------------- |
+| `FSTRING`             | `{variable}`     | `Hello, {name}!`                  |
+| `MUSTACHE`            | `{{variable}}`   | `Hello, {{name}}!`                |
+| `MUSTACHE_WITH_SPACE` | `{{ variable }}` | `Hello, {{ name }}!`              |
+| `DOLLAR_BRACKETS`     | `${variable}`    | `Hello, ${name}!`                 |
+| `JINJA`               | `{% ... %}`      | `{% if admin %}Hello!{% endif %}` |
+
+## Tools
+
+Tools can be defined and configured for prompt versions on the platform. After pulling a prompt, you can access its tools programmatically. See [Accessing Tools from Prompts](/llm-evaluation/prompt-management/using-prompts#accessing-tools-from-prompts) for details on how to use tools in code.
+
+<Note>
+  Tool configuration is currently only available through the Confident AI
+  platform. Use the Prompt Studio to add, edit, or remove tools from your prompt
+  versions.
+</Note>
+
+## Prompts in CI/CD
+
+Automate prompt versioning as part of your CI/CD pipeline. A common pattern is to push prompt updates whenever your prompt files change:
+
+```yaml prompts-ci.yml
+name: Push Prompt Versions
+
+on:
+  push:
+    paths:
+      - "prompts/**"
+
+jobs:
+  push-prompts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install deepeval
+
+      - name: Push prompts
+        env:
+          CONFIDENT_API_KEY: ${{ secrets.CONFIDENT_API_KEY }}
+        run: python scripts/push_prompts.py
+```
+
+Your `push_prompts.py` script can read prompt files and push them:
+
+```python scripts/push_prompts.py
+from deepeval.prompt import Prompt
+
+# Read your prompt content from file or config
+with open("prompts/assistant.txt") as f:
+    prompt_text = f.read()
+
+prompt = Prompt(alias="assistant-prompt")
+prompt.push(text=prompt_text)
+
+print("Prompt pushed successfully!")
+```
+
+<Tip>
+  Combine automated prompt pushing with [prompt
+  labeling](/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions)
+  to control which versions are deployed to different environments (e.g.,
+  staging, production).
+</Tip>

@@ -24,6 +24,46 @@ If you haven't already, create one under **Project** > **Datasets**:
 
 </Frame>
 
+## Golden Structure
+
+Understanding the golden structure is essential before uploading your data. Goldens are the building blocks of datasets, and their structure differs slightly between single-turn and multi-turn evaluations:
+
+<Tabs>
+
+<Tab title="Single-Turn">
+
+| Field               | Type            | Description                                                            |
+| ------------------- | --------------- | ---------------------------------------------------------------------- |
+| Input               | Text            | **Required.** The input query that will be used to invoke your AI app. |
+| Expected Output     | Text            | The ideal output for a given input.                                    |
+| Context             | List of text    | Static supporting context relevant to your use case.                   |
+| Expected Tools      | List of tools   | The ideal list of tools that should be called.                         |
+| Additional Metadata | Key-value pairs | Custom metadata for generating test cases.                             |
+| Comments            | Text            | Any notes or comments about this golden.                               |
+
+</Tab>
+
+<Tab title="Multi-Turn">
+
+| Field               | Type            | Description                                                               |
+| ------------------- | --------------- | ------------------------------------------------------------------------- |
+| Scenario            | Text            | **Required.** The circumstances under which the conversation takes place. |
+| Expected Outcome    | Text            | The desired, ideal outcome for the given scenario.                        |
+| User Description    | Text            | Description of the user interacting with your AI app.                     |
+| Context             | List of text    | Static supporting context relevant to your use case.                      |
+| Additional Metadata | Key-value pairs | Custom metadata for generating test cases.                                |
+| Comments            | Text            | Any notes or comments about this golden.                                  |
+
+</Tab>
+
+</Tabs>
+
+<Warning>
+  Avoid pre-populating Actual Output, Retrieval Context, or Tools Called for
+  single-turn goldens, and Turns for multi-turn goldens. These fields are meant
+  to be populated dynamically during evaluation.
+</Warning>
+
 ## Upload Goldens via CSV
 
 You can upload both single and multi-turn goldens stored in CSVs to datasets. The fields that you will be mapping to CSV headers will just be slightly different.

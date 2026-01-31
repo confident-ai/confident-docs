@@ -38,7 +38,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
             instrument=ConfidentInstrumentationSettings(),
             name="test_agent",
         )
-            
+
         agent.run_sync("What are the LLMs?")
         ```
       </Tab>
@@ -54,7 +54,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
             name="test_agent",
             instrument=ConfidentInstrumentationSettings(),
         )
-            
+
         def execute_simple_agent():
             result = asyncio.run(agent.run("What are the LLMs?"))
 
@@ -68,8 +68,8 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
         from deepeval.integrations.pydantic_ai import ConfidentInstrumentationSettings
 
         agent = Agent(
-          "openai:gpt-4o-mini", 
-          system_prompt="Be concise, reply with one sentence.", 
+          "openai:gpt-4o-mini",
+          system_prompt="Be concise, reply with one sentence.",
           instrument=ConfidentInstrumentationSettings(),
           name="test_agent",
         )
@@ -100,7 +100,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the ConfidentInstrumentationSettings.
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the ConfidentInstrumentationSettings.
 
 ```python main.py
 from pydantic_ai import Agent
@@ -119,7 +119,7 @@ agent = Agent(
         confident_prompt=prompt,
     )
 )
-    
+
 result = agent.run_sync("What are the LLMs?")
 ```
 
@@ -326,13 +326,14 @@ Send human annotations on the threads or traces on Confident AI. Learn more abou
     with trace() as current_trace:
         result = agent.run_sync("What are the LLMs?")
         TRACE_UUID = current_trace.uuid # you can save this to use it later
-    
+
     send_annotation(
         trace_uuid=TRACE_UUID,
         rating=1,
     )
 
     ```
+
   </Tab>
   <Tab title="Threads">
     ```python
@@ -349,6 +350,7 @@ Send human annotations on the threads or traces on Confident AI. Learn more abou
         rating=1,
     )
     ```
+
   </Tab>
 </Tabs>
 
@@ -393,7 +395,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent
                 trace_metric_collection="test_collection_1",
             )
         )
-            
+
         result = agent.run_sync("What are the LLMs?")
         ```
       </Tab>
@@ -412,7 +414,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent
                 agent_metric_collection="test_collection_1",
             )
         )
-            
+
         result = agent.run_sync("What are the LLMs?")
         ```
       </Tab>
@@ -430,7 +432,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent
                 llm_metric_collection="test_collection_1",
             )
         )
-            
+
         result = agent.run_sync("What are the LLMs?")
         ```
       </Tab>
@@ -453,7 +455,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent
         @agent.tool
         def get_llm_info() -> str:
             return "LLMs are the best!"
-            
+
         result = agent.run_sync("What are the LLMs?")
         ```
       </Tab>
@@ -519,11 +521,6 @@ Running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end) on your 
 You can view evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-  <video
-    data-video="demos.pydantic"
-    controls
-    autoPlay
-    playsInline
-  />
+  <video data-video="demos.pydantic" controls autoPlay playsInline />
 </Frame>
 ````

@@ -278,7 +278,7 @@ const handler = new DeepEvalCallbackHandler({
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
 <CodeBlocks >
 
@@ -339,11 +339,7 @@ If your LangChain application is in production, and you still want to run evalua
 Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
-  <video
-    data-video="integrations.createMetricCollection"
-    controls
-    autoPlay
-  />
+  <video data-video="integrations.createMetricCollection" controls autoPlay />
 </Frame>
 
 <Warning>
@@ -779,10 +775,5 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-  <video
-    data-video="demos.langgraph"
-    controls
-    autoPlay
-    playsInline
-  />
+  <video data-video="demos.langgraph" controls autoPlay playsInline />
 </Frame>
