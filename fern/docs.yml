@@ -33,6 +33,11 @@ tabs:
     slug: settings
     icon: fa-light fa-gear
     display-name: Platform Settings
+  changelog:
+    slug: changelog
+    icon: fa-light fa-clock-rotate-left
+    display-name: Changelog
+    changelog: ./changelog
 
 navigation:
   - tab: documentation
@@ -277,9 +282,6 @@ navigation:
           - page: LLM Use Cases
             path: docs/pages/resources/llm-use-cases.mdx
             icon: fa-light fa-list
-          - page: Changelog
-            path: docs/pages/changelog.mdx
-            icon: fa-light fa-clock-rotate-left
   - tab: api-reference
     layout:
       - section: "Get Started"
@@ -407,6 +409,7 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+  - tab: changelog
 
 navbar-links:
   - type: minimal
