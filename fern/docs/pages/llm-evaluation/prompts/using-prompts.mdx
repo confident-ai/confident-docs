@@ -1,6 +1,6 @@
 ---
 subtitle: Learn how to test and use prompts in your LLM app
-slug: llm-evaluation/prompt-optimization/using-prompts
+slug: llm-evaluation/prompt-management/using-prompts
 ---
 
 ## Overview
@@ -414,7 +414,7 @@ for (const tool of prompt.tools) {
 
 ## Pull Prompts By Label
 
-You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `verion` and `label`.
+You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
 
 <Tabs>
 
@@ -438,7 +438,7 @@ prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull(label="staging")
 ```
 
-You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-optimization/prompt-versioning#labelling-prompt-versions) to learn how to do so.
+You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions) to learn how to do so.
 
 </Tab>
 

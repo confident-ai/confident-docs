@@ -118,16 +118,23 @@ navigation:
                   - page: Push & Queue Goldens
                     path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
                     icon: fa-light fa-pen-to-square
-          - section: Prompt Optimization
+          - section: Prompts
             collapsed: false
             icon: fa-light fa-sliders
             contents:
-              - page: Prompt Versioning
-                path: docs/pages/llm-evaluation/prompt-optimization/prompt-versioning.mdx
+              - page: Version Prompts
+                path: docs/pages/llm-evaluation/prompts/version-prompts.mdx
                 icon: fa-light fa-code-branch
-              - page: Working with Prompts
-                path: docs/pages/llm-evaluation/prompt-optimization/using-prompts.mdx
-                icon: fa-light fa-circle-play
+              - section: Prompts in Code
+                collapsed: false
+                icon: fa-light fa-code
+                contents:
+                  - page: Automate Prompt Management
+                    path: docs/pages/llm-evaluation/prompts/automate-prompt-management.mdx
+                    icon: fa-light fa-robot
+                  - page: Using Prompts
+                    path: docs/pages/llm-evaluation/prompts/using-prompts.mdx
+                    icon: fa-light fa-circle-play
           - section: Dashboards
             collapsed: false
             icon: fa-light fa-chart-line

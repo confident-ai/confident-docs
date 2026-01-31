@@ -154,7 +154,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context.
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the `trace` context.
 
 ```python main.py
 from deepeval.openai import OpenAI
@@ -222,8 +222,10 @@ with trace(
         ],
     )
 ```
+
 <Note>
-  This override the trace attributes that were set using `update_current_trace` method.
+  This override the trace attributes that were set using `update_current_trace`
+  method.
 </Note>
 
 <Accordion title='View Trace Attributes'>
@@ -260,6 +262,7 @@ with trace(
 ## Evals Usage
 
 ### Online evals
+
 If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
@@ -269,11 +272,7 @@ If your OpenAI application is in production, and you still want to run evaluatio
 Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
-  <video
-    data-video="integrations.createMetricCollection"
-    controls
-    autoPlay
-  />
+  <video data-video="integrations.createMetricCollection" controls autoPlay />
 </Frame>
 
 </Step>
@@ -302,7 +301,6 @@ with trace(llm_metric_collection="test_collection_1"):
 
 </Steps>
 
-
 ### End-to-end evals
 
 Confident AI allows you to run [end-to-end evals](/llm-evaluation/single-turn/end-to-end) on your OpenAI client to evaluate your OpenAI calls directly. This is recommended if you are testing your OpenAI calls in isolation.
@@ -323,7 +321,9 @@ task_completion = AnswerRelevancyMetric(
 
 <Warning>
   You can only run end-to-end evals on OpenAI using metrics that evaluate
-  `input`, `output`, or `tools_called`. You can pass parameters like `expected_output`, `expected_tools`, `context` and `retrieval_context` to the `trace` context.
+  `input`, `output`, or `tools_called`. You can pass parameters like
+  `expected_output`, `expected_tools`, `context` and `retrieval_context` to the
+  `trace` context.
 </Warning>
 
 </Step>
@@ -441,7 +441,7 @@ async def openai_llm_call(input):
         return await async_client.responses.create(
             model="gpt-4o",
             instructions="You are a helpful assistant.",
-            input=input,  
+            input=input,
         )
 
 
