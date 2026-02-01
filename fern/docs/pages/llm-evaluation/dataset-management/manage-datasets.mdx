@@ -5,18 +5,20 @@ slug: llm-evaluation/dataset-management/manage-datasets
 
 ## Overview
 
-A dataset, single or multi-turn one, is a list of goldens and forms the basis of any evaluation workflow in development. In this section, you'll learn to manipulate goldens in datasets, including:
+A dataset, which is either single or multi-turn one, is a list of goldens and forms the basis of any evaluation workflow in development. In this section, you'll learn to manipulate goldens in datasets, including:
 
+- Understanding the golden structure for single and multi-turn datasets
 - Uploading goldens via CSV on the platform
-- Build an automated golden ingestion pipline via the Evals API
-- Assiging different team members to review and finalize goldens
+- Assigning different team members to review and finalize goldens
 
 <Tip>
   If you haven't already, you should get yourself familiarized with [what are
   goldens.](/llm-evaluation/core-concepts/test-cases-goldens-datasets#goldens)
 </Tip>
 
-If you haven't already, create one under **Project** > **Datasets**:
+## Create A Dataset
+
+A dataset can be created one under **Project** > **Datasets** (select either the single or multi-turn tab based on the type of dataset you wish to create):
 
 <Frame caption="Create Dataset on Confident AI" background="subtle">
 
@@ -74,9 +76,111 @@ You can upload both single and multi-turn goldens stored in CSVs to datasets. Th
 
 </Frame>
 
-## Assign Goldens For Annotation
+## Other Actions
 
-You can also assign goldens to different team members for review and annotation.
+Beyond creating and uploading, you can also:
+
+- **Add Images** — drag and drop images into text fields for multi-modal goldens
+- **Edit Non-Text Columns** — modify structured fields like Context, Expected Tools, and Tools Called
+- **Add Custom Columns** — extend goldens with additional metadata fields
+- **Assign Goldens** — delegate review to team members
+- **(Un)finalize Goldens** — enable or disable goldens for testing
+- **Duplicate Dataset** — create a copy of an existing dataset
+- **Delete Dataset** — permanently remove a dataset
+
+### Adding Images
+
+Datasets on Confident AI are **multi-modal by nature** — images are natively supported alongside text. You can add images to goldens by dragging and dropping them directly into any text field, including Input, Expected Output, Context, and other list-of-text fields.
+
+When you upload an image, Confident AI stores it and generates a public URL. This URL is embedded in your golden's text fields using a special format: `[DEEPEVAL:IMAGE:uuid]`. When you pull the dataset for evaluation, you can parse these into an evaluatable format.
+
+<Frame caption="Add Images to Goldens" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.addImages" type="video/mp4" />
+
+</Frame>
+
+<Tip>
+  Learn how to [parse multi-modal
+  goldens](/docs/llm-evaluation/dataset-management/using-datasets#parsing-multi-modal-goldens)
+  into an evaluatable format when pulling datasets in code.
+</Tip>
+
+### Edit Non-Text Columns
+
+Some golden fields require structured data rather than plain text. This is mostly relevant for **single-turn** datasets — multi-turn datasets only have Context.
+
+| Field             | Type               | Description                                        |
+| ----------------- | ------------------ | -------------------------------------------------- |
+| Context           | List of strings    | Static supporting context for your use case        |
+| Retrieval Context | List of strings    | Retrieved text chunks from a retrieval system      |
+| Expected Tools    | List of `ToolCall` | The ideal tools that should be called              |
+| Tools Called      | List of `ToolCall` | The actual tools that were called during execution |
+
+A `ToolCall` object has the following structure:
+
+```json
+{
+  "name": "get_weather",
+  "description": "Get weather for a location",
+  "reasoning": "User asked about the weather in San Francisco",
+  "output": "Sunny, 72°F",
+  "input_parameters": { "location": "San Francisco" }
+}
+```
+
+<Frame caption="Edit Non-Text Columns" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.editNonText" type="video/mp4" />
+
+</Frame>
+
+### Add Custom Columns
+
+Add custom columns to your dataset to store additional metadata. Custom columns appear as new fields on each golden and can be used for passing dynamic values during evaluation.
+
+<Warning>
+
+Your custom columns must not be one of the default fields:
+
+<Tabs>
+  <Tab title="Single-Turn">
+
+    - Input
+     - Expected Output
+     - Context
+     - Expected Tools
+     - Additional Metadata
+     - Comments
+     - Actual Output
+     - Retrieval Context
+     - Tools Called
+
+  </Tab>
+  <Tab title="Multi-Turn">
+
+    - Scenario
+    - Expected Outcome
+    - User Description
+    - Context
+    - Additional Metadata
+    - Comments
+    - Turns
+
+  </Tab>
+</Tabs>
+
+</Warning>
+
+<Frame caption="Add Custom Columns" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.addColumn" type="video/mp4" />
+
+</Frame>
+
+### Assign Goldens
+
+Assign goldens to different team members for review and annotation.
 
 <Frame caption="Assign Goldens for Annotation" background="subtle">
 
@@ -84,14 +188,29 @@ You can also assign goldens to different team members for review and annotation.
 
 </Frame>
 
-## Delete Dataset
+### (Un)finalize Goldens
 
-You can delete a dataset directly on the platform.
+Mark goldens as finalized to lock them from further edits, or unfinalize to allow changes. Finalizing is useful when you've reviewed and approved goldens for use in evaluations.
 
-<Warning>
-  This action cannot be undone. All goldens or conversational goldens in the
-  dataset will be permanently deleted.
-</Warning>
+<Frame caption="Finalize and Unfinalize Goldens" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.finalize" type="video/mp4" />
+
+</Frame>
+
+### Duplicate Dataset
+
+Create a copy of an existing dataset. Useful when you want to create variations or preserve a snapshot before making changes.
+
+<Frame caption="Duplicate Dataset" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.duplicate" type="video/mp4" />
+
+</Frame>
+
+### Delete Dataset
+
+Remove a dataset permanently on the platform:
 
 <Frame caption="Delete Dataset on Confident AI" background="subtle">
 
@@ -99,36 +218,45 @@ You can delete a dataset directly on the platform.
 
 </Frame>
 
-You can also do it programmatically through the Evals API.
+<Warning>
+  This action cannot be undone. All goldens or conversational goldens in the
+  dataset will be permanently deleted.
+</Warning>
 
-<Tabs>
+## Next Steps
 
-<Tab title="Python" language="python">
+Now that you know how to manage datasets on the platform, learn how to use them for evaluations or work with them programmatically in your code.
 
-```python main.py
-from deepeval.dataset import EvaluationDataset
+<CardGroup cols={2}>
+  <Card
+    title="Experiments"
+    icon="flask"
+    href="/docs/llm-evaluation/experiments"
+  >
+    Use datasets to compare AI apps side-by-side with statistical rigor.
+  </Card>
+  <Card
+    title="Single-Turn Evals"
+    icon="arrow-right"
+    href="/docs/llm-evaluation/no-code-evals/single-turn"
+  >
+    Run evaluations on your dataset without writing code.
+  </Card>
+</CardGroup>
 
-dataset = EvaluationDataset()
-dataset.delete(alias="YOUR-DATASET-ALIAS")
-```
-
-</Tab>
-
-<Tab title="Typescript" language="typescript">
-
-```ts index.ts
-import { EvaluationDataset } from "deepeval-ts";
-
-const dataset = new EvaluationDataset();
-dataset.delete({ alias: "YOUR-DATASET-ALIAS" });
-```
-
-</Tab>
-
-<Tab title="curL" language="curl">
-
-<EndpointRequestSnippet endpoint="DELETE /v1/datasets/{alias}" />
-
-</Tab>
-
-</Tabs>
+<CardGroup cols={2}>
+  <Card
+    title="Pull Datasets"
+    icon="arrow-down-to-bracket"
+    href="/docs/llm-evaluation/dataset-management/using-datasets"
+  >
+    Pull datasets locally to use them in code-driven evaluations.
+  </Card>
+  <Card
+    title="Push Goldens"
+    icon="pen-to-square"
+    href="/docs/llm-evaluation/dataset-management/automate-dataset-management"
+  >
+    Programmatically push goldens to datasets via the Evals API.
+  </Card>
+</CardGroup>

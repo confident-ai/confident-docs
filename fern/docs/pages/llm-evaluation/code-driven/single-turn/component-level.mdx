@@ -10,7 +10,7 @@ Component-level testing lets you evaluate individual parts of your LLM applicati
 
 **Requirements:**
 
-- A [dataset of goldens](/llm-evaluation/dataset-management/create-goldens) — determines how many times your app runs
+- A [dataset of goldens](/llm-evaluation/dataset-management/automate-dataset-management) — determines how many times your app runs
 - [LLM tracing](/llm-tracing/quickstart) setup with `@observe` decorators
 - [Metrics](/evaluation-metrics/introduction) defined per component via the `metrics` parameter in `@observe()`
 
@@ -150,7 +150,15 @@ Since test case fields are populated via `update_current_span()` inside your com
 
 Done ✅. You should see a link to your newly created sharable testing report.
 
-[video]
+<Frame caption="Component-Level Testing Report">
+  <video
+    autoPlay
+    loop
+    muted
+    data-video="evaluation.singleTurnComponentLevel"
+    type="video/mp4"
+  />
+</Frame>
 
 </Step>
 

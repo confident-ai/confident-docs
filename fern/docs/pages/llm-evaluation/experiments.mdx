@@ -6,7 +6,7 @@ slug: llm-evaluation/experiments
 
 ## Overview
 
-Now that you've ran your AI app in the Arena (or created a test run), it's time to answer the real question: **which version of your AI app is actually better?**
+Now that you've ran your AI app in the Arena (or created a test run), it's time to systematically find out **which version of your AI app is actually better**.
 
 Experiments let you compare two or more versions of your AI app side-by-side, using the same dataset and metrics.
 
@@ -17,7 +17,12 @@ This is fundamentally different from running [single-turn](/llm-evaluation/no-co
 
 Think of it this way: evals answer "how good is this version?" while experiments answer "which version is better?"
 
-[IMAGE: Experiment results comparison view showing multiple test runs]
+<Frame caption="Experiment results comparison view showing multiple test runs">
+  <img
+    data-image="experiments.resultsComparison"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
 <Note>
   Experiments require the **same dataset** and **same metric collection**. This
@@ -78,7 +83,10 @@ For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, the
   <Step title="Set up contestants">
     In the Arena, configure **at least 2 contestants**. Each can be a **Prompt** or **AI Connection** ([learn more](/docs/llm-evaluation/no-code-evals/quickstart#generating-ai-outputs)).
 
-    [IMAGE: Arena with multiple contestants configured]
+    <Frame caption="Arena with multiple contestants configured">
+
+  <img data-image="experiments.arenaContestants" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
 
   </Step>
 
@@ -89,7 +97,10 @@ For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, the
     - **Dataset** — select the dataset to evaluate against
     - **Metric Collection** — select the metrics to score each output
 
-    [IMAGE: Run Experiment dialog]
+    <Frame caption="Run Experiment dialog">
+
+  <img data-image="experiments.runDialog" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
 
     <Tip>
       **Variables Mapping** is optional but highly recommended. If your prompts use variables like `{input}`, map them to golden fields here. Without this, every golden gets the same static prompt — not very useful for comparison.
@@ -116,7 +127,9 @@ For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, the
     - View the actual input, expected output, and each contestant's output
     - Link to view traces for deeper debugging
 
-    [IMAGE: Experiment results showing metrics overview and test cases]
+    <Frame caption="Analyzing experiment results from existing test runs">
+      <video autoPlay loop muted data-video="experiments.overview" type="video/mp4" />
+    </Frame>
 
   </Step>
 </Steps>
@@ -148,7 +161,10 @@ This is different from regression testing:
       Only test runs using the same dataset and metric collection can be compared in an experiment.
     </Warning>
 
-    [IMAGE: Creating experiment from test run view]
+    <Frame caption="Creating experiment from test run view">
+
+  <img data-image="experiments.createFromTestRun" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
 
   </Step>
 
@@ -159,7 +175,12 @@ This is different from regression testing:
     - **Statistical significance** — confidence levels for the comparisons
     - **Score distributions** — visualize how scores varied across test cases
 
-    [VIDEO: Analyzing experiment results from existing test runs]
+<Frame caption="Experiment results showing metrics overview and test cases">
+  <img
+    data-image="experiments.metricsOverview"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
   </Step>
 </Steps>
@@ -173,7 +194,7 @@ A good experiment tells you more than just "A is better than B." Here's what to 
 - **Close calls** — if scores are within a few percentage points, you may need more test cases for confidence
 - **Outliers** — dig into test cases where one contestant dramatically outperformed or underperformed
 
-[IMAGE: Experiment results with annotations explaining key sections]
+[VIDEO: Experiment results with annotations explaining key sections such as traces and prompts side drawer]
 
 ## Next Steps
 

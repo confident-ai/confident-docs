@@ -9,7 +9,7 @@ Prompt versioning allows you to optimize and test different versions of your pro
 
 1. Collaborate and centralize where prompts are stored and edited, even for non-technical team members
 2. Pinpoint which version, or even combination of your prompt versions, performed best
-3. Optionally co-locate model settings with prompts to version them as a single unit
+3. Optionally co-locate model settings, output type, and tools with prompts to version them as a single unit
 
 There are a million places you can keep your prompts - on GitHub, CSV files, in memory in code, Google Sheets, Notion, or even written in a diary hidden under your table drawer. But only by keeping prompts on Confident AI can you fully leverage Confident AI's evaluation features.
 
@@ -21,14 +21,14 @@ There are a million places you can keep your prompts - on GitHub, CSV files, in 
 </Note>
 
 <Tip>
-  **Prompts vs Prompts + Model Settings:** You can use Confident AI purely for
+  **Prompts vs Prompts + Model Config:** You can use Confident AI purely for
   prompt versioning — pull your prompts and use them with whatever model you
   configure in your code. Alternatively, if you want to manage prompts and model
   configurations together as a single versioned unit, you can attach model
-  settings to prompt versions.
+  settings, output type, and tools to prompt versions.
 </Tip>
 
-## Two Types of Prompts
+## Different Types of Prompts
 
 There are two types of prompts you can create:
 
@@ -40,7 +40,7 @@ There are two types of prompts you can create:
   "list", assume it is a single prompt we're talking about.
 </Tip>
 
-## Prompts vs Prompt Versions
+## Understanding Prompt Versions
 
 In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
 
@@ -148,12 +148,14 @@ prompt.push(text="...")
 </Tabs>
 
 <Tip>
-  For more advanced push options including model settings and output schemas,
-  see [Automate Prompt
+  For more advanced push options including model settings, output type, and
+  tools, see [Automate Prompt
   Management](/llm-evaluation/prompt-management/automate-prompt-management).
 </Tip>
 
-## Setting Dynamic Variables
+## Templating Options
+
+### Dynamic variables
 
 You can include variables that can be interpolated dynamically in your LLM application later on. There are five interpolation types available:
 
@@ -177,9 +179,9 @@ Variable names must not contain spaces:
 "Hi, my name is {variable name}." # Spaces in variable name
 ```
 
-## Using Conditional Logic (Jinja)
+### Conditional logic
 
-JINJA interpolation supports [jinja templates](https://realpython.com/primer-on-jinja-templating/), which allows you to render more complex logic such as conditional if/else blocks:
+Conditional logic can be added when using JINJA interpolation. JINJA supports [jinja templates](https://realpython.com/primer-on-jinja-templating/), which allows you to render more complex logic such as conditional if/else blocks:
 
 ```txt If/Else
 {% if is_admin %}
@@ -200,19 +202,105 @@ Shopping List:
 
 <Note>Jinja interpolated prompts are only available for Python users.</Note>
 
-In the next section, we'll show you how to work with prompts you've created on Confident AI.
+## Model Configs
 
-## Labelling Prompt Versions
+Beyond creating and editing prompt versions, you can also configure model settings, output type, and tools associated with your prompt. This allows you to:
+
+- Version not just prompts, but also models associated with it
+- Use directly in code when [pulling prompts in code](/docs/llm-evaluation/prompt-management/pull-prompts)
+- Compare the impact of models on the same prompt (and vice versa) when [running experiments on your AI app](/docs/llm-evaluation/experiments)
+
+<Tip>
+
+Keeping model configs for prompt versions on Confident AI does no harm but it doesn't mean you have to use it - for both in code and on the platform in the [Arena](/docs/llm-evaluation/no-code-evals/arena) or when running experiments. However, if model configs confuses you, feel free to leave them out.
+
+</Tip>
+
+### Model settings
+
+You can configure the model provider, model name, and model parameters for each prompt version. This ensures that when you pull a prompt in code, you also get the exact model configuration needed to run it.
+
+<Frame caption="Configure Model Settings">
+  <img data-image="prompts.configureModelSettings" />
+</Frame>
+
+| Field          | Description                                                  | Example                                    |
+| -------------- | ------------------------------------------------------------ | ------------------------------------------ |
+| **Provider**   | The LLM provider (e.g., OpenAI, Anthropic, Azure)            | `openai`                                   |
+| **Model**      | The specific model name                                      | `gpt-4.1`                                  |
+| **Parameters** | Model-specific parameters like temperature, max tokens, etc. | `{"temperature": 0.7, "max_tokens": 1024}` |
+
+<Info title="Example">
+For an OpenAI GPT-4.1 configuration with custom temperature and max tokens:
+
+- **Provider**: `openai`
+- **Model**: `gpt-4.1`
+- **Parameters**:
+  ```json
+  {
+    "temperature": 0.7,
+    "max_tokens": 1024
+  }
+  ```
+
+</Info>
+
+### Output type
+
+You can specify the expected output format for your prompt by selecting an output type:
+
+- **Text Output**: Standard text response (default)
+- **JSON Output**: Structured JSON response
+- **Schema Output**: Structured response conforming to a defined schema
+
+<Frame caption="Configure Output Type">
+  <img data-image="prompts.configureOutputType" />
+</Frame>
+
+When using **Schema Output**, you can define a custom schema that your LLM response should conform to. This is useful for ensuring structured, predictable outputs.
+
+To configure a schema:
+
+1. Click on **Schema Output** in the output type dropdown
+2. Enter a **Schema Name** (required)
+3. Add **Schema Fields** with their property names and types (String, Number, Boolean, etc.)
+4. Click **Save Schema**
+
+<Frame caption="Configure Schema Output">
+  <img data-image="prompts.configureSchemaOutput" />
+</Frame>
+
+The schema will be previewed as a Pydantic `BaseModel` class, making it easy to visualize how your structured output will look.
+
+### Attach tools
+
+You can attach tools to your prompt version for function calling capabilities. This allows your LLM to invoke external tools like web search, APIs, or custom functions.
+
+To attach tools:
+
+1. Click on the **Tools** button in the prompt editor
+2. Search for available tools
+3. Select the tools you want to enable for this prompt version
+
+<Frame caption="Attach Tools">
+  <img data-image="prompts.attachTools" />
+</Frame>
+
+## Assign Prompt Labels
 
 You can also label different versions of your prompt in the **Version History** page so no code changes are required to "deploy" a new version into a certain environment.
 
-<video
-  autoPlay
-  loop
-  muted
-  data-video="prompts.labelVersions"
-  type="video/mp4"
-/>
+<Frame>
+  <video
+    autoPlay
+    loop
+    muted
+    data-video="prompts.labelVersions"
+    type="video/mp4"
+  />
+</Frame>
+
+Only users with [sufficient permissions](/docs/settings/project/roles-and-permissions) are able to modify prompt labels.
 
 <Info>
 
@@ -227,71 +315,40 @@ prompt.pull(label="staging")
 
 </Info>
 
-## Update Prompts
+## Next Steps
 
-You can update your prompt templates in code by specifying the prompt `alias` and `version`. Use `"latest"` to update the most recent version.
+Now that you know how to version prompts on the platform, put them to work in evaluations.
 
-<Tabs>
+<CardGroup cols={2}>
+  <Card
+    title="Experiments"
+    icon="flask"
+    href="/docs/llm-evaluation/experiments"
+  >
+    Compare prompt versions side-by-side with statistical rigor.
+  </Card>
+  <Card
+    title="Single-Turn Evals"
+    icon="arrow-right"
+    href="/docs/llm-evaluation/no-code-evals/single-turn"
+  >
+    Run evaluations on your prompts without writing code.
+  </Card>
+</CardGroup>
 
-<Tab title="Messages">
-
-```python
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import PromptMessage
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="latest", messages=[PromptMessage(role="...", content="...")])
-```
-
-</Tab>
-
-<Tab title="Text">
-
-```python
-from deepeval.prompt import Prompt
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="00.00.01", text="...")
-```
-
-</Tab>
-
-</Tabs>
-
-### Updating with Model Settings (Optional)
-
-If you're managing model configuration alongside your prompts, you can also update a prompt's model settings, interpolation type, output type, and output schema through the `update` method.
-
-<Note>
-  Model settings are optional. Most teams only need to version their prompt
-  templates and handle model selection separately in their code. Model settings
-  are useful when you want to treat the prompt + model as a single versioned
-  configuration.
-</Note>
-
-```python
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import (
-    ModelSettings,
-    ModelProvider,
-    PromptInterpolationType,
-    OutputType,
-)
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(
-    version="00.00.01",
-    model_settings=ModelSettings(
-        provider=ModelProvider.OPEN_AI,
-        name="gpt-4o-mini",
-    ),
-    interpolation_type=PromptInterpolationType.FSTRING,
-    output_type=OutputType.TEXT,
-)
-```
-
-<Tip>
-  For complete documentation on all available model settings and output
-  configurations, see [Automate Prompt
-  Management](/llm-evaluation/prompt-management/automate-prompt-management#model-settings-reference).
-</Tip>
+<CardGroup cols={2}>
+  <Card
+    title="Pull Prompts"
+    icon="arrow-down-to-bracket"
+    href="/docs/llm-evaluation/prompt-management/pull-prompts"
+  >
+    Pull prompt versions into your code for use in your LLM app.
+  </Card>
+  <Card
+    title="Automate Prompt Management"
+    icon="robot"
+    href="/docs/llm-evaluation/prompt-management/automate-prompt-management"
+  >
+    Push and manage prompts programmatically via the Evals API.
+  </Card>
+</CardGroup>

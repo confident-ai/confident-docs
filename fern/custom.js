@@ -17,7 +17,6 @@
   if (typeof window === "undefined") return;
 
   const S3_BASE = "https://confident-docs.s3.us-east-1.amazonaws.com";
-  const S3_BUCKET = "https://confident-bucket.s3.us-east-1.amazonaws.com";
 
   const VIDEOS = {
     // Metrics
@@ -37,9 +36,16 @@
     "datasets.assign": `${S3_BASE}/datasets:assign-4k.mp4`,
     "datasets.delete": `${S3_BASE}/datasets:delete-4k.mp4`,
 
+    // TODO: Dataset videos to record
+    "datasets.addImages": "TODO.mp4",
+    "datasets.editNonText": "TODO.mp4",
+    "datasets.addColumn": "TODO.mp4",
+    "datasets.finalize": "TODO.mp4",
+    "datasets.duplicate": "TODO.mp4",
+
     // Evaluation / Test Runs
-    "evaluation.singleTurnReport": `${S3_BASE}/evaluation:single-turn-e2e-report.mp4`,
-    "evaluation.singleTurnReportTracing": `${S3_BASE}/evaluation:single-turn-e2e-report-tracing.mp4`,
+    "evaluation.singleTurnE2E": `${S3_BASE}/evaluation:single-turn-e2e-report.mp4`,
+    "evaluation.singleTurnComponentLevel": `${S3_BASE}/evaluation:single-turn-e2e-report-tracing.mp4`,
     "evaluation.multiTurnReport": `${S3_BASE}/evaluation:multi-turn-e2e-report.mp4`,
     "evaluation.abRegressionTesting": `${S3_BASE}/evaluation:ab-regression-testing.mp4`,
     "evaluation.parameterInsights": `${S3_BASE}/evaluation:parameter-insights.mp4`,
@@ -67,13 +73,9 @@
     "queues.markItems": `${S3_BASE}/queues:mark-items.mp4`,
     "queues.manageItems": `${S3_BASE}/queues:manage-items.mp4`,
 
-    // Integrations
-    "integrations.createMetricCollection": `${S3_BASE}/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4`,
-
-    // End-to-End Demos
-    "demos.langgraph": `${S3_BUCKET}/end-to-end%3Alanggraph.mp4`,
-    "demos.pydantic": `${S3_BUCKET}/end-to-end%3Apydantic-1080.mp4`,
-    "demos.llamaIndex": `${S3_BUCKET}/end-to-end%3Allama-index-1080.mp4`,
+    // TODO: Videos to record
+    "arena.overview": "TODO.mp4",
+    "experiments.overview": "TODO.mp4",
   };
 
   // Find all videos with data-video attribute and set their src
@@ -119,6 +121,32 @@
   const IMAGES = {
     // Concepts
     "concepts.arenaVsGeval": `${S3_BASE}/concepts:arena-vs-geval.png`,
+
+    // TODO: Experiments images to capture
+    "experiments.resultsComparison": "TODO.png",
+    "experiments.arenaContestants": "TODO.png",
+    "experiments.runDialog": "TODO.png",
+    "experiments.createFromTestRun": "TODO.png",
+    "experiments.metricsOverview": "TODO.png",
+
+    // TODO: Arena images to capture
+    "arena.promptConfig": "TODO.png",
+    "arena.aiConnectionConfig": "TODO.png",
+    "arena.imageInput": "TODO.png",
+
+    // TODO: No-code multi-turn images to capture
+    "noCode.multiTurn.promptConfig": "TODO.png",
+    "noCode.multiTurn.aiConnectionConfig": "TODO.png",
+
+    // TODO: No-code single-turn images to capture
+    "noCode.singleTurn.promptConfig": "TODO.png",
+    "noCode.singleTurn.aiConnectionConfig": "TODO.png",
+
+    // TODO: Prompts images to capture
+    "prompts.configureModelSettings": "TODO.png",
+    "prompts.configureOutputType": "TODO.png",
+    "prompts.configureSchemaOutput": "TODO.png",
+    "prompts.attachTools": "TODO.png",
     "concepts.singleTurnLlmJudge": `${S3_BASE}/concepts:single-turn-llm-judge.png`,
     "concepts.multiTurnLlmJudge": `${S3_BASE}/concepts:multi-turn-llm-judge.png`,
     "concepts.geval": `${S3_BASE}/concepts:geval.png`,
@@ -166,7 +194,10 @@
   function loadImages() {
     document.querySelectorAll("img[data-image]").forEach((img) => {
       const key = img.getAttribute("data-image");
-      if (IMAGES[key] && !img.src) {
+      const currentSrc = img.getAttribute("src") || "";
+      // Replace if src is empty or a placeholder data URI
+      const needsReplacement = !currentSrc || currentSrc.startsWith("data:");
+      if (IMAGES[key] && needsReplacement) {
         img.src = IMAGES[key];
       }
     });

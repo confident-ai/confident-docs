@@ -19,8 +19,8 @@ Single-turn evals treat your AI app as a black box — only the output, tools ca
 
 To run a single-turn evaluation, you need:
 
-1. **A single-turn dataset** — goldens with `input` and optionally `expected_output`, `context`, etc.
-2. **A single-turn metric collection** — the metrics you want to evaluate against
+1. **A single-turn [dataset](/docs/llm-evaluation/dataset-management/manage-datasets)** — goldens with `input` and optionally `expected_output`, `context`, etc.
+2. **A single-turn [metric collection](/docs/metrics/metric-collections)** — the metrics you want to evaluate against
 
 <Note>
   If you completed the
@@ -69,10 +69,9 @@ Your "AI app" as shown in the diagram can be anything from single-prompt, multi-
 
 <Steps>
   <Step title="Select your dataset and metrics">
-    1. Navigate to **Evaluations** in the sidebar
-    2. Click **New Evaluation**
-    3. Select your **Dataset**
-    4. Select your **Metric Collection**
+    1. Navigate to **Project** > **Datasets**, and select your single-turn dataset to evaluate
+    2. Click **Evaluate**
+    3. Select your single-turn **Metric Collection**
   </Step>
 
   <Step title="Configure output generation">
@@ -80,18 +79,49 @@ Your "AI app" as shown in the diagram can be anything from single-prompt, multi-
 
     <Tabs>
       <Tab title="Prompt">
+
+<Frame caption="Configure prompt for single-turn evaluation">
+  <img
+    data-image="noCode.singleTurn.promptConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
         For single-prompt systems, select a prompt template that Confident AI will use to call your configured LLM provider.
 
-        1. Go to **Prompts** and create a prompt with variables like `{{input}}`
-        2. In the evaluation setup, select this prompt as your output generation method
-        3. Confident AI calls your LLM for each golden and generates outputs automatically
+        1. Select your desired prompt and the version of the prompt as your output generation method
+        2. Map any golden fields from your current dataset to any variables defined within your prompt
+        3. Confident AI calls your prompt for each golden and generates outputs automatically
+
+
+        <Note>
+
+You'll need an existing prompt for this to work. If you haven't already, you can create a prompt on the [Prompt Studio.](/docs/llm-evaluation/prompt-management/version-prompts)
+
+</Note>
+
       </Tab>
       <Tab title="AI Connection">
+
+<Frame caption="Configure AI Connection for single-turn evaluation">
+  <img
+    data-image="noCode.singleTurn.aiConnectionConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
         For deployed AI systems, connect Confident AI directly to your HTTP endpoint.
 
         1. Go to **Settings** → **AI Connections** and create a connection
         2. Configure your endpoint URL, request payload mapping, response parsing, and headers
         3. In the evaluation setup, select this AI Connection as your output generation method
+
+        <Note>
+
+You'll need an existing AI connection for this to work. If you haven't already, you can create an AI connection in [project settings.](/docs/settings/project/ai-connections)
+
+</Note>
+
       </Tab>
     </Tabs>
 
@@ -110,7 +140,7 @@ Your "AI app" as shown in the diagram can be anything from single-prompt, multi-
         autoPlay
         loop
         muted
-        data-video="evaluation.singleTurnReport"
+        data-video="evaluation.singleTurnE2E"
         type="video/mp4"
       />
     </Frame>
