@@ -203,6 +203,13 @@ Set the maximum time (in seconds) that Confident AI will wait for your endpoint 
   need to increase the timeout to avoid premature failures.
 </Note>
 
+### Max Concurrency
+
+Set the maximum number of concurrent requests that Confident AI will send to your endpoint at the same time. This helps prevent overwhelming your AI app during large evaluation runs.
+
+- **Minimum**: 1
+- **Default**: 20
+
 ## Testing Your Connection
 
 After configuring your AI connection, click **Ping Endpoint** to verify everything is set up correctly. You should receive a `200` status response. If not, check the error message and adjust your configuration accordingly.
