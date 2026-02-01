@@ -197,6 +197,32 @@ $$
 $$
 ```
 
+### Mermaid Diagrams
+
+Use mermaid diagrams to explain architecture and data flows. `sequenceDiagram` is particularly effective:
+
+````mdx
+```mermaid
+sequenceDiagram
+    participant User as You
+    participant Platform as Confident AI
+    participant AI as Your AI App
+
+    User->>Platform: Start Evaluation
+    Platform->>AI: Send input
+    AI-->>Platform: Generate output
+    Platform-->>User: Results
+```
+````
+
+````
+
+When to use mermaid diagrams:
+- Explaining how data flows through a system
+- Showing the sequence of operations in a feature
+- Illustrating relationships between components
+- Making complex processes visual and digestible
+
 ## Content Patterns
 
 ### Local vs Remote Pattern
@@ -220,7 +246,7 @@ When a feature can be done locally (SDK) or remotely (platform), use this patter
 
   </Card>
 </CardGroup>
-```
+````
 
 ### Quickstart Pattern
 
@@ -259,10 +285,16 @@ Brief summary of what was covered, then:
 - Use "you" to address the reader directly
 - Start sections with "## Overview"
 - Include code examples for every concept
-- Cross-link to related documentation
-- Use bullet points for feature lists
+- Cross-link to related documentation with context — use phrases like "as we saw in the previous section" or "as covered in the [Page Name] section" to orient readers on where they're jumping to. Say "section" not "docs" since you're already in the docs.
+- Use bullet points for feature lists and comparisons
 - Include "Done ✅" after completing tutorial steps
 - Show both Python and TypeScript examples when applicable
+- Add personality and life to the documentation — avoid dry, robotic writing
+- Use conversational phrases like "Here's the thing:", "Now it's time to...", "No more guessing"
+- Use mermaid diagrams (especially `sequenceDiagram`) to explain architecture and data flows
+- Keep headings short and punchy — they appear in side navigation and long headings look bad
+- Lead headings with the main subject, not prepositions — "Arena Experiments" not "From Arena", "Test Run Experiments" not "From Existing Test Runs"
+- Use the "sandwich" pattern: intro text → bullet points/list → closing text
 
 ### Don't
 
@@ -271,6 +303,9 @@ Brief summary of what was covered, then:
 - Don't use images without Frame and caption
 - Don't forget to include Next Steps at the end
 - Don't mix component styles (be consistent)
+- Don't use tables for comparisons — use bullet points instead (tables look bad)
+- Don't write long subheadings — keep them to 2-4 words when possible
+- Don't be boring — documentation should be engaging to read
 
 ## File Organization
 

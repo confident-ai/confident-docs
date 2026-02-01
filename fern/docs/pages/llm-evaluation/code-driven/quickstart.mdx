@@ -1,21 +1,19 @@
 ---
-subtitle: 5 min quickstart guide for LLM evaluation
+title: LLM Evaluation Quickstart
+subtitle: 5 min quickstart guide for a code-driven LLM evaluation workflow
 slug: llm-evaluation/quickstart
 ---
 
 ## Overview
 
-Confident AI offers a variety of features for you to test LLM apps in development for a pre-deployment workflow, offering a wide range of features for:
+Confident AI offers a variety of features for you to test AI apps using code for a pre-deployment workflow, offering a wide range of features for:
 
-- **End-to-end testing:** Treats your LLM app as a black box. Best for simple architectures such as calling raw model endpoints or lightweight RAG pipelines.
-- **Component-level testing:** Built for agentic use cases—debug each agent step and component (planner, tools, memory, retriever, prompts) with granular assertions.
+- **Single-turn evaluation:** Input-output as distinct AI interactions.
+  - End-to-end: Treats your AI app as a black box.
+  - Component-level: Built for agentic use cases—debug each agent step and component (planner, tools, memory, retriever, prompts) with granular assertions.
 - **Multi-turn evaluation:** Validate full conversations for consistency, state/memory retention, etc.
 
-LLM-as-a-Judge metrics from `deepeval` will be used throughout the platform to auto-score outputs (with or without references) for all of these use cases.
-
-<Success>You don't always need code to run evals.</Success>
-
-You can either run evals locally or remotely on Confident AI, both of which gives you the same functionality:
+You can either run evals via code locally or remotely on Confident AI, both of which gives you the same functionality:
 
 <CardGroup cols={2}>
   <Card
@@ -41,37 +39,6 @@ You can either run evals locally or remotely on Confident AI, both of which give
 
     **Suitable for:** Non-python users, online + offline evals for tracing in prod
 
-  </Card>
-</CardGroup>
-
-## Key Capabilities
-
-<CardGroup cols={2}>
-  <Card
-    title="A|B Regression Testing"
-    icon="arrows-split-up-and-left"
->
-
-    Catch regressions on different versions of your LLM app with side-by-side test case comparisons
-
-  </Card>
-  <Card
-    title="Sharable Testing Reports"
-    icon="file-text"
-  >
-    Comprehensive sharable AI testing reports that are sharable through organizations 
-  </Card>
-  <Card
-    title="Prompt and Model Insights"
-    icon="gear"
-  >
-    Find and optimize on the optimal set of prompts, models, and parameters
-  </Card>
-  <Card
-    title="Unit-Testing in CI/CD"
-    icon="code"
-  >
-    Integrate native `pytest` evaluations into your deployment CI/CD pipelines
   </Card>
 </CardGroup>
 
@@ -110,23 +77,6 @@ It is mandatory to create a dataset for a proper evaluation workflow.
 
 <Tabs>
 
-<Tab title="On Platform">
-You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
-
-<Frame caption="Create Dataset on Confident AI" background="subtle">
-
-<video
-  autoPlay
-  loop
-  muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:create-4k.mp4"
-  type="video/mp4"
-/>
-
-</Frame>
-
-</Tab>
-
 <Tab title="Code">
 
 ```python main.py
@@ -140,6 +90,17 @@ dataset.push(alias="YOUR-DATASET-ALIAS")
 ```
 
 Done ✅. You should now see your dataset on the platform.
+
+</Tab>
+
+<Tab title="On Platform">
+You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
+
+<Frame caption="Create Dataset on Confident AI" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.create" type="video/mp4" />
+
+</Frame>
 
 </Tab>
 
@@ -175,7 +136,7 @@ export OPENAI_API_KEY="sk-..."
 
   <Step title="Create a test run">
   
-A test run is a benchmark/snapshot of your LLM app's performance at any point in time. You'll need to:
+A test run is a benchmark/snapshot of your AI app's performance at any point in time. You'll need to:
 
 - Convert all goldens in your dataset into test cases, then
 - Use the metric you've created to evaluate each test case
@@ -194,7 +155,7 @@ dataset.pull(alias="YOUR-DATASET-ALIAS")
 for golden in dataset.goldens:
     test_case = LLMTestCase(
         input=golden.input,
-        actual_output=llm_app(golden.input) # Replace with your LLM app
+        actual_output=llm_app(golden.input) # Replace with your AI app
     )
     dataset.add_test_case(test_case)
 
@@ -240,23 +201,6 @@ It is mandatory to create a dataset for a proper evaluation workflow.
 
 <Tabs>
 
-<Tab title="On Platform">
-You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
-
-<Frame caption="Create Dataset on Confident AI" background="subtle">
-
-<video
-  autoPlay
-  loop
-  muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/datasets:create-4k.mp4"
-  type="video/mp4"
-/>
-
-</Frame>
-
-</Tab>
-
 <Tab title="Code">
 
 ```typescript index.ts
@@ -278,6 +222,17 @@ Done ✅. You should now see your dataset on the platform.
 
 </Tab>
 
+<Tab title="On Platform">
+You can create one in the UI under **Project** > **Datasets**, and upload goldens to your dataset via CSV:
+
+<Frame caption="Create Dataset on Confident AI" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.create" type="video/mp4" />
+
+</Frame>
+
+</Tab>
+
 </Tabs>
 
   </Step>
@@ -290,14 +245,14 @@ Create a metric collection under **Project** > **Metrics** > **Collections** wit
   autoPlay
   loop
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/metrics:create-collection-4k.mp4"
+  data-video="metrics.createCollection"
   type="video/mp4"
 />
 </Step>
 
   <Step title="Create a test run">
   
-A test run is a benchmark/snapshot of your LLM app's performance at any point in time. You'll need to:
+A test run is a benchmark/snapshot of your AI app's performance at any point in time. You'll need to:
 
 - Convert all goldens in your dataset into test cases, then
 - Use the metric collection you've created to evaluate each test case
@@ -314,7 +269,7 @@ async function runEvaluation() {
   for (const golden of dataset.goldens as Golden[]) {
     const testCase = new LLMTestCase({
       input: golden.input,
-      actualOutput: await llmApp(golden.input), // Replace with your LLM app
+      actualOutput: await llmApp(golden.input), // Replace with your AI app
     });
     dataset.addTestCase(testCase);
   }
@@ -351,7 +306,7 @@ tsx index.ts
   autoPlay
   controls
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:single-turn-e2e-report.mp4"
+  data-video="evaluation.singleTurnReport"
   type="video/mp4"
 />
 
@@ -366,8 +321,25 @@ When you have two or more test runs, you can also start running A|B regression t
 
 ## Next Steps
 
-Now that you've run your first **single-turn, end-to-end evaluation**, we'll dive into these core evaluation concepts and techniques:
+Now that you've run your first evaluation, dive deeper into single-turn testing:
 
-- **Core Concepts** - Learn what are goldens, test cases and how they form the foundation of end-to-end, component-level, and multi-turn evals.
-- **Use Cases** - Understand when to use each evaluation type for agents, AI workflows, RAG, and chatbots.
-- **LLM-as-a-Judge Metrics** - Discover 40+ available metrics for different use cases, and how to select them.
+<CardGroup cols={2}>
+  <Card
+    title="End-to-End Evals"
+    href="/llm-evaluation/single-turn/end-to-end"
+    icon="cube"
+    iconType="solid"
+  >
+    Treat your AI app as a black box. Learn how to use LLM tracing for better
+    debugging, run remote evals, and log hyperparameters for A|B testing.
+  </Card>
+  <Card
+    title="Component-Level Evals"
+    href="/llm-evaluation/single-turn/component-level"
+    icon="puzzle-piece"
+    iconType="solid"
+  >
+    Test individual components like retrievers, generators, and tools. Built for
+    agentic use cases where you need granular assertions.
+  </Card>
+</CardGroup>

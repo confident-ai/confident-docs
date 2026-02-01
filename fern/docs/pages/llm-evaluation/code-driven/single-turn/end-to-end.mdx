@@ -1,18 +1,27 @@
 ---
-title: Single-Turn, E2E Testing
+title: Single-Turn, E2E Evals
 subtitle: Learn how to run end-to-end testing for single-turn use cases
 slug: llm-evaluation/single-turn/end-to-end
 ---
 
 ## Overview
 
-Single-turn, end-to-end testing requires:
+End-to-end testing treats your LLM application as a black box — you provide an input and evaluate the final output. This is ideal for simple pipelines, RAG systems, or when you only care about the end result rather than intermediate steps.
 
-- A dataset of goldens
-- A list of metrics you wish to evaluate with
-- Construction of test case at runtime
+**Requirements:**
 
-The test case that you construct will be an `LLMTestCase` that encapsulates the end system input and outputs.
+- A [dataset of goldens](/llm-evaluation/dataset-management/create-goldens) containing golden inputs
+- A list of [metrics](/evaluation-metrics/introduction) to evaluate with
+- Construction of an `LLMTestCase` at runtime (mapping `input` → `actual_output`)
+
+<Note>
+  End-to-end testing is technically a subset of [component-level
+  testing](/llm-evaluation/single-turn/component-level) — your entire system can
+  be thought of as a single component. The key difference is that
+  component-level testing lets you define metrics for individual parts
+  (retriever, generator, tools), while end-to-end focuses solely on the final
+  output.
+</Note>
 
 ## How It Works
 
@@ -21,7 +30,7 @@ The test case that you construct will be an `LLMTestCase` that encapsulates the 
    - Invoke your LLM app using golden inputs to generate test case parameters such as actual output, tools called, and
    - Map golden fields to test case parameters
    - Add test case back to your dataset
-3. Run evaluation on test cases
+3. Run evaluation on test cases, which can happen locally or on Confident AI
 
 <Tip title="There many ways to run evaluations in Confident AI" icon="leaf">
   There are many ways to do step 3., For running evals locally:
@@ -35,7 +44,67 @@ The test case that you construct will be an `LLMTestCase` that encapsulates the 
 
 </Tip>
 
+Here's a visual representation of where the data-flows throughout the process:
+
+<Tabs>
+
+<Tab title="Local Metrics">
+
+```mermaid
+sequenceDiagram
+    participant Your Code
+    participant Confident AI
+    participant LLM App
+    participant Metrics
+
+    Your Code->>Confident AI: Pull dataset
+    Confident AI-->>Your Code: List of goldens
+
+    loop For each golden
+        Your Code->>LLM App: Invoke with golden.input
+        LLM App-->>Your Code: actual_output
+        Your Code->>Your Code: Create test case (input + actual_output)
+    end
+
+    Your Code->>Metrics: Run evaluation locally
+    Metrics-->>Confident AI: Upload results & generate testing report
+```
+
+</Tab>
+
+<Tab title="Remote Metrics">
+
+```mermaid
+sequenceDiagram
+    participant Your Code
+    participant Confident AI
+    participant LLM App
+
+    Your Code->>Confident AI: Pull dataset
+    Confident AI-->>Your Code: List of goldens
+
+    loop For each golden
+        Your Code->>LLM App: Invoke with golden.input
+        LLM App-->>Your Code: actual_output
+        Your Code->>Your Code: Create test case (input + actual_output)
+    end
+
+    Your Code->>Confident AI: Send test cases to Evals API
+    Confident AI->>Confident AI: Run metrics remotely
+    Confident AI-->>Your Code: Return testing report link
+```
+
+</Tab>
+
+</Tabs>
+
+## Run E2E Tests Locally
+
+Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](#run-e2e-tests-remotely) instead.
+
 For this section, we'll be using this mock LLM app, that is a simple RAG pipeline:
+
+<Accordion title="See Mock LLM App">
 
 ```python main.py
 from openai import OpenAI
@@ -56,9 +125,7 @@ def llm_app(query: str) -> str:
     return generator(query, retriever(query))
 ```
 
-## Run E2E Tests Locally
-
-Running evals locally is only possible if you are using the Python `deepeval` library. If you're working with Typescript or any other language, skip to the [remote end-to-end evals section](#run-e2e-tests-remotely) instead.
+</Accordion>
 
 <Steps>
 
@@ -132,7 +199,7 @@ Done ✅. You should see a link to your newly created sharable testing report.
   autoPlay
   controls
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:single-turn-e2e-report.mp4"
+  data-video="evaluation.singleTurnReport"
   type="video/mp4"
 />
 
@@ -149,7 +216,7 @@ The `evaluate()` function is extremely unopinionated and non-instrusive, which m
 
 In the next section, we'll show how you can avoid this ETL hellhole and bring LLM traces to end-to-end testing.
 
-## LLM Tracing for Local E2E Testing
+## LLM Tracing for E2E Evals
 
 LLM tracing solves all problems associated with constructing test cases.
 
@@ -186,7 +253,7 @@ The example above shows how we are tracing our LLM app by simply adding a few `@
 
 - Each `@observe` decorator creates a **span**, which represents **components**
 - A **trace** on the other hand is created by the top-level `@observe` decorator, and is made up of many spans/components
-- When you run end-to-end testing, you can call the `update_current_trace` function inside anywhere in your traced application to set test case parameters
+- When you run end-to-end testing, you can call the `update_current_trace` function inside anywhere in your traced app to set [test case parameters](/docs/llm-tracing/advanced-features/test-cases)
 
 Don't worry too much about learning everything you can about LLM tracing for
 now. We'll go through it in in a dedicated LLM tracing section.
@@ -222,7 +289,7 @@ Done ✅. You should see a link to your newly created sharable testing report. *
   autoPlay
   controls
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluation:single-turn-e2e-report-tracing.mp4"
+  data-video="evaluation.singleTurnReportTracing"
   type="video/mp4"
 />
 
@@ -271,7 +338,7 @@ Go to **Project** > **Metric** > **Collections**:
   autoPlay
   loop
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/metrics:create-collection-4k.mp4"
+  data-video="metrics.createCollection"
   type="video/mp4"
 />
 

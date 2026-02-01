@@ -70,7 +70,7 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
   autoPlay
   loop
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-messages-4k.mp4"
+  data-video="prompts.createMessages"
   type="video/mp4"
 />
 
@@ -82,13 +82,7 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
 
 <Frame caption="Create Prompt Text" background="subtle">
 
-<video
-  autoPlay
-  loop
-  muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:create-text.mp4"
-  type="video/mp4"
-/>
+<video autoPlay loop muted data-video="prompts.createText" type="video/mp4" />
 
 </Frame>
 
@@ -117,6 +111,7 @@ prompt.push()
 ```
 
 When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
+
 </Tip>
 
 <Tabs>
@@ -125,11 +120,12 @@ When both are provided, the `confident_api_key` passed to `Prompt` always takes 
 from deepeval.prompt import Prompt, PromptMessage
 
 prompt = Prompt(
-  alias="YOUR-PROMPT-ALIAS",
-  messages_template=[PromptMessage(role="...", content="...")]
+alias="YOUR-PROMPT-ALIAS",
+messages_template=[PromptMessage(role="...", content="...")]
 )
 prompt.push()
-```
+
+````
 </Tab>
 
 <Tab title="Text" language="python">
@@ -141,7 +137,7 @@ prompt = Prompt(
   text="..."
 )
 prompt.push()
-```
+````
 
 </Tab>
 
@@ -209,7 +205,7 @@ You can also label different versions of your prompt in the **Version History** 
   autoPlay
   loop
   muted
-  src="https://confident-docs.s3.us-east-1.amazonaws.com/prompts:label-versions.mp4"
+  data-video="prompts.labelVersions"
   type="video/mp4"
 />
 
