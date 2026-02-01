@@ -89,32 +89,9 @@ It is important to note that simulations will automatically end if the expected 
 
 <Steps>
   <Step title="Select your dataset and metrics">
-    1. Navigate to **Project** > **Datasets**
-    2. Select your dataset
-    3. Click **Evaluate**
-    4. Select your **Metric Collection**
-  </Step>
-
-  <Step title="Configure output generation">
-    Select how your AI app will respond to each turn:
-
-    <Tabs>
-      <Tab title="Prompt">
-        For prompt-based chatbots, select a prompt template that includes conversation history.
-
-        1. Go to **Prompts** and create a prompt with variables like `{{messages}}` or `{{conversation_history}}`
-        2. In the evaluation setup, select this prompt as your output generation method
-        3. Confident AI calls your LLM for each turn, passing the conversation history
-      </Tab>
-      <Tab title="AI Connection">
-        For deployed conversational systems, connect Confident AI directly to your HTTP endpoint.
-
-        1. Go to **Settings** → **AI Connections** and create a connection
-        2. Configure your endpoint to accept conversation history in the request payload
-        3. In the evaluation setup, select this AI Connection as your output generation method
-      </Tab>
-    </Tabs>
-
+    1. Navigate to **Project** > **Datasets**, and select your multi-turn dataset to evaluate
+    2. Click **Evaluate**
+    3. Select your multi-turn **Metric Collection**
   </Step>
 
   <Step title="Configure simulation">
@@ -128,6 +105,58 @@ It is important to note that simulations will automatically end if the expected 
     <Tip>
     Well-crafted simulation instructions are key to realistic conversations. Be specific about the user's goals, tone, and knowledge level.
     </Tip>
+
+  </Step>
+
+  <Step title="Configure output generation">
+    Select how your AI app will respond to each turn:
+
+    <Tabs>
+      <Tab title="Prompt">
+
+<Frame caption="Configure prompt for multi-turn evaluation">
+  <img
+    data-image="noCode.multiTurn.promptConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+        For prompt-based chatbots, select a prompt template that includes conversation history.
+
+        1. Go to **Prompts** and create a prompt with variables like `{{messages}}` or `{{conversation_history}}`
+        2. In the evaluation setup, select this prompt as your output generation method
+        3. Confident AI calls your LLM for each turn, passing the conversation history
+
+        <Note>
+
+You'll need an existing prompt for this to work. If you haven't already, you can create a prompt on the [Prompt Studio.](/docs/llm-evaluation/prompt-management/version-prompts)
+
+</Note>
+
+      </Tab>
+      <Tab title="AI Connection">
+
+<Frame caption="Configure AI Connection for multi-turn evaluation">
+  <img
+    data-image="noCode.multiTurn.aiConnectionConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+        For deployed conversational systems, connect Confident AI directly to your HTTP endpoint.
+
+        1. Go to **Settings** → **AI Connections** and create a connection
+        2. Configure your endpoint to accept conversation history in the request payload
+        3. In the evaluation setup, select this AI Connection as your output generation method
+
+        <Note>
+
+You'll need an existing AI connection for this to work. If you haven't already, you can create an AI connection in [project settings.](/docs/settings/project/ai-connections)
+
+</Note>
+
+      </Tab>
+    </Tabs>
 
   </Step>
 

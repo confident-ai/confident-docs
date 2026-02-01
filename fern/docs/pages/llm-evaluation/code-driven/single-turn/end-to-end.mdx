@@ -10,7 +10,7 @@ End-to-end testing treats your LLM application as a black box — you provide an
 
 **Requirements:**
 
-- A [dataset of goldens](/llm-evaluation/dataset-management/create-goldens) containing golden inputs
+- A [dataset of goldens](/llm-evaluation/dataset-management/automate-dataset-management) containing golden inputs
 - A list of [metrics](/evaluation-metrics/introduction) to evaluate with
 - Construction of an `LLMTestCase` at runtime (mapping `input` → `actual_output`)
 
@@ -131,7 +131,7 @@ def llm_app(query: str) -> str:
 
 <Step title="Pull dataset">
 
-Pull your dataset (and [create one](/llm-evaluation/dataset-management/create-goldens) if you haven't already):
+Pull your dataset (and [create one](/llm-evaluation/dataset-management/automate-dataset-management) if you haven't already):
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset
@@ -199,7 +199,7 @@ Done ✅. You should see a link to your newly created sharable testing report.
   autoPlay
   controls
   muted
-  data-video="evaluation.singleTurnReport"
+  data-video="evaluation.singleTurnE2E"
   type="video/mp4"
 />
 
@@ -289,7 +289,7 @@ Done ✅. You should see a link to your newly created sharable testing report. *
   autoPlay
   controls
   muted
-  data-video="evaluation.singleTurnReportTracing"
+  data-video="evaluation.singleTurnComponentLevel"
   type="video/mp4"
 />
 

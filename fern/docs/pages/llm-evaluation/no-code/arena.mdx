@@ -33,7 +33,9 @@ The Arena lets you set up two or more "contestants" and run the same input throu
 
 You can mix and match — for example, compare a new prompt against your production AI Connection to see if it's ready for deployment.
 
-[VIDEO]
+<Frame caption="Arena Overview">
+  <video autoPlay loop muted data-video="arena.overview" type="video/mp4" />
+</Frame>
 
 ## Using the Arena
 
@@ -47,6 +49,14 @@ You can mix and match — for example, compare a new prompt against your product
 
     <Tabs>
       <Tab title="Prompt">
+
+<Frame caption="Configure prompt in Arena">
+  <img
+    data-image="arena.promptConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
         1. Select a model provider (e.g., OpenAI) and model (e.g., gpt-4.1)
         2. Enter your prompt in the message composer — you can use variables like `{variable_name}`
         3. Optionally click **Settings** to configure model parameters
@@ -56,6 +66,14 @@ You can mix and match — for example, compare a new prompt against your product
         </Tip>
       </Tab>
       <Tab title="AI Connection">
+
+<Frame caption="Configure AI Connection in Arena">
+  <img
+    data-image="arena.aiConnectionConfig"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
         1. Select an existing AI Connection from the dropdown
         2. Optionally associate prompts with the connection
         3. Click **Update AI Connection** to save any changes
@@ -75,9 +93,11 @@ You can mix and match — for example, compare a new prompt against your product
   </Step>
 
 <Step title="Set Variable Values">
-  If your prompts contain variables, expand the **Variables** panel at the
-  bottom to provide values. These values will be interpolated into all prompts
-  before execution.
+
+If your prompts contain variables, expand the **Variables** panel at the
+bottom to provide values. These values will be interpolated into all prompts
+before execution.
+
 </Step>
 
   <Step title="Run the Comparison">
@@ -90,6 +110,24 @@ You can mix and match — for example, compare a new prompt against your product
 
   </Step>
 </Steps>
+
+## Include Images in Prompt
+
+You can include images in your Arena comparisons by simply dragging and dropping them into the message composer. This is useful for testing vision-capable models with image inputs.
+
+<Frame caption="Include images in Arena prompt">
+  <img
+    data-image="arena.imageInput"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Note>
+  Only models that support image inputs (such as GPT-4o, Claude 3, and Gemini
+  Pro Vision) will be able to generate responses based on the image. If a
+  contestant uses a model without vision capabilities, it will only process the
+  text portion of your input.
+</Note>
 
 ## Tips for Comparisons
 

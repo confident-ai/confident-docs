@@ -112,12 +112,12 @@ navigation:
                 collapsed: false
                 icon: fa-light fa-code
                 contents:
+                  - page: Automate Dataset Management
+                    path: docs/pages/llm-evaluation/dataset-management/automate-dataset-management.mdx
+                    icon: fa-light fa-pen-to-square
                   - page: Pull Datasets
                     path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
                     icon: fa-light fa-arrow-down-to-bracket
-                  - page: Push & Queue Goldens
-                    path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
-                    icon: fa-light fa-pen-to-square
           - section: Prompts
             collapsed: false
             icon: fa-light fa-sliders
@@ -132,22 +132,9 @@ navigation:
                   - page: Automate Prompt Management
                     path: docs/pages/llm-evaluation/prompts/automate-prompt-management.mdx
                     icon: fa-light fa-robot
-                  - page: Using Prompts
-                    path: docs/pages/llm-evaluation/prompts/using-prompts.mdx
+                  - page: Pull Prompts
+                    path: docs/pages/llm-evaluation/prompts/pull-prompts.mdx
                     icon: fa-light fa-circle-play
-          - section: Dashboards
-            collapsed: false
-            icon: fa-light fa-chart-line
-            contents:
-              - page: Testing Reports
-                path: docs/pages/llm-evaluation/dashboards/testing-reports.mdx
-                icon: fa-light fa-file-chart-column
-              - page: A|B Regression Testing
-                path: docs/pages/llm-evaluation/dashboards/ab-regression-testing.mdx
-                icon: fa-light fa-scale-balanced
-              - page: Model and Prompt Insights
-                path: docs/pages/llm-evaluation/dashboards/model-and-prompt-insights.mdx
-                icon: fa-light fa-lightbulb
           - section: Core Concepts
             collapsed: true
             icon: fa-light fa-brain

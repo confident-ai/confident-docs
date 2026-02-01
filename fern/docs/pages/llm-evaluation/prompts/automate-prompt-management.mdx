@@ -9,7 +9,7 @@ Instead of manually creating and updating prompts on the platform, you can autom
 
 - Push new prompt versions from your codebase or CI/CD pipeline
 - Update existing prompt versions programmatically
-- Optionally configure model settings to version prompts + models together
+- Optionally configure model settings, output type, and tools to version prompts + models together
 - Integrate prompt versioning into your development workflow
 
 <Note>
@@ -110,56 +110,6 @@ await prompt.push({ text: "You are a helpful assistant called {name}." });
 
 Each push creates a new version automatically. Confident AI handles version numbering for you.
 
-### Push with Model Settings
-
-Model settings are **completely optional**. If you only need to version your prompts, you can skip this section entirely. However, if you want to manage your model configuration alongside your prompts — treating the prompt + model as a single versioned unit — you can include model settings when pushing.
-
-This is useful when:
-
-- You want to ensure a specific prompt always runs with a specific model and parameters
-- You're A/B testing different prompt + model combinations together
-- You want to centralize both prompt and model configuration in one place
-
-For those who need the full prompt + model combo, you can push with model settings and output configurations:
-
-```python main.py
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import (
-    PromptMessage,
-    ModelSettings,
-    ModelProvider,
-    OutputType,
-    ReasoningEffort,
-    Verbosity,
-)
-from pydantic import BaseModel
-
-class ResponseSchema(BaseModel):
-    answer: str
-    confidence: float
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(
-    messages=[
-        PromptMessage(role="system", content="You are a helpful assistant."),
-    ],
-    model_settings=ModelSettings(
-        provider=ModelProvider.OPEN_AI,
-        name="gpt-4o",
-        temperature=0.7,
-        max_tokens=1000,
-        top_p=0.9,
-        frequency_penalty=0.1,
-        presence_penalty=0.1,
-        stop_sequence=["END"],
-        reasoning_effort=ReasoningEffort.MINIMAL,
-        verbosity=Verbosity.LOW,
-    ),
-    output_type=OutputType.SCHEMA,
-    output_schema=ResponseSchema,
-)
-```
-
 ## Update Prompt Versions
 
 Update an existing prompt version by specifying the `version` you want to modify. Use `"latest"` to update the most recent version.
@@ -190,45 +140,6 @@ from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.update(version="00.00.01", text="Updated prompt text.")
-```
-
-You can also update model settings and output configurations:
-
-```python main.py
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import (
-    PromptMessage,
-    ModelSettings,
-    ModelProvider,
-    PromptInterpolationType,
-    OutputType,
-    ReasoningEffort,
-    Verbosity,
-)
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(
-    version="latest",
-    messages=[
-        PromptMessage(role="user", content="Hello, assistant!"),
-        PromptMessage(role="assistant", content="Hello, user!"),
-    ],
-    model_settings=ModelSettings(
-        provider=ModelProvider.OPEN_AI,
-        name="o4-mini",
-        max_tokens=100,
-        temperature=0.7,
-        top_p=0.9,
-        frequency_penalty=0.1,
-        presence_penalty=0.1,
-        stop_sequence=["stop"],
-        verbosity=Verbosity.LOW,
-        reasoning_effort=ReasoningEffort.MINIMAL,
-    ),
-    interpolation_type=PromptInterpolationType.FSTRING,
-    output_type=OutputType.SCHEMA,
-    output_schema=YourSchema,
-)
 ```
 
 </Tab>
@@ -276,31 +187,131 @@ await prompt.update({
   to preserve the original, push a new version instead.
 </Warning>
 
-## Model Settings Reference
+## Adding Model Configs
 
 <Note>
-  Model settings are optional. You can version and use prompts without any model
-  configuration — simply pull the prompt and use it with whatever model you
-  choose in your code. Model settings are for teams who want to co-locate their
-  model configuration with their prompts.
+  Model settings, output type, and tools are **completely optional**. You can
+  version and use prompts without any of these — simply pull the prompt and use
+  it with whatever model you choose in your code. These options are for teams
+  who want to co-locate their model configuration with their prompts.
 </Note>
 
-When pushing or updating prompts, you can configure model settings with the following fields:
+If you want to manage your model configuration alongside your prompts — treating the prompt + model as a single versioned unit — you can include `model_settings` and `output_type` when pushing or updating.
 
-| Field             | Type              | Default   | Description                                         |
-| ----------------- | ----------------- | --------- | --------------------------------------------------- |
-| provider          | `ModelProvider`   | `OPEN_AI` | The model provider (see supported providers below)  |
-| name              | `str`             | `None`    | The model name (e.g., "gpt-4o", "claude-3-opus")    |
-| temperature       | `float`           | `0`       | Controls randomness (0-2)                           |
-| max_tokens        | `int`             | `None`    | Maximum tokens in the response                      |
-| top_p             | `float`           | `1`       | Nucleus sampling parameter                          |
-| frequency_penalty | `float`           | `0`       | Penalize repeated tokens (-2 to 2)                  |
-| presence_penalty  | `float`           | `0`       | Penalize tokens based on presence (-2 to 2)         |
-| stop_sequence     | `List[str]`       | `[]`      | Sequences that stop generation                      |
-| reasoning_effort  | `ReasoningEffort` | `MEDIUM`  | Reasoning effort level (MINIMAL, LOW, MEDIUM, HIGH) |
-| verbosity         | `Verbosity`       | `MEDIUM`  | Output verbosity (LOW, MEDIUM, HIGH)                |
+This is useful when:
 
-### Supported Model Providers
+- You want to ensure a specific prompt always runs with a specific model and parameters
+- You're A/B testing different prompt + model combinations together
+- You want to centralize both prompt and model configuration in one place
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py maxLines={0}
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import (
+    PromptMessage,
+    ModelSettings,
+    ModelProvider,
+    OutputType,
+    ReasoningEffort,
+    Verbosity,
+)
+from pydantic import BaseModel
+
+class ResponseSchema(BaseModel):
+    answer: str
+    confidence: float
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+
+# Use with push() to create a new version
+prompt.push(
+    messages=[
+        PromptMessage(role="system", content="You are a helpful assistant."),
+    ],
+    model_settings=ModelSettings(
+        provider=ModelProvider.OPEN_AI,
+        name="gpt-4o",
+        temperature=0.7,
+        max_tokens=1000,
+        top_p=0.9,
+        frequency_penalty=0.1,
+        presence_penalty=0.1,
+        stop_sequence=["END"],
+        reasoning_effort=ReasoningEffort.MINIMAL,
+        verbosity=Verbosity.LOW,
+    ),
+    output_type=OutputType.SCHEMA,
+    output_schema=ResponseSchema,
+)
+
+# Or use with update() to modify an existing version
+prompt.update(
+    version="latest",
+    model_settings=ModelSettings(
+        provider=ModelProvider.OPEN_AI,
+        name="gpt-4o-mini",
+        temperature=0.5,
+    ),
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+TODO
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+TODO
+
+</Tab>
+
+</Tabs>
+
+## Reference
+
+### Model settings
+
+Model settings include the provider, model name, and model parameters:
+
+| Field    | Type            | Default   | Description                                        |
+| -------- | --------------- | --------- | -------------------------------------------------- |
+| provider | `ModelProvider` | `OPEN_AI` | The model provider (see supported providers below) |
+| name     | `str`           | `None`    | The model name (e.g., "gpt-4o", "claude-3-opus")   |
+
+#### Parameters
+
+Here are all the available parameters you could set:
+
+| Field             | Type              | Default  | Description                                         |
+| ----------------- | ----------------- | -------- | --------------------------------------------------- |
+| temperature       | `float`           | `0`      | Controls randomness (0-2)                           |
+| max_tokens        | `int`             | `None`   | Maximum tokens in the response                      |
+| top_p             | `float`           | `1`      | Nucleus sampling parameter                          |
+| frequency_penalty | `float`           | `0`      | Penalize repeated tokens (-2 to 2)                  |
+| presence_penalty  | `float`           | `0`      | Penalize tokens based on presence (-2 to 2)         |
+| stop_sequence     | `List[str]`       | `[]`     | Sequences that stop generation                      |
+| reasoning_effort  | `ReasoningEffort` | `MEDIUM` | Reasoning effort level (MINIMAL, LOW, MEDIUM, HIGH) |
+| verbosity         | `Verbosity`       | `MEDIUM` | Output verbosity (LOW, MEDIUM, HIGH)                |
+
+<Warning>
+  Only include parameters that are valid for your chosen model provider and
+  model name. For example, `reasoning_effort` may only apply to certain OpenAI
+  models, while other parameters may not be supported by all providers.
+  Confident AI does not exhaustively validate which parameter combinations are
+  allowed — invalid configurations may result in runtime errors when using the
+  prompt in your code.
+</Warning>
+
+#### Providers
+
+Here are the list of available model providers:
 
 | Provider      | Description                  |
 | ------------- | ---------------------------- |
@@ -318,7 +329,7 @@ When pushing or updating prompts, you can configure model settings with the foll
 | `PORTKEY`     | Portkey (gateway)            |
 | `LITE_LLM`    | LiteLLM (gateway)            |
 
-### Output Configuration
+### Output configurations
 
 You can also configure structured outputs:
 
@@ -333,7 +344,7 @@ You can also configure structured outputs:
 - `JSON` - JSON formatted output
 - `SCHEMA` - Structured output validated against a Pydantic schema
 
-### Interpolation Types
+### Interpolation types
 
 Specify how variables are interpolated in your prompts:
 
@@ -345,9 +356,9 @@ Specify how variables are interpolated in your prompts:
 | `DOLLAR_BRACKETS`     | `${variable}`    | `Hello, ${name}!`                 |
 | `JINJA`               | `{% ... %}`      | `{% if admin %}Hello!{% endif %}` |
 
-## Tools
+## What about Tools?
 
-Tools can be defined and configured for prompt versions on the platform. After pulling a prompt, you can access its tools programmatically. See [Accessing Tools from Prompts](/llm-evaluation/prompt-management/using-prompts#accessing-tools-from-prompts) for details on how to use tools in code.
+Tools can only be defined and configured for prompt versions on the platform UI. After pulling a prompt, you can access its tools programmatically. [Click here](/docs/llm-evaluation/prompt-management/pull-prompts#using-tools) for details on how to use tools in code.
 
 <Note>
   Tool configuration is currently only available through the Confident AI
@@ -359,7 +370,7 @@ Tools can be defined and configured for prompt versions on the platform. After p
 
 Automate prompt versioning as part of your CI/CD pipeline. A common pattern is to push prompt updates whenever your prompt files change:
 
-```yaml prompts-ci.yml
+```yaml prompts-ci.yml maxLines={25}
 name: Push Prompt Versions
 
 on:
@@ -404,7 +415,19 @@ print("Prompt pushed successfully!")
 
 <Tip>
   Combine automated prompt pushing with [prompt
-  labeling](/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions)
+  labeling](/docs/llm-evaluation/prompt-management/version-prompts#assign-prompt-labels)
   to control which versions are deployed to different environments (e.g.,
   staging, production).
 </Tip>
+
+## Next Steps
+
+Now that you can push prompts programmatically, learn how to pull them into your app for usage.
+
+<Card
+  title="Pull Prompts"
+  icon="arrow-down-to-bracket"
+  href="/docs/llm-evaluation/prompt-management/pull-prompts"
+>
+  Pull prompt versions into your code for use in your LLM app.
+</Card>

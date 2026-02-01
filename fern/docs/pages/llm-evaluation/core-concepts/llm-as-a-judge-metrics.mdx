@@ -189,7 +189,7 @@ Decision:
 In Confident AI, out of the 40+ LLM evaluation metrics, only the Arena G-Eval metric uses pairwise comparison. However, an internal benchmarking of `deepeval`'s Arena G-Eval metric shows nearly identical performance to reference-less single-output LLM-as-a-judge:
 
 <Frame caption="Arena G-Eval vs Single-Output">
-  <img data-image="concepts.arenaVsGeval" />
+  <img data-image="concepts.arenaVsGeval" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 ## Single vs Multi-turn
@@ -197,7 +197,7 @@ In Confident AI, out of the 40+ LLM evaluation metrics, only the Arena G-Eval me
 Scoring single-turn LLM apps are straightforward, as we saw in the previous section. For **single-turn evals**, simply provide the test case parameters as dynamic variables in your evaluation prompt, and out you get a score.
 
 <Frame caption="Single-Turn LLM-as-a-Judge">
-  <img data-image="concepts.singleTurnLlmJudge" />
+  <img data-image="concepts.singleTurnLlmJudge" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 However for **multi-turn evals**, you'll need a prompt that:
@@ -209,7 +209,7 @@ However for **multi-turn evals**, you'll need a prompt that:
 In fact, often times a conversation can get length and the best way to evaluate it is to partition it into several list of turns instead:
 
 <Frame caption="Multi-Turn LLM-as-a-Judge">
-  <img data-image="concepts.multiTurnLlmJudge" />
+  <img data-image="concepts.multiTurnLlmJudge" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 Despite how different single and mult-turn LLM-as-a-judge may look, they both actually fall under the **single-output** LLM-as-a-judge category. For pairwise comparison, we generally **don't** do it for multi-turn since that would overload the LLM judge with too much context, hence it doesn't work as well compared to single-turn pairwise comparisons.
@@ -241,7 +241,7 @@ G-Eval is a **SOTA, research-backed framework** that uses **single-output** LLM-
 G-eval was first introduced in the [paper “NLG Evaluation using GPT-4 with Better Human Alignment”](https://arxiv.org/abs/2303.16634):
 
 <Frame caption="G-Eval Algorithm">
-  <img data-image="concepts.geval" />
+  <img data-image="concepts.geval" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 G-Eval makes great LLM evaluation metrics for **subjective criteria** because it is accurate, easily tunable, and surprisingly consistent across runs. Here's how you would use it in `deepeval` for running local evals:
@@ -282,7 +282,7 @@ More information on G-Eval can be found [here.](https://www.confident-ai.com/blo
 Deep Acyclic Graph (DAG) is a decision-tree based, deterministic, **single-output** LLM-as-a-judge metric. Each node in the DAG is a verdict, while each node contains the logic for which the LLM judge has to work through. In the end, the leaf nodes will return the score and reason.
 
 <Frame caption="Decision-Based LLM-as-a-Judge">
-  <img data-image="concepts.dag" />
+  <img data-image="concepts.dag" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 The DAG metric is currently not yet available on the platform, but you can run it through `deepeval` for local evals:
