@@ -42,23 +42,24 @@ Configure the JSON payload that Confident AI sends to your endpoint. You can cus
 
 Available variables:
 
-| Variable                                   | Description                                    | Type       |
-| ------------------------------------------ | ---------------------------------------------- | ---------- |
-| `golden.input`                             | The input from your golden                     | string     |
-| `golden.actual_output`                     | The actual output from your golden             | string     |
-| `golden.expected_output`                   | The expected output from your golden           | string     |
-| `golden.retrieval_context`                 | The retrieval context from your golden         | string[]   |
-| `golden.context`                           | The context from your golden                   | string[]   |
-| `golden.expected_tools`                    | The expected tools from your golden            | ToolCall[] |
-| `golden.tools_called`                      | The tools called from your golden              | ToolCall[] |
-| `golden.additional_metadata`               | Additional metadata from your golden           | object     |
-| `conversationalGolden.turns`               | Turn history for multi-turn evals              | Turn[]     |
-| `conversationalGolden.context`             | Context for conversational goldens             | string[]   |
-| `conversationalGolden.scenario`            | Scenario for conversational goldens            | string     |
-| `conversationalGolden.expected_outcome`    | Expected outcome for conversational goldens    | string     |
-| `conversationalGolden.user_description`    | User description for conversational goldens    | string     |
-| `conversationalGolden.additional_metadata` | Additional metadata for conversational goldens | object     |
-| `prompts`                                  | A dictionary of prompts                        | object     |
+| Variable                                   | Description                                        | Type       |
+| ------------------------------------------ | -------------------------------------------------- | ---------- |
+| `golden.input`                             | The input from your golden                         | string     |
+| `golden.actual_output`                     | The actual output from your golden                 | string     |
+| `golden.expected_output`                   | The expected output from your golden               | string     |
+| `golden.retrieval_context`                 | The retrieval context from your golden             | string[]   |
+| `golden.context`                           | The context from your golden                       | string[]   |
+| `golden.expected_tools`                    | The expected tools from your golden                | ToolCall[] |
+| `golden.tools_called`                      | The tools called from your golden                  | ToolCall[] |
+| `golden.additional_metadata`               | Additional metadata from your golden               | object     |
+| `conversationalGolden.turns`               | Turn history for multi-turn evals                  | Turn[]     |
+| `conversationalGolden.context`             | Context for conversational goldens                 | string[]   |
+| `conversationalGolden.scenario`            | Scenario for conversational goldens                | string     |
+| `conversationalGolden.expected_outcome`    | Expected outcome for conversational goldens        | string     |
+| `conversationalGolden.user_description`    | User description for conversational goldens        | string     |
+| `conversationalGolden.additional_metadata` | Additional metadata for conversational goldens     | object     |
+| `prompts`                                  | A dictionary of prompts                            | object     |
+| `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
 
 Example payload:
 
@@ -125,7 +126,7 @@ For more details on working with prompts, see [Prompt Versioning](/docs/llm-eval
 
 ### Actual Output Key Path
 
-A list of strings representing the path to the `actual_output` value in your JSON response. This is required for evaluation to work.
+A list of strings or integers representing the path to the `actual_output` value in your JSON response. Use strings for JSON keys and integers for array indices. This is required for evaluation to work.
 
 For example, if your endpoint returns:
 
@@ -139,13 +140,27 @@ For example, if your endpoint returns:
 
 Set the key path to `["response", "output"]`.
 
-<Warning>
-  You don't need to include `"quotations"` when setting the paths.
-</Warning>
+For nested arrays, use integers to specify the array index. For example, if your endpoint returns:
+
+```json
+{
+  "response": {
+    "output": {
+      "content": [{ "text": "Hello, world!" }]
+    }
+  }
+}
+```
+
+Set the key path to `["response", "output", "content", 0, "text"]`.
+
+<Frame caption="Key paths support both JSON keys (strings) and list indices (integers)">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/ai-connection%3Akey-paths.png" />
+</Frame>
 
 ### Retrieval Context Key Path
 
-A list of strings representing the path to the `retrieval_context` value in your JSON response. This is optional and only needed if you're using RAG metrics. The value must be a list of strings.
+A list of strings or integers representing the path to the `retrieval_context` value in your JSON response. Use strings for JSON keys and integers for array indices. This is optional and only needed if you're using RAG metrics. The value must be a list of strings.
 
 For example, if your endpoint returns:
 
@@ -162,7 +177,7 @@ Set the key path to `["response", "retrieval_context"]`.
 
 ### Tool Call Key Path
 
-A list of `ToolCall` representing the path to the `tools_called` value in your JSON response. This is optional and only needed if you're using metrics that require a tool call parameter. The value must be a list of `ToolCall`.
+A list of strings or integers representing the path to the `tools_called` value in your JSON response. Use strings for JSON keys and integers for array indices. This is optional and only needed if you're using metrics that require a tool call parameter. The value must be a list of `ToolCall`.
 
 For example, if your endpoint returns:
 
@@ -209,6 +224,104 @@ Set the maximum number of concurrent requests that Confident AI will send to you
 
 - **Minimum**: 1
 - **Default**: 20
+
+## Linking Test Cases to Traces
+
+When running evaluations through an AI Connection, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
+
+```mermaid
+sequenceDiagram
+    participant C as Confident AI
+    participant E as Your Endpoint
+    participant T as Tracing
+
+    C->>E: Ping AI Connection with testCaseId
+    E->>T: Create trace with testCaseId
+    E-->>C: Return actual_output
+    T-->>C: Send trace to Confident AI
+    Note over C: Trace linked to test case
+```
+
+Include `testCaseId` in your payload configuration and ensure your AI connection is configured to accept it.
+
+```json
+{
+  "input": golden.input,
+  "testCaseId": testCaseId
+}
+```
+
+Then, pass the `testCaseId` to your tracing implementation:
+
+<Tabs>
+
+  <Tab title="Python">
+
+```python
+from deepeval.tracing import observe, update_current_trace
+
+@observe()
+def llm_app(input: str, test_case_id: str):
+    # Link the trace to the test case
+    update_current_trace(test_case_id=test_case_id)
+
+    # Your generation logic here
+    response = llm.generate(user=input)
+    return response
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request,get("testCaseId")
+    response = llm_app(request["input"], test_case_id)
+    return {"output": response}
+```
+
+  </Tab>
+  <Tab title="LangChain">
+
+```python
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+
+    result = agent_executor.invoke(
+        {"input": request["input"]},
+        config={"callbacks": [CallbackHandler(test_case_id=test_case_id)]}
+    )
+    return {"output": result["output"]}
+```
+
+  </Tab>
+  <Tab title="LangGraph">
+
+```python
+from langgraph.prebuilt import create_react_agent
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": request["input"]}]},
+        config={"callbacks": [CallbackHandler(test_case_id=test_case_id)]}
+    )
+    return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+</Tabs>
+
+<Tip>
+  Once linked, you can view the full trace for each test case directly from the
+  evaluation results, making it easy to debug failures and understand model
+  behavior.
+</Tip>
 
 ## Testing Your Connection
 
