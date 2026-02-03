@@ -87,6 +87,15 @@ It is important to note that simulations will automatically end if the expected 
 
 ## Run an Evaluation
 
+You can evaluate on a dataset by clicking on the **Evaluate** button on the top right of a dataset page.
+
+<Frame caption="Evaluate button on multi-turn datasets">
+  <img
+    data-image="datasets.multiTurn.page"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
 <Steps>
   <Step title="Select your dataset and metrics">
     1. Navigate to **Project** > **Datasets**, and select your multi-turn dataset to evaluate
@@ -94,38 +103,33 @@ It is important to note that simulations will automatically end if the expected 
     3. Select your multi-turn **Metric Collection**
   </Step>
 
-  <Step title="Configure simulation">
-    This is the critical step for multi-turn evals. Configure how Confident AI simulates user turns to generate complete conversations:
-
-    - **Simulation model** — select the LLM that will simulate user responses
-    - **Simulation instructions** — guide the simulator's persona and behavior (e.g., "Act as a frustrated customer trying to get a refund")
-    - **Max turns** — set the maximum conversation length
-    - **Stop conditions** — define when the conversation should end (e.g., goal achieved, user says goodbye)
+  <Step title="Turn on simulations">
+    
+    This must be enabled if you want to call your AI app during evaluation time
 
     <Tip>
-    Well-crafted simulation instructions are key to realistic conversations. Be specific about the user's goals, tone, and knowledge level.
+    Well-crafted simulation instructions are key to realistic conversations. Be specific about the user's goals, tone, and knowledge level through the use of scenarios, expected outcome, and user description fields on your goldens.
     </Tip>
 
   </Step>
 
   <Step title="Configure output generation">
-    Select how your AI app will respond to each turn:
+    **If simulations is turned on**, and select how your AI app will respond to each turn:
 
     <Tabs>
       <Tab title="Prompt">
 
 <Frame caption="Configure prompt for multi-turn evaluation">
   <img
-    data-image="noCode.multiTurn.promptConfig"
+    data-image="datasets.multiTurn.promptConfig"
     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   />
 </Frame>
 
         For prompt-based chatbots, select a prompt template that includes conversation history.
 
-        1. Go to **Prompts** and create a prompt with variables like `{{messages}}` or `{{conversation_history}}`
-        2. In the evaluation setup, select this prompt as your output generation method
-        3. Confident AI calls your LLM for each turn, passing the conversation history
+        1. In the evaluation setup, select this prompt as your output generation method
+        2. Confident AI calls your LLM for each turn, passing the conversation history
 
         <Note>
 
@@ -138,7 +142,7 @@ You'll need an existing prompt for this to work. If you haven't already, you can
 
 <Frame caption="Configure AI Connection for multi-turn evaluation">
   <img
-    data-image="noCode.multiTurn.aiConnectionConfig"
+    data-image="datasets.multiTurn.aiConnectionConfig"
     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   />
 </Frame>
