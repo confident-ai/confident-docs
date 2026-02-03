@@ -903,20 +903,24 @@ paths:
                 text: "Updated hello, {{name}}!"
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
-                modelSettings:
-                  provider: "OPEN_AI"
-                  name: "gpt-4o"
-                  temperature: 0.7
               List-Prompt:
                 messages:
                   - role: user
                     content: "What is the updated weather like in {{city}}?"
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
+              Model-Settings:
+                text: "Updated hello, {{name}}!"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
                 modelSettings:
                   provider: "OPEN_AI"
                   name: "gpt-4o"
                   temperature: 0.7
+                  maxTokens: 1000
+                  topP: 0.9
+                  frequencyPenalty: 0.1
+                  presencePenalty: 0.1
       responses:
         "200":
           description: ""
@@ -1006,20 +1010,24 @@ paths:
                 text: "Updated hello, {{name}}!"
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
-                modelSettings:
-                  provider: "OPEN_AI"
-                  name: "gpt-4o"
-                  temperature: 0.7
               List-Prompt:
                 messages:
                   - role: user
                     content: "What is the updated weather like in {{city}}?"
                 interpolationType: "FSTRING"
                 outputType: "TEXT"
+              Model-Settings:
+                text: "Updated hello, {{name}}!"
+                interpolationType: "FSTRING"
+                outputType: "TEXT"
                 modelSettings:
                   provider: "OPEN_AI"
                   name: "gpt-4o"
                   temperature: 0.7
+                  maxTokens: 1000
+                  topP: 0.9
+                  frequencyPenalty: 0.1
+                  presencePenalty: 0.1
       responses:
         "200":
           description: ""
@@ -3983,6 +3991,7 @@ components:
           description: This is the array of fields that define the output schema structure.
       required:
         - fields
+        - name
 
     OutputSchemaField:
       type: object
@@ -4007,6 +4016,7 @@ components:
       required:
         - id
         - type
+        - name
 
     UpdatePromptRequest:
       type: object
