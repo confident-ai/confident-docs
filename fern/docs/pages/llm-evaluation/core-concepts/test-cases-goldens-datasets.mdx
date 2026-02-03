@@ -38,7 +38,7 @@ As a developer, you need to map these arguments into the test case format—eith
 A single-turn test case represents a single, atomic interaction with your LLM app:
 
 <Frame caption="Single LLM Interaction">
-  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/concepts:llm-test-case.png" />
+  <img data-image="concepts.llmTestCase" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 In the diagram above, we see that an interaction can include an `input`, `actual_output`, `retrieval_context` (for RAG), `tools_called`, etc. An interaction can live in both the:
@@ -113,7 +113,7 @@ In fact, the input will very unlikely be orphaned as shown in the example, and m
 A multi-turn test case represents a series of interactions with your LLM app:
 
 <Frame caption="Multi LLM Interaction">
-  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/concepts:conversational-test-case.png" />
+  <img data-image="concepts.conversationalTestCase" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
 In the diagram above, we see that an interaction is dictated by a list of turns, which represents exchanges between the user and AI. In `deepeval` this is represented by an `ConversationalTestCase`:

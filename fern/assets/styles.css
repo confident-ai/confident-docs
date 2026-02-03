@@ -1,0 +1,22 @@
+/* Card link icon - positioned in top right */
+.card-link-icon {
+  position: absolute !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  z-index: 10;
+}
+
+/* Ensure the card content area doesn't clip absolute elements */
+.fern-card > div > div:last-child {
+  overflow: visible !important;
+}
+
+/* Smaller font size for card content */
+.fern-card {
+  font-size: 0.875rem; /* 14px */
+}
+
+/* Add top margin to lists in cards */
+.fern-card ul {
+  margin-top: 0.5rem;
+}

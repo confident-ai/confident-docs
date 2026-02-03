@@ -1,0 +1,422 @@
+# Confident AI Documentation Style Guide
+
+This project uses Fern for documentation. Follow these patterns and best practices when creating or editing documentation.
+
+## Page Structure
+
+Every documentation page must follow this structure:
+
+```mdx
+---
+subtitle: Brief description of the page content
+slug: path/to/page
+description: Optional SEO description
+---
+
+## Overview
+
+[High-level explanation of what the page covers - 1-3 paragraphs]
+
+[Main content sections...]
+
+## Next Steps
+
+[Links to related/following content using CardGroup]
+```
+
+### Frontmatter Rules
+
+- `subtitle`: Required. Short description that appears below the title.
+- `slug`: Required. Clean URL path (e.g., `llm-evaluation/quickstart`).
+- `description`: Optional. Used for SEO.
+- `title`: Only use when different from the sidebar navigation name.
+
+## Components
+
+### Callouts
+
+Use these callout components appropriately:
+
+| Component   | When to Use                                          |
+| ----------- | ---------------------------------------------------- |
+| `<Note>`    | General information, clarifications, tips            |
+| `<Tip>`     | Pro tips, optional enhancements, best practices      |
+| `<Warning>` | Prerequisites, important cautions, potential issues  |
+| `<Info>`    | Technical clarifications, implementation details     |
+| `<Success>` | Short confirmations, highlights, completion messages |
+
+```mdx
+<Note>Content here. Can include [links](/path) and **formatting**.</Note>
+
+<Tip title="Optional Title" icon="leaf">
+  Tips can have titles and icons.
+</Tip>
+
+<Warning>Prerequisites or cautions go here.</Warning>
+```
+
+### Cards
+
+Use `<CardGroup>` with `<Card>` for feature showcases and navigation:
+
+```mdx
+<CardGroup cols={2}>
+  <Card
+    title="Card Title"
+    icon="icon-name"
+    iconType="solid"
+    href="/optional/link"
+  >
+    - Bullet point features
+    - Another feature
+
+    **Suitable for:** Target audience description
+
+  </Card>
+</CardGroup>
+```
+
+Rules:
+
+- Use `cols={2}` for side-by-side comparisons (Local vs Remote pattern)
+- Use `cols={3}` for feature overviews
+- Include "**Suitable for:**" line when comparing options
+- Use Font Awesome icons (e.g., `laptop`, `cloud`, `flask-vial`)
+
+### Tabs
+
+Use `<Tabs>` for language/platform variations:
+
+````mdx
+<Tabs>
+  <Tab title="Python" language="python">
+    ```python # Python code ```
+  </Tab>
+  <Tab title="TypeScript" language="typescript">
+    ```typescript // TypeScript code ```
+  </Tab>
+  <Tab title="curL" language="curl">
+    <EndpointRequestSnippet endpoint="GET /v1/endpoint" />
+  </Tab>
+</Tabs>
+````
+
+Rules:
+
+- Order: Python → TypeScript → cURL (when showing SDK examples)
+- Use `language` attribute on Tab components
+- Nest Tabs when showing UI vs Code alternatives
+
+### Steps
+
+Use `<Steps>` for tutorials and quickstarts:
+
+````mdx
+<Steps>
+  <Step title="Step Title">
+    Step content here. ```bash # Commands or code ```
+  </Step>
+  <Step title="Next Step">
+    More content. End with confirmation: ✅ Done. You just completed [action].
+  </Step>
+</Steps>
+````
+
+### Media
+
+Use `<Frame>` for images and videos:
+
+```mdx
+<Frame caption="Descriptive Caption" background="subtle">
+  <video
+    autoPlay
+    loop
+    muted
+    src="https://confident-docs.s3.us-east-1.amazonaws.com/video.mp4"
+    type="video/mp4"
+  />
+</Frame>
+
+<Frame caption="Image Caption">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/image.png" />
+</Frame>
+```
+
+### Accordions (FAQs)
+
+```mdx
+<AccordionGroup>
+  <Accordion title="Question here?">
+    Answer content with [links](/path) if needed.
+  </Accordion>
+</AccordionGroup>
+```
+
+### Code Blocks
+
+````mdx
+```python main.py {6,17}
+# Include filename after language
+# Use {lineNumbers} to highlight important lines
+from deepeval import evaluate
+```
+````
+
+For multiple related code snippets:
+
+````mdx
+<CodeBlocks>
+  ```bash title="Option 1"
+  export API_KEY=value
+````
+
+```python title="Option 2"
+configure(api_key="value")
+```
+
+</CodeBlocks>
+```
+
+### Parameter Documentation
+
+```mdx
+<ParamField path="param_name" type="string" required>
+  Description of the parameter.
+</ParamField>
+
+<ParamField path="optional_param" type="number" default={0.5}>
+  Description with default value.
+</ParamField>
+```
+
+### Math Formulas
+
+```mdx
+$$
+\text{Metric Name} = \frac{\text{Numerator}}{\text{Denominator}}
+$$
+```
+
+### Mermaid Diagrams
+
+Use mermaid diagrams to explain architecture and data flows. `sequenceDiagram` is particularly effective:
+
+````mdx
+```mermaid
+sequenceDiagram
+    participant User as You
+    participant Platform as Confident AI
+    participant AI as Your AI App
+
+    User->>Platform: Start Evaluation
+    Platform->>AI: Send input
+    AI-->>Platform: Generate output
+    Platform-->>User: Results
+```
+````
+
+````
+
+When to use mermaid diagrams:
+- Explaining how data flows through a system
+- Showing the sequence of operations in a feature
+- Illustrating relationships between components
+- Making complex processes visual and digestible
+
+## Content Patterns
+
+### Local vs Remote Pattern
+
+When a feature can be done locally (SDK) or remotely (platform), use this pattern:
+
+```mdx
+<CardGroup cols={2}>
+  <Card title="Local [Feature]" icon="laptop" iconType="solid">
+    - Run locally using `deepeval` with full control
+    - Support for custom configurations
+
+    **Suitable for:** Python users, development, and pre-deployment workflows
+
+  </Card>
+  <Card title="Remote [Feature]" icon="cloud" iconType="solid">
+    - Run on Confident AI platform with pre-built features
+    - Integrated with monitoring and team collaboration
+
+    **Suitable for:** Non-python users, online + offline evals for tracing in prod
+
+  </Card>
+</CardGroup>
+````
+
+### Quickstart Pattern
+
+Quickstart pages should:
+
+1. Start with `## Overview` explaining key capabilities
+2. Include a `<Warning>` about prerequisites (API key setup)
+3. Use `<Tabs>` for Python/TypeScript
+4. Wrap instructions in `<Steps>`
+5. End with "✅ Done" confirmation
+6. Include `## Next Steps` with CardGroup
+
+### Next Steps Pattern
+
+End documentation pages with:
+
+```mdx
+## Next Steps
+
+Brief summary of what was covered, then:
+
+<CardGroup cols={2}>
+  <Card title="Related Topic" icon="icon" href="/path">
+    Brief description of what they'll learn
+  </Card>
+  <Card title="Another Topic" icon="icon" href="/path">
+    Brief description
+  </Card>
+</CardGroup>
+```
+
+## Writing Style
+
+### Do
+
+- Use "you" to address the reader directly
+- Start sections with "## Overview"
+- Include code examples for every concept
+- Cross-link to related documentation with context — use phrases like "as we saw in the previous section" or "as covered in the [Page Name] section" to orient readers on where they're jumping to. Say "section" not "docs" since you're already in the docs.
+- Use bullet points for feature lists and comparisons
+- Include "Done ✅" after completing tutorial steps
+- Show both Python and TypeScript examples when applicable
+- Add personality and life to the documentation — avoid dry, robotic writing
+- Use conversational phrases like "Here's the thing:", "Now it's time to...", "No more guessing"
+- Use mermaid diagrams (especially `sequenceDiagram`) to explain architecture and data flows
+- Keep headings short and punchy — they appear in side navigation and long headings look bad
+- Lead headings with the main subject, not prepositions — "Arena Experiments" not "From Arena", "Test Run Experiments" not "From Existing Test Runs"
+- Use the "sandwich" pattern: intro text → bullet points/list → closing text
+
+### Don't
+
+- Don't use overly technical jargon without explanation
+- Don't create pages without an Overview section
+- Don't use images without Frame and caption
+- Don't forget to include Next Steps at the end
+- Don't mix component styles (be consistent)
+- Don't use tables for comparisons — use bullet points instead (tables look bad)
+- Don't write long subheadings — keep them to 2-4 words when possible
+- Don't be boring — documentation should be engaging to read
+
+## File Organization
+
+- Documentation pages: `fern/docs/pages/`
+- Assets (images, styles): `fern/docs/assets/` or `fern/assets/`
+- Navigation config: `fern/docs.yml`
+- Media files: Host on S3 at `https://confident-docs.s3.us-east-1.amazonaws.com/`
+
+## Navigation Structure (docs.yml)
+
+### Tab Structure Pattern
+
+Each tab follows this consistent structure:
+
+1. **Standalone overview page first** - A single page introducing the tab's content (not wrapped in a section)
+2. **Key standalone pages** - Important top-level pages that don't need grouping
+3. **Sections for grouped content** - Related pages organized into collapsible sections
+
+Example structure (Integrations tab):
+
+```yaml
+- tab: integrations
+  layout:
+    # 1. STANDALONE OVERVIEW PAGE (always first, not in a section)
+    - page: Integrations
+      path: docs/pages/integrations/integrations.mdx
+      icon: fa-light fa-plug
+
+    # 2. SECTIONS FOR GROUPED CONTENT
+    - section: Native Integrations
+      contents:
+        - section: OpenTelemetry
+          path: docs/pages/integrations/opentelemetry.mdx # Section can have its own overview page
+          icon: fa-light fa-satellite-dish
+          collapsed: false
+          contents:
+            - page: Distributed Tracing
+              path: docs/pages/integrations/opentelemetry/distributed-tracing.mdx
+              icon: fa-light fa-globe
+
+    - section: Third-Party Integrations
+      contents:
+        - page: OpenAI
+          path: docs/pages/integrations/third-party/openai.mdx
+          icon: fa-light fa-brain
+        - page: LangChain
+          path: docs/pages/integrations/third-party/langchain.mdx
+          icon: fa-light fa-chain
+```
+
+Example structure (Settings tab):
+
+```yaml
+- tab: settings
+  layout:
+    # 1. STANDALONE OVERVIEW PAGE
+    - page: Platform Settings
+      path: docs/pages/settings.mdx
+      icon: fa-light fa-gear
+
+    # 2. KEY STANDALONE PAGES (important top-level pages, not grouped)
+    - page: Data Residency
+      path: docs/pages/settings/data-residency.mdx
+      icon: fa-light fa-globe
+    - page: RBAC
+      path: docs/pages/settings/rbac.mdx
+      icon: fa-light fa-user-shield
+
+    # 3. SECTIONS FOR GROUPED CONTENT
+    - section: Project Settings
+      contents:
+        - page: Team Members
+          path: docs/pages/settings/project/team-members.mdx
+          icon: fa-light fa-user-plus
+        - page: API Keys
+          path: docs/pages/settings/project/api-keys.mdx
+          icon: fa-light fa-key
+
+    - section: Organization Settings
+      contents:
+        - page: Projects
+          path: docs/pages/settings/organization/projects.mdx
+          icon: fa-light fa-folder
+        - page: Users
+          path: docs/pages/settings/organization/users.mdx
+          icon: fa-light fa-users
+```
+
+### Key Patterns
+
+| Pattern                      | When to Use                                                                |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| Standalone page at top       | Every tab should start with an overview/intro page (not in a section)      |
+| Standalone pages (ungrouped) | For important pages that don't fit a category (e.g., RBAC, Data Residency) |
+| Section with `path`          | When a section itself needs an overview page (e.g., OpenTelemetry section) |
+| `collapsed: false`           | For sections users need to see expanded immediately                        |
+| Nested sections              | For sub-categorization (e.g., Single-Turn metrics inside All Metrics)      |
+
+### Icon Conventions
+
+- **Overview/Introduction pages**: `fa-light fa-info-circle` or topic-specific (e.g., `fa-light fa-plug` for Integrations)
+- **Quickstart pages**: `fa-light fa-bolt`
+- **Setup pages**: `fa-light fa-play`
+- **Settings pages**: `fa-light fa-gear`
+- **User-related**: `fa-light fa-user-*` variants
+- **All icons**: Use Font Awesome Light (`fa-light fa-*`)
+
+### Adding New Content
+
+1. **New tab**: Start with a standalone overview page, then add sections as needed
+2. **New top-level page**: Add as standalone page after the overview if it's important and doesn't fit existing sections
+3. **New grouped page**: Add to the appropriate section
+4. **New category**: Create a new section with related pages inside
+5. **Sub-category needed**: Create a nested section with `collapsed: false` if frequently accessed

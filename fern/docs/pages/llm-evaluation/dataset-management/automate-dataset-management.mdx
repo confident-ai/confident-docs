@@ -1,0 +1,295 @@
+---
+subtitle: Programmatically push goldens to datasets via the Evals API.
+slug: llm-evaluation/dataset-management/automate-dataset-management
+---
+
+## Overview
+
+This section covers how to programmatically manage goldens in datasets using the Evals API:
+
+- Push single and multi-turn goldens to datasets
+- Set `finalized=True` to make goldens available for evaluation, or `finalized=False` to queue for review
+- Include custom column values when pushing goldens
+- Delete datasets programmatically
+
+<Note>Only finalized goldens will be pulled for evaluation.</Note>
+
+## Push Goldens
+
+Push goldens to a dataset. If the dataset does not already exist, Confident AI will create it for you.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+For **single-turn** datasets:
+
+```python main.py
+from deepeval.dataset import EvaluationDataset, Golden
+
+goldens = [Golden(input="How tall is Mt. Everest?")]
+dataset = EvaluationDataset(goldens=goldens)
+
+# Push as finalized (ready for evaluation)
+dataset.push(alias="YOUR-DATASET-ALIAS", finalized=True)
+
+# Or push as unfinalized (queued for review)
+dataset.push(alias="YOUR-DATASET-ALIAS", finalized=False)
+```
+
+For **multi-turn** datasets:
+
+<Tabs>
+<Tab title="With Turns">
+```python main.py
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+from deepeval.test_case import Turn
+
+goldens = [
+ConversationalGolden(
+scenario="Angry user asking for a refund.",
+turns=[Turn(role="user", content="Give me my money!")]
+)
+]
+dataset = EvaluationDataset(goldens=goldens)
+
+dataset.push(alias="YOUR-DATASET-ALIAS", finalized=True)
+
+````
+</Tab>
+<Tab title="Without Turns">
+```python main.py
+from deepeval.dataset import EvaluationDataset, ConversationalGolden
+
+goldens = [ConversationalGolden(scenario="Angry user asking for a refund.")]
+dataset = EvaluationDataset(goldens=goldens)
+
+dataset.push(alias="YOUR-DATASET-ALIAS", finalized=True)
+````
+
+</Tab>
+</Tabs>
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+For **single-turn** datasets:
+
+```ts index.ts
+import { EvaluationDataset, Golden } from "deepeval-ts";
+
+const goldens = [new Golden({ input: "How tall is Mt. Everest?" })];
+const dataset = new EvaluationDataset({ goldens: goldens });
+
+// Push as finalized (ready for evaluation)
+dataset.push({ alias: "YOUR-DATASET-ALIAS", finalized: true });
+
+// Or push as unfinalized (queued for review)
+dataset.push({ alias: "YOUR-DATASET-ALIAS", finalized: false });
+```
+
+For **multi-turn** datasets:
+
+<Tabs>
+<Tab title="With Turns">
+
+```ts index.ts
+import { EvaluationDataset, ConversationalGolden, Turn } from "deepeval-ts";
+
+const firstTurn = new Turn({
+  role: "user",
+  content: "Where's my money!?",
+});
+
+const goldens = [
+  new ConversationalGolden({
+    scenario: "Angry user asking for a refund.",
+    turns: [firstTurn],
+  }),
+];
+const dataset = new EvaluationDataset({ goldens: goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS", finalized: true });
+```
+
+</Tab>
+<Tab title="Without Turns">
+
+```ts index.ts
+import { EvaluationDataset, ConversationalGolden } from "deepeval-ts";
+
+const conversationalGolden = new ConversationalGolden({
+  scenario: "Angry user asking for a refund.",
+});
+
+const goldens = [conversationalGolden];
+const dataset = new EvaluationDataset({ goldens: goldens });
+
+dataset.push({ alias: "YOUR-DATASET-ALIAS", finalized: true });
+```
+
+</Tab>
+</Tabs>
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+Set `finalized` to `true` for evaluation-ready goldens, or `false` to queue for review.
+
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Single-Turn"
+/>
+
+For **multi-turn** datasets:
+
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Multi-Turn"
+/>
+
+</Tab>
+
+</Tabs>
+
+## Add Custom Columns
+
+You can include custom column values when pushing goldens. Custom columns must already exist on the dataset, or Confident AI will create them for you.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import Golden, ConversationalGolden
+
+golden = Golden(
+    input="How tall is Mt. Everest?",
+    custom_column_key_values={"difficulty": "easy", "category": "geography"}
+)
+
+multiturn_golden = ConversationalGolden(
+    scenario="User asking for a refund.",
+    custom_column_key_values={"sentiment": "angry", "priority": "high"}
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { Golden, ConversationalGolden } from "deepeval-ts";
+
+const golden = new Golden({
+  input: "How tall is Mt. Everest?",
+  customColumnKeyValues: { difficulty: "easy", category: "geography" },
+});
+
+const multiturnGolden = new ConversationalGolden({
+  scenario: "User asking for a refund.",
+  customColumnKeyValues: { sentiment: "angry", priority: "high" },
+});
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Custom-Columns"
+/>
+
+</Tab>
+
+</Tabs>
+
+## Delete Dataset
+
+Delete a dataset programmatically via the Evals API.
+
+<Warning>
+  This action cannot be undone. All goldens or conversational goldens in the
+  dataset will be permanently deleted.
+</Warning>
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.delete(alias="YOUR-DATASET-ALIAS")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+dataset.delete({ alias: "YOUR-DATASET-ALIAS" });
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet endpoint="DELETE /v1/datasets/{alias}" />
+
+</Tab>
+
+</Tabs>
+
+## Switching Projects
+
+You can push or manage datasets in any project by configuring a `CONFIDENT_API_KEY`.
+
+- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
+- To target a specific project, pass a `confident_api_key` directly when creating the `EvaluationDataset`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset(confident_api_key="confident_us...")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset({ confidenApiKey: "confident_us..." });
+```
+
+</Tab>
+
+</Tabs>
+
+When both are provided, the `confident_api_key` passed to `EvaluationDataset` always takes precedence over the environment variable.
+
+## Next Steps
+
+Now that you know how to push goldens, learn how to pull them for evaluation.
+
+<Card
+  title="Pull Datasets"
+  icon="arrow-down-to-bracket"
+  href="/docs/llm-evaluation/dataset-management/using-datasets"
+>
+  Pull datasets locally to use them in code-driven evaluations.
+</Card>
+````

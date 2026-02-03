@@ -1,6 +1,6 @@
 ---
 subtitle: Learn how to test and use prompts in your LLM app
-slug: llm-evaluation/prompt-optimization/using-prompts
+slug: llm-evaluation/prompt-management/pull-prompts
 ---
 
 ## Overview
@@ -13,25 +13,7 @@ You can pull a prompt version from Confident AI like how you would pull a datase
 
 You should pull prompts once and save it in memory instead of pulling it everytime you need to use it.
 
-<Tip>
-You can pull and manage your prompts in any project by configuring a `CONFIDENT_API_KEY`.
-
-- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
-- To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
-
-```python
-from deepeval.prompt import Prompt, PromptMessage
-
-prompt = Prompt(
-  alias="YOUR-PROMPT-ALIAS",
-  confident_api_key="confident_us...",
-)
-```
-
-When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
-</Tip>
-
-## Using Prompt Versions
+## Pull Prompt By Version
 
 <Steps>
 
@@ -365,56 +347,9 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Steps>
 
-## Accessing Tools from Prompts
-
-After pulling a prompt, you can access any tools that were defined in the prompt version via the `tools` property. Each tool contains:
-
-- **name**: The name of the tool
-- **description**: A description of what the tool does
-- **input schema**: The JSON schema defining the tool's input parameters
-
-<Tabs>
-
-<Tab title="Python" language="python">
-
-```python main.py
-from deepeval.prompt import Prompt
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull()
-
-# Access tools from the prompt
-for tool in prompt.tools:
-    print(f"Tool Name: {tool.name}")
-    print(f"Description: {tool.description}")
-    print(f"Input Schema: {tool.input_schema}")
-```
-
-</Tab>
-
-<Tab title="TypeScript" language="typescript">
-
-```typescript index.ts
-import { Prompt } from "deepeval-ts";
-
-const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull();
-
-// Access tools from the prompt
-for (const tool of prompt.tools) {
-  console.log(`Tool Name: ${tool.name}`);
-  console.log(`Description: ${tool.description}`);
-  console.log(`Input Schema: ${JSON.stringify(tool.inputSchema)}`);
-}
-```
-
-</Tab>
-
-</Tabs>
-
 ## Pull Prompts By Label
 
-You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `verion` and `label`.
+You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
 
 <Tabs>
 
@@ -438,11 +373,17 @@ prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull(label="staging")
 ```
 
-You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-optimization/prompt-versioning#labelling-prompt-versions) to learn how to do so.
+You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions) to learn how to do so.
 
 </Tab>
 
 </Tabs>
+
+<Note>
+
+By pulling via labels, you effectively allow users with sufficient permission to "deploy" new versions of your prompt without going through code.
+
+</Note>
 
 ## How Are Prompts Pulled?
 
@@ -527,7 +468,7 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 
 </Tabs>
 
-### Disable Caching
+### Configure cache
 
 To disable caching, you can set `refresh=0`. This will force an API call every time you pull the prompt, which is particularly useful for development and testing.
 
@@ -559,60 +500,284 @@ const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 
 </Tabs>
 
-## Log Prompts During Evals
+## Advanced Usage
 
-You can associate a prompt with your evals to get detailed insights on how each prompt and their versions are performing. It works by:
+As you learnt in [earlier sections](/docs/llm-evaluation/prompt-management/version-prompts#model-config), prompts have the additional option to not just version text/messages but also model settings (provider, name, parameters), output type, and tools.
 
-- Pulling or creating prompts in `deepeval` using the `Prompt` object
-- Logging prompts as hyperparameters in your evaluations
+### Using model settings
 
-<Steps>
-
-<Step title="Pull prompts">
-
-You should first pull a prompt from Confident AI using alias, version or label.
+After pulling a prompt, you can access any model settings that were configured for the prompt version via the `model_settings` property. Model settings include the provider, model name, and model parameters (temperature, max_tokens, etc.).
 
 <Tabs>
 
 <Tab title="Python" language="python">
 
-```python
+```python main.py maxLines={0} focus={1-7}
 from deepeval.prompt import Prompt
+from openai import OpenAI
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull(version="00.00.01")
+prompt.pull()
+interpolated_prompt = prompt.interpolate()
+settings = prompt.model_settings
+
+# Use model settings (provider, name, parameters) in your OpenAI call
+response = OpenAI().chat.completions.create(
+    model=settings.name,
+    messages=interpolated_prompt,
+    temperature=settings.temperature,
+    max_tokens=settings.max_tokens,
+    top_p=settings.top_p,
+    frequency_penalty=settings.frequency_penalty,
+    presence_penalty=settings.presence_penalty,
+    stop=settings.stop_sequence,
+)
+
+print(response.choices[0].message.content)
 ```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript
+```typescript index.ts maxLines={0} focus={1-7}
 import { Prompt } from "deepeval-ts";
+import { OpenAI } from "openai";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull((version = "00.00.01"));
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate();
+const settings = prompt.modelSettings;
+
+// Use model settings (provider, name, parameters) in your OpenAI call
+const openai = new OpenAI();
+const response = await openai.chat.completions.create({
+  model: settings.name,
+  messages: interpolatedPrompt as any[],
+  temperature: settings.temperature,
+  max_tokens: settings.maxTokens,
+  top_p: settings.topP,
+  frequency_penalty: settings.frequencyPenalty,
+  presence_penalty: settings.presencePenalty,
+  stop: settings.stopSequence,
+});
+
+console.log(response.choices[0].message.content);
 ```
 
 </Tab>
 
 <Tab title="curL" language="curl">
-  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+The response includes a `modelSettings` object with the configured model settings.
+
 </Tab>
 
 </Tabs>
 
-You can now interpolate and use this prompt in your LLM app.
+<Tip>
+  Model settings are optional. If no model settings were configured for the
+  prompt version, `model_settings` will be `None`.
+</Tip>
 
-</Step>
+### Using output type
 
-<Step title="Logging prompt in `evaluate`">
-
-Now, simply add this prompt as a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function
+After pulling a prompt, you can access the output configuration via the `output_type` and `output_schema` properties. This is useful when you want to enforce structured outputs from your LLM.
 
 <Tabs>
 
 <Tab title="Python" language="python">
+
+```python main.py maxLines={0} focus={1-17}
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import OutputType
+from openai import OpenAI
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate()
+
+# Build response_format based on output type
+response_format = None
+if prompt.output_type == OutputType.JSON:
+    response_format = {"type": "json_object"}
+elif prompt.output_type == OutputType.SCHEMA:
+    response_format = {
+        "type": "json_schema",
+        "json_schema": prompt.output_schema
+    }
+
+# Use output type in your OpenAI call
+response = OpenAI().chat.completions.create(
+    model="gpt-4o",
+    messages=interpolated_prompt,
+    response_format=response_format,
+)
+
+print(response.choices[0].message.content)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts maxLines={0} focus={1-17}
+import { Prompt, OutputType } from "deepeval-ts";
+import { OpenAI } from "openai";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate();
+
+// Build response_format based on output type
+let responseFormat: any = undefined;
+if (prompt.outputType === OutputType.JSON) {
+  responseFormat = { type: "json_object" };
+} else if (prompt.outputType === OutputType.SCHEMA) {
+  responseFormat = {
+    type: "json_schema",
+    json_schema: prompt.outputSchema,
+  };
+}
+
+// Use output type in your OpenAI call
+const openai = new OpenAI();
+const response = await openai.chat.completions.create({
+  model: "gpt-4o",
+  messages: interpolatedPrompt as any[],
+  response_format: responseFormat,
+});
+
+console.log(response.choices[0].message.content);
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+The response includes `outputType` and `outputSchema` fields for the output configuration. The `outputSchema` field contains the output schema definition when `outputType` is `SCHEMA`.
+
+</Tab>
+
+</Tabs>
+
+The available output types are:
+
+- **TEXT** - Plain text output (default)
+- **JSON** - JSON formatted output (maps to `{"type": "json_object"}`)
+- **SCHEMA** - Structured output validated against a schema (maps to `{"type": "json_schema", ...}`)
+
+### Using tools
+
+After pulling a prompt, you can access any tools that were defined in the prompt version via the `tools` property. Each tool contains:
+
+- **name**: The name of the tool
+- **description**: A description of what the tool does
+- **input_schema**: The JSON schema defining the tool's input parameters
+- **mode**: The tool mode (`ALLOW_ADDITIONAL`, `NO_ADDITIONAL`, or `STRICT`)
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py maxLines={30} focus={1-18}
+from deepeval.prompt import Prompt
+from openai import OpenAI
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate()
+
+# Convert prompt tools to OpenAI format
+openai_tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": tool.name,
+            "description": tool.description,
+            "parameters": tool.input_schema,
+            "strict": tool.mode == "STRICT",
+        },
+    }
+    for tool in prompt.tools
+]
+
+# Use tools in your OpenAI call
+response = OpenAI().chat.completions.create(
+    model="gpt-4o",
+    messages=interpolated_prompt,
+    tools=openai_tools,
+)
+
+print(response.choices[0].message)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript index.ts maxLines={30} focus={1-18}
+import { Prompt } from "deepeval-ts";
+import { OpenAI } from "openai";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate();
+
+// Convert prompt tools to OpenAI format
+const openaiTools = prompt.tools.map((tool) => ({
+  type: "function" as const,
+  function: {
+    name: tool.name,
+    description: tool.description,
+    parameters: tool.inputSchema,
+    strict: tool.mode === "STRICT",
+  },
+}));
+
+// Use tools in your OpenAI call
+const openai = new OpenAI();
+const response = await openai.chat.completions.create({
+  model: "gpt-4o",
+  messages: interpolatedPrompt as any[],
+  tools: openaiTools,
+});
+
+console.log(response.choices[0].message);
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+The response includes a `tools` array with each tool's `name`, `description`, `inputSchema`, and `mode`.
+
+</Tab>
+
+</Tabs>
+
+## Prompt Association
+
+You can and should definitely associate prompt versions with test runs and traced data for Confident AI to let you know which version of your prompt performs best.
+
+### Evals
+
+You can associate a prompt with your evals to get detailed insights on how each prompt and their versions are performing. It works by:
+
+- Pulling prompt via the Evals API
+- Logging prompts as a hyperparameter during evaluation
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+Simply add the **pulled prompt instance** as a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function
 
 ```python
 evaluate(
@@ -627,6 +792,8 @@ evaluate(
 </Tab>
 
 <Tab title="Typescript" language="typescript">
+
+Simply add the **pulled prompt instance** as a free-form key-value pair to the `hyperparameters` argument in the `evaluate()` function
 
 ```ts
 evaluate({
@@ -653,11 +820,13 @@ evaluate({
 
 This will automatically attribute the prompt used during this test run, which will allow you get detailed insights in the Confident AI platform.
 
-</Step>
+<Warning>
 
-</Steps>
+Never ever ever associate the **interpolated** prompt version - Confident AI will treat it as a string literal and you will not be able to associate prompt versions but instead raw strings (which isn't helpful at all).
 
-## Log Prompts During Tracing
+</Warning>
+
+### Tracing
 
 Associating prompts with [LLM traces and spans](/docs/llm-tracing/introduction) is a great way to determine which prompts performs best in production.
 
@@ -731,3 +900,42 @@ This will automatically attribute the prompt used to the LLM span.
 </Step>
 
 </Steps>
+
+## Switching Projects
+
+You can pull and manage your prompts in any project by configuring a `CONFIDENT_API_KEY`.
+
+- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
+- To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
+
+```python
+from deepeval.prompt import Prompt, PromptMessage
+
+prompt = Prompt(
+  alias="YOUR-PROMPT-ALIAS",
+  confident_api_key="confident_us...",
+)
+```
+
+When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
+
+## Next Steps
+
+Now that you can pull prompts into your app, learn how to push them programmatically or run evaluations.
+
+<CardGroup cols={2}>
+  <Card
+    title="Automate Prompt Management"
+    icon="robot"
+    href="/docs/llm-evaluation/prompt-management/automate-prompt-management"
+  >
+    Push and manage prompts programmatically via the Evals API.
+  </Card>
+  <Card
+    title="Run Evaluations"
+    icon="flask"
+    href="/docs/llm-evaluation/code-driven/quickstart"
+  >
+    Evaluate your LLM app with metrics and datasets.
+  </Card>
+</CardGroup>

@@ -43,6 +43,7 @@ import deepeval
 deepeval.login("<your-confident-api-key>")
 
 ```
+
 </CodeBlock>
 
 <CodeBlock title="Env" language="bash">
@@ -50,7 +51,6 @@ deepeval.login("<your-confident-api-key>")
 export CONFIDENT_API_KEY="<your-confident-api-key>"
 ```
 </CodeBlock>
-
 
 </CodeBlocks>
 
@@ -107,7 +107,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Setting Trace Attributes
 
-Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application. 
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application.
 
 For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
 
@@ -115,7 +115,7 @@ You can set these attributes in the `CallbackHandler` when invoking your LangCha
 
 ```python main.py maxLines=100
 result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},   
+    {"input": "What is 8 multiplied by 6?"},
     config={
         "callbacks": [CallbackHandler(thread_id="123")]
     },
@@ -155,7 +155,7 @@ result = agent_executor.invoke(
 
 ### Logging prompts
 
-If you are [managing prompts](/docs/llm-evaluation/prompt-optimization/prompt-versioning) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
 ```python main.py
 from langchain_openai import ChatOpenAI
@@ -165,7 +165,7 @@ prompt = Prompt(alias="<prompt-alias>")
 prompt.pull(version="00.00.01")
 
 llm = ChatOpenAI(
-    model="gpt-4o-mini", 
+    model="gpt-4o-mini",
     metadata={"prompt": prompt}
 )
 ```
@@ -177,7 +177,9 @@ llm = ChatOpenAI(
 </Note>
 
 ## Evals Usage
+
 ### Online evals
+
 If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
@@ -187,15 +189,12 @@ If your LangChain application is in production, and you still want to run evalua
 Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
-  <video
-    src="https://confident-docs.s3.us-east-1.amazonaws.com/integrations%3Athird-party-integrations%3Acreate-metric-collection-4k.mp4"
-    controls
-    autoPlay
-  />
+  <video data-video="metrics.createCollection" controls autoPlay />
 </Frame>
 
 <Warning>
-  The current LangChain integration supports metrics that only evaluate `Input` and `Actual Output` in addition to the **Task Completion** metric.
+  The current LangChain integration supports metrics that only evaluate `Input`
+  and `Actual Output` in addition to the **Task Completion** metric.
 </Warning>
 
 </Step>
@@ -209,7 +208,7 @@ Set the `metric_collection` name to evaluate various components of your LangChai
 <Tab title="Agent Span">
 This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
 
-```python main.py {22} maxLines=100 
+```python main.py {22} maxLines=100
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
@@ -281,9 +280,9 @@ result = agent.invoke(
 For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
 
 <Note>
-  If your application does not use `@tool` decorator, you can also use `@observe` decorator from `deepeval.tracing` to set the metric collection.
+  If your application does not use `@tool` decorator, you can also use
+  `@observe` decorator from `deepeval.tracing` to set the metric collection.
 </Note>
-
 
 <CodeBlocks>
 
@@ -296,29 +295,30 @@ from deepeval.integrations.langchain import CallbackHandler, tool
 
 @tool(metric_collection="test_collection_1")
 def get_weather(city: str) -> str:
-    """Returns the weather in a city"""
-    return f"It's always sunny in {city}!"
+"""Returns the weather in a city"""
+return f"It's always sunny in {city}!"
 
 llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    metadata={"metric_collection": "test_collection_1"}
+model="gpt-4o-mini",
+metadata={"metric_collection": "test_collection_1"}
 )
 
 agent = create_react_agent(
-    model=llm,
-    tools=[get_weather],
-    prompt="You are a helpful assistant",
+model=llm,
+tools=[get_weather],
+prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
-    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={
-        "callbacks": [
-            CallbackHandler(metric_collection="task_completion")
-        ],
-    },
+input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+config={
+"callbacks": [
+CallbackHandler(metric_collection="task_completion")
+],
+},
 )
-```
+
+````
 </CodeBlock>
 
 <CodeBlock title="Using @observe">
@@ -353,7 +353,8 @@ result = agent.invoke(
         ],
     },
 )
-```
+````
+
 </CodeBlock>
 
 </CodeBlocks>
@@ -481,12 +482,5 @@ for golden in dataset.evals_iterator():
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  src="https://confident-bucket.s3.us-east-1.amazonaws.com/end-to-end%3Alanggraph.mp4"
-  controls
-  autoPlay
-  playsInline
-/>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
 </Frame>
-
-

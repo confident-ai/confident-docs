@@ -1,37 +1,71 @@
 ---
-title: Single-Turn, Component-Level Testing
+title: Single-Turn, Component-Level Evals
 subtitle: Learn how to run component-level testing for single-turn use cases
 slug: llm-evaluation/single-turn/component-level
 ---
 
 ## Overview
 
-Single-turn, component-level testing requires:
+Component-level testing lets you evaluate individual parts of your LLM application — retrievers, generators, tools, planners — rather than just the final output. This is essential for debugging complex pipelines where you need to pinpoint exactly which component is failing.
 
-- A dataset of goldens
-- Setting up LLM tracing
-- A list of metrics for each component you wish to test
-- Construction of test cases at the component-level at runtime
+**Requirements:**
+
+- A [dataset of goldens](/llm-evaluation/dataset-management/automate-dataset-management) — determines how many times your app runs
+- [LLM tracing](/llm-tracing/quickstart) setup with `@observe` decorators
+- [Metrics](/evaluation-metrics/introduction) defined per component via the `metrics` parameter in `@observe()`
 
 <Warning>
-  This is currently only supported for users using `deepeval` Python, and **must
-  run locally.** However, ad-hoc online-evals for components in production are
-  still [available here.](/llm-tracing/evaluations)
+  Component-level testing is currently only supported for users using `deepeval`
+  Python, and **must run locally.** However, ad-hoc online-evals for components
+  in production are still [available here.](/llm-tracing/evaluations)
 </Warning>
 
 ## How It Works
 
-1. Setup LLM tracing
+1. Setup LLM tracing with `@observe` decorators and define `metrics` for each component
 2. Pull your dataset from Confident AI
-3. Loop through goldens and call your LLM app using the `evals_iterator()`
+3. Loop through goldens using the `evals_iterator()` and invoke your LLM app
 
-You can automatically run end-to-end testing if you have component-level
-setup, as shown in the [previous
-section.](/llm-evaluation/single-turn/end-to-end#llm-tracing-for-local-e2e-testing)
+```mermaid
+sequenceDiagram
+    participant Your Code
+    participant Confident AI
+    participant LLM App
+    participant Components
+
+    Your Code->>Confident AI: Pull dataset
+    Confident AI-->>Your Code: List of goldens (count = N)
+
+    loop N times via evals_iterator()
+        Your Code->>LLM App: Invoke app
+        LLM App->>Components: @observe captures spans
+        Components->>Components: update_current_span() sets test case fields
+        Components-->>LLM App: Component metric(s) executes
+    end
+
+    LLM App-->>Confident AI: Upload traces & run component metrics
+    Note over Confident AI: Generate testing report
+```
+
+<Tip>
+  Unlike end-to-end testing, you don't need to use `golden.input` to call your
+  LLM app. The `evals_iterator()` simply controls how many times your app runs
+  (once per golden). Test case fields are set via `update_current_span()` inside
+  each component — the golden just determines the iteration count.
+</Tip>
+
+## Run Component-Level Tests Locally
+
+This section is nearly identical to this part of the previous section, where we use LLM tracing to run end-to-end evals. This is because LLM tracing is just so convenient to evaluate everything and anything.
+
+<Note>
+  In this example we're basically just swapping `update_current_trace` with
+  `update_current_span` instead.
+</Note>
+
+We're also using the same mock LLM app in the [previous section](/llm-evaluation/single-turn/end-to-end#how-it-works) to demonstrate LLM tracing:
 
 <Accordion title="See Mock LLM App">
-
-For this section, we'll be using the same mock LLM app in the [previous section](/llm-evaluation/single-turn/end-to-end#how-it-works) to demonstrate LLM tracing:
 
 ```python main.py
 from openai import OpenAI
@@ -53,15 +87,6 @@ def llm_app(query: str) -> str:
 ```
 
 </Accordion>
-
-## Run Component-Level Tests Locally
-
-This section is nearly identical to this part of the previous section, where we use LLM tracing to run end-to-end evals. This is because LLM tracing is just so convenient to evaluate everything and anything.
-
-<Tip>
-  In this example we're basically just swapping `update_current_trace` with
-  `update_current_span` instead.
-</Tip>
 
 <Steps>
 
@@ -109,7 +134,7 @@ When you call `update_current_span()` to set `input`s, `output`s, `retrieval_con
 
 <Step title="Pull dataset, and loop through goldens">
 
-Pull your dataset in the same way as before, and use the `.evals_iterator()` to loop through your goldens. You will use data in your goldens (most likely the `input`) to call your LLM app:
+Pull your dataset and use the `.evals_iterator()` to iterate. The iterator controls how many times your LLM app runs — once per golden in your dataset.
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset
@@ -117,13 +142,23 @@ from deepeval.dataset import EvaluationDataset
 dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
 
-for golden in dataset.evals_iterator():
-    llm_app(golden.input) # Replace with your LLM app
+for _ in dataset.evals_iterator():
+    llm_app("any input") # golden.input is optional for component-level testing
 ```
+
+Since test case fields are populated via `update_current_span()` inside your components, you can pass any input to your LLM app — or use `golden.input` if your test scenarios require specific inputs.
 
 Done ✅. You should see a link to your newly created sharable testing report.
 
-[video]
+<Frame caption="Component-Level Testing Report">
+  <video
+    autoPlay
+    loop
+    muted
+    data-video="evaluation.singleTurnComponentLevel"
+    type="video/mp4"
+  />
+</Frame>
 
 </Step>
 

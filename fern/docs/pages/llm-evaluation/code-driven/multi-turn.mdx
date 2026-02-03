@@ -1,15 +1,16 @@
 ---
-title: Simulate User Turns
-subtitle: Mock user interactions with your multi-turn use cases
-slug: llm-evaluation/multi-turn/simulate-user-turns
+title: Multi-Turn Evals
+subtitle: Simulate conversations and run end-to-end testing for multi-turn use cases
+slug: llm-evaluation/code-driven/multi-turn
 ---
 
 ## Overview
 
-Simulating user turns require:
+Multi-turn evaluation requires:
 
 - A multi-turn dataset of conversational goldens
-- A callback function that wraps around your chatbot to the next conversation turn
+- A callback function that wraps around your chatbot to generate conversation turns
+- A list of multi-turn metrics you wish to evaluate with
 
 <Note>
   Each conversational golden must have a `scenario` before you can simulate user
@@ -17,32 +18,18 @@ Simulating user turns require:
   higher quality simulations.
 </Note>
 
-## How it works
+## How It Works
 
-1. Pull your [multi-turn dataset](/llm-evaluation/dataset-management/create-goldens) from Confident AI
-2. Define a callback that invokes your chatbot to generate the next conversation turn
-3. Run a simulation for each golden in your dataset
+1. Pull your [multi-turn dataset](/llm-evaluation/dataset-management/manage-datasets) from Confident AI
+2. Define a callback that invokes your chatbot to generate conversation turns
+3. Simulate conversations for each golden in your dataset
+4. Run evaluation on the resulting test cases
 
-## Run Simulations Locally
+## Define Your Callback
 
-<Steps>
-<Step title="Pull dataset">
+Define a callback that wraps around your chatbot and generates the next conversation turn:
 
-Pull your multi-turn dataset (and [create one](/llm-evaluation/dataset-management/create-goldens) if you haven’t already):
-
-```python main.py
-from deepeval.dataset import EvaluationDataset
-
-dataset = EvaluationDataset()
-dataset.pull(alias="YOUR-DATASET-ALIAS")
-```
-
-</Step>
-<Step title="Define callback">
-
-Define a callback that wraps around your chatbot and generates the next conversation turn.
-
-```python main.py
+```python callback.py
 from deepeval.test_case import Turn
 from typing import List
 
@@ -58,37 +45,15 @@ def chatbot_callback(input: str, turns: List[Turn], thread_id: str) -> Turn:
   thread id. It should return the next `Turn` in the conversation.
 </Info>
 
-</Step>
-<Step title="Run simulation">
+## Run Evals Locally
 
-Create a [simulator](https://deepeval.com/docs/conversation-simulator) with your callback and run simulations for the goldens in your dataset.
-
-```python main.py
-from deepeval.simulator import ConversationSimulator
-
-simulator = ConversationSimulator(model_callback=chatbot_callback)
-conversational_test_cases = simulator.simulate(conversational_goldens=dataset.goldens)
-```
-
-<Success>
-  The conversational test cases should now contain test cases with simulated
-  conversation turns for each golden in your dataset.
-</Success>
-
-</Step>
-
-</Steps>
-
-## Run Simulations Remotely
+Running evals locally is only possible with the Python `deepeval` library. For Typescript or other languages, skip to [remote evals](#run-evals-remotely).
 
 <Steps>
+
 <Step title="Pull dataset">
 
-Pull your multi-turn dataset as you would with local simulations:
-
-<Tabs>
-
-<Tab title="Python" language="python">
+Pull your multi-turn dataset (and [create one](/llm-evaluation/dataset-management/using-datasets) if you haven't already):
 
 ```python main.py
 from deepeval.dataset import EvaluationDataset
@@ -97,63 +62,134 @@ dataset = EvaluationDataset()
 dataset.pull(alias="YOUR-DATASET-ALIAS")
 ```
 
-</Tab>
+</Step>
 
-<Tab title="Typescript" language="typescript">
+<Step title="Simulate conversations">
 
-```ts index.ts
-import { EvaluationDataset } from "deepeval-ts";
+Create a [simulator](https://deepeval.com/docs/conversation-simulator) with your callback and generate test cases from your goldens:
 
-const dataset = new EvaluationDataset();
-await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+```python main.py
+from deepeval.simulator import ConversationSimulator
+
+simulator = ConversationSimulator(model_callback=chatbot_callback)
+for golden in dataset.goldens:
+    test_case = simulator.simulator(golden)
+    dataset.add_test_case(test_case)
 ```
 
-</Tab>
-
-<Tab title="cURL" language="curl">
-
-<EndpointRequestSnippet endpoint="GET /v1/datasets/{alias}" />
-
-</Tab>
-
-</Tabs>
+<Note>
+  You can also use any other means to generate `turns` in a
+  `ConversationalTestCase` and map golden properties manually.
+</Note>
 
 </Step>
 
-<Step title="Simulate turns">
+<Step title="Run evaluation">
+
+The `evaluate()` function runs your test suite and uploads results to Confident AI:
+
+```python main.py
+from deepeval.metrics import TurnRelevancyMetric
+from deepeval import evaluate
+
+# Replace with your metrics
+evaluate(test_cases=dataset.test_cases, metrics=[TurnRelevancyMetric()])
+```
+
+Done! You should see a link to your newly created sharable testing report.
+
+- Each metric is applied to every test case (e.g., 10 test cases × 2 metrics = 20 evaluations)
+- A test case passes only if all metrics for it pass
+- The test run's pass rate is the proportion of test cases that pass
+
+<Tip>
+  `deepeval` opens your browser automatically by default. To disable this
+  behavior, set `CONFIDENT_BROWSER_OPEN=NO`.
+</Tip>
+
+<Frame caption="Multi-Turn Testing Reports">
+
+<video
+  autoPlay
+  controls
+  muted
+  data-video="evaluation.multiTurnReport"
+  type="video/mp4"
+/>
+
+</Frame>
+
+</Step>
+
+</Steps>
+
+## Run Evals Remotely
+
+<Steps>
+
+<Step title="Create metric collection">
+
+Go to **Project** > **Metric** > **Collections**:
+
+<Frame caption="Metric Collection for Remote Evals" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  data-video="metrics.createCollection"
+  type="video/mp4"
+/>
+
+</Frame>
+
+<Warning>Don't forget to create a multi-turn collection.</Warning>
+
+</Step>
+
+<Step title="Pull dataset and simulate conversations">
 
 <Tabs>
 
 <Tab title="Python" language="python">
 
-Set `run_remote` to true to run simulations remotely.
+Set `run_remote` to true to run simulations remotely:
 
-```python main.py {3}
+```python main.py
 from deepeval.simulator import ConversationSimulator
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
 
 simulator = ConversationSimulator(model_callback=chatbot_callback, run_remote=True)
-conversational_test_cases = simulator.simulate(conversational_goldens=dataset.goldens)
+for golden in dataset.goldens:
+    test_case = simulator.simulator(golden)
+    dataset.add_test_case(test_case)
 ```
 
 </Tab>
 
 <Tab title="Typescript" language="typescript">
 
-Only remote simluation is available in typescript.
-
 ```ts index.ts
-import { ConversationalGolden, ConversationSimulator, EvaluationDataset } from "deepeval-ts";
+import {
+  ConversationalGolden,
+  ConversationSimulator,
+  EvaluationDataset,
+} from "deepeval-ts";
 
 const dataset = new EvaluationDataset();
 await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
 
-const simulator = new ConversationSimulator({
-  modelCallback: chatbotCallback,
-});
-
-const results = await simulator.simulate({
+const simulator = new ConversationSimulator({ modelCallback: chatbotCallback });
+const testCases = await simulator.simulate({
   conversationalGoldens: dataset.goldens as ConversationalGolden[],
 });
+
+for (const testCase of testCases) {
+  dataset.addTestCase(testCase);
+}
 ```
 
 <Accordion title="Click to see example callback in Typescript">
@@ -176,7 +212,8 @@ const chatbotCallback = async (args: {
 </Tab>
 
 <Tab title="cURL" language="curl">
-Use `/v1/simulate` to generate the first user turn for each golden.
+
+Use `/v1/simulate` to generate the first user turn for each golden:
 
 ```curl
 curl -X POST https://api.confident-ai.com/v1/simulate \
@@ -186,35 +223,17 @@ curl -X POST https://api.confident-ai.com/v1/simulate \
   "golden": [{
     "scenario": "A frustrated user asking for a refund.",
     "userDescription": "A white male who is a customer for over 2 years."
-  }],
+  }]
 }'
 ```
 
-Continue calling `/v1/simulate` until you’ve simulated the desired number of turns.
+Continue calling `/v1/simulate` until you've simulated the desired number of turns.
 
 <Note>
   The `/v1/simulate` endpoint returns the **next user turn**. You should add
-  this turn to your golden, append the chatbot’s response, and then call the
+  this turn to your golden, append the chatbot's response, and then call the
   endpoint again.
 </Note>
-
-```curl
-curl -X POST https://api.confident-ai.com/v1/simulate \
-     -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-     -H "Content-Type: application/json" \
-     -d '{
-  "golden": [{
-    "scenario": "A frustrated user asking for a refund.",
-    "userDescription": "A white male who is a customer for over 2 years.",
-    "turns": [
-      {"role": "user", "content": "Hi"},
-      {"role": "assistant", "content": "Hello! How can I help you today?"}
-    ]
-  }],
-
-}'
-
-```
 
 <Warning>
   `/v1/simulate` will fail if the role of the last turn is not `assistant`, if
@@ -227,13 +246,57 @@ curl -X POST https://api.confident-ai.com/v1/simulate \
 
 </Step>
 
+<Step title="Run evaluation">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval import evaluate
+
+evaluate(test_case=dataset.test_cases, metric_collection="YOUR-COLLECTION-NAME")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import {
+  ConversationalTestCase,
+  evaluate,
+  EvaluationDataset,
+} from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+evaluate({
+  conversationalTestCases: dataset.testCases as ConversationalTestCase[],
+  metricCollection: "YOUR-COLLECTION-NAME",
+});
+```
+
+</Tab>
+
+<Tab title="cURL" language="curl">
+
+<EndpointRequestSnippet endpoint="POST /v1/evaluate" example="Multi-Turn" />
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
 </Steps>
 
 ## Advanced Usage
 
-### Early stopping
+### Early Stopping
 
-To stop a simulation naturally before it reaches the maximum number of turns, you can provide the `expected_outcome` for each golden, which will end the conversation automatically after the expected outcome has been reached.
+To stop a simulation naturally before it reaches the maximum number of turns, provide an `expected_outcome` for each golden. The conversation will end automatically after the expected outcome has been reached.
 
 <Tabs>
 
@@ -250,9 +313,9 @@ conversation_golden = ConversationalGolden(
 ```
 
 <Note>
-  If `expected_outcome` is unavalaible, the `max_user_simulations` parameter in
-  the `simluate` method will stop simulation after a certain number of user
-  turns, which is defaulted to 10.
+  If `expected_outcome` is unavailable, the `max_user_simulations` parameter in
+  the `simulate` method will stop simulation after a certain number of user
+  turns, which defaults to 10.
 </Note>
 
 </Tab>
@@ -294,9 +357,9 @@ curl -X POST https://api.confident-ai.com/v1/simulate \
 
 </Tabs>
 
-### Extending existing conversations
+### Extend Existing Turns
 
-You can extend existing conversations by providing existing `Turn`s to each golden in your dataset. The simulator will automatically detect and continue simulating from the existing turns.
+You can extend existing conversations by providing existing `Turn`s to each golden. The simulator will automatically detect and continue simulating from the existing turns.
 
 <Tabs>
 
@@ -358,9 +421,9 @@ curl -X POST https://api.confident-ai.com/v1/simulate \
     "userDescription": "Andy Byron is the CEO of Astronomer.",
     "turns": [
       {"role": "user", "content": "Hi"},
-      {"role": "assistant", "content": "Hello! How can I help you today?"},
+      {"role": "assistant", "content": "Hello! How can I help you today?"}
     ]
-  }],
+  }]
 }'
 ```
 
