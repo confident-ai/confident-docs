@@ -36,13 +36,6 @@
     "datasets.assign": `${S3_BASE}/datasets:assign-4k.mp4`,
     "datasets.delete": `${S3_BASE}/datasets:delete-4k.mp4`,
 
-    // TODO: Dataset videos to record
-    "datasets.addImages": "TODO.mp4",
-    "datasets.editNonText": "TODO.mp4",
-    "datasets.addColumn": "TODO.mp4",
-    "datasets.finalize": "TODO.mp4",
-    "datasets.duplicate": "TODO.mp4",
-
     // Evaluation / Test Runs
     "evaluation.singleTurnE2E": `${S3_BASE}/evaluation:single-turn-e2e-report.mp4`,
     "evaluation.singleTurnComponentLevel": `${S3_BASE}/evaluation:single-turn-e2e-report-tracing.mp4`,
@@ -74,8 +67,8 @@
     "queues.manageItems": `${S3_BASE}/queues:manage-items.mp4`,
 
     // TODO: Videos to record
-    "arena.overview": "TODO.mp4",
-    "experiments.overview": "TODO.mp4",
+    "arena.overview": `${S3_BASE}/arena:overview.mp4`,
+    "experiments.overview": `${S3_BASE}/experiments:overview.mp4`,
   };
 
   // Find all videos with data-video attribute and set their src
@@ -119,34 +112,36 @@
   const S3_BASE = "https://confident-docs.s3.us-east-1.amazonaws.com";
 
   const IMAGES = {
-    // Concepts
+    "datasets.addImages": `${S3_BASE}/datasets:add-images.png`,
+    "datasets.editNonText": `${S3_BASE}/datasets:edit-non-text.png`,
+    "datasets.duplicate": `${S3_BASE}/datasets:duplicate.png`,
+    "datasets.singleTurn.page": `${S3_BASE}/datasets:single-turn:page.png`,
+    "datasets.multiTurn.page": `${S3_BASE}/datasets:multi-turn:page.png`,
+    "datasets.multiTurn.promptConfig": `${S3_BASE}/datasets:multi-turn:prompt-config.png`,
+    "datasets.multiTurn.aiConnectionConfig": `${S3_BASE}/datasets:multi-turn:ai-connection-config.png`,
+    "datasets.singleTurn.promptConfig": `${S3_BASE}/datasets:single-turn:prompt-config.png`,
+    "datasets.singleTurn.aiConnectionConfig": `${S3_BASE}/datasets:single-turn:ai-connection-config.png`,
+
+    "experiments.resultsComparison": `${S3_BASE}/experiments:results-comparison.png`,
+    "experiments.runDialog": `${S3_BASE}/experiments:run-dialog.png`,
+    "experiments.createFromTestRuns": `${S3_BASE}/experiments:create-from-test-runs.png`,
+    "experiments.metricsOverview": `${S3_BASE}/experiments:metrics-overview.png`,
+
+    "arena.promptConfig": `${S3_BASE}/arena:prompt-config.png`,
+    "arena.aiConnectionConfig": `${S3_BASE}/arena:ai-connection-config.png`,
+    "arena.mixedConfig": `${S3_BASE}/arena:mixed-config.png`,
+    "arena.imageInput": `${S3_BASE}/arena:image-input.png`,
+    "arena.contestants": `${S3_BASE}/arena:contestants.png`,
+    "arena.variables": `${S3_BASE}/arena:variables.png`,
+    "arena.quickRun": `${S3_BASE}/arena:quick-run.png`,
+    "arena.modelConfigs": `${S3_BASE}/arena:model-configs.png`,
+
+    "prompts.configureModelSettings": `${S3_BASE}/prompts:configure-model-settings.png`,
+    "prompts.configureOutputType": `${S3_BASE}/prompts:configure-output-type.png`,
+    "prompts.configureSchemaOutput": `${S3_BASE}/prompts:configure-schema-output.png`,
+    "prompts.attachTools": `${S3_BASE}/prompts:attach-tools.png`,
+
     "concepts.arenaVsGeval": `${S3_BASE}/concepts:arena-vs-geval.png`,
-
-    // TODO: Experiments images to capture
-    "experiments.resultsComparison": "TODO.png",
-    "experiments.arenaContestants": "TODO.png",
-    "experiments.runDialog": "TODO.png",
-    "experiments.createFromTestRun": "TODO.png",
-    "experiments.metricsOverview": "TODO.png",
-
-    // TODO: Arena images to capture
-    "arena.promptConfig": "TODO.png",
-    "arena.aiConnectionConfig": "TODO.png",
-    "arena.imageInput": "TODO.png",
-
-    // TODO: No-code multi-turn images to capture
-    "noCode.multiTurn.promptConfig": "TODO.png",
-    "noCode.multiTurn.aiConnectionConfig": "TODO.png",
-
-    // TODO: No-code single-turn images to capture
-    "noCode.singleTurn.promptConfig": "TODO.png",
-    "noCode.singleTurn.aiConnectionConfig": "TODO.png",
-
-    // TODO: Prompts images to capture
-    "prompts.configureModelSettings": "TODO.png",
-    "prompts.configureOutputType": "TODO.png",
-    "prompts.configureSchemaOutput": "TODO.png",
-    "prompts.attachTools": "TODO.png",
     "concepts.singleTurnLlmJudge": `${S3_BASE}/concepts:single-turn-llm-judge.png`,
     "concepts.multiTurnLlmJudge": `${S3_BASE}/concepts:multi-turn-llm-judge.png`,
     "concepts.geval": `${S3_BASE}/concepts:geval.png`,

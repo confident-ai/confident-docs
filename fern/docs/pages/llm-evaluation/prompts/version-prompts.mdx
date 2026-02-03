@@ -132,7 +132,7 @@ from deepeval.prompt.api import PromptMessage
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.push(messages=[PromptMessage(role="...", content="...")])
 
-```
+````
 </Tab>
 
 <Tab title="Text" language="python">
@@ -141,7 +141,7 @@ from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.push(text="...")
-```
+````
 
 </Tab>
 
@@ -221,7 +221,10 @@ Keeping model configs for prompt versions on Confident AI does no harm but it do
 You can configure the model provider, model name, and model parameters for each prompt version. This ensures that when you pull a prompt in code, you also get the exact model configuration needed to run it.
 
 <Frame caption="Configure Model Settings">
-  <img data-image="prompts.configureModelSettings" />
+  <img
+    data-image="prompts.configureModelSettings"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 | Field          | Description                                                  | Example                                    |
@@ -254,7 +257,10 @@ You can specify the expected output format for your prompt by selecting an outpu
 - **Schema Output**: Structured response conforming to a defined schema
 
 <Frame caption="Configure Output Type">
-  <img data-image="prompts.configureOutputType" />
+  <img
+    data-image="prompts.configureOutputType"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 When using **Schema Output**, you can define a custom schema that your LLM response should conform to. This is useful for ensuring structured, predictable outputs.
@@ -267,7 +273,10 @@ To configure a schema:
 4. Click **Save Schema**
 
 <Frame caption="Configure Schema Output">
-  <img data-image="prompts.configureSchemaOutput" />
+  <img
+    data-image="prompts.configureSchemaOutput"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 The schema will be previewed as a Pydantic `BaseModel` class, making it easy to visualize how your structured output will look.
@@ -283,7 +292,10 @@ To attach tools:
 3. Select the tools you want to enable for this prompt version
 
 <Frame caption="Attach Tools">
-  <img data-image="prompts.attachTools" />
+  <img
+    data-image="prompts.attachTools"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 ## Assign Prompt Labels

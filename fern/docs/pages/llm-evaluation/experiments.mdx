@@ -85,7 +85,7 @@ For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, the
 
     <Frame caption="Arena with multiple contestants configured">
 
-  <img data-image="experiments.arenaContestants" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+  <img data-image="arena.contestants" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
   </Step>
@@ -118,9 +118,9 @@ For example, for an experiment with 4 contestants, 5 goldens, and 3 metrics, the
     - Winner indicator showing which contestant performed best on each metric
     - Score differences (e.g., +0.02, -0.01) relative to the base run
 
-    <Tip>
+    <Note>
       All differences are compared against the **base run**. You can switch which contestant is the base run to change your control — useful when you want to see how everything compares to a different baseline.
-    </Tip>
+    </Note>
 
     **Experiment Test Cases** — drill into individual goldens:
     - Score breakdown per metric × contestant
@@ -163,7 +163,7 @@ This is different from regression testing:
 
     <Frame caption="Creating experiment from test run view">
 
-  <img data-image="experiments.createFromTestRun" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+  <img data-image="experiments.createFromTestRuns" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
   </Step>
@@ -193,6 +193,8 @@ A good experiment tells you more than just "A is better than B." Here's what to 
 - **Trade-offs** — one contestant might be more relevant but less concise; decide what matters most
 - **Close calls** — if scores are within a few percentage points, you may need more test cases for confidence
 - **Outliers** — dig into test cases where one contestant dramatically outperformed or underperformed
+
+You should also avoid looking at the details of each contestants from the get go to avoid bias - **Confident AI intentionally hides contestant details** unless you explicitly click on the top of each column.
 
 [VIDEO: Experiment results with annotations explaining key sections such as traces and prompts side drawer]
 
