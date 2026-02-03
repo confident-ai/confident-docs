@@ -102,7 +102,13 @@ await prompt.push({ text: "You are a helpful assistant called {name}." });
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/prompts" />
+For **message** prompts:
+
+<EndpointRequestSnippet endpoint="POST /v1/prompts" example="List-Prompt" />
+
+For **text** prompts:
+
+<EndpointRequestSnippet endpoint="POST /v1/prompts" example="Text-Prompt" />
 
 </Tab>
 
@@ -176,7 +182,13 @@ await prompt.update({
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" />
+For **message** prompts:
+
+<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="List-Prompt" />
+
+For **text** prompts:
+
+<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="Text-Prompt" />
 
 </Tab>
 
@@ -262,13 +274,56 @@ prompt.update(
 
 <Tab title="TypeScript" language="typescript">
 
-TODO
+```typescript maxLines={0}
+import { Prompt } from "deepeval-ts";
+
+const responseSchema = {
+  name: "ResponseSchema",
+  fields: {
+    answer: "string",
+    confidence: "float",
+  }
+}
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+
+await prompt.push({
+  version: "00.00.01",
+  messagesTemplate: [
+    new PromptMessage({ role: "system", content: "You are a helpful assistant." }),
+  ],
+  modelSettings: {
+    provider: "OPEN_AI",
+    name: "gpt-4o",
+    temperature: 0.7,
+    maxTokens: 1000,
+    topP: 0.9,
+    frequencyPenalty: 0.1,
+    presencePenalty: 0.1,
+    stopSequence: ["END"],
+    reasoningEffort: "MINIMAL",
+    verbosity: "LOW",
+  },
+  outputType: OutputType.SCHEMA,
+  outputSchema: responseSchema,
+});
+
+await prompt.update({
+  version: "latest",
+  modelSettings: {
+    provider: "OPEN_AI",
+    name: "gpt-4o",
+    temperature: 0.8,
+    maxTokens: 2000,
+  }
+});
+```
 
 </Tab>
 
 <Tab title="curL" language="curl">
 
-TODO
+<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="Model-Settings" />
 
 </Tab>
 
