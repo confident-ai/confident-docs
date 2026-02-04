@@ -140,6 +140,7 @@
     "prompts.configureOutputType": `${S3_BASE}/prompts:configure-output-type.png`,
     "prompts.configureSchemaOutput": `${S3_BASE}/prompts:configure-output-schema.png`,
     "prompts.attachTools": `${S3_BASE}/prompts:attach-tools.png`,
+    "prompts.includeImages": `${S3_BASE}/prompts:include-images.png`,
 
     "concepts.arenaVsGeval": `${S3_BASE}/concepts:arena-vs-geval.png`,
     "concepts.singleTurnLlmJudge": `${S3_BASE}/concepts:single-turn-llm-judge.png`,
