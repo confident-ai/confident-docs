@@ -169,6 +169,8 @@
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
     "settings.project.alerts": `${S3_BASE}/settings:project:alerts.png`,
+    "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
+    "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,
 
     // Third-Party Logos
     "logos.openai": "https://www.svgrepo.com/show/306500/openai.svg",

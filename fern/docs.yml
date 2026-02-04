@@ -415,6 +415,12 @@ navigation:
           - page: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
             icon: fa-light fa-globe
+          - page: Model Costs
+            path: docs/pages/settings/project/model-costs.mdx
+            icon: fa-light fa-dollar-sign
+          - page: Data Usage
+            path: docs/pages/settings/project/data-usage.mdx
+            icon: fa-light fa-chart-bar
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star

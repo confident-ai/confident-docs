@@ -1,0 +1,81 @@
+---
+subtitle: View processed data and retention usage for your project.
+slug: settings/project/data-usage
+description: Learn about tracking data usage and cost insights
+---
+
+Data Usage lets you monitor your project's data consumption across traces, spans, online evaluations, and test runs. Use this page to understand your usage patterns and track progress toward your plan limits.
+
+<Frame caption="Data Usage Overview">
+  <img
+    data-image="settings.project.dataUsage"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Overview
+
+The Overview tab provides a breakdown of usage by data type over a selected time period.
+
+### Usage Summary
+
+Usage is broken down into four categories:
+
+| Data Type                  | Description                                                      | Billing                 |
+| -------------------------- | ---------------------------------------------------------------- | ----------------------- |
+| Traces                     | Top-level observability units representing complete interactions | Contributes to GB usage |
+| Spans                      | Individual operations within traces                              | Contributes to GB usage |
+| Online Evals (metric data) | Evaluations run on production traces, spans, and threads         | Counted separately      |
+| Test Runs                  | Evaluation runs from experiments and test suites                 | Counted separately      |
+
+The summary shows:
+
+- **Total in period** — Total data size and unit count for the selected time range
+- **Average per month** — Average monthly data size and unit count
+
+### Ingested Trace/Span Data
+
+This section shows your observability data ingestion over time. Your observability data usage is calculated based on **GB-months**—the total gigabytes of traces and spans ingested over your selected retention period.
+
+You can view the data in three ways:
+
+- **Ingested size over time** — Total data size ingested per month
+- **Count over time** — Number of traces/spans ingested per month
+- **Avg size per trace/span** — Average size of each trace or span
+
+<Note>
+  You'll only be charged for additional data you ingest OR retain beyond your
+  plan's limits. Adjust your [data retention
+  settings](/docs/settings/project/data-retention) to manage costs. The minimum
+  retention period is 1 month.
+</Note>
+
+## Cost Insights
+
+The Cost Insights tab shows how close you are to your plan's included usage limits.
+
+<Note>
+  How usage contributes to costs depends on your plan:
+
+- **Free, Starter, and Premium plans** — Usage limits are set at the project level. Each project has its own usage allowance, and the data shown reflects how much this project contributes to its own costs.
+- **Team and Enterprise plans** — Usage limits are set at the organization level. All projects share a pooled allowance, and the data shown reflects how much this project contributes to your organization's overall costs.
+
+Billing is managed at the organization level for all plans—the difference is whether usage limits are tracked per project or pooled across the organization.
+
+  </Note>
+
+### Observability Data Usage
+
+Tracks your trace and span data consumption against your plan's GB-months allowance. The progress bar shows your current usage as a percentage of your included limit, with a breakdown between traces and spans.
+
+<Tip>
+  GB-months is calculated by summing your trace/span data ingested over your
+  selected retention period. You can reduce usage by shortening your retention
+  period.
+</Tip>
+
+### Online Evals Usage
+
+Tracks the number of online evaluations run on your production traces, spans, and threads in real-time. Online evals are evaluations that run automatically on incoming observability data, as opposed to test runs which are triggered manually or via CI/CD.
+
+The progress bar shows your current eval count against your plan's included allowance.

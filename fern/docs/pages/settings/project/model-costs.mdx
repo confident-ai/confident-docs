@@ -1,0 +1,74 @@
+---
+subtitle: Configure LLM model costs for usage tracking and cost estimation for LLM tracing.
+slug: settings/project/model-costs
+description: Learn about setting up custom model costs for cost tracing
+---
+
+Model Costs lets you configure cost tracking for your LLM usage. This is useful for monitoring spending across different models and understanding cost breakdowns in your traces.
+
+<Frame caption="Configure Model Costs">
+  <img
+    data-image="settings.project.modelCosts"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Cost Priority
+
+Model costs are applied in the following order of priority:
+
+1. **Tracing API / DeepEval** — Costs explicitly set when logging traces take highest priority
+2. **Custom Model Costs** — Costs you configure in project settings override pre-configured defaults
+3. **Pre-configured Model Costs** — Fallback pricing for common models when no other cost is set
+
+## Inherit Custom Model Pricing From Organization
+
+Toggle this option to inherit model cost configurations from your organization settings. When enabled, organization-level model costs will override the pre-configured defaults for this project.
+
+This is useful when you want to maintain consistent pricing across multiple projects without configuring each one individually.
+
+## Custom Model Costs
+
+Custom model costs let you define pricing for specific models or model patterns. These costs override pre-configured defaults but are themselves overridden by costs explicitly set via the tracing API or DeepEval.
+
+To add a custom model cost:
+
+1. Navigate to **Project Settings** → **Model Costs**
+2. Click **Add Model Cost**
+3. Enter a **Match Pattern** (e.g., `gpt-4.1`, `claude-*`, or `my-custom-model`)
+4. Optionally select a **Provider** to restrict the cost rule to spans from that specific provider
+5. Set the **Input Cost** per million token
+6. Set the **Output Cost** per million tokens
+7. Click **Save**
+
+You only need either one of input or output cost.
+
+<Tip>
+  Use wildcard patterns (e.g., `gpt-4*`) to match multiple model variants with a
+  single cost configuration.
+</Tip>
+
+| Field                  | Description                                              |
+| ---------------------- | -------------------------------------------------------- |
+| Match Pattern          | The model name or pattern to match against traced models |
+| Provider               | Optional provider filter for the cost rule               |
+| Input Cost / M Tokens  | Cost per million input tokens                            |
+| Output Cost / M Tokens | Cost per million output tokens                           |
+
+## Pre-configured Model Costs
+
+Confident AI includes pre-configured costs for popular models from major providers. These serve as fallback pricing when no cost is set through the tracing API or custom model costs.
+
+Pre-configured costs are available for:
+
+- **OpenAI** — GPT-4, GPT-4o, GPT-3.5 Turbo, and other OpenAI models
+- **Anthropic** — Claude 3.5, Claude 3, and other Anthropic models
+- **Gemini** — Gemini Pro, Gemini Ultra, and other Google models
+
+<Note>
+  Pre-configured costs are updated periodically to reflect current provider
+  pricing. For the most accurate cost tracking, consider setting custom costs or
+  passing costs directly via the tracing API.
+</Note>
+
+You can search through pre-configured costs by model name to verify the pricing being used for your traces.
