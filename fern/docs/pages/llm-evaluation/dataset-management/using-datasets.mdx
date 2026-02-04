@@ -384,6 +384,34 @@ for (const golden of dataset.goldens as Golden[]) {
 
 </Tabs>
 
+## Using Images
+
+Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of [TODO].
+
+For goldens containing images, here you can parse and use it accordingly as follows:
+
+<Tabs>
+
+<Tab title="Python" language="python">
+  TODO
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+  TODO
+</Tab>
+
+<Tab title="curL" language="curl">
+  TODO
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+This is only required when using datasets in code - Confident AI automatically handles image parsing and conversion on the platform.
+
+</Tip>
+
 ## Using Evals Iterator
 
 Typically, you would just provide your dataset as a list of test cases for evaluation. However, if you're running **single-turn, end-to-end OR component-level** evaluations and using `deepeval` in Python, you can use the `evals_iterator()` instead:
