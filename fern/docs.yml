@@ -146,12 +146,23 @@ navigation:
                 icon: fa-light fa-gavel
       - section: Metrics
         contents:
-          - page: Custom Metrics
-            path: docs/pages/metrics/custom-metrics.mdx
-            icon: fa-light fa-gauge-high
-          - page: Metric Collection
-            path: docs/pages/metrics/metric-collection.mdx
+          - page: Introduction
+            path: docs/pages/metrics/introduction.mdx
+            icon: fa-light fa-circle-info
+          - page: Metric Collections
+            path: docs/pages/metrics/metric-collections.mdx
             icon: fa-light fa-bucket
+          - section: Custom Metrics
+            path: docs/pages/metrics/custom-metrics.mdx
+            collapsed: false
+            icon: fa-light fa-gauge-high
+            contents:
+              - page: G-Eval
+                path: docs/pages/metrics/custom-metrics/g-eval.mdx
+                icon: fa-solid fa-g
+              - page: Code-Evals
+                path: docs/pages/metrics/custom-metrics/code-eval.mdx
+                icon: fa-light fa-code
           - section: All Metrics
             collapsed: false
             icon: fa-light fa-list

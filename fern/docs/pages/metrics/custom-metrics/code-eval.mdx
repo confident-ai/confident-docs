@@ -1,0 +1,243 @@
+---
+subtitle: Create custom metrics using Python code on Confident AI
+---
+
+## Overview
+
+Code-Eval lets you create and execute custom metrics by writing Python code directly on the Confident AI platform. Unlike [G-Eval](/docs/metrics/g-eval) which uses natural language criteria, Code-Eval gives you full programmatic control over your evaluation logic using the `deepeval` framework.
+
+<Note>Code-Eval also executes on Confident AI.</Note>
+
+## Why Code-Eval?
+
+Code-Eval is ideal when you need evaluation logic that can't be expressed in natural language:
+
+- **Exact format validation** — Verify JSON structure, regex patterns, or specific output formats
+- **Deterministic scoring** — Apply consistent, rule-based logic without LLM variability
+- **Complex calculations** — Perform multi-step computations, statistical analysis, or aggregations
+- **Custom business rules** — Implement domain-specific validation logic unique to your use case
+
+<Tip>
+  For subjective evaluations like tone, helpfulness, or nuanced quality checks,
+  use [G-Eval](/docs/metrics/g-eval) instead — it handles LLM-as-a-judge
+  reasoning and is easier to create without code.
+</Tip>
+
+## How It Works
+
+Code-Eval works exactly like creating a [custom metric in `deepeval`](https://deepeval.com/docs/metrics-custom). You write a Python class that inherits from `BaseMetric` and implement the evaluation logic.
+
+However, on Confident AI you can **only edit** the following methods:
+
+- `a_measure()` — the async method where your evaluation logic runs
+- `is_successful()` — determines whether the test case passed
+
+All other parts of the metric (initialization, properties, etc.) are handled by the platform.
+
+## Available Packages
+
+Your code runs in a secure environment with access to:
+
+- **`deepeval` library** — Always the [latest version from GitHub](https://github.com/confident-ai/deepeval), including all utilities like `BaseMetric`, and test case types
+- **Standard Python libraries** — `json`, `re`, `math`, `collections`, `datetime`, etc.
+- **No external network calls** — For security reasons, external API calls are not supported (for now)
+
+## Create Code-Eval via the UI
+
+Code-Eval metrics can be created under **Project** > **Metrics** > **Library**.
+
+<Steps>
+
+<Step title="Fill in metric details">
+
+Provide the metric name, and optionally a description. You can also toggle whether you're creating a single-turn or multi-turn metric.
+
+<Frame caption="General Metric Info">
+  <video data-video="customMetrics.generalInfo" controls autoPlay />
+</Frame>
+
+<Warning>
+  Your metric name must be unique in your project and not clash with any of the
+  default metric names.
+</Warning>
+
+</Step>
+
+<Step title="Write your evaluation code">
+
+Instead of defining criteria, evaluation steps, and rubrics like in G-Eval, you write Python code that computes the evaluation **score** directly.
+
+Your code must inherit from the appropriate base class and implement:
+
+- `a_measure(test_case)` — Your async evaluation logic that sets `self.score`, `self.reason`, and `self.success`
+- `is_successful()` — Returns whether the metric passed based on the threshold (pre-filled for you, not recommended to change)
+
+You `a_measure()` method does not have to return `self.score` - although it is recommended that you do so.
+
+<Tabs>
+  <Tab title="Single-turn">
+
+For single-turn metrics, inherit from `BaseMetric` and accept an `LLMTestCase`:
+
+```python maxLines={0}
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
+
+class CodeMetric(BaseMetric):
+    async def a_measure(self, test_case: LLMTestCase) -> float:
+        # Your evaluation logic here
+        if len(test_case.actual_output) > 5:
+            self.score = 1
+        else:
+            self.score = 0
+
+        self.success = self.score >= self.threshold
+        return self.score
+
+    def is_successful(self) -> bool:
+        if self.error is not None:
+            self.success = False
+        else:
+            try:
+                self.success = self.score >= self.threshold
+            except TypeError:
+                self.success = False
+        return self.success
+```
+
+The `LLMTestCase` object gives you access to parameters such as `input`, `actual_output`, `expected_output`, and more.
+
+  </Tab>
+  <Tab title="Multi-turn">
+
+For multi-turn metrics, inherit from `BaseConversationalMetric` and accept a `ConversationalTestCase`:
+
+```python maxLines={0}
+from deepeval.metrics import BaseConversationalMetric
+from deepeval.test_case import ConversationalTestCase
+
+class CodeMetric(BaseConversationalMetric):
+    async def a_measure(self, test_case: ConversationalTestCase) -> float:
+        # Your evaluation logic here
+        if len(test_case.turns) > 5:
+            self.score = 1
+        else:
+            self.score = 0
+
+        self.success = self.score >= self.threshold
+        return self.score
+
+    def is_successful(self) -> bool:
+        if self.error is not None:
+            self.success = False
+        else:
+            try:
+                self.success = self.score >= self.threshold
+            except TypeError:
+                self.success = False
+        return self.success
+```
+
+The `ConversationalTestCase` gives you access to a list of `turns`, where each turn contains `role`, `content`, and other parameters.
+
+  </Tab>
+</Tabs>
+
+<Tip>
+  For more details on test case parameters, see [Test Cases, Goldens, and
+  Datasets](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets).
+</Tip>
+
+</Step>
+
+<Step title="Review and save">
+
+Once you've written your code, make sure everything looks right in the final review page, and click **Save**.
+
+<Success>
+  You can now add your Code-Eval metric to a metric collection to start running
+  remote evals.
+</Success>
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+### Set verbose logs
+
+Use `self.verbose_logs` to log intermediate steps and decision paths in your evaluation logic. This is useful for debugging complex metrics and understanding how scores are computed.
+
+```python
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
+
+class CodeMetric(BaseMetric):
+    async def a_measure(self, test_case: LLMTestCase) -> float:
+        # Log anything for debugging purposes
+        self.verbose_logs = "Wow I can't believe I can do this on Confident AI"
+
+        return self.score
+
+    def is_successful(self) -> bool:
+        if self.error is not None:
+            self.success = False
+        return self.success
+```
+
+<Tip>
+  Verbose logs are displayed in the Confident AI dashboard alongside your metric
+  results, making it easy to trace through evaluation decisions.
+</Tip>
+
+### Log reasoning
+
+Use `self.reason` to provide a human-readable explanation of the score. This helps users understand why a particular score was given and is displayed in the evaluation results.
+
+```python
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
+
+class CodeMetric(BaseMetric):
+    async def a_measure(self, test_case: LLMTestCase) -> float:
+        # Set any reason you wish
+        self.reason = "Wow I can't believe I can do this on Confident AI"
+
+        return self.score
+
+    def is_successful(self) -> bool:
+        if self.error is not None:
+            self.success = False
+        return self.success
+```
+
+<Note>
+  A clear `self.reason` makes it much easier to understand evaluation results,
+  especially when reviewing failed test cases or debugging unexpected scores.
+</Note>
+
+### Raise exceptions
+
+You can also raise an error like how you would normally do so in Python and log it to `self.error`:
+
+```python
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
+
+class CodeMetric(BaseMetric):
+    async def a_measure(self, test_case: LLMTestCase) -> float:
+        try:
+            raise ValueError("Raising an error because I feel like it")
+        except Exception as e:
+            # Surface the error before re-raising
+            self.error = str(e)
+            raise
+
+        return self.score
+
+    def is_successful(self) -> bool:
+        if self.error is not None:
+            self.success = False
+        return self.success
+```

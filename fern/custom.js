@@ -45,7 +45,7 @@
 
     // Prompts
     "prompts.createMessages": `${S3_BASE}/prompts:create-messages-4k.mp4`,
-    "prompts.createText": `${S3_BASE}/prompts:create-text-4k.mp4`,
+    "prompts.createText": `${S3_BASE}/prompts:create-text.mp4`,
     "prompts.labelVersions": `${S3_BASE}/prompts:label-versions.mp4`,
 
     // LLM Tracing
@@ -138,7 +138,7 @@
 
     "prompts.configureModelSettings": `${S3_BASE}/prompts:configure-model-settings.png`,
     "prompts.configureOutputType": `${S3_BASE}/prompts:configure-output-type.png`,
-    "prompts.configureSchemaOutput": `${S3_BASE}/prompts:configure-schema-output.png`,
+    "prompts.configureSchemaOutput": `${S3_BASE}/prompts:configure-output-schema.png`,
     "prompts.attachTools": `${S3_BASE}/prompts:attach-tools.png`,
 
     "concepts.arenaVsGeval": `${S3_BASE}/concepts:arena-vs-geval.png`,
