@@ -386,22 +386,105 @@ for (const golden of dataset.goldens as Golden[]) {
 
 ## Using Images
 
-Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of [TODO].
+Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of `[DEEPEVAL:IMAGE:url]`. The `url` inside the `[DEEPEVAL:IMAGE:url]` format is a public url that can be accessed by anyone.
 
 For goldens containing images, here you can parse and use it accordingly as follows:
 
 <Tabs>
 
 <Tab title="Python" language="python">
-  TODO
+
+```python maxLines=0
+import re
+from deepeval.dataset import EvaluationDataset
+PATTERN = r"\[DEEPEVAL:IMAGE:(.*?)\]"
+
+dataset = EvaluationDataset()
+dataset.pull(alias="My Evals Dataset")
+
+URLs = []
+
+for golden in dataset.goldens:
+  matches = list(re.finditer(PATTERN, golden.input))
+  for match in matches:
+    url = match.group(1)
+    URLs.append(url)
+
+for i in range(len(URLs)):
+  response = client.chat.completions.create(
+    model="gpt-5.2",
+    messages=[
+      {
+        "role": "user",
+        "content": [
+          {"type": "text", "text": "What’s in this image?"},
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": URLs[i],
+            },
+          },
+        ],
+      }
+    ],
+  )
+  print(response)
+```
+
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-  TODO
+
+```typescript maxLines=0
+import { OpenAI } from "openai";
+import { EvaluationDataset } from "deepeval-ts";
+
+const client = new OpenAI();
+const PATTERN = /\[DEEPEVAL:IMAGE:(.*?)\]/g;
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "My Evals Dataset" });
+
+const URLs: string[] = [];
+
+for (const golden of dataset.goldens) {
+  const matches = golden.input.matchAll(PATTERN);
+  for (const match of matches) {
+    const url = match[1];
+    URLs.push(url);
+  }
+}
+
+for (let i = 0; i < URLs.length; i++) {
+  const response = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "What’s in this image?" },
+          {
+            type: "image_url",
+            image_url: {
+              url: URLs[i],
+            },
+          },
+        ],
+      },
+    ],
+  });
+  console.log(response);
+}
+```
+
 </Tab>
 
 <Tab title="curL" language="curl">
-  TODO
+
+<EndpointRequestSnippet endpoint="GET /v1/datasets/{alias}" />
+
+The dataset pulled here has images inside golden fields with the pattern `[DEEPEVAL:IMAGE:url]`. Please parse the fields to fetch the public `url` and use it as necessary.
+
 </Tab>
 
 </Tabs>
@@ -411,6 +494,26 @@ For goldens containing images, here you can parse and use it accordingly as foll
 This is only required when using datasets in code - Confident AI automatically handles image parsing and conversion on the platform.
 
 </Tip>
+
+<Note>
+
+`deepeval`'s native models like `GPTModel`, `GeminiModel` automatically parse the images inside the `[DEEPEVAL:IMAGE:url]` formats for you, you can simply pass any golden field with images inside the `.generate()` or `.a_generate()` methods and `deepeval` automatically handles images for you internally!
+
+```python
+from deepeval.models import GPTModel
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="My Evals Dataset")
+
+model = GPTModel(model="gpt-5.2")
+
+for golden in dataset.goldens:
+  print(model.generate(golden.input)) # Images are automatically handled by deepeval
+```
+
+</Note>
+
 
 ## Using Evals Iterator
 
