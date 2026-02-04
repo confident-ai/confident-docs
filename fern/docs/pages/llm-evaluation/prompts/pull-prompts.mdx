@@ -460,7 +460,7 @@ interpolated_prompt = prompt.interpolate(name="Joe")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull({ refresh: 60 });
+await prompt.pull();
 const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 ```
 
@@ -492,7 +492,7 @@ interpolated_prompt = prompt.interpolate(name="Joe")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull({ refresh: 0 });
+await prompt.pull();
 const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 ```
 
@@ -770,19 +770,94 @@ For prompts containing images, here's how you would parse it and pass it for use
 
 <Tab title="Python" language="python">
 
-TODO
+
+```python maxLines=0
+import re
+from deepeval.prompt import Prompt
+PATTERN = r"\[DEEPEVAL:IMAGE:(.*?)\]"
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+
+URLs = []
+
+matches = list(re.finditer(PATTERN, prompt.text))
+for match in matches:
+  url = match.group(1)
+  URLs.append(url)
+
+for i in range(len(URLs)):
+  response = client.chat.completions.create(
+    model="gpt-5.2",
+    messages=[
+      {
+        "role": "user",
+        "content": [
+          {"type": "text", "text": prompt.text},
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": URLs[i],
+            },
+          },
+        ],
+      }
+    ],
+  )
+  print(response)
+```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
 
-TODO
+```typescript maxLines=0
+import { OpenAI } from "openai";
+import { Prompt } from "deepeval-ts";
+
+const client = new OpenAI();
+const PATTERN = /\[DEEPEVAL:IMAGE:(.*?)\]/g;
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+
+const URLs: string[] = [];
+
+const matches = prompt.text.matchAll(PATTERN);
+for (const match of matches) {
+  const url = match[1];
+  URLs.push(url);
+}
+
+for (let i = 0; i < URLs.length; i++) {
+  const response = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: prompt.text },
+          {
+            type: "image_url",
+            image_url: {
+              url: URLs[i],
+            },
+          },
+        ],
+      },
+    ],
+  });
+  console.log(response);
+}
+```
 
 </Tab>
 
 <Tab title="curL" language="curl">
 
-TODO
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+The prompt pulled here has images in text / messages fields with the pattern `[DEEPEVAL:IMAGE:url]`. Please parse the fields to fetch the public `url` and use it as necessary.
 
 </Tab>
 
