@@ -21,12 +21,6 @@ Model costs are applied in the following order of priority:
 2. **Custom Model Costs** — Costs you configure in project settings override pre-configured defaults
 3. **Pre-configured Model Costs** — Fallback pricing for common models when no other cost is set
 
-## Inherit Custom Model Pricing From Organization
-
-Toggle this option to inherit model cost configurations from your organization settings. When enabled, organization-level model costs will override the pre-configured defaults for this project.
-
-This is useful when you want to maintain consistent pricing across multiple projects without configuring each one individually.
-
 ## Custom Model Costs
 
 Custom model costs let you define pricing for specific models or model patterns. These costs override pre-configured defaults but are themselves overridden by costs explicitly set via the tracing API or DeepEval.
@@ -41,7 +35,7 @@ To add a custom model cost:
 6. Set the **Output Cost** per million tokens
 7. Click **Save**
 
-You only need either one of input or output cost.
+You can treat input and output costs as separate entities, and you'll only need either one of the either. For example, not providing the output cost would default to the pre-configured model costs, so be sure to set it to `0` if you don't wish to count output costs.
 
 <Tip>
   Use wildcard patterns (e.g., `gpt-4*`) to match multiple model variants with a
@@ -72,3 +66,9 @@ Pre-configured costs are available for:
 </Note>
 
 You can search through pre-configured costs by model name to verify the pricing being used for your traces.
+
+## Inherit From Organization
+
+Toggle this option to inherit model cost configurations from your organization settings. When enabled, organization-level model costs will override the pre-configured defaults for this project.
+
+This is useful when you want to maintain consistent pricing across multiple projects without configuring each one individually.
