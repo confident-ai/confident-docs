@@ -1,0 +1,111 @@
+---
+title: LLM Metrics on Confident AI
+subtitle: Overview of metrics in Confident AI
+---
+
+## Overview
+
+Metrics are the foundation of LLM evaluation on Confident AI. They define the criteria used to score and assess your LLM outputs — whether you're testing in development, running experiments, or monitoring production systems.
+
+<Warning>
+  On Confident AI, "metrics" refers to **evaluation metrics** that assess the
+  quality of LLM outputs — not operational metrics like latency, cost, or token
+  usage. For tracking operational data, see [Latency, Cost, and Error
+  Tracking](/docs/llm-tracing/latency-cost-tracking).
+</Warning>
+
+Confident AI provides two categories of metrics:
+
+- **Pre-built metrics** — Battle-tested metrics for common evaluation scenarios like answer relevancy, faithfulness, hallucination detection, and more
+- **Custom metrics** — Create your own metrics tailored to your specific use case using [G-Eval](/docs/metrics/g-eval) (natural language criteria) or [Code-Evals](/docs/metrics/code-eval) (Python code)
+
+Both categories support **single-turn** (individual LLM interactions) and **multi-turn** (conversational) evaluations.
+
+## How Metrics Work
+
+Metrics on Confident AI follow a simple pattern:
+
+1. **Define your metrics** — Choose from pre-built metrics or create custom ones
+2. **Group into collections** — Add metrics to a [metric collection](/docs/metrics/metric-collections) with specific settings (threshold, strictness, etc.)
+3. **Run evaluations** — Use the collection for test runs, experiments, or production monitoring
+4. **Analyze results** — View scores, reasoning, and pass/fail status in the dashboard
+
+<Note>
+  Metric collections are required for remote evaluations on Confident AI. For
+  local evaluations using `deepeval`, you can use metrics directly without
+  collections.
+</Note>
+
+## Pre-built Metrics
+
+Confident AI offers a comprehensive library of pre-built metrics powered by LLM-as-a-judge:
+
+<Tabs>
+  <Tab title="Single-Turn">
+
+| Metric                                                     | Description                                                |
+| ---------------------------------------------------------- | ---------------------------------------------------------- |
+| [Answer Relevancy](/docs/metrics/answer-relevancy)         | Measures how relevant the response is to the input query   |
+| [Faithfulness](/docs/metrics/faithfulness)                 | Checks if the response is grounded in the provided context |
+| [Hallucination](/docs/metrics/hallucination)               | Detects fabricated or unsupported information              |
+| [Contextual Precision](/docs/metrics/contextual-precision) | Evaluates retrieval ranking quality                        |
+| [Contextual Recall](/docs/metrics/contextual-recall)       | Measures retrieval completeness                            |
+| [Contextual Relevancy](/docs/metrics/contextual-relevancy) | Assesses relevance of retrieved context                    |
+| [Bias](/docs/metrics/bias)                                 | Detects biased content in responses                        |
+| [Toxicity](/docs/metrics/toxicity)                         | Identifies toxic or harmful content                        |
+| [Summarization](/docs/metrics/summarization)               | Evaluates summary quality and accuracy                     |
+| [Task Completion](/docs/metrics/task-completion)           | Checks if the task was successfully completed              |
+| [Tool Correctness](/docs/metrics/tool-correctness)         | Validates correct tool/function usage                      |
+
+  </Tab>
+  <Tab title="Multi-Turn">
+
+| Metric                                                               | Description                                    |
+| -------------------------------------------------------------------- | ---------------------------------------------- |
+| [Conversation Completeness](/docs/metrics/conversation-completeness) | Measures if the conversation achieved its goal |
+| [Knowledge Retention](/docs/metrics/knowledge-retention)             | Checks if context is maintained across turns   |
+| [Role Adherence](/docs/metrics/role-adherence)                       | Evaluates consistency with assigned persona    |
+| [Turn Relevancy](/docs/metrics/turn-relevancy)                       | Assesses relevance of each conversational turn |
+
+  </Tab>
+</Tabs>
+
+## Custom Metrics
+
+When pre-built metrics don't fit your use case, create custom metrics:
+
+<CardGroup cols={2}>
+  <Card title="G-Eval" icon="fa-solid fa-g" href="/docs/metrics/g-eval">
+    Define evaluation criteria in natural language. Best for subjective
+    qualities like tone, helpfulness, or domain-specific correctness.
+  </Card>
+  <Card
+    title="Code-Evals"
+    icon="fa-light fa-code"
+    href="/docs/metrics/code-eval"
+  >
+    Write Python code directly on Confident AI. Best for deterministic checks,
+    format validation, or complex calculations.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+Ready to start evaluating? Here's where to go next:
+
+<CardGroup cols={2}>
+  <Card
+    title="Metric Collections"
+    icon="fa-light fa-bucket"
+    href="/docs/metrics/metric-collections"
+  >
+    Learn how to group metrics and configure settings for remote evaluations.
+  </Card>
+  <Card
+    title="Custom Metrics"
+    icon="fa-light fa-gauge-high"
+    href="/docs/metrics/custom-metrics"
+  >
+    Create metrics tailored to your specific evaluation needs.
+  </Card>
+</CardGroup>

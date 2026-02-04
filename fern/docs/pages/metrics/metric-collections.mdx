@@ -42,7 +42,19 @@ Metric collections are strictly used for **remote evals**, and are identified by
   </Card>
 </CardGroup>
 
+## Why Metric Collection?
+
+Metric collections solve key challenges when running evaluations at scale:
+
+- **Reusable configurations** — Define your evaluation setup once and reuse it across test runs, experiments, and production monitoring
+- **Customizable settings per context** — The same metric can have different thresholds or strictness levels in different collections (e.g., stricter for production, lenient for development)
+- **No-code management** — Create and update collections entirely through the UI without touching any code
+- **Consistent evaluations** — Ensure all team members and automated pipelines use the same evaluation criteria
+
 ## Create a Metric Collection
+
+<Tabs>
+  <Tab title="Via UI">
 
 You can create a single or multi-turn metric collection under **Project** > **Metrics** > **Collections**. All you need to do is provide it with a unique name, select the appropriate metrics, and edit their settings (if required).
 
@@ -57,6 +69,16 @@ You can create a single or multi-turn metric collection under **Project** > **Me
 />
 
 </Frame>
+
+  </Tab>
+  <Tab title="Via Code">
+
+You can also create metric collections programmatically using the Evals API:
+
+<EndpointRequestSnippet endpoint="POST /v1/metric-collections" />
+
+  </Tab>
+</Tabs>
 
 You can use metric collections for any remote evals in Confident AI:
 
@@ -84,13 +106,13 @@ graph TD
     C --> G
     C --> H
 
-    style A fill:#e1f5fe
-    style B fill:#e1f5fe
-    style C fill:#f3e5f5
-    style D fill:#e8f5e8
-    style F fill:#e8f5e8
-    style G fill:#e8f5e8
-    style H fill:#e8f5e8
+    style A fill:#e1f5fe,color:#1e293b
+    style B fill:#e1f5fe,color:#1e293b
+    style C fill:#f3e5f5,color:#1e293b
+    style D fill:#e8f5e8,color:#1e293b
+    style F fill:#e8f5e8,color:#1e293b
+    style G fill:#e8f5e8,color:#1e293b
+    style H fill:#e8f5e8,color:#1e293b
 ```
 
 When you run remote evals by providing a metric collection name, Confident AI will fetch the metric and their settings related to said collection, before using all these configs to run evals.
