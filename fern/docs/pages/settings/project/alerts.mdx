@@ -4,12 +4,12 @@ slug: settings/project/alerts
 description: Learn about project alerts configuration
 ---
 
-Set up alerts to notify you when certain events occur in your project. This is especially useful for live monitoring use cases.
+Set up alerts to notify you when certain events occur in your project. There are two types of alerts: **Event-based** alerts that trigger immediately when specific events occur, and **Scheduled** alerts that run on recurring intervals primarily for observability monitoring.
 
 <Note>
-  You'll need to [set up an integration](/settings/project/integrations) to
-  receive alerts. Connect your Slack, Discord, email, or Teams channels to
-  receive alerts.
+  You'll need to [set up an integration](/docs/settings/project/integrations) to
+  receive alerts. Connect your Slack, Discord, Teams, or email to receive
+  notifications.
 </Note>
 
 <Frame caption="Configure Alerts">
@@ -19,22 +19,48 @@ Set up alerts to notify you when certain events occur in your project. This is e
   />
 </Frame>
 
-## Configure Alerts
+## Event-Based Alerts
 
-To configure alerts:
+Event-based alerts trigger immediately when specific events occur in your project. These are useful for staying informed about evaluation completions and other discrete events.
+
+To configure event-based alerts:
 
 1. Navigate to **Project Settings** → **Alerts**
-2. Toggle on the alerts you want to receive
-3. Configure any additional settings (metrics, frequency)
-4. Click **Save** to apply your changes
+2. Select the **Events** tab
+3. Toggle on the alerts you want to receive
+4. Click **Save**
 
-## Available Alerts
+### Available Event Alerts
 
-- **Notify on Test Run Complete** — Get notified everytime a test run completes.
+| Alert                       | Description                                                  |
+| --------------------------- | ------------------------------------------------------------ |
+| Notify on Test Run Complete | Get notified every time a test run completes in your project |
 
-- **Notify on Trace, Span, or Thread Performance Degradation** — Get notified when a trace's performance degrades. You can configure:
+## Scheduled Alerts
 
-  - Which metrics to monitor
-  - How frequently to check (e.g., every 30 minutes)
+Scheduled alerts (also called Custom Alert Rules) notify you on specific recurring events occurring in your project on custom schedules. These are primarily used for **observability alerting** on traces, spans, and threads.
 
-- **Notify on End User Feedback** — Get notified when end user feedback is received.
+To create a scheduled alert:
+
+1. Navigate to **Project Settings** → **Alerts**
+2. Select the **Scheduled** tab
+3. Click **New Alert Rule**
+4. Configure your alert conditions (e.g., trace count falls below a threshold)
+5. Select your preferred schedule frequency
+6. Click **Save**
+
+### Schedule Frequencies
+
+| Frequency        | Description                     |
+| ---------------- | ------------------------------- |
+| Every 30 minutes | Check conditions twice per hour |
+| Hourly           | Check conditions once per hour  |
+| Daily            | Check conditions once per day   |
+| Weekly           | Check conditions once per week  |
+| Monthly          | Check conditions once per month |
+
+### Example Use Cases
+
+- **Trace volume monitoring** — Alert when the number of traces per hour falls below a threshold, indicating potential issues with your application or tracing setup
+- **Error rate spikes** — Monitor for unusual increases in error rates across your spans
+- **Performance degradation** — Track latency metrics and get notified when they exceed acceptable thresholds
