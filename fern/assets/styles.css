@@ -29,3 +29,12 @@
 .fern-card ul {
   margin-top: 0.5rem;
 }
+
+/* AWS logo text - dark in light mode, white in dark mode */
+.aws-text {
+  fill: #252f3e;
+}
+
+.dark .aws-text {
+  fill: #ffffff;
+}
