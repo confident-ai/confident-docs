@@ -7,7 +7,10 @@ description: Learn about setting up AI connections
 AI Connections let you run evaluations directly on the platform by connecting to your AI app via an HTTPS endpoint. Instead of writing code, you can trigger evaluations with a click of a button—Confident AI will call your endpoint with data from your goldens and parse the response.
 
 <Frame caption="Setup AI Connection">
-  <img data-image="settings.project.aiConnection" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+  <img
+    data-image="settings.project.aiConnection"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 ## Setting Up an AI Connection
@@ -224,6 +227,13 @@ Set the maximum number of concurrent requests that Confident AI will send to you
 
 - **Minimum**: 1
 - **Default**: 20
+
+### Max Retries
+
+Set the maximum number of times Confident AI will retry a failed request to your endpoint. This helps handle transient errors without failing the entire evaluation.
+
+- **Minimum**: 0
+- **Default**: 0
 
 ## Linking Test Cases to Traces
 
