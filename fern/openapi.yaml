@@ -796,43 +796,43 @@ paths:
                   totalTraces: 1
                 deprecated: false
 
-  /v1/traces/{uuid}:
-    put:
-      x-fern-server-name: Confident AI
-      tags:
-        - Tracing
-      summary: Update Trace
-      operationId: updateTrace
-      description: Updates an existing trace on your Confident AI project.
-      requestBody:
-        description: ""
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTrace"
-            examples:
-              example1:
-                output: "The capital of France is Rome"
-                endTime: "2025-01-16T10:30:05Z"
-                metadata:
-                  ip_address: "127.0.0.1"
-                tags:
-                  - "General QA"
-
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateTraceResponse"
-              examples:
-                example1:
-                  success: true
-                  data:
-                    id: "TRACE-ID"
-                  deprecated: false
+  #   /v1/traces/{uuid}:
+  #     put:
+  #       x-fern-server-name: Confident AI
+  #       tags:
+  #         - Tracing
+  #       summary: Update Trace
+  #       operationId: updateTrace
+  #       description: Updates an existing trace on your Confident AI project.
+  #       requestBody:
+  #         description: ""
+  #         required: true
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/UpdateTrace"
+  #             examples:
+  #               example1:
+  #                 output: "The capital of France is Rome"
+  #                 endTime: "2025-01-16T10:30:05Z"
+  #                 metadata:
+  #                   ip_address: "127.0.0.1"
+  #                 tags:
+  #                   - "General QA"
+  #
+  #       responses:
+  #         "200":
+  #           description: ""
+  #           content:
+  #             application/json:
+  #               schema:
+  #                 $ref: "#/components/schemas/UpdateTraceResponse"
+  #               examples:
+  #                 example1:
+  #                   success: true
+  #                   data:
+  #                     id: "TRACE-ID"
+  #                   deprecated: false
 
   /v1/prompts/{alias}/labels/{label}:
     get:
