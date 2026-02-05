@@ -921,6 +921,30 @@ paths:
                   topP: 0.9
                   frequencyPenalty: 0.1
                   presencePenalty: 0.1
+              Tools:
+                - text: "Updated hello, {{name}}!"
+                  interpolationType: "FSTRING"
+                  outputType: "TEXT"
+                  tools:
+                    name: "SearchTool"
+                    description: "Search functionality"
+                    mode: STRICT
+                    structuredSchema:
+                      id: "field_id"
+                      name: "InputSchema"
+                      fields:
+                        - id: "field_1"
+                          name: "response"
+                          description: None
+                          type: "STRING"
+                          required: True
+                          parentId: None
+                        - id: "field_1"
+                          name: "confidence"
+                          description: None
+                          type: "NUMBER"
+                          required: True
+                          parentId: None
       responses:
         "200":
           description: ""
@@ -1028,6 +1052,30 @@ paths:
                   topP: 0.9
                   frequencyPenalty: 0.1
                   presencePenalty: 0.1
+              Tools:
+                - text: "Updated hello, {{name}}!"
+                  interpolationType: "FSTRING"
+                  outputType: "TEXT"
+                  tools:
+                    name: "SearchTool"
+                    description: "Search functionality"
+                    mode: STRICT
+                    structuredSchema:
+                      id: "field_id"
+                      name: "InputSchema"
+                      fields:
+                        - id: "field_1"
+                          name: "response"
+                          description: None
+                          type: "STRING"
+                          required: True
+                          parentId: None
+                        - id: "field_1"
+                          name: "confidence"
+                          description: None
+                          type: "NUMBER"
+                          required: True
+                          parentId: None
       responses:
         "200":
           description: ""
@@ -3932,6 +3980,10 @@ components:
         outputSchema:
           $ref: "#/components/schemas/OutputSchema"
           description: This is the output schema definition when outputType is SCHEMA.
+        tools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
       required:
         - alias
 
@@ -4017,6 +4069,23 @@ components:
         - id
         - type
         - name
+      
+    Tool:
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the unique identifier for the schema field.
+        name:
+          type: string
+          description: This is the name of the schema field.
+        mode:
+          type: string
+          enum: [STRICT, ADDITIONAL, NO_ADDITIONAL]
+          description: This is the type for tool input fields.
+        structuredSchema:
+          $ref: "#/components/schemas/OutputSchema"
+          description: This is the schema for your tool input
 
     UpdatePromptRequest:
       type: object
@@ -4043,6 +4112,11 @@ components:
         outputSchema:
           $ref: "#/components/schemas/OutputSchema"
           description: This is the output schema definition when outputType is SCHEMA.
+        tools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+          description: These are the list of tools your agent has access to.
 
     UpdatePromptResponse:
       type: object

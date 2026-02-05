@@ -386,22 +386,157 @@ for (const golden of dataset.goldens as Golden[]) {
 
 ## Using Images
 
-Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of [TODO].
+Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of `[DEEPEVAL:IMAGE:url]`. The `url` inside the `[DEEPEVAL:IMAGE:url]` format is a public url that can be accessed by anyone.
 
 For goldens containing images, here you can parse and use it accordingly as follows:
 
 <Tabs>
 
 <Tab title="Python" language="python">
-  TODO
+
+The `deepeval` python SDK offers a utility method called `convert_to_multi_modal_array`. This method is useful for converting a string containing images in the `[DEEPEVAL:IMAGE:url]` format into a list of strings and `MLLMImage` items.
+
+```python
+from deepeval.dataset import EvaluationDataset
+from deepeval.utils import convert_to_multi_modal_array
+
+dataset = EvaluationDataset()
+dataset.pull(alias="My Evals Dataset")
+
+for golden in dataset.goldens:
+    multimodal_array = convert_to_multi_modal_array(golden.input)
+```
+
+The `multimodal_array` here is a list containing strings and `MLLMImage`s, you can loop over this array to construct a messages array with images to pass to your MLLM. Here's an example showing how to construct messages array for `openai`:
+
+```python maxLines=0
+messages = []
+for element in multimodal_array:
+    if isinstance(element, str):
+        messages.append({"type": "text", "text": element})
+    elif isinstance(element, MLLMImage):
+      if element.url:
+          messages.append(
+              {
+                  "type": "image_url",
+                  "image_url": {"url": element.url},
+              }
+          )
+```
+
 </Tab>
 
 <Tab title="Typescript" language="typescript">
-  TODO
+
+You can use a custom method to parse strings with images in `[DEEPEVAL:IMAGE:url]` format to convert them into an array of strings and URLs
+
+```typescript maxLines=0
+const parseMultimodalString = (s: string) => {
+  const PATTERN = /\[DEEPEVAL:IMAGE:(.*?)\]/g;
+
+  const result = [];
+  let lastEnd = 0;
+  let match;
+
+  while ((match = PATTERN.exec(s)) !== null) {
+    const start = match.index;
+    const end = PATTERN.lastIndex;
+
+    if (start > lastEnd) {
+      result.push(s.slice(lastEnd, start));
+    }
+
+    const imageUrl = match[1];
+    result.push({ url: imageUrl });
+
+    lastEnd = end;
+  }
+
+  if (lastEnd < s.length) {
+    result.push(s.slice(lastEnd));
+  }
+
+  return result;
+}
+```
+
+You can now use this method to get `multimodalArray` and construct messages array to pass it to your MLLM. Here's an example on how to use it to construct `openai` format messages:
+
+```typescript
+const multimodalArray = parseMultimodalString(golden.input);
+
+const messages = [];
+
+for (const element of multimodalArray) {
+  if (typeof element === "string") {
+    messages.push({
+      type: "text",
+      text: element,
+    });
+  } else if (element.url) {
+    messages.push({
+      type: "image_url",
+      image_url: { url: element.url },
+    });
+  }
+}
+```
+
 </Tab>
 
 <Tab title="curL" language="curl">
-  TODO
+
+<EndpointRequestSnippet endpoint="GET /v1/datasets/{alias}" />
+
+The dataset pulled here has images inside golden fields with the pattern `[DEEPEVAL:IMAGE:url]`. Please parse the fields to fetch the public `url` and use it as necessary.
+
+</Tab>
+
+<Tab title="Custom" language="custom">
+
+You can use a custom method to parse strings with images in `[DEEPEVAL:IMAGE:url]` format to convert them into an array of strings and URLs
+
+```python
+def parse_multimodal_string(s: str):
+    PATTERN = r"\[DEEPEVAL:IMAGE:(.*?)\]"
+    matches = list(re.finditer(pattern, s))
+
+    result = []
+    last_end = 0
+    for m in matches:
+        start, end = m.span()
+        if start > last_end:
+          result.append(s[last_end:start])
+
+        image_url = m.group(1)
+
+        result.append({url: image_url})
+        last_end = end
+
+    if last_end < len(s):
+        result.append(s[last_end:])
+        return result
+```
+
+You can use this method to get `multimodal_array` and construct messages array to pass it to your MLLM. Here's an example on how to use it:
+
+```python
+multimodal_array = parse_multimodal_string(golden.input)
+
+messages = []
+for element in multimodal_array:
+    if isinstance(element, str):
+        messages.append({"type": "text", "text": element})
+    else:
+        if element.url:
+          messages.append(
+              {
+                  "type": "image_url",
+                  "image_url": {"url": element.url},
+              }
+          )
+```
+
 </Tab>
 
 </Tabs>
@@ -411,6 +546,26 @@ For goldens containing images, here you can parse and use it accordingly as foll
 This is only required when using datasets in code - Confident AI automatically handles image parsing and conversion on the platform.
 
 </Tip>
+
+<Note>
+
+`deepeval`'s native models like `GPTModel`, `GeminiModel` automatically parse the images inside the `[DEEPEVAL:IMAGE:url]` formats for you, you can simply pass any golden field with images inside the `.generate()` or `.a_generate()` methods and `deepeval` automatically handles images for you internally!
+
+```python
+from deepeval.models import GPTModel
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="My Evals Dataset")
+
+model = GPTModel(model="gpt-5.2")
+
+for golden in dataset.goldens:
+  print(model.generate(golden.input)) # Images are automatically handled by deepeval
+```
+
+</Note>
+
 
 ## Using Evals Iterator
 
