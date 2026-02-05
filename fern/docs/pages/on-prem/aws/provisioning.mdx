@@ -3,4 +3,287 @@ slug: on-prem/aws/provisioning
 description: Provision AWS infrastructure with Terraform
 ---
 
-Coming soon.
+## Overview
+
+This step executes Terraform to create all AWS infrastructure. The process takes 15-25 minutes and provisions:
+
+- VPC with public/private subnets and NAT gateway
+- EKS cluster with managed node groups
+- RDS PostgreSQL database with automatic password rotation
+- S3 bucket with VPC endpoint for private access
+- Secrets Manager with KMS encryption
+- IAM roles for pod identity (IRSA)
+- Helm releases: ALB Controller, External Secrets, ArgoCD, ClickHouse Operator
+
+After completion, you will have a fully provisioned AWS environment ready for Kubernetes workloads.
+
+## What happens during provisioning
+
+When you run `terraform apply`, Terraform:
+
+1. **Reads your configuration** from `terraform.tfvars`
+2. **Calculates dependencies** to determine the order resources must be created
+3. **Creates resources** in AWS via API calls
+4. **Tracks state** in your S3 backend so it knows what exists
+5. **Outputs** important values you'll need for subsequent steps
+
+The process is mostly automated, but you'll need to monitor for errors and potentially troubleshoot issues.
+
+## Initialize Terraform
+
+From the `aws_tf` directory, initialize the working directory:
+
+```bash
+terraform init
+```
+
+This command:
+- Downloads required provider plugins (AWS, Kubernetes, Helm)
+- Configures the S3 backend for state storage
+- Validates your backend configuration
+
+**Expected output:**
+```
+Initializing the backend...
+Successfully configured the backend "s3"!
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 6.0"...
+- Installing hashicorp/aws v6.x.x...
+
+Terraform has been successfully initialized!
+```
+
+<Warning>
+**Backend initialization errors** usually mean:
+- The S3 bucket doesn't exist (create it first)
+- You don't have permission to access the bucket
+- The bucket is in a different region than specified
+
+If you see "Error loading state," verify your backend configuration in `provider.tf`.
+</Warning>
+
+## Review the plan
+
+Before creating anything, preview what Terraform will do:
+
+```bash
+terraform plan
+```
+
+This shows all resources that will be created, modified, or destroyed. For a fresh deployment, you should see only resource additions (green `+` symbols).
+
+**Key resources in the plan:**
+
+| Category | What's created |
+|----------|----------------|
+| **Networking** | VPC, 4+ subnets, NAT gateway, Internet gateway, route tables, S3 VPC endpoint |
+| **Compute** | EKS cluster, node group (EC2 instances), security groups |
+| **Database** | RDS PostgreSQL instance, subnet group, security group |
+| **Storage** | S3 bucket, bucket policy |
+| **Security** | KMS key, Secrets Manager secret, 5+ IAM roles and policies |
+| **Kubernetes** | Namespace, service accounts, Helm releases |
+
+<Note>
+**Save the plan for audit purposes:**
+```bash
+terraform plan -out=plan.tfplan
+```
+You can then apply this exact plan with `terraform apply plan.tfplan`. This is useful if you need approval before applying.
+</Note>
+
+<Warning>
+**Review the plan carefully if you see any deletions or modifications.** For a new deployment, there should be no `-` (destroy) or `~` (modify) symbols. If you see them, something may be misconfigured.
+</Warning>
+
+## Apply the infrastructure
+
+Once you've reviewed the plan, create the resources:
+
+```bash
+terraform apply
+```
+
+Terraform shows the plan again and asks for confirmation. Type `yes` to proceed.
+
+**Expected duration:** 15-25 minutes
+
+| Resource | Typical creation time |
+|----------|----------------------|
+| VPC and subnets | 1-2 minutes |
+| NAT Gateway | 2-3 minutes |
+| EKS cluster | 10-12 minutes |
+| EKS node group | 3-5 minutes |
+| RDS instance | 5-10 minutes |
+| Helm releases | 2-3 minutes |
+
+<Note>
+**Don't interrupt the process.** If you press Ctrl+C or close your terminal, Terraform may leave resources in a partially created state. If this happens, just run `terraform apply` again—it will pick up where it left off.
+</Note>
+
+## Common provisioning errors
+
+### IAM permission errors
+
+```
+Error: creating IAM Role: AccessDenied
+```
+
+Your IAM user/role lacks permission to create IAM resources. You need:
+- `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:CreatePolicy`
+- `iam:CreateOpenIDConnectProvider` (for IRSA)
+
+<Warning>
+**Many organizations restrict IAM creation.** If you can't get these permissions, you may need a platform team member to run the deployment or pre-create the required roles.
+</Warning>
+
+### Service quota errors
+
+```
+Error: creating EKS Node Group: ResourceLimitExceeded
+```
+
+You've hit an AWS service quota. Common limits:
+
+| Quota | Default limit | How to increase |
+|-------|--------------|-----------------|
+| EC2 On-Demand vCPUs | 32 | Service Quotas console |
+| VPCs per region | 5 | Service Quotas console |
+| EIPs per region | 5 | Service Quotas console |
+
+<Warning>
+**Quota increases can take hours to days.** If you're in a new AWS account, request increases before starting deployment.
+</Warning>
+
+### Naming conflicts
+
+```
+Error: creating S3 Bucket: BucketAlreadyExists
+```
+
+Resource names must be globally unique (S3) or unique within your account (most others). If you get naming conflicts:
+- Change `confident_application_name` to something unique
+- Verify you're not running multiple deployments with the same name
+
+### EKS cluster creation timeout
+
+```
+Error: waiting for EKS Cluster to create: timeout while waiting
+```
+
+EKS can occasionally take longer than expected. Usually just re-running `terraform apply` continues where it left off. If it keeps failing:
+- Check AWS Health Dashboard for regional issues
+- Verify your VPC has available IPs
+- Check for restrictive SCPs (Service Control Policies) in your organization
+
+<Warning>
+**Organization SCPs can block resource creation.** Many enterprises have Service Control Policies that:
+- Restrict which regions you can deploy to
+- Require specific tags on all resources
+- Block certain instance types
+- Require encryption settings
+
+If you get persistent errors, check with your cloud governance team about SCPs.
+</Warning>
+
+### Provider authentication errors
+
+```
+Error: error configuring Terraform AWS Provider: no valid credential sources found
+```
+
+Terraform can't authenticate to AWS. Verify:
+- `aws sts get-caller-identity` works
+- Environment variables are set if using them
+- AWS SSO session hasn't expired (re-run `aws sso login`)
+
+### Helm release errors
+
+```
+Error: unable to build kubernetes objects from release manifest
+```
+
+This usually means EKS isn't fully ready when Helm tries to install charts. Re-running `terraform apply` typically resolves it.
+
+## Capture important outputs
+
+After successful completion, Terraform displays outputs. Save these—you'll need them for subsequent steps:
+
+```bash
+# View all outputs
+terraform output
+
+# Get specific values
+terraform output cluster_name
+terraform output db_instance_endpoint
+terraform output app_bucket_name
+terraform output argocd_server_url
+```
+
+| Output | What it's for |
+|--------|---------------|
+| `cluster_name` | Used to configure kubectl access |
+| `db_instance_endpoint` | Database hostname (already configured in secrets) |
+| `app_bucket_name` | S3 bucket name for uploaded files |
+| `argocd_server_url` | URL to access ArgoCD dashboard |
+| `vpc_id` | Needed for VPC peering or VPN setup |
+
+<Note>
+**You can always retrieve outputs later** by running `terraform output` in the same directory with access to the state file.
+</Note>
+
+## What was deployed
+
+Here's what now exists in your AWS account:
+
+### Networking
+- **VPC** with DNS support enabled
+- **Public subnets** (2) — where the ALB receives traffic
+- **Private subnets** (2) — where EKS nodes run, no direct internet access
+- **Database subnets** (2) — isolated subnets for RDS
+- **NAT Gateway** — allows private subnets to make outbound requests
+- **Internet Gateway** — connects public subnets to the internet
+- **S3 VPC Endpoint** — private connection to S3, traffic never touches internet
+
+### Compute (EKS)
+- **EKS Cluster** — Kubernetes control plane managed by AWS
+- **Node Group** — EC2 instances running Kubernetes workloads
+- **EBS CSI Driver** — allows pods to use persistent storage
+
+### Data stores
+- **RDS PostgreSQL** — managed database with encryption and automated backups
+- **S3 Bucket** — private bucket for uploaded files
+- **Secrets Manager secret** — contains all application credentials
+
+### Kubernetes components (pre-installed via Helm)
+- **AWS Load Balancer Controller** — creates ALBs from Kubernetes Ingress
+- **External Secrets Operator** — syncs secrets from Secrets Manager to Kubernetes
+- **ArgoCD** — GitOps tool for managing deployments
+- **ClickHouse Operator** — manages the analytics database
+
+### Security
+- **KMS Key** — encrypts secrets at rest
+- **IAM Roles** — separate roles for EKS, nodes, and pods (IRSA)
+- **Security Groups** — firewall rules for each component
+
+## What to do if provisioning fails
+
+1. **Read the error message carefully.** Terraform errors usually indicate exactly what went wrong.
+
+2. **Don't panic.** Terraform is idempotent—you can run `apply` again and it will continue from where it failed.
+
+3. **Check common causes:**
+   - IAM permissions
+   - Service quotas
+   - Network connectivity
+   - Invalid variable values
+
+4. **If stuck, don't destroy and recreate.** This can leave orphaned resources. Instead, fix the configuration and re-apply.
+
+<Warning>
+**Never run `terraform destroy` unless you intend to delete everything.** If you're troubleshooting, fix the issue and re-run `apply`. Destroying and recreating can lose data and create inconsistent state.
+</Warning>
+
+## Next steps
+
+After infrastructure is provisioned, proceed to [SSL Certificates](/on-prem/aws/ssl-certificates) to validate your HTTPS certificate.

@@ -1,6 +1,399 @@
 ---
 slug: on-prem/aws/verification
-description: Verify your Confident AI deployment
+description: Verify the Confident AI deployment on AWS
 ---
 
-Coming soon.
+## Overview
+
+You've provisioned infrastructure and deployed the application. This final step verifies everything works correctly. You will:
+
+- Confirm all infrastructure components (EKS, RDS, S3, secrets) are healthy
+- Configure DNS to point to your load balancer
+- Test application access via the frontend and backend URLs
+- Run functional tests (user login, project creation, SDK connectivity)
+- Check health endpoints for each service
+- Complete a production readiness checklist
+
+After this step, your deployment is verified and ready for users.
+
+## Infrastructure verification
+
+Before testing the application, verify all infrastructure components are healthy.
+
+### EKS cluster health
+
+```bash
+kubectl get nodes
+```
+
+All nodes should show `Ready`:
+
+```
+NAME                             STATUS   ROLES    AGE    VERSION
+ip-10-0-1-123.ec2.internal       Ready    <none>   1h     v1.33.0
+ip-10-0-2-45.ec2.internal        Ready    <none>   1h     v1.33.0
+```
+
+<Warning>
+**Nodes stuck in NotReady?** Check for issues:
+```bash
+kubectl describe node <node-name>
+```
+Look at the "Conditions" section for clues. Common causes: network plugin issues, insufficient resources, or failed health checks.
+</Warning>
+
+### RDS connectivity
+
+Verify the database is accessible from the cluster by checking backend logs:
+
+```bash
+kubectl logs deployment/confident-backend -n confident-ai | grep -i database
+```
+
+You should see successful connection messages, not connection refused errors.
+
+**Check RDS status in AWS Console:**
+1. Go to RDS → Databases
+2. Find your instance (named like `confidentai-stage-rds`)
+3. Status should be "Available"
+
+### Secrets Manager
+
+Verify the secret exists and External Secrets can read it:
+
+```bash
+# Check the secret exists in AWS
+aws secretsmanager describe-secret --secret-id confidentai-stage-confident-secret
+
+# Check External Secrets synced it to Kubernetes
+kubectl get secret confident-externalsecret -n confident-ai
+```
+
+### S3 bucket
+
+Verify the bucket exists:
+
+```bash
+aws s3 ls | grep confidentai
+```
+
+You should see your bucket (e.g., `confidentai-stage-app-bucket`).
+
+<Note>
+**S3 is used for file uploads.** If S3 connectivity fails, users won't be able to upload datasets or export reports. The backend uses IRSA (IAM Roles for Service Accounts) to access S3—verify the `confident-s3-sa` service account exists.
+</Note>
+
+## DNS configuration
+
+The ALB (Application Load Balancer) has been created, but DNS records must point to it.
+
+### Get the ALB hostname
+
+```bash
+kubectl get ingress confident-ingress -n confident-ai -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+```
+
+Example output:
+
+```
+k8s-confiden-confiden-abc123-1234567890.us-east-1.elb.amazonaws.com
+```
+
+<Note>
+**Why a long hostname?** AWS ALBs have automatically generated hostnames. You create DNS records (CNAME or ALIAS) that point your friendly domains to this ALB hostname.
+</Note>
+
+### Create DNS records
+
+Add DNS records for each hostname you configured in the ingress:
+
+| Record Type | Name | Value |
+|-------------|------|-------|
+| CNAME or ALIAS | `app.yourdomain.com` | (ALB hostname) |
+| CNAME or ALIAS | `api.yourdomain.com` | (ALB hostname) |
+| CNAME or ALIAS | `deepeval.yourdomain.com` | (ALB hostname) |
+| CNAME or ALIAS | `otel.yourdomain.com` | (ALB hostname) |
+
+<Warning>
+**CNAME vs. ALIAS:**
+- **CNAME:** Works with most DNS providers. Points one hostname to another.
+- **ALIAS (Route 53 only):** Works at the zone apex (e.g., `yourdomain.com` without a subdomain). Recommended if using Route 53.
+
+If your DNS provider only supports CNAME, you must use subdomains (e.g., `app.yourdomain.com`), not the root domain.
+</Warning>
+
+<Warning>
+**Corporate DNS changes may require approval.** If your DNS is managed by an internal team, submit change requests for all four records. Factor in approval time—this can delay verification by hours or days.
+</Warning>
+
+### Verify DNS propagation
+
+After adding records, verify they resolve correctly:
+
+```bash
+# Check each domain
+nslookup app.yourdomain.com
+nslookup api.yourdomain.com
+```
+
+You should see the ALB hostname in the response. If you see "NXDOMAIN" or your old values, wait for DNS propagation (typically 5-30 minutes, up to 48 hours for some providers).
+
+**Use a global DNS checker:**
+1. Go to [dnschecker.org](https://dnschecker.org)
+2. Enter your frontend domain (e.g., `app.yourdomain.com`)
+3. Verify servers worldwide resolve to your ALB
+
+## Application verification
+
+### Frontend access
+
+Open your frontend URL in a browser:
+
+```
+https://app.yourdomain.com
+```
+
+**What you should see:**
+1. HTTPS (padlock icon) — certificate is working
+2. Confident AI login page — application is serving
+3. Google OAuth button (if configured) — SSO is set up
+
+<Warning>
+**Certificate errors?**
+
+- "NET::ERR_CERT_COMMON_NAME_INVALID" — The certificate doesn't cover this domain. Verify the ACM certificate includes the right domain names.
+- "NET::ERR_CERT_DATE_INVALID" — Certificate isn't issued yet. Go back to SSL Certificates step.
+- "Your connection is not private" — Mixed causes. Check certificate status in ACM console.
+</Warning>
+
+### Backend health check
+
+The backend exposes a health endpoint:
+
+```bash
+curl -s https://api.yourdomain.com/health
+```
+
+**Expected response:**
+
+```json
+{"status":"ok","version":"1.2.3"}
+```
+
+<Warning>
+**Connection refused or timeout?**
+
+1. **DNS not propagated:** Wait and retry
+2. **Security group blocking:** Check ALB security group allows inbound HTTPS
+3. **ALB not ready:** ALB provisioning takes a few minutes after ingress creation
+4. **Backend not running:** Check pod status with `kubectl get pods -n confident-ai`
+</Warning>
+
+### Evals health check
+
+```bash
+curl -s https://deepeval.yourdomain.com/health
+```
+
+Expected: `{"status":"healthy"}`
+
+### OTEL collector health
+
+```bash
+curl -s https://otel.yourdomain.com/health
+```
+
+Expected: `{"status":"ok"}`
+
+## Functional testing
+
+### Test 1: User login
+
+1. Navigate to `https://app.yourdomain.com`
+2. Click "Sign in with Google" (or your configured auth provider)
+3. Complete authentication
+4. **Expected:** Redirected to dashboard, user session created
+
+<Warning>
+**OAuth errors?**
+
+- "redirect_uri_mismatch" — The redirect URI in Google Console doesn't match. It must be exactly `https://api.yourdomain.com/api/auth/callback/google`.
+- "access_denied" — User not authorized. Check if OAuth app restricts to certain domains.
+- Infinite redirect loop — `confident_subdomain` may be misconfigured. Must be root domain, not full subdomain.
+</Warning>
+
+### Test 2: Create a project
+
+1. From the dashboard, click "New Project"
+2. Enter a project name
+3. Click Create
+4. **Expected:** Project created successfully, appears in list
+
+This verifies database connectivity and basic write operations.
+
+### Test 3: API key generation
+
+1. Go to Project Settings → API Keys
+2. Click "Generate API Key"
+3. Copy the generated key
+4. **Expected:** API key displayed (save it—it won't be shown again)
+
+### Test 4: SDK connectivity
+
+From your local machine (or any machine that can reach the backend):
+
+```python
+import deepeval
+
+# Configure to use your deployment
+deepeval.login(
+    api_key="<your-generated-api-key>",
+    confident_api_endpoint="https://api.yourdomain.com"
+)
+
+# Test connection
+print(deepeval.check_connection())
+```
+
+**Expected:** `True` or success message
+
+<Warning>
+**SDK can't connect?**
+
+- "Connection refused" — Backend not reachable. Check DNS and network connectivity.
+- "401 Unauthorized" — API key invalid. Generate a new one.
+- "SSL certificate verify failed" — Certificate issue. Check the URL is using HTTPS and cert is valid.
+
+If your machine can't reach the backend directly (internal ALB), run this test from within the same network (VPN) or from a pod inside the cluster.
+</Warning>
+
+### Test 5: Run a simple evaluation
+
+```python
+from deepeval import evaluate
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+
+# Create a test case
+test_case = LLMTestCase(
+    input="What is the capital of France?",
+    actual_output="Paris is the capital of France.",
+)
+
+# Run evaluation
+metric = AnswerRelevancyMetric()
+evaluate([test_case], [metric])
+```
+
+**Expected:** Evaluation runs and results appear in the dashboard.
+
+<Warning>
+**Evaluation fails with API errors?**
+
+- "OpenAI API error" — `openai_api_key` not configured or invalid
+- "timeout" — Network can't reach OpenAI. Check outbound connectivity to `api.openai.com`
+- "Rate limited" — OpenAI quota exceeded. Check your OpenAI usage limits.
+
+Your cluster needs outbound HTTPS access to OpenAI (or your configured LLM provider).
+</Warning>
+
+## Service health checks
+
+Run comprehensive health checks on all services:
+
+```bash
+# All pods should be Running
+kubectl get pods -n confident-ai
+
+# No recent crashes
+kubectl get events -n confident-ai --field-selector type=Warning
+
+# Check each deployment is ready
+kubectl rollout status deployment/confident-backend -n confident-ai
+kubectl rollout status deployment/confident-frontend -n confident-ai
+kubectl rollout status deployment/confident-evals -n confident-ai
+kubectl rollout status deployment/confident-otel -n confident-ai
+```
+
+### View logs for troubleshooting
+
+```bash
+# Backend logs
+kubectl logs -f deployment/confident-backend -n confident-ai
+
+# Frontend logs
+kubectl logs -f deployment/confident-frontend -n confident-ai
+
+# Evals logs
+kubectl logs -f deployment/confident-evals -n confident-ai
+```
+
+<Note>
+**Log levels:** By default, logs show INFO level and above. If you need more detail for debugging, you can increase verbosity through environment variables (contact Confident AI support for guidance).
+</Note>
+
+## Production readiness checklist
+
+Before announcing the deployment is ready for users, verify:
+
+### Security
+
+- [ ] HTTPS working on all endpoints (padlock icon in browser)
+- [ ] ACM certificate valid and not expiring soon
+- [ ] ALB security groups restrict access appropriately (internal vs. internet-facing)
+- [ ] RDS not publicly accessible (should be in private subnets)
+- [ ] S3 bucket has no public access
+- [ ] Secrets Manager secret has automatic rotation enabled
+- [ ] `terraform.tfvars` not committed to version control
+
+### High availability
+
+- [ ] At least 2 nodes running in different availability zones
+- [ ] At least 2 replicas for backend service (scale if not)
+- [ ] RDS has multi-AZ enabled (if required)
+- [ ] Node group autoscaling configured for traffic spikes
+
+### Monitoring (recommended)
+
+- [ ] CloudWatch logs configured for EKS
+- [ ] RDS performance insights enabled
+- [ ] ALB access logs enabled
+- [ ] Alerts configured for node health, pod restarts, errors
+
+### Operations
+
+- [ ] Team members have cluster access (see Cluster Access page)
+- [ ] Runbook documented for common issues
+- [ ] Backup strategy confirmed for RDS
+- [ ] Upgrade path understood for future releases
+
+## What to do if verification fails
+
+**Don't panic.** Most issues have straightforward fixes:
+
+1. **Identify the failing component:** Use the checks above to isolate which part isn't working
+2. **Check logs:** `kubectl logs` for pod issues, CloudWatch for AWS services
+3. **Review configuration:** Typos in URLs, missing certificates, wrong secret names
+4. **Check network:** Security groups, DNS propagation, VPN connectivity
+5. **Contact support:** If stuck, reach out to your Confident AI representative with:
+   - What step failed
+   - Exact error messages
+   - Results of relevant `kubectl get` commands
+
+## Summary
+
+You've completed the Confident AI deployment on AWS:
+
+1. **Prerequisites** — Installed tools and gathered credentials
+2. **Configuration** — Set up Terraform variables
+3. **Provisioning** — Created AWS infrastructure
+4. **SSL Certificates** — Validated domain ownership
+5. **Cluster Access** — Configured kubectl access
+6. **Kubernetes Deployment** — Deployed application services
+7. **Verification** — Tested everything works
+
+Your deployment is now ready for users. Welcome to Confident AI!
+
+---
+
+**Need help?** Contact your Confident AI representative or email support@confident-ai.com with details about your deployment and any issues encountered.
