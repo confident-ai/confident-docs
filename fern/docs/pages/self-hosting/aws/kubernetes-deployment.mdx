@@ -1,0 +1,440 @@
+---
+slug: self-hosting/aws/kubernetes-deployment
+description: Deploy Confident AI workloads to EKS
+---
+
+## Overview
+
+With infrastructure and cluster access ready, you now deploy the Confident AI application services. This step covers:
+
+- Preparing Kubernetes manifests from the `confident-k8s` repository
+- Updating container image tags to the versions provided by Confident AI
+- Configuring the ingress with your domain names and ACM certificate ARN
+- Setting up External Secrets to sync credentials from AWS Secrets Manager
+- Deploying services in the correct order: base config → Redis → application services
+- Monitoring deployment status and troubleshooting common issues
+
+After completion, all Confident AI services will be running in your EKS cluster.
+
+## How Kubernetes deployments work
+
+Kubernetes uses YAML manifests to describe what you want to run. A Deployment tells Kubernetes:
+
+- What container image to use
+- How many replicas (copies) to run
+- What environment variables and secrets to inject
+- Resource limits (CPU, memory)
+
+When you `kubectl apply` a manifest, Kubernetes:
+
+1. Reads your desired state
+2. Compares it to current state
+3. Creates, updates, or deletes resources to match
+4. Continuously ensures the desired state is maintained
+
+### Repository structure
+
+The `confident-k8s` repository contains Kubernetes manifests organized by service:
+
+```
+confident-k8s/
+├── base/                    # Shared configuration
+│   ├── namespace.yaml       # The confident-ai namespace (already created)
+│   ├── network/
+│   │   └── ingress.yaml     # Load balancer and routing rules
+│   └── common/
+│       └── external-secrets/ # Secrets sync configuration
+├── confident-backend/       # API service
+│   ├── deployment.yaml
+│   └── service.yaml
+├── confident-frontend/      # Web dashboard
+├── confident-evals/         # Evaluation service
+├── confident-otel/          # OpenTelemetry collector
+└── redis/                   # Cache service
+```
+
+## Prepare manifests
+
+Navigate to the Kubernetes repository:
+
+```bash
+cd confident-k8s
+```
+
+### Update image tags
+
+Container images are stored in Confident AI's ECR. Your Confident AI representative will provide the specific version tags to use.
+
+Open each deployment file and update the `image` field:
+
+| File                                 | What to update           |
+| ------------------------------------ | ------------------------ |
+| `confident-backend/deployment.yaml`  | Backend API image        |
+| `confident-frontend/deployment.yaml` | Frontend dashboard image |
+| `confident-evals/deployment.yaml`    | Evaluation service image |
+| `confident-otel/deployment.yaml`     | OTEL collector image     |
+
+Example change in `confident-backend/deployment.yaml`:
+
+```yaml
+containers:
+  - name: confident-backend
+    image: 128045499490.dkr.ecr.us-east-1.amazonaws.com/confidentai/confident-backend:v1.2.3
+```
+
+<Note>
+**Image tag format:** `<ecr-account>.dkr.ecr.<region>.amazonaws.com/confidentai/<service>:<version>`
+
+The ECR account ID and region are the values provided by Confident AI for ECR access. The version tag (e.g., `v1.2.3`) is what your representative will provide.
+
+</Note>
+
+<Warning>
+  **Use exact tags, not "latest."** Always use specific version tags (e.g.,
+  `v1.2.3`), not `latest`. Specific tags ensure reproducible deployments and
+  make rollbacks possible. Using `latest` can cause unexpected behavior when
+  images are updated.
+</Warning>
+
+### Configure ingress
+
+The ingress defines how external traffic reaches your services. Edit `base/network/ingress.yaml`:
+
+#### 1. Set your domain names
+
+Find and replace the placeholder hostnames with your actual domains:
+
+```yaml
+spec:
+  rules:
+    - host: app.yourdomain.com # Your frontend URL hostname
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: confident-frontend
+                port:
+                  number: 3000
+
+    - host: api.yourdomain.com # Your backend URL hostname
+      # ...
+
+    - host: deepeval.yourdomain.com # Evals service hostname
+      # ...
+
+    - host: otel.yourdomain.com # OTEL collector hostname (for traces)
+      # ...
+```
+
+#### 2. Add the ACM certificate ARN
+
+Find the `certificate-arn` annotation and add your certificate ARN (from the SSL Certificates step):
+
+```yaml
+annotations:
+  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/abc12345-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+<Warning>
+  **The certificate ARN must be exact.** Copy it carefully from `terraform
+  output -raw acm_certificate_arn`. Don't include any trailing `%` characters
+  your terminal might display.
+</Warning>
+
+#### 3. Set ALB scheme
+
+The `scheme` annotation controls whether the load balancer is internal or internet-facing:
+
+```yaml
+annotations:
+  alb.ingress.kubernetes.io/scheme: internal  # Only accessible via VPN
+  # OR
+  alb.ingress.kubernetes.io/scheme: internet-facing  # Accessible from internet
+```
+
+<Note>
+  **Internal vs. internet-facing:** - **Internal:** ALB only gets a private IP.
+  Users must be on VPN or connected network to access. More secure for
+  enterprise deployments. - **Internet-facing:** ALB gets a public IP. Anyone
+  with the URL can reach the login page (authentication still required). Simpler
+  but larger attack surface.
+</Note>
+
+#### 4. Update ExternalDNS annotation (optional)
+
+If using ExternalDNS to automatically create DNS records:
+
+```yaml
+annotations:
+  external-dns.alpha.kubernetes.io/hostname: app.yourdomain.com,api.yourdomain.com,deepeval.yourdomain.com
+```
+
+### Configure External Secrets
+
+External Secrets syncs credentials from AWS Secrets Manager into Kubernetes. The configuration needs to match your deployment.
+
+#### Update the secret store region
+
+Edit `base/common/external-secrets/secret-store.yaml`:
+
+```yaml
+spec:
+  provider:
+    aws:
+      service: SecretsManager
+      region: us-east-1 # Match your deployment region
+```
+
+#### Update the secret name
+
+Edit `base/common/external-secrets/external-secrets.yaml`:
+
+The `key` field in each secret reference should match the Terraform-created secret name. The pattern is:
+
+```
+confidentai-<environment>-confident-secret
+```
+
+For example, if you deployed with `confident_environment = "stage"`:
+
+```yaml
+data:
+  - secretKey: DATABASE_URL
+    remoteRef:
+      key: confidentai-stage-confident-secret
+      property: DATABASE_URL
+```
+
+<Warning>
+  **Secret name must exactly match.** If the name doesn't match what Terraform
+  created, External Secrets won't find it and pods won't start. You can verify
+  the secret name in AWS Secrets Manager console or via: ```bash aws
+  secretsmanager list-secrets --query 'SecretList[*].Name' ```
+</Warning>
+
+## Deploy services
+
+Deploy in order to ensure dependencies are available when needed.
+
+### Step 1: Apply network and secrets configuration
+
+The namespace already exists (Terraform created it), but apply the network and secrets configuration:
+
+```bash
+kubectl apply -f base/network/
+kubectl apply -f base/common/external-secrets/
+```
+
+### Step 2: Wait for secrets to sync
+
+External Secrets needs to pull credentials from Secrets Manager before pods can start. Watch the sync status:
+
+```bash
+kubectl get externalsecret -n confident-ai -w
+```
+
+Wait until `STATUS` shows `SecretSynced`:
+
+```
+NAME                       STORE                          REFRESH   STATUS
+confident-externalsecret   confident-clustersecretstore   1h        SecretSynced
+```
+
+Press `Ctrl+C` to stop watching once synced.
+
+Verify the Kubernetes secret was created:
+
+```bash
+kubectl get secret confident-externalsecret -n confident-ai
+```
+
+<Warning>
+  **Don't proceed until secrets are synced.** Pods reference this secret for
+  database URLs, API keys, and other credentials. If you deploy before sync
+  completes, pods will fail to start with "secret not found" errors.
+</Warning>
+
+### Step 3: Deploy Redis
+
+Redis must be running before the backend, which uses it for caching and job queues:
+
+```bash
+kubectl apply -f redis/
+```
+
+Verify it's running:
+
+```bash
+kubectl get pods -n confident-ai -l app=redis
+```
+
+Wait for `Running` status before continuing.
+
+### Step 4: Deploy application services
+
+Now deploy the Confident AI services:
+
+```bash
+kubectl apply -f confident-backend/
+kubectl apply -f confident-frontend/
+kubectl apply -f confident-evals/
+kubectl apply -f confident-otel/
+```
+
+### Alternative: Deploy all at once
+
+If you prefer fewer commands:
+
+```bash
+kubectl apply -f base/
+kubectl apply -f redis/
+kubectl apply -f confident-backend/
+kubectl apply -f confident-frontend/
+kubectl apply -f confident-evals/
+kubectl apply -f confident-otel/
+```
+
+## Monitor deployment
+
+### Watch pod status
+
+```bash
+kubectl get pods -n confident-ai -w
+```
+
+All pods should eventually reach `Running` status with all containers ready:
+
+```
+NAME                                  READY   STATUS    RESTARTS   AGE
+confident-backend-xxx-yyy             1/1     Running   0          2m
+confident-frontend-xxx-yyy            1/1     Running   0          2m
+confident-evals-xxx-yyy               1/1     Running   0          2m
+confident-otel-xxx-yyy                1/1     Running   0          2m
+confident-redis-xxx-yyy               1/1     Running   0          3m
+```
+
+<Note>
+  **Backend may restart once during initial deployment.** The backend runs
+  database migrations on startup. If the database isn't ready immediately, it
+  may fail once and then succeed on retry. One or two restarts is normal.
+</Note>
+
+### Check events
+
+If pods aren't starting, check recent events:
+
+```bash
+kubectl get events -n confident-ai --sort-by='.lastTimestamp' | tail -20
+```
+
+This shows what Kubernetes is doing and any errors it encountered.
+
+## Common deployment issues
+
+### ImagePullBackOff
+
+```
+confident-backend-xxx   0/1   ImagePullBackOff   0   2m
+```
+
+The cluster can't pull the container image. Causes:
+
+1. **ECR credentials not synced:** The CronJob that refreshes ECR tokens hasn't run yet
+2. **Wrong image tag:** The specified version doesn't exist
+3. **Network issues:** Nodes can't reach ECR
+
+**Fix: Manually trigger ECR credential sync:**
+
+```bash
+kubectl create job --from=cronjob/ecr-credentials-sync manual-ecr-sync -n confident-ai
+```
+
+Wait 30 seconds, then check if pods start pulling images.
+
+<Warning>
+  **ECR tokens expire every 12 hours.** The CronJob refreshes them
+  automatically, but on initial deployment, you may need to trigger it manually.
+  If you see ImagePullBackOff after the cluster has been running for a while,
+  the CronJob may have failed—check its logs.
+</Warning>
+
+### CrashLoopBackOff
+
+```
+confident-backend-xxx   0/1   CrashLoopBackOff   5   10m
+```
+
+The container starts but crashes. Check logs to see why:
+
+```bash
+kubectl logs deployment/confident-backend -n confident-ai
+```
+
+Common causes:
+
+| Error in logs              | Cause                           | Fix                                                |
+| -------------------------- | ------------------------------- | -------------------------------------------------- |
+| "ECONNREFUSED" to database | RDS not accessible              | Check security groups allow traffic from EKS       |
+| "Secret not found"         | External Secrets not synced     | Wait for sync or check ExternalSecret status       |
+| "Invalid DATABASE_URL"     | Wrong format in Secrets Manager | Verify secret value in AWS Console                 |
+| "OPENAI_API_KEY not set"   | Missing secret                  | Verify secret was created with all required fields |
+
+### External Secrets not syncing
+
+```bash
+kubectl describe externalsecret confident-externalsecret -n confident-ai
+```
+
+Look at the `Status` section for error messages. Common issues:
+
+| Error                        | Cause                     | Fix                                                                 |
+| ---------------------------- | ------------------------- | ------------------------------------------------------------------- |
+| "AccessDeniedException"      | IAM role lacks permission | Check `external-secrets-sa` role has Secrets Manager access         |
+| "ResourceNotFoundException"  | Secret name doesn't match | Verify secret name in Secrets Manager matches ExternalSecret config |
+| "Invalid ClusterSecretStore" | Store misconfigured       | Check region in `secret-store.yaml` matches deployment              |
+
+### Ingress not creating ALB
+
+After applying the ingress, check if an ALB is being created:
+
+```bash
+kubectl get ingress -n confident-ai
+```
+
+The `ADDRESS` column should show an ALB hostname. If it's empty after a few minutes:
+
+```bash
+kubectl describe ingress confident-ingress -n confident-ai
+```
+
+Look for errors in the events. Common issues:
+
+- **Missing subnet tags:** ALB Controller can't find subnets tagged for ELB
+- **IAM permission errors:** The ALB Controller service account lacks permissions
+- **Invalid certificate ARN:** The specified ACM certificate doesn't exist or isn't issued
+
+## Scaling services
+
+Once everything is running, you can scale based on load:
+
+```bash
+# Scale backend for more API capacity
+kubectl scale deployment confident-backend --replicas=3 -n confident-ai
+
+# Scale frontend if dashboard is slow
+kubectl scale deployment confident-frontend --replicas=2 -n confident-ai
+
+# Scale evals for more concurrent evaluations
+kubectl scale deployment confident-evals --replicas=3 -n confident-ai
+```
+
+<Note>
+  **The evals service is most resource-intensive** during evaluation runs. If
+  evaluations are slow or timing out, scaling this service usually helps most.
+</Note>
+
+## Next steps
+
+After all services are running and healthy, proceed to [Verification](/self-hosting/aws/verification) to test the deployment end-to-end.

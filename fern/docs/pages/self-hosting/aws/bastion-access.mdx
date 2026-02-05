@@ -1,0 +1,380 @@
+---
+slug: self-hosting/aws/bastion-access
+description: Configure kubectl access to the EKS cluster
+---
+
+## Overview
+
+With infrastructure provisioned, you now need to configure access to the EKS cluster. This step covers:
+
+- Updating your kubeconfig to authenticate with EKS
+- Verifying cluster connectivity and node status
+- Confirming Terraform-deployed resources (Helm releases, service accounts, External Secrets)
+- Understanding private cluster access options (VPN, Client VPN, bastion)
+- Granting access to additional team members
+
+After this step, you will have working `kubectl` access and can verify all infrastructure components are healthy.
+
+## How EKS authentication works
+
+EKS uses AWS IAM for authentication. When you run `kubectl`, it:
+
+1. Calls AWS to get a token using your IAM credentials
+2. Sends the token to the EKS API server
+3. EKS verifies the token matches an allowed IAM user/role
+4. If authorized, your command executes
+
+This is why you need:
+
+- Working AWS credentials (configured earlier)
+- Your IAM identity to be authorized in EKS
+- Network connectivity to the EKS API endpoint
+
+<Note>
+  **Terraform automatically grants you access** because it creates the cluster
+  using your credentials. The cluster creator is automatically an admin. Other
+  team members need to be added separately (covered below).
+</Note>
+
+## Configure kubectl
+
+Update your kubeconfig file with the EKS cluster credentials:
+
+```bash
+aws eks update-kubeconfig \
+  --region us-east-1 \
+  --name $(terraform output -raw cluster_name)
+```
+
+This command:
+
+- Retrieves cluster connection information from EKS
+- Adds a new context to your `~/.kube/config` file
+- Configures token generation using your AWS credentials
+
+**Expected output:**
+
+```
+Added new context arn:aws:eks:us-east-1:123456789012:cluster/confidentai-stage-eks to /Users/you/.kube/config
+```
+
+<Warning>
+**"Could not connect to the endpoint URL" error?**
+
+This usually means:
+
+1. **Wrong region:** Ensure `--region` matches where you deployed
+2. **EKS not ready:** The cluster may still be provisioning—wait a few minutes
+3. **Network issues:** Your network may block HTTPS to AWS APIs
+
+Verify your region matches your Terraform configuration.
+
+</Warning>
+
+## Verify cluster access
+
+Test that you can communicate with the cluster:
+
+```bash
+kubectl get nodes
+```
+
+**Expected output:**
+
+```
+NAME                             STATUS   ROLES    AGE   VERSION
+ip-10-0-1-123.ec2.internal       Ready    <none>   30m   v1.33.0
+ip-10-0-2-45.ec2.internal        Ready    <none>   30m   v1.33.0
+```
+
+You should see 2-4 nodes (depending on your `confident_node_group_desired_size` setting) in `Ready` status.
+
+<Warning>
+**Timeout or connection refused?**
+
+This typically means the EKS API is not accessible from your network:
+
+```
+Unable to connect to the server: dial tcp 10.0.1.123:443: i/o timeout
+```
+
+**If `confident_public_eks = false` (default):** The EKS API is only accessible from within the VPC. You need VPN access or VPC peering to your corporate network. See "Private cluster access" below.
+
+**If `confident_public_eks = true`:** The API should be publicly accessible. Check your security group rules and network connectivity.
+
+</Warning>
+
+### Check system pods
+
+Verify core Kubernetes components are running:
+
+```bash
+kubectl get pods -n kube-system
+```
+
+You should see pods for:
+
+- **coredns** — DNS resolution within the cluster
+- **kube-proxy** — Network routing
+- **aws-node** — AWS VPC CNI (networking)
+- **aws-load-balancer-controller** — Creates ALBs from Ingress resources
+- **ebs-csi-controller** — Manages persistent volumes
+
+All pods should be `Running` with all containers ready (e.g., `1/1`, `2/2`).
+
+## Verify Terraform-deployed resources
+
+Terraform deployed several Kubernetes resources. Let's verify they're working correctly.
+
+### Helm releases
+
+Check that all Helm charts installed successfully:
+
+```bash
+helm list -A
+```
+
+| Name                         | Namespace           | Expected Status |
+| ---------------------------- | ------------------- | --------------- |
+| aws-load-balancer-controller | kube-system         | deployed        |
+| external-secrets             | confident-ai        | deployed        |
+| argocd                       | argocd              | deployed        |
+| clickhouse-operator          | clickhouse-operator | deployed        |
+
+<Warning>
+**Helm release shows "failed" or "pending-install"?**
+
+This sometimes happens when EKS wasn't fully ready. Usually fixable by re-running:
+
+```bash
+terraform apply
+```
+
+Terraform will retry the failed Helm installations.
+
+</Warning>
+
+### Confident AI namespace
+
+Verify the namespace exists:
+
+```bash
+kubectl get namespace confident-ai
+```
+
+### Service accounts
+
+Check that the required service accounts are created:
+
+```bash
+kubectl get serviceaccounts -n confident-ai
+```
+
+Expected service accounts:
+
+| Service Account        | Purpose                                                       |
+| ---------------------- | ------------------------------------------------------------- |
+| `confident-s3-sa`      | Allows pods to access the S3 bucket                           |
+| `external-secrets-sa`  | Allows External Secrets Operator to read from Secrets Manager |
+| `ecr-credentials-sync` | Used by the ECR credential rotation job                       |
+
+<Note>
+  **Why service accounts?** Service accounts enable "IAM Roles for Service
+  Accounts" (IRSA), which gives pods fine-grained AWS permissions. Instead of
+  giving the whole cluster access to S3, only pods using `confident-s3-sa` can
+  access the bucket. This follows the principle of least privilege.
+</Note>
+
+### External Secrets
+
+External Secrets Operator syncs credentials from AWS Secrets Manager into Kubernetes secrets. Verify it's working:
+
+```bash
+kubectl get clustersecretstore
+```
+
+Expected:
+
+```
+NAME                           AGE   STATUS   CAPABILITIES   READY
+confident-clustersecretstore   30m   Valid    ReadWrite      True
+```
+
+Check the ExternalSecret:
+
+```bash
+kubectl get externalsecret -n confident-ai
+```
+
+Expected status: `SecretSynced`
+
+```
+NAME                       STORE                          REFRESH   STATUS
+confident-externalsecret   confident-clustersecretstore   1h        SecretSynced
+```
+
+<Warning>
+**ExternalSecret shows "SecretSyncedError"?**
+
+This means it couldn't read from Secrets Manager. Common causes:
+
+1. **IAM permissions:** The `external-secrets-sa` role may not have correct permissions
+2. **Secret name mismatch:** The ExternalSecret is looking for a secret that doesn't exist
+3. **Region mismatch:** The ClusterSecretStore is configured for a different region
+
+Check the error details:
+
+```bash
+kubectl describe externalsecret confident-externalsecret -n confident-ai
+```
+
+</Warning>
+
+## Private cluster access
+
+By default (`confident_public_eks = false`), the EKS API server is only accessible from within the VPC. This is a security best practice—it prevents unauthorized access from the internet.
+
+To access a private cluster, you need network connectivity to the VPC.
+
+### Option A: VPN to your corporate network (recommended)
+
+If your organization has VPN connectivity to AWS (via Direct Connect, Site-to-Site VPN, or Transit Gateway):
+
+1. Connect to your corporate VPN
+2. Ensure the VPN routes include the Confident AI VPC CIDR range
+3. Run kubectl commands normally
+
+This is the recommended approach for production because it uses your existing network security infrastructure.
+
+<Warning>
+  **VPN routing must include the EKS VPC.** If you configured a custom CIDR
+  (e.g., `10.0.0.0/16`) in Prerequisites, ensure your VPN routes include it.
+  Work with your network team to add the route if needed.
+</Warning>
+
+### Option B: AWS Client VPN
+
+If you don't have existing VPC connectivity, AWS Client VPN provides on-demand access:
+
+1. Create a Client VPN endpoint in the Confident AI VPC
+2. Download the VPN client configuration
+3. Connect using the AWS VPN Client or compatible OpenVPN client
+4. Run kubectl commands while connected
+
+This requires additional setup beyond this guide. See [AWS Client VPN documentation](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/what-is.html).
+
+### Option C: Enable public API (not recommended for production)
+
+If you're just testing, you can enable public API access by setting `confident_public_eks = true` in your tfvars and re-running Terraform. This makes the EKS API accessible from the internet.
+
+<Warning>
+  **Public EKS API is a security risk.** While authenticated by IAM, a publicly
+  accessible API endpoint increases your attack surface. Only use this for
+  temporary testing, never for production.
+</Warning>
+
+## Grant access to team members
+
+The person who ran Terraform is automatically an EKS admin. To grant access to other team members:
+
+### Using Terraform (recommended)
+
+If the team member has an IAM role, add it to your tfvars:
+
+```hcl
+confident_eks_admin_arn = "arn:aws:iam::123456789012:role/PlatformAdminRole"
+```
+
+Then re-run `terraform apply`. This grants cluster admin access to anyone who can assume that role.
+
+### Using AWS CLI
+
+For individual users:
+
+```bash
+aws eks create-access-entry \
+  --cluster-name $(terraform output -raw cluster_name) \
+  --principal-arn arn:aws:iam::123456789012:user/developer \
+  --type STANDARD
+
+aws eks associate-access-policy \
+  --cluster-name $(terraform output -raw cluster_name) \
+  --principal-arn arn:aws:iam::123456789012:user/developer \
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
+  --access-scope type=cluster
+```
+
+<Warning>
+  **Access entries require the IAM identity to exist.** If you get
+  "PrincipalNotFound", verify the user/role ARN is correct and exists in your
+  account.
+</Warning>
+
+## ArgoCD access
+
+ArgoCD is deployed for GitOps-based deployments. You can access it once your network has connectivity to the cluster:
+
+```bash
+# Get the ArgoCD URL
+terraform output argocd_server_url
+
+# Credentials
+# Username: admin
+# Password: the argocd_admin_password you configured
+```
+
+<Note>
+  ArgoCD runs inside the cluster, so it's only accessible via the internal
+  network. You'll need VPN connectivity to access the dashboard.
+</Note>
+
+## Troubleshooting
+
+### "You must be logged in to the server (Unauthorized)"
+
+```
+error: You must be logged in to the server (Unauthorized)
+```
+
+Your IAM identity isn't authorized to access the cluster:
+
+1. Verify your credentials: `aws sts get-caller-identity`
+2. Check you're using the same IAM identity that ran Terraform
+3. If using a different identity, have an admin add you (see above)
+
+### "Unable to connect to the server: dial tcp: i/o timeout"
+
+You have no network path to the EKS API:
+
+1. For private clusters, ensure you're connected to VPN
+2. Verify the VPN routes include the VPC CIDR range
+3. Check no firewall is blocking HTTPS (port 443) to AWS
+
+### "No credentials found"
+
+```
+error: exec plugin: invalid apiVersion "client.authentication.k8s.io/v1alpha1"
+```
+
+Your kubectl or AWS CLI version is outdated. Update to:
+
+- kubectl 1.28+
+- AWS CLI v2
+
+### Nodes show "NotReady"
+
+Nodes take a few minutes to fully initialize. Wait 2-3 minutes after the cluster is created. If they stay NotReady:
+
+```bash
+kubectl describe node <node-name>
+```
+
+Look at the "Conditions" section for clues. Common causes:
+
+- VPC CNI not configured correctly
+- Node can't reach the EKS API
+- Node instance has insufficient resources
+
+## Next steps
+
+With cluster access configured, proceed to [Kubernetes Deployment](/self-hosting/aws/kubernetes-deployment) to deploy the Confident AI application services.
