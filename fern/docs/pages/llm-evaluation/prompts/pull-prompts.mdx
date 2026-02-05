@@ -460,7 +460,7 @@ interpolated_prompt = prompt.interpolate(name="Joe")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull();
+await prompt.pull({ refresh: 60 });
 const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 ```
 
@@ -492,7 +492,7 @@ interpolated_prompt = prompt.interpolate(name="Joe")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull();
+await prompt.pull({ refresh: 0 });
 const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
 ```
 
