@@ -1,0 +1,172 @@
+---
+title: Experiment with AI Apps
+subtitle: Move beyond vibes. Compare multiple versions of your AI app with statistical rigor.
+slug: llm-evaluation/experiments
+---
+
+## Overview
+
+You've tested prompts in the Arena. You've run evaluations and gotten test runs. Now it's time to answer the real question: **which version of your AI app is actually better?**
+
+Experiments let you compare two or more versions of your AI app side-by-side, using the same dataset and metrics. No more guessing, no more "this one feels better" — just data.
+
+[IMAGE: Experiment results comparison view showing multiple test runs]
+
+<Note>
+  Experiments require all test runs to use the **same dataset** and **same
+  metric collection**. This ensures you're comparing apples to apples.
+</Note>
+
+## How to Experiment
+
+You can kick off an experiment in two ways:
+
+- **Arena** — you've been iterating on prompts and want to formalize the comparison
+- **Existing Test Runs** — you already have test runs and want to compare them retroactively
+
+Either way you'll get the same result, however running experiments from Arena will be the more natural workflow.
+
+## Arena Experiments
+
+As covered in the [Arena section](/docs/llm-evaluation/no-code-evals/arena), the Arena is great for quick, qualitative comparisons. But when you're ready to graduate from vibes to data, it's time to run a proper experiment.
+
+Here's the key difference:
+
+- **Arena** — fast feedback on a few inputs, great for exploration
+- **Experiments** — run your entire dataset through each configuration and get statistically meaningful results
+
+Here's what happens when you run an experiment:
+
+```mermaid
+sequenceDiagram
+    participant You
+    participant Platform as Confident AI
+    participant A as Contestant A
+    participant B as Contestant B
+    participant Metrics as Metric Collection
+
+    You->>Platform: Run Experiment
+
+    loop For each golden in dataset
+        Platform->>A: Send input
+        A-->>Platform: Output A
+        Platform->>B: Send input
+        B-->>Platform: Output B
+        Platform->>Metrics: Evaluate both outputs
+        Metrics-->>Platform: Scores for A and B
+    end
+
+    Platform-->>You: Side-by-side comparison
+```
+
+As an example, this for an experiment with 4 contestants, 5 goldens, and 3 metrics, there will be a grand total of 20 (4 x 5) outputs generated and 60 (20 x 3) evaluations total.
+
+<Steps>
+  <Step title="Set up contestants">
+    In the Arena, configure **at least 2 contestants**. Each can be a **Prompt** or **AI Connection** ([learn more](/docs/llm-evaluation/no-code-evals/quickstart#generating-ai-outputs)).
+
+    [IMAGE: Arena with multiple contestants configured]
+
+  </Step>
+
+  <Step title="Run as Experiment">
+    Click **Run as Experiment** in the top right corner. You'll see a dialog to configure your experiment:
+
+    - **Experiment Name** — give it something memorable so you can find it later
+    - **Dataset** — select the dataset to evaluate against
+    - **Metric Collection** — select the metrics to score each output
+
+    [IMAGE: Run Experiment dialog]
+
+    <Tip>
+      **Variables Mapping** is optional but highly recommended. If your prompts use variables like `{input}`, map them to golden fields here. Without this, every golden gets the same static prompt — not very useful for comparison.
+    </Tip>
+
+  </Step>
+
+  <Step title="Analyze results">
+    Confident AI generates outputs for each contestant across your entire dataset, then runs your metrics on every test case.
+
+    When complete, you'll see:
+
+    **Metrics Overview** — a side-by-side comparison of all contestants:
+    - Average score per metric for each contestant
+    - Winner indicator showing which contestant performed best on each metric
+    - Score differences (e.g., +0.02, -0.01) relative to the base run
+
+    <Tip>
+      All differences are compared against the **base run**. You can switch which contestant is the base run to change your control — useful when you want to see how everything compares to a different baseline.
+    </Tip>
+
+    **Experiment Test Cases** — drill into individual goldens:
+    - Score breakdown per metric × contestant
+    - View the actual input, expected output, and each contestant's output
+    - Link to view traces for deeper debugging
+
+    [IMAGE: Experiment results showing metrics overview and test cases]
+
+  </Step>
+</Steps>
+
+<Tip>
+  Running experiments from Arena is perfect when you're actively iterating. Set
+  up your contestants, tweak prompts, and run experiments until you find a
+  winner.
+</Tip>
+
+## Experiments with test runs
+
+Already have test runs from previous evaluations? You can create an experiment directly from them — no need to re-run anything.
+
+This is different from regression testing:
+
+- **Regression Testing** — compare two test runs to spot what got better or worse
+- **Experiments** — compare multiple test runs with aggregate statistics and declare a winner
+
+<Steps>
+  <Step title="Navigate to your test run">
+    Go to **Test Runs** and select a test run you want to include in the experiment.
+  </Step>
+
+  <Step title="Create experiment">
+    Click **Create Experiment** and select the other test runs you want to compare against.
+
+    <Warning>
+      Only test runs using the same dataset and metric collection can be compared in an experiment.
+    </Warning>
+
+    [IMAGE: Creating experiment from test run view]
+
+  </Step>
+
+  <Step title="Analyze results">
+    The experiment view aggregates all your test runs and shows you:
+
+    - **Winner by metric** — which version performed best on each metric
+    - **Statistical significance** — confidence levels for the comparisons
+    - **Score distributions** — visualize how scores varied across test cases
+
+    [VIDEO: Analyzing experiment results from existing test runs]
+
+  </Step>
+</Steps>
+
+## Reading Results
+
+A good experiment tells you more than just "A is better than B." Here's what to look for:
+
+- **Consistent winners** — if one contestant wins across all metrics, you have a clear choice
+- **Trade-offs** — one contestant might be more relevant but less concise; decide what matters most
+- **Close calls** — if scores are within a few percentage points, you may need more test cases for confidence
+- **Outliers** — dig into test cases where one contestant dramatically outperformed or underperformed
+
+[IMAGE: Experiment results with annotations explaining key sections]
+
+## Next Steps
+
+Now that you've run an experiment, the next step is making your results even more reliable. Your experiment is only as valid as the quality of your dataset. That means scaling your dataset and keeping it well-maintained.
+
+<Card title="Datasets" icon="database" href="/docs/datasets">
+  Learn how to grow, curate, and maintain your test datasets for better
+  experiments.
+</Card>

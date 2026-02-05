@@ -1,0 +1,114 @@
+---
+title: Introduction to LLM Evaluation
+subtitle: Run LLM evals with or without code — choose the workflow that fits your team.
+slug: llm-evaluation/introduction
+description: Learn how to evaluate AI applications using Confident AI's code-driven or no-code workflows.
+---
+
+## Overview
+
+LLM evaluation on Confident AI refers to **benchmarking via datasets** in a pre-deployment setting, can be done in two ways:
+
+- **No-code** directly in the platform UI, best for QAs, PMs, SMEs, or,
+- **Code-driven** using the `deepeval` (or `deepeval.ts`) framework, best for engineers and QAs.
+
+Both approaches give you access to the same comprehensive evaluation metrics and insights — the difference is in how you run them.
+
+<Note>
+
+For those looking to use **online evals for production monitoring** on observability data, [click here.](/docs/llm-tracing/evaluations)
+
+</Note>
+
+## What you can evaluate
+
+Both code-dirven and no-code workflows allow you to evaluate all 3 use cases:
+
+<CardGroup cols={3}>
+  <Card title="Single-Turn" icon="arrow-right">
+    One input → one output interactions like Q&A, summarization, or
+    classification tasks.
+  </Card>
+  <Card title="Multi-Turn" icon="comments">
+    Conversational interactions where context builds across multiple exchanges.
+  </Card>
+  <Card title="Agentic Workflows" icon="robot">
+    Complex systems with tool calls, reasoning chains, and multi-step execution.
+  </Card>
+</CardGroup>
+
+## Choose your workflow
+
+Run evals entirely in the platform UI without writing any code or use `deepeval` programmatically:
+
+<CardGroup cols={2}>
+  <Card
+    title="No-Code Evals"
+    icon="browser"
+    iconType="solid"
+    href="/docs/documentation/llm-evaluation/no-code-evals/quickstart"
+  >
+
+    <div className='card-link-icon'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+
+    - Run experiments on single and multi-prompt AI apps
+    - Compare prompts and models in Arena
+
+    **Suitable for:** PMs, QA teams, rapid prototyping
+
+  </Card>
+  <Card
+    title="Code-Driven Evals"
+    icon="code"
+    iconType="solid"
+    href="/docs/documentation/llm-evaluation/code-driven-evals/quickstart"
+  >
+    <div className='card-link-icon'>
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+
+      - Automated regression testing in CI/CD
+      - Full control over output generation
+      - Version-controlled eval logic
+
+      **Suitable for:** Engineers, automated testing
+
+  </Card>
+</CardGroup>
+
+<Tip title="Not sure which to pick?">
+  Most teams use **both** approaches. Start with no-code to explore and
+  experiment, then move to code-driven for automated regression testing in
+  CI/CD. The results from both workflows appear in the same dashboards.
+</Tip>
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Dataset Management" icon="database">
+    Create, organize, and version datasets of test cases to systematically
+    benchmark your LLM applications
+  </Card>
+  <Card title="Experimentation" icon="flask">
+    Run experiments to compare prompts, models, and parameters with detailed
+    analysis and insights
+  </Card>
+  <Card title="A|B Regression Testing" icon="arrows-split-up-and-left">
+    Catch regressions on different versions of your AI app with side-by-side
+    test case comparisons
+  </Card>
+  <Card title="Unit-Testing in CI/CD" icon="code">
+    Integrate native `pytest` evaluations into your deployment CI/CD pipelines
+  </Card>
+</CardGroup>
+
+## Learn the fundamentals
+
+New to LLM evaluation? These concepts will help you get the most out of your evals:
+
+- [Single vs Multi-Turn Evals](/docs/documentation/llm-evaluation/core-concepts/single-vs-multi-turn-evals) — understand when to use each approach
+- [Test Cases, Goldens, and Datasets](/docs/documentation/llm-evaluation/core-concepts/test-cases-goldens-datasets) — the building blocks of evaluation
+- [LLM-as-a-Judge Metrics](/docs/documentation/llm-evaluation/core-concepts/llm-as-a-judge-metrics) — how automated scoring works

@@ -56,53 +56,70 @@ navigation:
             icon: fa-light fa-play
       - section: LLM Evaluation
         contents:
-          - page: Quickstart
-            path: docs/pages/llm-evaluation/quickstart.mdx
-            icon: fa-light fa-bolt
-          - section: Core Concepts
+          - page: Introduction
+            path: docs/pages/llm-evaluation/introduction.mdx
+            icon: fa-light fa-circle-info
+          - section: Code-Driven Evals
             collapsed: false
-            icon: fa-light fa-brain
+            icon: fa-light fa-code
             contents:
-              - page: Single vs Multi-Turn Evals
-                path: docs/pages/llm-evaluation/core-concepts/single-vs-multi-turn-evals.mdx
+              - page: Quickstart
+                path: docs/pages/llm-evaluation/code-driven/quickstart.mdx
+                icon: fa-light fa-bolt
+              - section: Single-Turn Evals
+                collapsed: false
+                icon: fa-light fa-arrow-turn-down-right
+                contents:
+                  - page: End-to-End
+                    path: docs/pages/llm-evaluation/code-driven/single-turn/end-to-end.mdx
+                    icon: fa-light fa-route
+                  - page: Component-Level
+                    path: docs/pages/llm-evaluation/code-driven/single-turn/component-level.mdx
+                    icon: fa-light fa-puzzle-piece
+              - page: Multi-Turn Evals
+                path: docs/pages/llm-evaluation/code-driven/multi-turn.mdx
                 icon: fa-light fa-comments
-              - page: Test Cases, Goldens, and Datasets
-                path: docs/pages/llm-evaluation/core-concepts/test-cases-goldens-datasets.mdx
-                icon: fa-light fa-file-code
-              - page: LLM-as-a-Judge Metrics
-                path: docs/pages/llm-evaluation/core-concepts/llm-as-a-judge-metrics.mdx
-                icon: fa-light fa-gavel
-          - section: Single-Turn Evals
+              - page: Unit-Testing in CI/CD
+                path: docs/pages/llm-evaluation/code-driven/unit-testing-in-cicd.mdx
+                icon: fa-light fa-gear-complex
+          - section: No-Code Evals
             collapsed: false
-            icon: fa-light fa-arrow-turn-down-right
+            icon: fa-light fa-browser
             contents:
-              - page: End-to-End Testing
-                path: docs/pages/llm-evaluation/single-turn/end-to-end.mdx
-                icon: fa-light fa-route
-              - page: Component-Level Testing
-                path: docs/pages/llm-evaluation/single-turn/component-level.mdx
-                icon: fa-light fa-puzzle-piece
-          - section: Multi-Turn Evals
+              - page: Quickstart
+                path: docs/pages/llm-evaluation/no-code/quickstart.mdx
+                icon: fa-light fa-bolt
+              - page: Single-Turn Evals
+                path: docs/pages/llm-evaluation/no-code/single-turn.mdx
+                icon: fa-light fa-arrow-turn-down-right
+              - page: Multi-Turn Evals
+                path: docs/pages/llm-evaluation/no-code/multi-turn.mdx
+                icon: fa-light fa-comments
+              - page: Arena
+                path: docs/pages/llm-evaluation/no-code/arena.mdx
+                icon: fa-light fa-swords
+          - page: Experiments
+            path: docs/pages/llm-evaluation/experiments.mdx
+            icon: fa-light fa-flask
+          - section: Datasets
             collapsed: false
-            icon: fa-light fa-comments
+            icon: fa-light fa-database
             contents:
-              - page: Simulate User Turns
-                path: docs/pages/llm-evaluation/multi-turn/simulate-user-turns.mdx
-                icon: fa-light fa-user-plus
-              - page: End-to-End Testing
-                path: docs/pages/llm-evaluation/multi-turn/end-to-end.mdx
-                icon: fa-light fa-route
-          - section: Dataset Management
-            collapsed: false
-            icon: fa-light fa-file-code
-            contents:
-              - page: Push, Queue, and Annotate Goldens
-                path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
-                icon: fa-light fa-pen-to-square
-              - page: Pull Datasets for Testing
-                path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
-                icon: fa-light fa-database
+              - page: Manage Datasets
+                path: docs/pages/llm-evaluation/dataset-management/manage-datasets.mdx
+                icon: fa-light fa-file-pen
+              - section: Datasets in Code
+                collapsed: false
+                icon: fa-light fa-code
+                contents:
+                  - page: Pull Datasets
+                    path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
+                    icon: fa-light fa-arrow-down-to-bracket
+                  - page: Push & Queue Goldens
+                    path: docs/pages/llm-evaluation/dataset-management/create-goldens.mdx
+                    icon: fa-light fa-pen-to-square
           - section: Prompt Optimization
+            collapsed: false
             icon: fa-light fa-sliders
             contents:
               - page: Prompt Versioning
@@ -124,9 +141,19 @@ navigation:
               - page: Model and Prompt Insights
                 path: docs/pages/llm-evaluation/dashboards/model-and-prompt-insights.mdx
                 icon: fa-light fa-lightbulb
-          - page: Unit-Testing in CI/CD
-            path: docs/pages/llm-evaluation/unit-testing-in-cicd.mdx
-            icon: fa-light fa-gear-complex
+          - section: Core Concepts
+            collapsed: true
+            icon: fa-light fa-brain
+            contents:
+              - page: Single vs Multi-Turn Evals
+                path: docs/pages/llm-evaluation/core-concepts/single-vs-multi-turn-evals.mdx
+                icon: fa-light fa-comments
+              - page: Test Cases, Goldens, and Datasets
+                path: docs/pages/llm-evaluation/core-concepts/test-cases-goldens-datasets.mdx
+                icon: fa-light fa-file-code
+              - page: LLM-as-a-Judge Metrics
+                path: docs/pages/llm-evaluation/core-concepts/llm-as-a-judge-metrics.mdx
+                icon: fa-light fa-gavel
       - section: Metrics
         contents:
           - page: Custom Metrics

@@ -1,0 +1,171 @@
+---
+title: No-Code Evals Quickstart
+subtitle: Run your first evaluation in the platform UI — no code required.
+slug: llm-evaluation/no-code-evals/quickstart
+---
+
+## Overview
+
+This quickstart walks you through running your first no-code evaluation on Confident AI. By the end, you'll have:
+
+- Created a metric collection to define what you're evaluating
+- Built a dataset with goldens
+- Run an evaluation and viewed results on the dashboard
+
+A no-code evaluation workflow allows non-technical team members to run an end-to-end iteration of your AI app without leaving Confident AI.
+
+<Warning>
+  You'll need a Confident AI account to follow along. [Sign up
+  here](https://app.confident-ai.com/) if you haven't already.
+</Warning>
+
+## Run your first evaluation
+
+RUn your first evaluation by following this example for a **single-turn, QA use case**:
+
+<Steps>
+  <Step title="Create a Metric Collection">
+    A metric collection groups the metrics you want to evaluate together.
+
+    <Frame caption="Creating a metric collection">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="metrics.createCollection"
+        type="video/mp4"
+      />
+    </Frame>
+
+    1. Navigate to **Metric Collections** in the sidebar
+    2. Click **Create Metric Collection**
+    3. Give it a name (e.g., "RAG Quality Metrics")
+    4. Select the metrics you want to include:
+       - **Answer Relevancy** — measures if the output addresses the input
+       - **Faithfulness** — measures if the output is grounded in the context
+       - Add any other metrics relevant to your use case
+    5. Click **Save**
+
+
+
+    <Tip>
+      Start with 2-3 metrics for your first evaluation. You can always add more later.
+    </Tip>
+
+  </Step>
+
+  <Step title="Create a Dataset">
+    Datasets contain the goldens you'll use to generate AI outputs.
+
+    <Frame caption="Creating a dataset with goldens">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="datasets.create"
+        type="video/mp4"
+      />
+    </Frame>
+
+    1. Navigate to **Datasets** in the sidebar
+    2. Click **Create Dataset**
+    3. Give it a name (e.g., "QA Test Cases")
+    4. Add your golden:
+       - **Input**: The user query (e.g., "What is the refund policy?")
+       - **Expected Output** (optional): The ideal response
+       - **Actual Output**: The AI app's output to evaluate
+    5. Click **Save**
+
+
+    <Note>
+
+    We'll cover all the ways you can generate AI outputs in later sections.
+
+    </Note>
+
+
+    For this quickstart, provide a **hardcoded actual output** (don't worry, we won't be doing this later):
+
+    | Field | Example Value |
+    |-------|---------------|
+    | Input | "What is the refund policy?" |
+    | Actual Output | "You can request a refund within 30 days of purchase by contacting support." |
+
+  </Step>
+
+  <Step title="Run the Evaluation">
+    Now let's evaluate your goldens against your metrics.
+
+    1. Navigate to **Evaluations** in the sidebar
+    2. Click **New Evaluation**
+    3. Select your **Dataset** (e.g., "QA Test Cases")
+    4. Select your **Metric Collection** (e.g., "RAG Quality Metrics")
+    5. Click **Run Evaluation**
+
+    The evaluation will process each test case and score it against your selected metrics.
+
+  </Step>
+
+  <Step title="View Results on Dashboard">
+    Once your run an evaluation, you will be redirected to a test run. Wait for a moment for evaluation to complete, and ✅ **done!**. You've run your first no-code evaluation.
+
+    <Frame caption="Viewing test run results">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="evaluation.singleTurnReport"
+        type="video/mp4"
+      />
+    </Frame>
+
+    In the testing report, you can analyze:
+
+    - **Individual test cases** — drill down into specific failures to understand what went wrong
+    - **Score distributions** — view average, median, and percentile breakdowns for each metric
+    - **Pass/fail results** — a test case passes only if all its metrics meet their thresholds
+    - **AI-generated summary** — get an automated analysis of patterns and issues across your test run
+
+    In later sections, you can find out more on what a test run offers.
+
+  </Step>
+</Steps>
+
+## Generating AI Outputs
+
+In the quickstart above, we hardcoded the actual output directly in the dataset. This is useful for quick tests, but highly not recommedned. This is because you should aim to test changes made to your AI app, not static outputs that are pre-computed.
+
+Confident AI offers more powerful ways to generate outputs dynamically:
+
+1. **Single prompt generation** — define a prompt template in the platform and Confident AI calls your configured LLM provider to generate outputs automatically. Ideal for testing prompt variations or comparing models.
+
+2. [**AI Connections**](/docs/settings/project/ai-connections) — connect directly to your deployed AI system. If it's reachable via HTTP(s), it's testable. Customize request payloads, parse custom response structures, and pass headers or auth tokens.
+
+AI connections are powerful because it allows Confident AI to test your AI apps as they are. However, it does require an [initial small setup time](/docs/settings/project/ai-connections) from engineering.
+
+<Tip>
+  AI Connections let you test your actual AI system end-to-end, catching
+  integration issues that prompt-only testing misses.
+</Tip>
+
+## Next Steps
+
+Now that you've completed a basic evaluation, learn how to handle different use cases:
+
+<CardGroup cols={2}>
+  <Card
+    title="Single-Turn Evals"
+    icon="arrow-right"
+    href="/docs/documentation/llm-evaluation/no-code-evals/single-turn-evals"
+  >
+    Evaluate one-shot Q&A, summarization, and classification tasks with
+    generated outputs.
+  </Card>
+  <Card
+    title="Multi-Turn Evals"
+    icon="comments"
+    href="/docs/documentation/llm-evaluation/no-code-evals/multi-turn-evals"
+  >
+    Evaluate conversational AI where context builds across multiple exchanges.
+  </Card>
+</CardGroup>

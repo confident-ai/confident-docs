@@ -1,0 +1,111 @@
+---
+title: Arena
+subtitle: Quickly compare prompts, models, and AI connections side-by-side without running a full evaluation.
+slug: llm-evaluation/no-code-evals/arena
+---
+
+## Overview
+
+The Arena is a lightweight comparison tool for rapid comparison. It's ideal when you want to quickly see how different prompts, models, or AI connections perform — without setting up a full evaluation with datasets and metrics.
+
+Use the Arena when you:
+
+- Want to **compare prompt variations** to see which produces better outputs
+- Need to **test a new model** against your current one before committing
+- Are **iterating on a prompt** and want instant feedback
+- Want to **demo differences** between configurations to stakeholders
+- Don't yet have a dataset and want to rely on vibes
+
+<Note>
+  The Arena is for quick, qualitative comparisons. For evaluation with metrics
+  and test datasets, perform [experiments](/docs/llm-evaluation/experiments)
+  instead.
+</Note>
+
+## How It Works
+
+The Arena lets you set up two or more "contestants" and run the same input through all of them simultaneously. Each contestant can be either a **Prompt** or **AI Connection** ([learn more](/docs/llm-evaluation/no-code-evals/quickstart#generating-ai-outputs)).
+
+1. **Set up contestants** — configure two or more contestants to compare
+2. **Enter your message(s)** — or existing prompts or AI connections
+3. **Interpolate variables** - if any, enter the dynamic variables in your input
+4. **Press Quick Run** — execute all contestants and view results side-by-side
+
+You can mix and match — for example, compare a new prompt against your production AI Connection to see if it's ready for deployment.
+
+## Using the Arena
+
+<Steps>
+  <Step title="Navigate to Arena">
+    Go to **Project** > **Arena** from the sidebar.
+  </Step>
+
+  <Step title="Configure the Base Run">
+    The base run is your starting point. Choose how it should generate outputs:
+
+    <Tabs>
+      <Tab title="Prompt">
+        1. Select a model provider (e.g., OpenAI) and model (e.g., gpt-4.1)
+        2. Enter your prompt in the message composer — you can use variables like `{variable_name}`
+        3. Optionally click **Settings** to configure model parameters
+
+        <Tip>
+          Use the **Select prompt...** dropdown to load a saved prompt from your Prompt Studio, or click **Save Prompt** to save your current prompt for later.
+        </Tip>
+      </Tab>
+      <Tab title="AI Connection">
+        1. Select an existing AI Connection from the dropdown
+        2. Optionally associate prompts with the connection
+        3. Click **Update AI Connection** to save any changes
+      </Tab>
+    </Tabs>
+
+  </Step>
+
+  <Step title="Add Comparison Runs">
+    Click **Add Contestant** to add as many comparison runs as you need. Each contestant is independently configured — you can choose either a prompt or an AI Connection for each one.
+
+    Common comparison setups:
+    - **Prompt vs Prompt** — compare different prompt variations on the same model
+    - **Model vs Model** — compare the same prompt across different models
+    - **Prompt vs AI Connection** — test a new prompt against your production system
+
+  </Step>
+
+{" "}
+
+<Step title="Set Variable Values">
+  If your prompts contain variables, expand the **Variables** panel at the
+  bottom to provide values. These values will be interpolated into all prompts
+  before execution.
+</Step>
+
+  <Step title="Run the Comparison">
+    You have two options:
+
+    - **Quick Run** — immediately execute all contestants and view results inline
+    - **Run as Experiment** — run the comparison as a tracked experiment for more detailed analysis
+
+    Results appear below each contestant, allowing you to compare outputs side-by-side.
+
+  </Step>
+</Steps>
+
+## Tips for Comparisons
+
+- **Test one variable at a time** — change only the prompt OR the model between contestants to isolate what's causing differences
+- **Use realistic inputs** — test with inputs that represent your actual use cases
+- **Try edge cases** — compare how different configurations handle unusual or challenging inputs
+- **Save winning prompts** — when you find a prompt that works well, save it to Prompt Studio for use in evaluations
+
+## Next Steps
+
+Once you've found a configuration that works (🎉), take it to the next level — run a full experiment with a dataset to get statistically meaningful results.
+
+<Card title="Experiments" icon="flask" href="/docs/llm-evaluation/experiments">
+  <div className="card-link-icon">
+    <Icon icon="arrow-up-right-from-square" />
+  </div>
+  Run systematic evaluations to compare 2 or more versions of your AI app with datasets
+  and metrics.
+</Card>

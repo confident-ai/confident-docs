@@ -1,0 +1,94 @@
+---
+subtitle: Learn the core functions of a dataset, and ways to manipulate goldens within
+slug: llm-evaluation/dataset-management/manage-datasets
+---
+
+## Overview
+
+A dataset, single or multi-turn one, is a list of goldens and forms the basis of any evaluation workflow in development. In this section, you'll learn to manipulate goldens in datasets, including:
+
+- Uploading goldens via CSV on the platform
+- Build an automated golden ingestion pipline via the Evals API
+- Assiging different team members to review and finalize goldens
+
+<Tip>
+  If you haven't already, you should get yourself familiarized with [what are
+  goldens.](/llm-evaluation/core-concepts/test-cases-goldens-datasets#goldens)
+</Tip>
+
+If you haven't already, create one under **Project** > **Datasets**:
+
+<Frame caption="Create Dataset on Confident AI" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.create" type="video/mp4" />
+
+</Frame>
+
+## Upload Goldens via CSV
+
+You can upload both single and multi-turn goldens stored in CSVs to datasets. The fields that you will be mapping to CSV headers will just be slightly different.
+
+<Frame caption="Upload Goldens via CSV" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.uploadCsv" type="video/mp4" />
+
+</Frame>
+
+## Assign Goldens For Annotation
+
+You can also assign goldens to different team members for review and annotation.
+
+<Frame caption="Assign Goldens for Annotation" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.assign" type="video/mp4" />
+
+</Frame>
+
+## Delete Dataset
+
+You can delete a dataset directly on the platform.
+
+<Warning>
+  This action cannot be undone. All goldens or conversational goldens in the
+  dataset will be permanently deleted.
+</Warning>
+
+<Frame caption="Delete Dataset on Confident AI" background="subtle">
+
+<video autoPlay loop muted data-video="datasets.delete" type="video/mp4" />
+
+</Frame>
+
+You can also do it programmatically through the Evals API.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.delete(alias="YOUR-DATASET-ALIAS")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval-ts";
+
+const dataset = new EvaluationDataset();
+dataset.delete({ alias: "YOUR-DATASET-ALIAS" });
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="DELETE /v1/datasets/{alias}" />
+
+</Tab>
+
+</Tabs>
