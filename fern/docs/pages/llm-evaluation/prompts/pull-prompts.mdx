@@ -770,84 +770,95 @@ For prompts containing images, here's how you would parse it and pass it for use
 
 <Tab title="Python" language="python">
 
+The `deepeval` python SDK offers a utility method called `convert_to_multi_modal_array`. This method is useful for converting a string containing images in the `[DEEPEVAL:IMAGE:url]` format into a list of strings and `MLLMImage` items.
 
-```python maxLines=0
-import re
+```python
 from deepeval.prompt import Prompt
-PATTERN = r"\[DEEPEVAL:IMAGE:(.*?)\]"
+from deepeval.utils import convert_to_multi_modal_array
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull()
 
-URLs = []
+multimodal_array = convert_to_multi_modal_array(prompt.text)
+```
 
-matches = list(re.finditer(PATTERN, prompt.text))
-for match in matches:
-  url = match.group(1)
-  URLs.append(url)
+The `multimodal_array` here is a list containing strings and `MLLMImage`s, you can loop over this list to construct a messages array with images to pass to your MLLM. Here's an example showing how to construct messages array for `openai`:
 
-for i in range(len(URLs)):
-  response = client.chat.completions.create(
-    model="gpt-5.2",
-    messages=[
-      {
-        "role": "user",
-        "content": [
-          {"type": "text", "text": prompt.text},
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": URLs[i],
-            },
-          },
-        ],
-      }
-    ],
-  )
-  print(response)
+```python
+messages = []
+for element in multimodal_array:
+    if isinstance(element, str):
+        messages.append({"type": "text", "text": element})
+    elif isinstance(element, MLLMImage):
+      if element.url:
+          messages.append(
+              {
+                  "type": "image_url",
+                  "image_url": {"url": element.url},
+              }
+          )
 ```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript maxLines=0
-import { OpenAI } from "openai";
-import { Prompt } from "deepeval-ts";
+You can use a custom method to parse strings with images in `[DEEPEVAL:IMAGE:url]` format to convert them into an array of strings and URLs
 
-const client = new OpenAI();
-const PATTERN = /\[DEEPEVAL:IMAGE:(.*?)\]/g;
+```typescript maxLines=0
+const parseMultimodalString = (s: string) => {
+  const PATTERN = /\[DEEPEVAL:IMAGE:(.*?)\]/g;
+
+  const result = [];
+  let lastEnd = 0;
+  let match;
+
+  while ((match = PATTERN.exec(s)) !== null) {
+    const start = match.index;
+    const end = PATTERN.lastIndex;
+
+    if (start > lastEnd) {
+      result.push(s.slice(lastEnd, start));
+    }
+
+    const imageUrl = match[1];
+    result.push({ url: imageUrl });
+
+    lastEnd = end;
+  }
+
+  if (lastEnd < s.length) {
+    result.push(s.slice(lastEnd));
+  }
+
+  return result;
+}
+```
+
+You can now use this method to get `multimodalArray` from prompt text and construct messages array to pass it to your MLLM. Here's an example on how to use it to construct `openai` format messages:
+
+```typescript maxLines=0
+import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
 await prompt.pull();
 
-const URLs: string[] = [];
+const multimodalArray = parseMultimodalString(prompt.text);
 
-const matches = prompt.text.matchAll(PATTERN);
-for (const match of matches) {
-  const url = match[1];
-  URLs.push(url);
-}
+const messages = [];
 
-for (let i = 0; i < URLs.length; i++) {
-  const response = await client.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: prompt.text },
-          {
-            type: "image_url",
-            image_url: {
-              url: URLs[i],
-            },
-          },
-        ],
-      },
-    ],
-  });
-  console.log(response);
+for (const element of multimodalArray) {
+  if (typeof element === "string") {
+    messages.push({
+      type: "text",
+      text: element,
+    });
+  } else if (element.url) {
+    messages.push({
+      type: "image_url",
+      image_url: { url: element.url },
+    });
+  }
 }
 ```
 
@@ -858,6 +869,54 @@ for (let i = 0; i < URLs.length; i++) {
 <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
 
 The prompt pulled here has images in text / messages fields with the pattern `[DEEPEVAL:IMAGE:url]`. Please parse the fields to fetch the public `url` and use it as necessary.
+
+</Tab>
+
+
+<Tab title="Custom" language="custom">
+
+You can use a custom method to parse strings with images in `[DEEPEVAL:IMAGE:url]` format to convert them into an array of strings and URLs
+
+```python
+def parse_multimodal_string(s: str):
+    PATTERN = r"\[DEEPEVAL:IMAGE:(.*?)\]"
+    matches = list(re.finditer(pattern, s))
+
+    result = []
+    last_end = 0
+    for m in matches:
+        start, end = m.span()
+        if start > last_end:
+          result.append(s[last_end:start])
+
+        image_url = m.group(1)
+
+        result.append({url: image_url})
+        last_end = end
+
+    if last_end < len(s):
+        result.append(s[last_end:])
+        return result
+```
+
+You can now use this method to get `multimodal_array` and construct messages array to pass it to your MLLM. Here's an example on how to use it:
+
+```python
+multimodal_array = parse_multimodal_string(prompt.text)
+
+messages = []
+for element in multimodal_array:
+    if isinstance(element, str):
+        messages.append({"type": "text", "text": element})
+    else:
+        if element.url:
+          messages.append(
+              {
+                  "type": "image_url",
+                  "image_url": {"url": element.url},
+              }
+          )
+```
 
 </Tab>
 
