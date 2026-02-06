@@ -100,7 +100,9 @@ The ECR account ID and region are the values provided by Confident AI for ECR ac
 
 The ingress defines how external traffic reaches your services. Edit `base/network/ingress.yaml`:
 
-#### 1. Set your domain names
+<Steps>
+
+<Step title="Set your domain names">
 
 Find and replace the placeholder hostnames with your actual domains:
 
@@ -128,7 +130,9 @@ spec:
       # ...
 ```
 
-#### 2. Add the ACM certificate ARN
+</Step>
+
+<Step title="Add the ACM certificate ARN">
 
 Find the `certificate-arn` annotation and add your certificate ARN (from the SSL Certificates step):
 
@@ -143,7 +147,9 @@ annotations:
   your terminal might display.
 </Warning>
 
-#### 3. Set ALB scheme
+</Step>
+
+<Step title="Set ALB scheme">
 
 The `scheme` annotation controls whether the load balancer is internal or internet-facing:
 
@@ -162,7 +168,9 @@ annotations:
   but larger attack surface.
 </Note>
 
-#### 4. Update ExternalDNS annotation (optional)
+</Step>
+
+<Step title="Update ExternalDNS annotation (optional)">
 
 If using ExternalDNS to automatically create DNS records:
 
@@ -170,6 +178,10 @@ If using ExternalDNS to automatically create DNS records:
 annotations:
   external-dns.alpha.kubernetes.io/hostname: app.yourdomain.com,api.yourdomain.com,deepeval.yourdomain.com
 ```
+
+</Step>
+
+</Steps>
 
 ### Configure External Secrets
 
@@ -218,7 +230,9 @@ data:
 
 Deploy in order to ensure dependencies are available when needed.
 
-### Step 1: Apply network and secrets configuration
+<Steps>
+
+<Step title="Apply network and secrets configuration">
 
 The namespace already exists (Terraform created it), but apply the network and secrets configuration:
 
@@ -227,7 +241,9 @@ kubectl apply -f base/network/
 kubectl apply -f base/common/external-secrets/
 ```
 
-### Step 2: Wait for secrets to sync
+</Step>
+
+<Step title="Wait for secrets to sync">
 
 External Secrets needs to pull credentials from Secrets Manager before pods can start. Watch the sync status:
 
@@ -256,7 +272,9 @@ kubectl get secret confident-externalsecret -n confident-ai
   completes, pods will fail to start with "secret not found" errors.
 </Warning>
 
-### Step 3: Deploy Redis
+</Step>
+
+<Step title="Deploy Redis">
 
 Redis must be running before the backend, which uses it for caching and job queues:
 
@@ -272,7 +290,9 @@ kubectl get pods -n confident-ai -l app=redis
 
 Wait for `Running` status before continuing.
 
-### Step 4: Deploy application services
+</Step>
+
+<Step title="Deploy application services">
 
 Now deploy the Confident AI services:
 
@@ -283,7 +303,7 @@ kubectl apply -f confident-evals/
 kubectl apply -f confident-otel/
 ```
 
-### Alternative: Deploy all at once
+**Alternative: Deploy all at once**
 
 If you prefer fewer commands:
 
@@ -295,6 +315,10 @@ kubectl apply -f confident-frontend/
 kubectl apply -f confident-evals/
 kubectl apply -f confident-otel/
 ```
+
+</Step>
+
+</Steps>
 
 ## Monitor deployment
 

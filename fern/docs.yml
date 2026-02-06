@@ -33,8 +33,8 @@ tabs:
     slug: settings
     icon: fa-light fa-gear
     display-name: Platform Settings
-  on-prem:
-    slug: on-prem
+  self-hosting:
+    slug: self-hosting
     icon: fa-light fa-house
     display-name: Self-Hosting
   changelog:
@@ -451,11 +451,14 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
-  - tab: on-prem
+  - tab: self-hosting
     layout:
       - page: Self-Hosting
         path: docs/pages/self-hosting/introduction.mdx
         icon: fa-light fa-house
+      - page: Security & Compliance
+        path: docs/pages/self-hosting/security-and-compliance.mdx
+        icon: fa-light fa-shield-check
       - section: AWS Deployment
         icon: fa-brands fa-amazon
         contents:
@@ -465,9 +468,6 @@ navigation:
           - page: Requirements
             path: docs/pages/self-hosting/aws/requirements.mdx
             icon: fa-light fa-clipboard-list
-          - page: Security & Compliance
-            path: docs/pages/self-hosting/aws/security-and-compliance.mdx
-            icon: fa-light fa-shield-check
           - section: Step-by-step guide
             collapsed: true
             icon: fa-light fa-list-check
@@ -480,8 +480,8 @@ navigation:
                 path: docs/pages/self-hosting/aws/provisioning.mdx
               - page: SSL Certificates
                 path: docs/pages/self-hosting/aws/ssl-certificates.mdx
-              - page: Bastion Access
-                path: docs/pages/self-hosting/aws/bastion-access.mdx
+              - page: Cluster Access
+                path: docs/pages/self-hosting/aws/cluster-access.mdx
               - page: Kubernetes Deployment
                 path: docs/pages/self-hosting/aws/kubernetes-deployment.mdx
               - page: Verification
