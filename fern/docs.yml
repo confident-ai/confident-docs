@@ -33,6 +33,10 @@ tabs:
     slug: settings
     icon: fa-light fa-gear
     display-name: Platform Settings
+  self-hosting:
+    slug: self-hosting
+    icon: fa-light fa-house
+    display-name: Self-Hosting
   changelog:
     slug: changelog
     icon: fa-light fa-clock-rotate-left
@@ -447,6 +451,53 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+  - tab: self-hosting
+    layout:
+      - page: Self-Hosting
+        path: docs/pages/self-hosting/introduction.mdx
+        icon: fa-light fa-house
+      - page: Security & Compliance
+        path: docs/pages/self-hosting/security-and-compliance.mdx
+        icon: fa-light fa-shield-check
+      - section: AWS Deployment
+        icon: fa-brands fa-amazon
+        contents:
+          - page: Overview
+            path: docs/pages/self-hosting/aws/overview.mdx
+            icon: fa-light fa-map
+          - page: Requirements
+            path: docs/pages/self-hosting/aws/requirements.mdx
+            icon: fa-light fa-clipboard-list
+          - section: Step-by-step guide
+            collapsed: true
+            icon: fa-light fa-list-check
+            contents:
+              - page: Prerequisites
+                path: docs/pages/self-hosting/aws/prerequisites.mdx
+              - page: Configuration
+                path: docs/pages/self-hosting/aws/configuration.mdx
+              - page: Provisioning
+                path: docs/pages/self-hosting/aws/provisioning.mdx
+              - page: SSL Certificates
+                path: docs/pages/self-hosting/aws/ssl-certificates.mdx
+              - page: Cluster Access
+                path: docs/pages/self-hosting/aws/cluster-access.mdx
+              - page: Kubernetes Deployment
+                path: docs/pages/self-hosting/aws/kubernetes-deployment.mdx
+              - page: Verification
+                path: docs/pages/self-hosting/aws/verification.mdx
+      - section: Azure Deployment
+        icon: fa-brands fa-microsoft
+        contents:
+          - page: Overview
+            path: docs/pages/self-hosting/azure/overview.mdx
+            icon: fa-light fa-map
+      - section: GCP Deployment
+        icon: fa-brands fa-google
+        contents:
+          - page: Overview
+            path: docs/pages/self-hosting/gcp/overview.mdx
+            icon: fa-light fa-map
   - tab: changelog
 
 navbar-links:

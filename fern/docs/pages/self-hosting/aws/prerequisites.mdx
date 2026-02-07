@@ -1,0 +1,310 @@
+---
+slug: self-hosting/aws/prerequisites
+description: Prerequisites for deploying Confident AI on AWS
+---
+
+## Overview
+
+Before deploying Confident AI, you need to prepare your local environment and gather required information. This page covers:
+
+- Installing required CLI tools (Terraform, AWS CLI, kubectl, Helm)
+- Configuring AWS credentials with appropriate permissions
+- Obtaining repository access from Confident AI
+- Gathering domain, OAuth, and ECR credentials
+- Planning your VPC configuration
+
+Complete all items on this page before proceeding to Configuration.
+
+## Tools
+
+Install the following tools on your local machine (or wherever you'll run the deployment from):
+
+| Tool          | Version  | Purpose                                      | Installation                                                              |
+| ------------- | -------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| **Terraform** | >= 1.5.0 | Provisions all AWS infrastructure            | [terraform.io/downloads](https://www.terraform.io/downloads)              |
+| **AWS CLI**   | v2       | Authenticates with AWS and manages resources | [aws.amazon.com/cli](https://aws.amazon.com/cli/)                         |
+| **kubectl**   | >= 1.28  | Manages Kubernetes workloads on EKS          | [kubernetes.io/docs/tasks/tools](https://kubernetes.io/docs/tasks/tools/) |
+| **Helm**      | >= 3.12  | Installs Kubernetes packages (charts)        | [helm.sh/docs/intro/install](https://helm.sh/docs/intro/install/)         |
+| **Git**       | Latest   | Clones the deployment repositories           | [git-scm.com](https://git-scm.com/)                                       |
+
+Verify installations:
+
+```bash
+terraform version
+aws --version
+kubectl version --client
+helm version
+```
+
+<Warning>
+  **Corporate laptop restrictions:** Many organizations restrict software
+  installation on managed devices. If you can't install these tools locally,
+  consider: - Using a cloud-based VM (EC2 instance) as your deployment
+  workstation - Requesting exceptions from your IT security team - Using
+  pre-approved container images that include these tools
+</Warning>
+
+## AWS credentials
+
+Terraform needs AWS credentials to create resources on your behalf. The IAM user or role you use must have permissions to create VPCs, EKS clusters, RDS databases, S3 buckets, and IAM roles.
+
+### Option A: Configure AWS CLI directly
+
+```bash
+aws configure
+```
+
+This prompts for your access key, secret key, and default region.
+
+### Option B: Use environment variables
+
+```bash
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_REGION="us-east-1"
+```
+
+### Option C: Use AWS SSO (recommended for organizations)
+
+If your organization uses AWS SSO:
+
+```bash
+aws configure sso
+aws sso login --profile your-profile-name
+export AWS_PROFILE=your-profile-name
+```
+
+Verify access works:
+
+```bash
+aws sts get-caller-identity
+```
+
+This should return your account ID and user/role ARN.
+
+<Warning>
+**IAM permission errors are the #1 cause of failed deployments.** Before starting, verify your IAM user/role has permissions to create:
+- VPC, subnets, NAT gateways, Internet gateways
+- EKS clusters and node groups
+- RDS instances
+- S3 buckets
+- IAM roles and policies
+- Secrets Manager secrets
+- KMS keys
+
+If your organization requires pre-approved IAM policies, work with your cloud security team to get the necessary permissions before proceeding. The [Requirements](/self-hosting/aws/requirements) page lists the specific AWS services used.
+
+</Warning>
+
+<Note>
+  **Using a service account?** Many organizations prohibit using personal IAM
+  credentials for infrastructure provisioning. If you need to use a service
+  account or assume a role, ensure it has the permissions listed above and that
+  you can authenticate with it from your deployment workstation.
+</Note>
+
+## Repository access
+
+Confident AI provides two private GitHub repositories containing the deployment code:
+
+| Repository            | What it contains                                                             |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `confident-terraform` | Terraform code that creates all AWS infrastructure (VPC, EKS, RDS, S3, etc.) |
+| `confident-k8s`       | Kubernetes YAML files that deploy the actual application services            |
+
+Your Confident AI representative will grant your GitHub account access to these repositories. Once granted, clone them:
+
+```bash
+git clone git@github.com:confident-ai/confident-terraform.git
+git clone git@github.com:confident-ai/confident-k8s.git
+```
+
+<Warning>
+**SSH key issues:** If the clone fails with "Permission denied (publickey)", you need to add your SSH key to GitHub. See [GitHub's SSH key documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+**Corporate proxy/firewall:** If git commands hang or timeout, your network may block SSH (port 22). Try using HTTPS instead:
+
+```bash
+git clone https://github.com/confident-ai/confident-terraform.git
+```
+
+</Warning>
+
+## Information to gather
+
+Before running Terraform, you need several pieces of information. Gather these now to avoid interruptions during configuration.
+
+### Domain and URLs
+
+Confident AI needs three URLs configured. These determine where your users and applications access the platform:
+
+| Variable         | What it's for                                                       | Example                      |
+| ---------------- | ------------------------------------------------------------------- | ---------------------------- |
+| **Frontend URL** | Where users open their browser to access the Confident AI dashboard | `https://app.yourdomain.com` |
+| **Backend URL**  | API endpoint that the SDK and integrations call                     | `https://api.yourdomain.com` |
+| **Subdomain**    | Used for authentication cookies—typically your root domain          | `yourdomain.com`             |
+
+<Note>
+  **Why separate frontend and backend URLs?** The frontend serves the web
+  dashboard, while the backend handles API requests. Separating them allows
+  independent scaling and clearer security boundaries. Both URLs will point to
+  the same load balancer but route to different services.
+</Note>
+
+<Warning>
+  **DNS control required:** You must be able to create DNS records (CNAME or A
+  records) for these domains. If your DNS is managed by a different team, loop
+  them in early—DNS changes often require change tickets and approvals.
+</Warning>
+
+### OAuth credentials (Google SSO)
+
+If using Google for user authentication, you need OAuth credentials. Skip this if using a different identity provider (Okta, Azure AD, etc.—these are configured separately).
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new **OAuth 2.0 Client ID** (Web application type)
+3. Add authorized redirect URI: `https://<your-backend-url>/api/auth/callback/google`
+4. Save the **Client ID** and **Client Secret**
+
+<Warning>
+  **OAuth redirect URI must be exact.** The redirect URI must match exactly what
+  you configure in Confident AI. A common mistake is forgetting the
+  `/api/auth/callback/google` path or using HTTP instead of HTTPS.
+</Warning>
+
+### ECR access credentials
+
+Confident AI container images are stored in our private Elastic Container Registry (ECR). Your Confident AI representative will provide credentials that allow your EKS cluster to pull these images:
+
+| Credential                  | What it's for                                              |
+| --------------------------- | ---------------------------------------------------------- |
+| `ecr_aws_access_key_id`     | AWS access key that can authenticate to Confident AI's ECR |
+| `ecr_aws_secret_access_key` | Corresponding secret key                                   |
+| `ecr_aws_account_id`        | The AWS account ID where images are stored                 |
+
+<Note>
+  **Why cross-account ECR access?** Confident AI hosts the container images in
+  our AWS account. The credentials we provide allow your cluster to pull images
+  without you needing to host them yourself. Your cluster authenticates to our
+  ECR, pulls the images, and runs them in your environment—the images never
+  leave your infrastructure after the initial pull.
+</Note>
+
+### Secrets to generate
+
+You need to generate several secure random values. These are used for encrypting sessions, database passwords, and admin access:
+
+```bash
+# Auth secret - used to sign authentication tokens (32+ characters)
+openssl rand -base64 32
+
+# ClickHouse password - analytics database password
+openssl rand -base64 24
+
+# ArgoCD admin password - GitOps dashboard access
+openssl rand -base64 16
+```
+
+<Warning>
+  **Save these values securely.** You'll need them during configuration. Use a
+  password manager or secure notes—don't save them in plain text files or commit
+  them to git. If you lose these values, you may need to redeploy or reset
+  credentials.
+</Warning>
+
+### OpenAI API key
+
+Confident AI uses OpenAI (or compatible LLM providers) to run evaluations. You need an API key with access to models like GPT-4.
+
+<Note>
+  **Outbound network access:** Your EKS cluster needs outbound HTTPS access to
+  `api.openai.com` for evaluations to work. If your organization restricts
+  outbound traffic, ensure this is allowlisted. Alternatively, if you use Azure
+  OpenAI or a self-hosted model, provide those credentials instead.
+</Note>
+
+## Network planning
+
+Terraform can either create a new VPC or deploy into an existing one. Understanding this decision is important because it affects network isolation, connectivity, and security.
+
+### What is a VPC?
+
+A Virtual Private Cloud (VPC) is your isolated network in AWS. Think of it as your own private data center in the cloud. Resources inside the VPC can talk to each other, but external access is controlled by gateways and security rules.
+
+### Option A: Create new VPC (recommended for most deployments)
+
+Terraform creates a dedicated VPC for Confident AI with:
+
+- **Public subnets:** Where the load balancer lives (receives traffic from your network)
+- **Private subnets:** Where EKS worker nodes run (no direct internet access)
+- **Database subnets:** Isolated subnets for RDS (extra network isolation)
+- **NAT Gateway:** Allows private subnets to make outbound requests (for pulling images, calling APIs)
+
+Default IP ranges (CIDR blocks):
+
+| Subnet Type  | CIDR Block                       | What it means                   |
+| ------------ | -------------------------------- | ------------------------------- |
+| **VPC**      | `10.0.0.0/16`                    | 65,536 available IP addresses   |
+| **Private**  | `10.0.1.0/24`, `10.0.2.0/24`     | 256 IPs each, for EKS nodes     |
+| **Public**   | `10.0.101.0/24`, `10.0.102.0/24` | 256 IPs each, for load balancer |
+| **Database** | Auto-calculated                  | Created automatically           |
+
+<Note>
+  **CIDR conflicts:** If these IP ranges overlap with your corporate network
+  (e.g., if you already use `10.0.x.x` internally), you'll have routing problems
+  when setting up VPN connectivity. Check with your network team and choose
+  non-overlapping ranges.
+</Note>
+
+### Option B: Use existing VPC
+
+If your organization requires deploying into an existing VPC (common for compliance or network policy reasons), gather:
+
+- **VPC ID** (e.g., `vpc-0abc123def456789`)
+- **VPC CIDR block** (e.g., `10.0.0.0/16`)
+- **Private subnet IDs** — at least 2, in different Availability Zones
+- **Public subnet IDs** — at least 2, in different Availability Zones
+- **Private route table IDs** — for the S3 VPC endpoint
+- **Database subnet IDs** — for RDS
+
+<Warning>
+**EKS subnet tagging is required.** EKS uses specific tags to identify which subnets it can use. Without these tags, the load balancer won't provision and pods won't schedule correctly.
+
+Required tags:
+
+- Private subnets: `kubernetes.io/role/internal-elb = 1`
+- Public subnets: `kubernetes.io/role/elb = 1`
+- All subnets: `kubernetes.io/cluster/<cluster-name> = owned`
+
+If using an existing VPC, verify these tags exist or add them before proceeding.
+
+</Warning>
+
+<Warning>
+**Corporate VPC restrictions:** Many organizations have strict policies on what can be created in shared VPCs:
+- Security groups may require approval
+- NAT Gateways may need to use existing shared infrastructure
+- Subnet CIDR ranges may be pre-allocated
+- VPC Flow Logs may be required
+
+Work with your network/cloud team to understand these constraints before choosing this option.
+
+</Warning>
+
+## Checklist before proceeding
+
+Before moving to Configuration, verify:
+
+- [ ] All CLI tools installed and working (`terraform`, `aws`, `kubectl`, `helm`, `git`)
+- [ ] AWS credentials configured and `aws sts get-caller-identity` succeeds
+- [ ] Both GitHub repositories cloned successfully
+- [ ] Domain URLs decided and DNS access confirmed
+- [ ] OAuth credentials created (if using Google SSO)
+- [ ] ECR credentials received from Confident AI
+- [ ] Secrets generated and stored securely
+- [ ] VPC decision made (new vs. existing) and relevant IDs gathered
+- [ ] Network team consulted if using existing VPC or if CIDR conflicts possible
+
+## Next steps
+
+Once you have all prerequisites in place, proceed to [Configuration](/self-hosting/aws/configuration) to set up your Terraform variables.

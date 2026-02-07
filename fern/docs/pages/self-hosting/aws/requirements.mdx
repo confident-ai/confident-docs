@@ -1,0 +1,203 @@
+---
+slug: self-hosting/aws/requirements
+description: Technologies and resource requirements for Confident AI on AWS
+---
+
+## Overview
+
+Before starting deployment, review these requirements with your infrastructure and security teams. This page covers:
+
+- Technologies that need approval in your environment
+- Resource sizing for staging and production
+- AWS services that will be provisioned
+- IAM permissions required for deployment
+- Estimated costs and considerations
+
+Understanding these requirements upfront prevents delays caused by missing approvals or insufficient quotas.
+
+## Technologies
+
+Confident AI uses the following technologies. Your organization may require approval before deploying new technologies:
+
+| Technology                    | Version | Purpose                               |
+| ----------------------------- | ------- | ------------------------------------- |
+| **PostgreSQL**                | 17.x    | Primary database (via AWS RDS)        |
+| **Redis**                     | 7.x     | Session cache and job queues          |
+| **Kubernetes**                | 1.33+   | Container orchestration (via AWS EKS) |
+| **Node.js**                   | 20.x    | Backend and frontend runtime          |
+| **Python**                    | 3.11+   | Evaluations service runtime           |
+| **Terraform**                 | 1.5+    | Infrastructure provisioning           |
+| **Helm**                      | 3.x     | Kubernetes package management         |
+| **External Secrets Operator** | 0.9+    | Secrets sync from AWS Secrets Manager |
+
+<Note>
+  **Why this tech stack?** PostgreSQL is the application's source of truth.
+  Redis provides fast caching and manages background job queues. Kubernetes
+  enables reliable, scalable container orchestration. External Secrets keeps
+  credentials in Secrets Manager (your security team's preferred location) while
+  making them available to pods.
+</Note>
+
+<Warning>
+  **Technology approval processes:** Many enterprises have technology review
+  boards or approved software lists. If PostgreSQL, Kubernetes, or Terraform
+  aren't already approved in your environment, initiate that process early—it
+  can take weeks.
+</Warning>
+
+## Resource allocation
+
+Default resource configurations for staging and production environments. These represent starting points—adjust based on your expected workload.
+
+| Resource            | Staging                      | Production                     |
+| ------------------- | ---------------------------- | ------------------------------ |
+| **EKS Nodes**       | 2x `m6i.large` (2 vCPU, 8GB) | 4x `m6i.xlarge` (4 vCPU, 16GB) |
+| **EKS Autoscaling** | 2-4 nodes                    | 2-8 nodes                      |
+| **RDS Instance**    | `db.t4g.large` (2 vCPU, 8GB) | `db.m6g.large` (2 vCPU, 8GB)   |
+| **RDS Storage**     | 20GB (max 100GB)             | 50GB (max 500GB)               |
+
+### Understanding resource sizing
+
+**EKS nodes** run your application containers. More nodes = more capacity for concurrent users and evaluations. The autoscaler adds nodes during high load and removes them when idle.
+
+**RDS** stores all application data. The instance class affects query performance; storage grows automatically as you accumulate data.
+
+<Note>
+  **Which service is most resource-intensive?** The evaluations service
+  (`confident-evals`) consumes the most CPU during evaluation runs—it processes
+  LLM outputs and computes metrics. If evaluations are slow, scale this service
+  first before adding nodes.
+</Note>
+
+<Warning>
+**EC2 service quotas can block deployment.** AWS accounts have default limits on vCPUs. A typical staging deployment needs ~8 vCPUs (2 nodes × 2 vCPU + 2 vCPU for system pods). Production needs more.
+
+Check your quotas before starting:
+
+- AWS Console → Service Quotas → Amazon EC2 → "Running On-Demand Standard instances"
+
+If your limit is low (e.g., 32 vCPUs in a new account), request an increase—this can take hours to days.
+
+</Warning>
+
+## AWS services
+
+The deployment provisions the following AWS services:
+
+| Service             | Purpose                                      | Why it's needed                      |
+| ------------------- | -------------------------------------------- | ------------------------------------ |
+| **VPC**             | Isolated network with public/private subnets | Network isolation and security       |
+| **EKS**             | Managed Kubernetes control plane and nodes   | Runs application containers          |
+| **RDS**             | Managed PostgreSQL database                  | Stores all application data          |
+| **S3**              | Object storage for application data          | File uploads and exports             |
+| **Secrets Manager** | Secure credential storage                    | Stores API keys, DB passwords        |
+| **ACM**             | SSL/TLS certificate management               | HTTPS encryption                     |
+| **ALB**             | Application load balancer                    | Routes traffic to services           |
+| **IAM**             | Roles and policies for IRSA                  | Grants pods specific AWS permissions |
+| **KMS**             | Encryption keys for secrets and storage      | Encrypts data at rest                |
+| **NAT Gateway**     | Outbound internet for private subnets        | Allows pods to call external APIs    |
+
+<Warning>
+
+**Some organizations restrict which AWS services can be used.** Service Control Policies (SCPs) or internal policies may prohibit certain services. Verify the services above are allowed in your AWS organization before proceeding.
+
+Common restrictions that cause issues:
+
+- NAT Gateway (some orgs require shared NAT infrastructure)
+- KMS (some orgs require centrally managed keys)
+- IAM role creation (some orgs require pre-provisioned roles)
+
+</Warning>
+
+### Outbound network requirements
+
+Confident AI needs to reach external services. Ensure your network allows outbound HTTPS (port 443) to:
+
+| Service               | Why                      |
+| --------------------- | ------------------------ |
+| `api.openai.com`      | Running LLM evaluations  |
+| `*.ecr.amazonaws.com` | Pulling container images |
+| `github.com`          | ArgoCD syncing (if used) |
+
+<Warning>
+**Corporate proxies and firewalls:** If your organization routes traffic through a proxy or inspects HTTPS, you may need to:
+- Allowlist the domains above
+- Configure proxy settings in the deployment
+- Get certificate exceptions for HTTPS inspection
+
+Network restrictions are a common cause of deployment failures that appear as timeouts or SSL errors.
+
+</Warning>
+
+## IAM permissions
+
+The IAM user or role running Terraform needs permissions to create and manage:
+
+- VPC, subnets, route tables, gateways
+- EKS clusters and node groups
+- RDS instances and subnet groups
+- S3 buckets and policies
+- IAM roles, policies, and OIDC providers
+- Secrets Manager secrets
+- ACM certificates
+- EC2 instances and security groups
+- KMS keys
+
+<Note>
+  **Why so many permissions?** Terraform creates a complete, self-contained
+  infrastructure. It needs permission to create all the pieces. After
+  deployment, ongoing operations need far fewer permissions.
+</Note>
+
+<Warning>
+**IAM permissions are the #1 cause of deployment failures.** Most organizations don't grant broad permissions by default.
+
+Options:
+
+1. **Use AdministratorAccess temporarily** — Simplest for initial deployment. Restrict after success.
+2. **Request specific permissions** — Work with your cloud security team to create a deployment role with the permissions above.
+3. **Have a platform team deploy** — If you can't get IAM permissions, have someone who does run Terraform.
+
+IAM permission errors look like: `Error: creating IAM Role: AccessDenied`
+
+</Warning>
+
+## Estimated costs
+
+AWS costs vary by region and usage. Approximate monthly costs for always-on infrastructure:
+
+| Component          | Staging      | Production    |
+| ------------------ | ------------ | ------------- |
+| EKS Control Plane  | $75          | $75           |
+| EKS Nodes (EC2)    | $120-240     | $400-800      |
+| RDS Instance       | $100         | $200          |
+| NAT Gateway        | $35          | $35           |
+| S3 + Data Transfer | ~$10         | $10-50        |
+| **Total (approx)** | **$350-500** | **$750-1200** |
+
+<Note>
+**These are estimates.** Actual costs depend on:
+- Region (us-east-1 is typically cheapest)
+- Usage (more evaluations = more compute = higher cost)
+- Data volume (RDS storage, S3 objects)
+- Reserved instances (can reduce EC2/RDS costs 30-50%)
+
+Use AWS Cost Explorer after deployment to track actual spending.
+
+</Note>
+
+## Pre-deployment checklist
+
+Before proceeding to Prerequisites, verify:
+
+- [ ] Technologies listed above are approved for use
+- [ ] AWS services above can be provisioned (no SCP blocks)
+- [ ] IAM permissions available or obtainable
+- [ ] EC2 service quotas sufficient for desired node count
+- [ ] Outbound network access available or exceptions requested
+- [ ] Budget approved for estimated costs
+- [ ] Security team aware of deployment plan
+
+## Next steps
+
+Once requirements are understood and approved, proceed to [Prerequisites](/self-hosting/aws/prerequisites) to set up your deployment environment.
