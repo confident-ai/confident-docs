@@ -86,7 +86,7 @@ This should return your account ID and user/role ARN.
 **IAM permission errors are the #1 cause of failed deployments.** Before starting, verify your IAM user/role has permissions to create:
 - VPC, subnets, NAT gateways, Internet gateways
 - EKS clusters and node groups
-- RDS instances
+- EKS Cluster's API Server / Control Plane (to setup Namespaces, Helm Charts, ArgoCD, etc)
 - S3 buckets
 - IAM roles and policies
 - Secrets Manager secrets
@@ -107,10 +107,10 @@ If your organization requires pre-approved IAM policies, work with your cloud se
 
 Confident AI provides two private GitHub repositories containing the deployment code:
 
-| Repository            | What it contains                                                             |
-| --------------------- | ---------------------------------------------------------------------------- |
-| `confident-terraform` | Terraform code that creates all AWS infrastructure (VPC, EKS, RDS, S3, etc.) |
-| `confident-k8s`       | Kubernetes YAML files that deploy the actual application services            |
+| Repository            | What it contains                                                                                                                                          |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `confident-terraform` | Terraform code that sets up the complete AWS infrastructure (including VPC, EKS, RDS, S3, etc.) and performs the initial configuration of the EKS cluster |
+| `confident-k8s`       | Kubernetes YAML files that deploy the actual application services                                                                                         |
 
 Your Confident AI representative will grant your GitHub account access to these repositories. Once granted, clone them:
 
