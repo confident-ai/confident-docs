@@ -1,0 +1,316 @@
+---
+slug: integrations/third-party/vercel-ai-sdk
+subtitle: Use Confident AI for LLM observability and evals for Vercel AI SDK on typescript
+---
+
+The [AI SDK](https://ai-sdk.dev) by vercel is a powerful typescript framework that allows you to use various LLM providers and models for AI based applications. Confident AI allows you to trace and evaluate AI SDK based LLM applications in just a few lines of code.
+
+
+## Tracing Quickstart
+
+<Tip>
+For users in the EU region, please set the OTEL endpoint to the EU version as shown below:
+
+```bash
+export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
+```
+</Tip>
+
+<Steps>
+  <Step title="Install Dependencies">
+    Run the following command to install the required packages:
+
+    ```bash
+    npm install ai deepeval-ts
+    ```
+  </Step>
+  <Step title="Configure AI SDK">
+    Use DeepEval's `configureAiSdkTracing` to trace the LLM operations. 
+    <Tabs>
+      <Tab title="Generate Text">
+
+        ```typescript
+        import { generateText } from "ai";
+        import { configureAiSdkTracing } from "deepeval-ts";
+
+        const tracer = configureAiSdkTracing();
+
+        const { text } = await generateText({
+            model: "openai/gpt-4o",
+            prompt: "How to make the best coffee?",
+            experimental_telemetry: {
+                isEnabled: true,
+                tracer: tracer,
+            },
+        });
+
+        console.log(text);
+        ```
+      </Tab>
+      <Tab title="Stream Text">
+        ```typescript
+        import { streamText } from "ai";
+        import { configureAiSdkTracing } from "deepeval-ts";
+
+        const tracer = configureAiSdkTracing();
+
+        const result = streamText({
+            model: "openai/gpt-4o",
+            prompt: 'Invent a new holiday and describe its traditions.',
+            experimental_telemetry: {
+                isEnabled: true,
+                tracer: tracer,
+            },
+        });
+
+        // example: use textStream as an async iterable
+        for await (const textPart of result.textStream) {
+            console.log(textPart);
+        }
+        ```
+      </Tab>
+      <Tab title="Tool Calling">
+        ```typescript
+        import { generateText } from "ai";
+        import { configureAiSdkTracing } from "deepeval-ts";
+
+        const tracer = configureAiSdkTracing();
+
+        const result = await generateText({
+            model: "openai/gpt-4o",
+            tools: {
+                weather: tool({
+                description: 'Get the weather in a location',
+                inputSchema: z.object({
+                    location: z.string().describe('The location to get the weather for'),
+                }),
+                execute: async ({ location }) => ({
+                    location,
+                    temperature: 72 + Math.floor(Math.random() * 21) - 10,
+                }),
+                }),
+            },
+            stopWhen: stepCountIs(5),
+            prompt: 'What is the weather in San Francisco?',
+            experimental_telemetry: {
+                isEnabled: true,
+                tracer: tracer,
+            },
+        });
+
+        conosle.log(result);
+        ```
+      </Tab>
+      <Tab title="Generate Structured Data">
+        ```typescript
+        import { generateText } from "ai";
+        import { configureAiSdkTracing } from "deepeval-ts";
+
+        const tracer = configureAiSdkTracing();
+
+        const { output } = await generateText({
+            model: "openai/gpt-4o",
+            output: Output.object({
+                schema: z.object({
+                recipe: z.object({
+                    name: z.string(),
+                    ingredients: z.array(
+                    z.object({ name: z.string(), amount: z.string() }),
+                    ),
+                    steps: z.array(z.string()),
+                }),
+                }),
+            }),
+            prompt: 'Generate a lasagna recipe.',
+            experimental_telemetry: {
+                isEnabled: true,
+                tracer: tracer,
+            },
+        });
+
+        conosle.log(output);
+        ```
+      </Tab>
+      <Tab title="Embedding Text">
+        ```typescript
+        import { embed } from "ai";
+        import { configureAiSdkTracing } from "deepeval-ts";
+
+        const tracer = configureAiSdkTracing();
+
+        const { embedding } = await embed({
+            model: 'openai/text-embedding-3-small',
+            value: 'sunny day at the beach',
+            experimental_telemetry: {
+                isEnabled: true,
+                tracer: tracer,
+            },
+        });
+
+        conosle.log(embedding);
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+  <Step title="Run AI SDK Generation">
+    Run your LLM application by executing the following script:
+
+    ```bash
+    npx ts-node
+    ```
+    You can directly view the traces on [Confident AI](https://app.confident.ai)'s traces page inside the observatory.
+  </Step>
+</Steps>
+
+## Advanced Usage
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the `configureAiSdkTracing`.
+
+```typescript
+import { generateText } from "ai";
+import { configureAiSdkTracing, Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({alias: "PROMPT_ALIAS"});
+prompt.pull()
+const tracer = configureAiSdkTracing({
+    confident_prompt: prompt
+});
+
+const { text } = await generateText({
+    model: "openai/gpt-4o",
+    prompt: "How to make the best coffee?",
+    experimental_telemetry: {
+        isEnabled: true,
+        tracer: tracer,
+    },
+});
+
+console.log(text);
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to AI SDK LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+### Setting trace attributes
+
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your AI SDK applications.
+
+For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
+
+You can set these attributes in the `configureAiSdkTracing` from `deepeval-ts`:
+
+```typescript
+import { generateText } from "ai";
+import { configureAiSdkTracing } from "deepeval-ts";
+
+const tracer = configureAiSdkTracing({
+    threadId: "123",
+    userId: "456"
+});
+
+const { text } = await generateText({
+    model: "openai/gpt-4o",
+    prompt: "How to make the best coffee?",
+    experimental_telemetry: {
+        isEnabled: true,
+        tracer: tracer,
+    },
+});
+
+console.log(text);
+```
+
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn more](/docs/llm-tracing/advanced-features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn more](/docs/llm-tracing/advanced-features/metadata).
+</ParamField>
+
+<ParamField path="threadId" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations. [Learn more](/docs/llm-tracing/advanced-features/threads).
+</ParamField>
+
+<ParamField path="userId" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn more](/docs/llm-tracing/advanced-features/users).
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-tracing/evaluations) on your AI SDK application by setting a `metricCollection` which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+  <Step title="Create metric collection">
+    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your AI SDK based application.
+    <Frame caption="Create metric collection">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="metrics.createCollection"
+        type="video/mp4"
+      />
+    </Frame>
+    <Warning>
+      Your metric collection must only contain metrics that only evaluate the input and actual output of your AI SDK application.
+    </Warning>
+  </Step>
+  <Step title="Run evals">
+    You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+    You can pass different metric collections like `metricCollection` (for entire trace), `llmMetricCollection`, `toolMetricCollection` in the `configureAiSdkTracing` as shown below:
+
+    ```typescript
+    import { generateText } from "ai";
+    import { configureAiSdkTracing } from "deepeval-ts";
+
+    const tracer = configureAiSdkTracing({
+        metricCollection: "metric-collection-name",
+        llmMetricCollection: "llm-metric-collection-name",
+        toolMetricCollection: "tool-metric-collection-name"
+    });
+
+    const { text } = await generateText({
+        model: "openai/gpt-4o",
+        prompt: "How to make the best coffee?",
+        experimental_telemetry: {
+            isEnabled: true,
+            tracer: tracer,
+        },
+    });
+
+    console.log(text);
+    ```
+
+  </Step>
+  <Success>
+    All incoming traces will now be evaluated using metrics from your metric
+    collection.
+  </Success>
+</Steps>
+
+You can view evals on [Confident AI](https://app.confident.ai) by visiting the traces pages inside the observatory on Confident AI platform.
+
+<Frame>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
+</Frame>
+````
