@@ -184,8 +184,12 @@
       "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/llamaindex.png",
     "logos.crewai":
       "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/crewai.png",
-    "logos.portkey":
+    "logos.litellm":
       "https://thumb.ac-illust.com/42/425e87b240c970dfc92bfb0252ea7e52_t.jpeg",
+    "logos.vercelaisdk":
+      "https://karmanivero.us/assets/images/logo-vercel.png",
+    "logos.portkey":
+      "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/text-formatting/hexagon-tkv73cir8m2b39ei1hkca.png/hexagon-osek3863mig4att1do9c7.png?_a=DATAiZAAZAA0"
   };
 
   // Find all images with data-image attribute and set their src
