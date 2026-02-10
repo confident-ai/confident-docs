@@ -1,0 +1,230 @@
+---
+slug: self-hosting/aws/ssl-certificates
+description: Configure SSL/TLS certificates for Confident AI
+---
+
+## Overview
+
+Terraform created an ACM (AWS Certificate Manager) certificate for HTTPS, but it requires DNS validation before it becomes active. In this step, you will:
+
+- Retrieve the DNS validation records from Terraform outputs
+- Add CNAME records to your DNS provider
+- Wait for ACM to validate and issue the certificate
+- Obtain the certificate ARN for ingress configuration
+
+This typically takes 5-15 minutes after adding DNS records. The certificate ARN is required for the Kubernetes ingress in later steps.
+
+## How SSL certificate validation works
+
+AWS Certificate Manager issues free SSL certificates, but it needs to verify you control the domain. It does this by asking you to add a specific DNS record. When ACM sees the record, it knows you're the legitimate domain owner and issues the certificate.
+
+This is called "DNS validation" and is the most common method because:
+
+- It doesn't require running a web server
+- It works before your application is deployed
+- The validation record can stay in place for automatic renewals
+
+<Note>
+  **If using public EKS mode:** If you configured `confident_public_eks = true`
+  (HTTP-only, no HTTPS), you can skip this page. Public mode is only recommended
+  for testing, not production.
+</Note>
+
+## Get validation records
+
+After Terraform apply completes, retrieve the DNS records needed for validation:
+
+```bash
+terraform output acm_certificate_domain_validation_options
+```
+
+Example output:
+
+```
+tolist([
+  {
+    "domain_name" = "yourdomain.com"
+    "resource_record_name" = "_abc123.yourdomain.com."
+    "resource_record_type" = "CNAME"
+    "resource_record_value" = "_xyz789.acm-validations.aws."
+  },
+])
+```
+
+**What this means:**
+
+- `resource_record_name` — the DNS record name to create
+- `resource_record_type` — always CNAME for ACM validation
+- `resource_record_value` — the value the CNAME should point to
+
+<Note>
+  **Multiple records?** If your certificate covers multiple domains (Subject
+  Alternative Names), you'll see multiple records. You need to create all of
+  them.
+</Note>
+
+## Add DNS records
+
+You need to add the CNAME record(s) in your DNS provider. The exact steps depend on which provider you use.
+
+### General steps
+
+1. Log into your DNS provider's management console
+2. Navigate to the DNS records for your domain
+3. Add a new CNAME record
+4. Set the name to `resource_record_name` (may need to remove the trailing dot)
+5. Set the value to `resource_record_value` (may need to remove the trailing dot)
+6. Save the record
+
+<Warning>
+
+**Common DNS mistakes that cause validation failures:**
+
+1. **Extra domain suffix:** Some providers automatically append your domain. If the record name is `_abc123.yourdomain.com.`, you may only need to enter `_abc123` (the provider adds `.yourdomain.com` automatically). If you enter the full name, you might end up with `_abc123.yourdomain.com.yourdomain.com`.
+
+2. **Missing or extra dots:** Some providers want the trailing dot, others don't. Try both if validation fails.
+
+3. **Proxy enabled:** If using Cloudflare, ensure the proxy is OFF (gray cloud, "DNS only"). The orange cloud proxies traffic through Cloudflare, which breaks ACM validation.
+
+4. **Wrong record type:** Ensure you're creating a CNAME, not an A record or TXT record.
+
+</Warning>
+
+### Provider-specific instructions
+
+<AccordionGroup>
+  <Accordion title="Route 53 (AWS)">
+    If your domain is in Route 53, you can create records directly or let
+    Terraform manage them. **Manual method:** 1. Go to Route 53 → Hosted zones →
+    Select your domain 2. Click "Create record" 3. Enter the record name
+    (without your domain suffix) 4. Select CNAME as record type 5. Paste the
+    validation value 6. Click "Create records" **TTL:** Use 300 seconds (5
+    minutes) for faster propagation during validation.
+  </Accordion>
+
+<Accordion title="Cloudflare">
+  1. Go to your domain's DNS settings 2. Click "Add record" 3. Type: CNAME 4.
+  Name: paste the record name (Cloudflare will handle the domain suffix) 5.
+  Target: paste the validation value 6. **Proxy status: DNS only** (gray cloud)
+  — this is critical 7. TTL: Auto 8. Save
+
+{" "}
+
+<Warning>
+  The proxy must be OFF for ACM validation. If the cloud icon is orange, click
+  it to turn it gray.
+</Warning>
+
+</Accordion>
+
+<Accordion title="GoDaddy">
+  1. Go to Domain Settings → DNS Management 2. Click "Add" in the Records
+  section 3. Type: CNAME 4. Name: paste the record name (remove your domain
+  suffix if present) 5. Value: paste the validation value 6. TTL: 600 seconds 7.
+  Save GoDaddy often strips the trailing dot automatically.
+</Accordion>
+
+<Accordion title="Namecheap">
+  1. Go to Domain List → Manage → Advanced DNS 2. Click "Add New Record" 3.
+  Type: CNAME 4. Host: paste just the subdomain part (before your domain) 5.
+  Value: paste the validation value 6. TTL: Automatic 7. Save all changes
+</Accordion>
+
+  <Accordion title="Corporate/Internal DNS">
+    If your DNS is managed by an internal team: 1. Submit a change request with
+    the exact record details 2. Include the record name, type (CNAME), and value
+    3. Request expedited processing if possible—this is blocking deployment 4.
+    Ask them to notify you when the change is live
+
+    <Warning>
+      Corporate DNS changes often require change tickets and approval workflows.
+      Factor this into your timeline—it can add hours or days to deployment.
+    </Warning>
+
+  </Accordion>
+</AccordionGroup>
+
+## Wait for validation
+
+After adding DNS records, ACM automatically detects them and validates your certificate. This typically takes:
+
+- **5-15 minutes** if DNS propagates quickly
+- **Up to 48 hours** in rare cases with slow DNS providers
+
+### Check validation status
+
+**Via AWS Console:**
+
+1. Go to AWS Console → Certificate Manager
+2. Find your certificate (the domain name you configured)
+3. Status should change from "Pending validation" to "Issued"
+
+**Via CLI:**
+
+```bash
+aws acm describe-certificate \
+  --certificate-arn $(terraform output -raw acm_certificate_arn) \
+  --query 'Certificate.Status'
+```
+
+Expected output when validated: `"ISSUED"`
+
+### Verify DNS propagation
+
+If validation is taking longer than expected, verify your DNS records are visible globally:
+
+1. Go to [dnschecker.org](https://dnschecker.org)
+2. Enter your validation record name (e.g., `_abc123.yourdomain.com`)
+3. Select CNAME as the record type
+4. Check if servers worldwide see your record
+
+<Warning>
+**Certificate stuck in "Pending validation"?**
+
+Common causes:
+
+- DNS record not created or has typo
+- Wrong record type (needs to be CNAME)
+- DNS hasn't propagated yet (wait longer)
+- Cloudflare proxy is enabled (must be "DNS only")
+- Corporate DNS change hasn't been applied yet
+
+ACM retries validation every few minutes. Once the record is correct and propagated, it should validate automatically.
+
+</Warning>
+
+## Get the certificate ARN
+
+Once your certificate shows "Issued" status, get the ARN for use in the Kubernetes ingress:
+
+```bash
+terraform output -raw acm_certificate_arn
+```
+
+Example output:
+
+```
+arn:aws:acm:us-east-1:123456789012:certificate/abc12345-1234-1234-1234-abc123456789
+```
+
+<Warning>
+  **Copy the ARN carefully.** Some terminals add a `%` character at the end of
+  output (this is a shell formatting artifact). Don't include the `%` when you
+  paste the ARN elsewhere.
+</Warning>
+
+Save this ARN—you'll need it when configuring the Kubernetes ingress to enable HTTPS on the load balancer.
+
+## Certificate renewal
+
+ACM certificates are valid for 13 months and renew automatically as long as the validation DNS records remain in place.
+
+<Note>
+  **Don't delete the validation DNS records.** While they're only strictly
+  needed during initial validation, leaving them in place allows automatic
+  renewal without any manual intervention.
+</Note>
+
+## Next steps
+
+After the certificate is validated and issued, proceed to [Cluster Access](/self-hosting/aws/bastion-access) to configure kubectl access to your EKS cluster.
