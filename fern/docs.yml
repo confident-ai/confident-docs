@@ -460,7 +460,6 @@ navigation:
         path: docs/pages/self-hosting/security-and-compliance.mdx
         icon: fa-light fa-shield-check
       - section: AWS Deployment
-        icon: fa-brands fa-amazon
         contents:
           - page: Overview
             path: docs/pages/self-hosting/aws/overview.mdx
@@ -487,13 +486,11 @@ navigation:
               - page: Verification
                 path: docs/pages/self-hosting/aws/verification.mdx
       - section: Azure Deployment
-        icon: fa-brands fa-microsoft
         contents:
           - page: Overview
             path: docs/pages/self-hosting/azure/overview.mdx
             icon: fa-light fa-map
       - section: GCP Deployment
-        icon: fa-brands fa-google
         contents:
           - page: Overview
             path: docs/pages/self-hosting/gcp/overview.mdx
