@@ -510,7 +510,7 @@ def parse_multimodal_string(s: str):
 
         image_url = m.group(1)
 
-        result.append({url: image_url})
+        result.append({"url": image_url})
         last_end = end
 
     if last_end < len(s):
@@ -528,7 +528,7 @@ for element in multimodal_array:
     if isinstance(element, str):
         messages.append({"type": "text", "text": element})
     else:
-        if element.url:
+        if element.get("url") is not None:
           messages.append(
               {
                   "type": "image_url",

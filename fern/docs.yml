@@ -379,6 +379,9 @@ navigation:
           - page: Crew AI
             path: docs/pages/integrations/third-party/crew-ai.mdx
             icon: fa-light fa-user-group
+          - page: Vercel AI SDK
+            path: docs/pages/integrations/third-party/vercel-ai-sdk.mdx
+            icon: fa-light fa-circle-caret-up
       - section: LLM Gateways
         collapsed: false
         contents:

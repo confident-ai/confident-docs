@@ -119,14 +119,15 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex's `FunctionAgent`, `ReActAgent` and `CodeActAgent`. Replace your LlamaIndex agent with DeepEval’s, and provide metric collection as an argument to the agent.
+Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex applications. Evaluations are configured using `metric_collection` as an argument on the trace context which applies to all spans emitted during the trace.
 
-```python main.py maxLines=100 focus={5,17}
+```python main.py maxLines=100 focus={5,21}
 import asyncio
 from llama_index.llms.openai import OpenAI
+from llama_index.core.agent import FunctionAgent
 import llama_index.core.instrumentation as instrument
 from deepeval.integrations.llama_index import instrument_llama_index
-from deepeval.integrations.llama_index import FunctionAgent
+from deepeval.tracing import trace
 
 instrument_llama_index(instrument.get_dispatcher())
 
@@ -137,97 +138,19 @@ def multiply(a: float, b: float) -> float:
 agent = FunctionAgent(
     tools=[multiply],
     llm=OpenAI(model="gpt-4o-mini"),
-    system_prompt="You are a helpful assistant that can perform calculations.",
-    metric_collection="<your-metric-collection-name>",
+    system_prompt="You are a helpful assistant.",
 )
 
-async def llm_app(input: str):
-    return await agent.run(input)
+async def llm_app():
+    with trace(metric_collection="my_metric_collection"):
+        await agent.run("What is 3 * 12?")
 
-asyncio.run(llm_app("What is 3 * 12?"))
+asyncio.run(llm_app())
 ```
 
 <Success>
   All incoming traces will now be evaluated using metrics from your metric
   collection.
-</Success>
-
-</Step>
-</Steps>
-
-### End-to-end evals
-
-Running [end-to-end evals](/docs/llm-evaluation/single-turn/end-to-end) on your LlamaIndex agent evaluates your agent locally, and is the recommended approach if your agent is in a development or testing environment.
-
-<Steps>
-
-<Step title="Create metric">
-
-```python
-from deepeval.metrics import AnswerRelevancyMetric
-
-answer_relevancy_metric = AnswerRelevancyMetric(
-    threshold=0.7,
-    model="gpt-4o-mini",
-    include_reason=True
-)
-```
-
-</Step>
-
-<Warning>
-  Similar to online evals, you can only run end-to-end evals on metrics that don't require `retrieval_context`, `context`, `expected_output`, or `expected_tools` for evaluation.
-</Warning>
-
-<Step title="Run evals">
-
-Provide your metrics. Then, use the dataset's `evals_iterator` to invoke your LlamaIndex agent for each golden.
-
-<Tabs>
-<Tab title="Asynchronous">
-
-```python main.py focus={6,19, 25-33} maxLines=100
-import asyncio
-from llama_index.llms.openai import OpenAI
-import llama_index.core.instrumentation as instrument
-from deepeval.integrations.llama_index import instrument_llama_index
-from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.integrations.llama_index import FunctionAgent
-
-instrument_llama_index(instrument.get_dispatcher())
-answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.7, model="gpt-4o-mini", include_reason=True)
-
-def multiply(a: float, b: float) -> float:
-    """Useful for multiplying two numbers."""
-    return a * b
-
-agent = FunctionAgent(
-    tools=[multiply],
-    llm=OpenAI(model="gpt-4o-mini"),
-    system_prompt="You are a helpful assistant that can perform calculations.",
-    metrics=[answer_relevancy_metric],
-)
-
-async def llm_app(input: str):
-    return await agent.run(input)
-
-from deepeval.dataset import EvaluationDataset, Golden
-
-dataset = EvaluationDataset(
-    goldens=[Golden(input="What is 3 * 12?"), Golden(input="What is 4 * 13?")]
-)
-
-for golden in dataset.evals_iterator():
-    task = asyncio.create_task(llm_app(golden.input))
-    dataset.evaluate(task)
-```
-
-</Tab>
-</Tabs>
-
-<Success>
-  This will automatically generate a test run with evaluated traces using inputs
-  from your dataset.
 </Success>
 
 </Step>
