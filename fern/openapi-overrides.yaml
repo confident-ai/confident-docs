@@ -340,55 +340,9 @@ paths:
             type: string
           description: The label name of the prompt.
           example: "PROMPT-LABEL"
-    put:
-      parameters:
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
-        - name: alias
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The unique alias of the prompt.
-          example: "PROMPT-ALIAS"
-        - name: label
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The label name of the prompt.
-          example: "PROMPT-LABEL"
 
-  /v1/prompts/{alias}/versions/{version}:
+  /v1/prompts/{alias}/versions/{versionId}:
     get:
-      parameters:
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
-        - name: alias
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The unique alias of the prompt.
-          example: "PROMPT-ALIAS"
-        - name: version
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The version number of the prompt.
-          example: "PROMPT-VERSION"
-    put:
       parameters:
         - in: header
           name: CONFIDENT_API_KEY
@@ -464,7 +418,7 @@ paths:
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
 
-  /v1/prompts/{alias}/commits/{commitHash}:
+  /v1/prompts/{alias}/commits/{hash}:
     get:
       parameters:
         - in: header
@@ -481,7 +435,7 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: commitHash
+        - name: hash
           in: path
           required: true
           schema:
