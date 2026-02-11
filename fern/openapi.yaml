@@ -841,7 +841,7 @@ paths:
         - Prompt
       summary: Push Prompts
       operationId: pushPrompt
-      description: Creates a new prompt on your Confident AI project.
+      description: Creates a new commit for an existing prompt, or creates a new prompt with the given `alias` otherwise.
       requestBody:
         required: true
         description: ""
@@ -912,9 +912,9 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
-      summary: Release Version
-      operationId: releaseVersion
-      description: Creates a new version of the specified / latest commit on your Confident AI project.
+      summary: Create Version
+      operationId: createVersion
+      description: Creates a new version of the specified or latest commit on your Confident AI project.
       requestBody:
         required: true
         description: ""
@@ -998,7 +998,7 @@ paths:
                         temperature: 0.7
                     deprecated: false
 
-  /v1/prompts/{alias}/versions/{version}:
+  /v1/prompts/{alias}/versions/{versionId}:
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -1020,6 +1020,7 @@ paths:
                     data:
                       id: "prv_abc123"
                       version: "00.00.01"
+                      label: "my-label"
                       text: "Hello, {{name}}!"
                       type: "TEXT"
                       interpolationType: "FSTRING"
@@ -1036,6 +1037,7 @@ paths:
                     data:
                       id: "prv_abc123"
                       version: "00.00.02"
+                      label: "my-label"
                       messages:
                         - role: system
                           content: "Hello, {{name}}"
@@ -1055,7 +1057,7 @@ paths:
         - Prompt
       summary: List Commits
       operationId: getPromptCommits
-      description: Retrieves a list of all commits associated with a prompt
+      description: Retrieves a list of all the commits associated with a prompt
       responses:
         "200":
           description: ""
@@ -1072,14 +1074,14 @@ paths:
                       message: "Committed from API"
                 deprecated: false
 
-  /v1/prompts/{alias}/commits/{commitHash}:
+  /v1/prompts/{alias}/commits/{hash}:
     get:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
-      summary: Pull Prompts By Hash
-      operationId: getPromptByHash
-      description: Retrieves a prompt with `alias` and `commitHash` from your Confident AI account.
+      summary: Pull Prompts By Commit
+      operationId: getPromptByCommit
+      description: Retrieves a prompt with `alias` and the specific `hash` from your Confident AI account.
       responses:
         "200":
           description: ""
@@ -1094,6 +1096,7 @@ paths:
                     data:
                       id: "prv_abc123"
                       version: "00.00.01"
+                      label: "my-label"
                       text: "Hello, {{name}}!"
                       type: "TEXT"
                       interpolationType: "FSTRING"
@@ -1110,6 +1113,7 @@ paths:
                     data:
                       id: "prv_abc123"
                       version: "00.00.02"
+                      label: "my-label"
                       messages:
                         - role: system
                           content: "Hello, {{name}}"
@@ -4161,6 +4165,9 @@ components:
             version:
               type: string
               description: The version number of the prompt.
+            label:
+              type: string
+              description: The user-defined label for a specific version of the prompt.
             text:
               description: This is the text content of the prompt, which is null if the prompt is a list prompt.
               type: string
@@ -4193,12 +4200,10 @@ components:
                 $ref: "#/components/schemas/Tool"
           required:
             - id
-            - version
             - type
             - interpolationType
             - modelSettings
             - outputType
-            - tools
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
