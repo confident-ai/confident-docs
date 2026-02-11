@@ -429,6 +429,47 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: alias
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+
+  /v1/prompts/{alias}/commits/{commitHash}:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: commitHash
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique hash of the commit.
+          example: "bab04ce"
 
   /v1/projects:
     get:
