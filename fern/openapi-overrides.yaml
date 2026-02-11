@@ -400,7 +400,7 @@ paths:
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
   
-  /v1/prompts/{alias}/commits/:
+  /v1/prompts/{alias}/commits:
     get:
       parameters:
         - in: header

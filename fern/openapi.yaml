@@ -1050,7 +1050,7 @@ paths:
                         temperature: 0.7
                     deprecated: false
   
-  /v1/prompts/{alias}/commits/:
+  /v1/prompts/{alias}/commits:
     get:
       x-fern-server-name: Confident AI
       tags:
