@@ -118,86 +118,41 @@ Each push creates a new version automatically. Confident AI handles version numb
 
 ## Update Prompt Versions
 
-Update an existing prompt version by specifying the `version` you want to modify. Use `"latest"` to update the most recent version.
+<Warning>
+  Updating prompts is no longer supported on Confident AI. All prompt updates are treated as new commits and as such, you can only `push` a new commit using the `push()` method.
+</Warning>
+
+If you need to modify a prompt, simply call `push()` again with your updated content which will create a new commit on the Confident AI platform:
 
 <Tabs>
 
 <Tab title="Python" language="python">
-
-For **message** prompts:
-
-```python main.py
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import PromptMessage
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(
-    version="latest",
-    messages=[
-        PromptMessage(role="system", content="Updated system message."),
-    ]
-)
-```
-
-For **text** prompts:
-
 ```python main.py
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.update(version="00.00.01", text="Updated prompt text.")
+prompt.push(text="Updated prompt text.")
 ```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
-
-For **message** prompts:
-
-```ts index.ts
-import { Prompt, PromptMessage } from "deepeval-ts";
-
-const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.update({
-  version: "latest",
-  messages: [
-    new PromptMessage({ role: "system", content: "Updated system message." }),
-  ],
-});
-```
-
-For **text** prompts:
-
 ```ts index.ts
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.update({
-  version: "00.00.01",
-  text: "Updated prompt text.",
-});
+await prompt.push({ text: "Updated prompt text." });
 ```
 
 </Tab>
 
 <Tab title="curL" language="curl">
 
-For **message** prompts:
-
-<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="List-Prompt" />
-
-For **text** prompts:
-
-<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="Text-Prompt" />
+<EndpointRequestSnippet endpoint="POST /v1/prompts" example="Text-Prompt" />
 
 </Tab>
 
 </Tabs>
-
-<Warning>
-  Updating a prompt version modifies the existing version in place. If you want
-  to preserve the original, push a new version instead.
-</Warning>
 
 ## Adding Model Configs
 
@@ -258,16 +213,6 @@ prompt.push(
     output_type=OutputType.SCHEMA,
     output_schema=ResponseSchema,
 )
-
-# Or use with update() to modify an existing version
-prompt.update(
-    version="latest",
-    model_settings=ModelSettings(
-        provider=ModelProvider.OPEN_AI,
-        name="gpt-4o-mini",
-        temperature=0.5,
-    ),
-)
 ```
 
 </Tab>
@@ -306,16 +251,6 @@ await prompt.push({
   },
   outputType: OutputType.SCHEMA,
   outputSchema: responseSchema,
-});
-
-await prompt.update({
-  version: "latest",
-  modelSettings: {
-    provider: "OPEN_AI",
-    name: "gpt-4o",
-    temperature: 0.8,
-    maxTokens: 2000,
-  }
 });
 ```
 
@@ -449,9 +384,9 @@ tool_2 = Tool(
     structured_schema=ToolInputSchema,
 )
 
-# Or use with update() to modify an existing version
-prompt.update(
-    version="latest",
+# Create a new commit with the new updated tool using 'push'
+prompt.push(
+    text="This a prompt for a tool using agent",
     tools=[tool_2]
 )
 ```
@@ -494,8 +429,11 @@ const tool2 = new Tool({
   structuredSchema=responseSchema
 });
 
-await prompt.update({
-  version: "latest",
+// Create a new commit with the new updated tool using 'push'
+await prompt.push({
+  messages: [
+    new PromptMessage({ role: "system", content: "You are a helpful assistant." }),
+  ],
   tools=[tool2]
 });
 ```

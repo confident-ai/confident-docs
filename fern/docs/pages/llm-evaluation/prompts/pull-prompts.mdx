@@ -351,21 +351,6 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
 
-<Tabs>
-
-<Tab title="Version">
-
-```python main.py
-from deepeval.prompt import Prompt
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull(version="00.00.01")
-```
-
-</Tab>
-
-<Tab title="Label">
-
 ```python main.py
 from deepeval.prompt import Prompt
 
@@ -375,15 +360,22 @@ prompt.pull(label="staging")
 
 You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions) to learn how to do so.
 
-</Tab>
-
-</Tabs>
-
 <Note>
 
 By pulling via labels, you effectively allow users with sufficient permission to "deploy" new versions of your prompt without going through code.
 
 </Note>
+
+## Pull Prompts By Commit
+
+You can also pull specific snapshots of prompts using it's `alias` and the commit `hash`.
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(hash="bab04ce")
+```
 
 ## How Are Prompts Pulled?
 
