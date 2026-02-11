@@ -1069,7 +1069,7 @@ paths:
                   commits:
                     - id: "144aa01d-af4d-4054-83fa-78e2301d94fb"
                       hash: "bab04ce"
-                      message: "Commited from API"
+                      message: "Committed from API"
                 deprecated: false
 
   /v1/prompts/{alias}/commits/{commitHash}:
