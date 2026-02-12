@@ -3953,14 +3953,14 @@ components:
       properties:
         commit:
           type: string
-          description: The commit hash of the commit you wanna release a new version of. Only commits above the last versioned commit can be released as new versions.
+          description: The commit hash of the commit you wanna release a new version of. Only commits above the last versioned commit can be released as new versions. If ommited, the most recent commit will be versioned.
 
     CreatePromptVersionResponse:
       type: object
       properties:
         success:
           type: boolean
-          description: This is true if the trace was successfully evaluated.
+          description: This is true prompt version was successfully created
         data:
           type: object
           properties:
