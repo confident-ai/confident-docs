@@ -969,6 +969,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.02"
                       label: "my-label"
+                      hash: "bab04ce"
                       text: "Hello, {{name}}!"
                       type: "TEXT"
                       interpolationType: "FSTRING"
@@ -986,6 +987,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.02"
                       label: "my-label"
+                      hash: "bab04ce"
                       messages:
                         - role: system
                           content: "Hello, {{name}}"
@@ -1021,6 +1023,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.01"
                       label: "my-label"
+                      hash: "bab04ce"
                       text: "Hello, {{name}}!"
                       type: "TEXT"
                       interpolationType: "FSTRING"
@@ -1038,6 +1041,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.02"
                       label: "my-label"
+                      hash: "bab04ce"
                       messages:
                         - role: system
                           content: "Hello, {{name}}"
@@ -1097,6 +1101,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.01"
                       label: "my-label"
+                      hash: "bab04ce"
                       text: "Hello, {{name}}!"
                       type: "TEXT"
                       interpolationType: "FSTRING"
@@ -1114,6 +1119,7 @@ paths:
                       id: "prv_abc123"
                       version: "00.00.02"
                       label: "my-label"
+                      hash: "bab04ce"
                       messages:
                         - role: system
                           content: "Hello, {{name}}"
@@ -4165,6 +4171,9 @@ components:
             version:
               type: string
               description: The version number of the prompt.
+            hash:
+              type: string
+              description: This is the commit hash of the prompt pulled
             label:
               type: string
               description: The user-defined label for a specific version of the prompt.
