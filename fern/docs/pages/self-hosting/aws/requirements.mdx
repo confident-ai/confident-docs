@@ -19,16 +19,18 @@ Understanding these requirements upfront prevents delays caused by missing appro
 
 Confident AI uses the following technologies. Your organization may require approval before deploying new technologies:
 
-| Technology                    | Version | Purpose                               |
-| ----------------------------- | ------- | ------------------------------------- |
-| **PostgreSQL**                | 17.x    | Primary database (via AWS RDS)        |
-| **Redis**                     | 7.x     | Session cache and job queues          |
-| **Kubernetes**                | 1.33+   | Container orchestration (via AWS EKS) |
-| **Node.js**                   | 20.x    | Backend and frontend runtime          |
-| **Python**                    | 3.11+   | Evaluations service runtime           |
-| **Terraform**                 | 1.5+    | Infrastructure provisioning           |
-| **Helm**                      | 3.x     | Kubernetes package management         |
-| **External Secrets Operator** | 0.9+    | Secrets sync from AWS Secrets Manager |
+| Technology                    | Version | Purpose                                      |
+| ----------------------------- | ------- | -------------------------------------------- |
+| **PostgreSQL**                | 17.x    | Primary database (via AWS RDS)               |
+| **ClickHouse**                | Latest  | Analytics database (via ClickHouse Operator) |
+| **Redis**                     | 7.x     | Session cache and job queues                 |
+| **Kubernetes**                | 1.33+   | Container orchestration (via AWS EKS)        |
+| **Node.js**                   | 20.x    | Backend and frontend runtime                 |
+| **Python**                    | 3.11+   | Evaluations service runtime                  |
+| **Terraform**                 | 1.5+    | Infrastructure provisioning                  |
+| **Helm**                      | 3.x     | Kubernetes package management                |
+| **ArgoCD**                    | 2.x     | GitOps continuous delivery                   |
+| **External Secrets Operator** | 0.9+    | Secrets sync from AWS Secrets Manager        |
 
 <Note>
   **Why this tech stack?** PostgreSQL is the application's source of truth.
@@ -117,7 +119,7 @@ Confident AI needs to reach external services. Ensure your network allows outbou
 | --------------------- | ------------------------ |
 | `api.openai.com`      | Running LLM evaluations  |
 | `*.ecr.amazonaws.com` | Pulling container images |
-| `github.com`          | ArgoCD syncing (if used) |
+| `github.com`          | ArgoCD GitOps syncing    |
 
 <Warning>
 **Corporate proxies and firewalls:** If your organization routes traffic through a proxy or inspects HTTPS, you may need to:

@@ -9,74 +9,101 @@ Deploy Confident AI on your AWS infrastructure for complete control over your ev
 
 The AWS deployment uses Terraform to provision a production-ready infrastructure with the following components:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              AWS Cloud                                       │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                           VPC (10.0.0.0/16)                           │  │
-│  │                                                                       │  │
-│  │   ┌─────────────────────┐       ┌─────────────────────────────────┐  │  │
-│  │   │   Public Subnets    │       │       Private Subnets           │  │  │
-│  │   │                     │       │                                 │  │  │
-│  │   │  ┌───────────────┐  │       │  ┌─────────────────────────┐   │  │  │
-│  │   │  │    Bastion    │  │       │  │      EKS Cluster        │   │  │  │
-│  │   │  │     Host      │──┼───────┼──│  ┌─────────────────┐    │   │  │  │
-│  │   │  └───────────────┘  │       │  │  │   confident-ai  │    │   │  │  │
-│  │   │                     │       │  │  │    namespace    │    │   │  │  │
-│  │   │  ┌───────────────┐  │       │  │  │  ┌───────────┐  │    │   │  │  │
-│  │   │  │  NAT Gateway  │  │       │  │  │  │  Backend  │  │    │   │  │  │
-│  │   │  └───────────────┘  │       │  │  │  │  Frontend │  │    │   │  │  │
-│  │   │                     │       │  │  │  │   Evals   │  │    │   │  │  │
-│  │   │  ┌───────────────┐  │       │  │  │  │   OTEL    │  │    │   │  │  │
-│  │   │  │      ALB      │──┼───────┼──│  │  │   Redis   │  │    │   │  │  │
-│  │   │  │  (HTTPS/443)  │  │       │  │  │  └───────────┘  │    │   │  │  │
-│  │   │  └───────────────┘  │       │  │  └─────────────────┘    │   │  │  │
-│  │   └─────────────────────┘       │  └─────────────────────────┘   │  │  │
-│  │                                 │                                 │  │  │
-│  │                                 │  ┌─────────────────────────┐   │  │  │
-│  │                                 │  │    RDS PostgreSQL       │   │  │  │
-│  │                                 │  └─────────────────────────┘   │  │  │
-│  │                                 └─────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                                                                              │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐                 │
-│  │  S3 Bucket     │  │ Secrets Manager│  │      ACM       │                 │
-│  │  (App Data)    │  │  (Credentials) │  │ (SSL Certs)    │                 │
-│  └────────────────┘  └────────────────┘  └────────────────┘                 │
-└─────────────────────────────────────────────────────────────────────────────┘
+```python maxLines={0}
+┌──────────────────────────────────────────────────────────────────────────────────────-─┐
+│  AWS Cloud                                                                             │
+│                                                                                        │
+│  ┌────────────────────────────────────────────────────────────────────────────────-─┐  │
+│  │  VPC (10.0.0.0/16)                                                               │  │
+│  │                                                                                  │  │
+│  │  ┌───────────────────────────────────────────────────────────────────────────-┐  │  │
+│  │  │  Public Subnets                                                            │  │  │
+│  │  │                                                                            │  │  │
+│  │  │    ┌───────────────┐     ┌───────────────┐     ┌───────────────────────┐   │  │  │
+│  │  │    │  NAT Gateway  │     │ Internet GW   │     │   ALB (HTTPS/443)     │   │  │  │
+│  │  │    └───────────────┘     └───────────────┘     └───────────┬───────────┘   │  │  │
+│  │  └────────────────────────────────────────────────────────────┼──────────────-┘  │  │
+│  │                                                               │ traffic          │  │
+│  │  ┌────────────────────────────────────────────────────────────┼─────────────-─┐  │  │
+│  │  │  Private Subnets                                           │               │  │  │
+│  │  │                                                            ▼               │  │  │
+│  │  │  ┌────────────────────────────────────────────────────────────────────-┐   │  │  │
+│  │  │  │  EKS Cluster                                                        │   │  │  │
+│  │  │  │                                                                     │   │  │  │
+│  │  │  │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ - ─ ─ ─ ─ ─ ┐      │   │  │  │
+│  │  │  │    confident-ai namespace                                    │      │   │  │  │
+│  │  │  │  │                                                           │      │   │  │  │
+│  │  │  │    ┌──────────┐ ┌──────────┐ ┌───────┐ ┌────────┐ ┌───────┐  │      │   │  │  │
+│  │  │  │  │ │ Backend  │ │ Frontend │ │ Evals │ │  OTEL  │ │ Redis │  │      │   │  │  │
+│  │  │  │    └──────────┘ └──────────┘ └───────┘ └────────┘ └───────┘  |      │   │  │  │
+│  │  │  │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ - ┘      │   │  │  │
+│  │  │  │                                                                     │   │  │  │
+│  │  │  │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ - -┐      │   │  │  │
+│  │  │  │    argocd namespace          |  |     clickhouse-operator ns |      │   │  │  │
+│  │  │  │  │                           |  │                            |      │   │  │  │
+│  │  │  │    ┌────────────────────────┐   |  ┌────────────────────────-┐      │   │  │  │
+│  │  │  │  │ │        ArgoCD          │   │  │  ClickHouse Operator    │      │   │  │  │
+│  │  │  │    └────────────────────────┘   |  └-────────────────────────┘      │   │  │  │
+│  │  │  │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ - ┘  └ ─ ─ ─ ─ ─ - - -─ ─ ─ ─ ─ ─ ┘      │   │  │  │
+│  │  │  │                                                                     │   │  │  │
+│  │  │  │  ┌──────────────────────────┐   ┌────────────────────────────────┐  │   │  │  │
+│  │  │  │  │  ALB Controller          │   │  External Secrets Operator     │  │   │  │  │
+│  │  │  │  └──────────────────────────┘   └────────────────────────────────┘  │   │  │  │
+│  │  │  └─────────────────────────────────────────────────────────────────────┘   │  │  │
+│  │  └────────────────────────────────────────────────────────────────────-───────┘  │  │
+│  │                                                                                  │  │
+│  │  ┌─────────────────────────────────────────────────────────────────────-──────┐  │  │
+│  │  │  Database Subnets                                                          │  │  │
+│  │  │    ┌──────────────────┐                                                    │  │  │
+│  │  │    │  RDS PostgreSQL  │                                                    │  │  │
+│  │  │    └──────────────────┘                                                    │  │  │
+│  │  └─────────────────────────────────────────────────────────────────────────-──┘  │  │
+│  └─────────────────────────────────────────────────────────────────────────────-────┘  │
+│                                                                                        │
+│  ┌────────────────┐ ┌─────────────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐     │
+│  │  S3 Bucket     │ │ Secrets Manager │ │   ACM    │ │   KMS    │ │  IAM / IRSA  │     │
+│  │  (+ VPC EP)    │ │ (Credentials)   │ │ (Certs)  │ │  (Keys)  │ │  (Pod roles) │     │
+│  └────────────────┘ └─────────────────┘ └──────────┘ └──────────┘ └──────────────┘     │
+└──────────────────────────────────────────────────────────────────────────────────────-─┘
 ```
 
 ## Core components
 
 <CardGroup cols={3}>
   <Card title="VPC & Networking" icon="fa-light fa-network-wired">
-    Public/private subnets with NAT and Internet Gateways.
+    Public/private/database subnets with NAT Gateway, Internet Gateway, and S3
+    VPC Endpoint.
   </Card>
   <Card title="EKS Cluster" icon="fa-light fa-dharmachakra">
-    Managed Kubernetes with autoscaling node groups.
+    Managed Kubernetes with autoscaling node groups and EBS CSI driver.
   </Card>
   <Card title="RDS PostgreSQL" icon="fa-light fa-database">
-    Managed database with automated backups and encryption.
+    Managed database in isolated subnets with automated backups, encryption, and
+    password rotation.
   </Card>
   <Card title="ALB" icon="fa-light fa-scale-balanced">
-    HTTPS load balancer with ACM certificates.
+    HTTPS load balancer managed by ALB Controller with ACM certificates.
+  </Card>
+  <Card title="ArgoCD" icon="fa-light fa-arrows-rotate">
+    GitOps tool for managing Kubernetes deployments.
   </Card>
   <Card title="S3 Storage" icon="fa-light fa-bucket">
-    Private bucket for application data.
-  </Card>
-  <Card title="Bastion Host" icon="fa-light fa-server">
-    SSH jump host for kubectl access.
+    Private bucket with VPC endpoint for application data.
   </Card>
 </CardGroup>
 
 ## Deployed services
 
-The Kubernetes cluster runs the following Confident AI services:
+The Kubernetes cluster runs the following services:
 
-| Service                | Description                                            |
-| ---------------------- | ------------------------------------------------------ |
-| **confident-backend**  | Express.js API service handling core platform logic    |
-| **confident-frontend** | Next.js web application for the Confident AI dashboard |
-| **confident-evals**    | FastAPI service for running LLM evaluations            |
-| **confident-otel**     | OpenTelemetry collector for trace ingestion            |
-| **redis**              | In-memory cache for session and queue management       |
+| Service                 | Namespace           | Description                                            |
+| ----------------------- | ------------------- | ------------------------------------------------------ |
+| **confident-backend**   | confident-ai        | Express.js API service handling core platform logic    |
+| **confident-frontend**  | confident-ai        | Next.js web application for the Confident AI dashboard |
+| **confident-evals**     | confident-ai        | FastAPI service for running LLM evaluations            |
+| **confident-otel**      | confident-ai        | OpenTelemetry collector for trace ingestion            |
+| **redis**               | confident-ai        | In-memory cache for session and queue management       |
+| **ArgoCD**              | argocd              | GitOps continuous delivery                             |
+| **ClickHouse Operator** | clickhouse-operator | Manages the analytics database                         |
+| **ALB Controller**      | kube-system         | Creates ALBs from Kubernetes Ingress resources         |
+| **External Secrets**    | confident-ai        | Syncs credentials from AWS Secrets Manager             |
