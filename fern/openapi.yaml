@@ -978,7 +978,6 @@ paths:
                         provider: "OPEN_AI"
                         name: "gpt-4o"
                         temperature: 0.7
-                      tools: []
                     deprecated: false
                 Message-Example:
                   value:
@@ -1016,7 +1015,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetPromptResponse"
               examples:
-                Test-Example:
+                Text-Example:
                   value:
                     success: true
                     data:
@@ -1032,7 +1031,6 @@ paths:
                         provider: "OPEN_AI"
                         name: "gpt-4o"
                         temperature: 0.7
-                      tools: []
                     deprecated: false
                 Message-Example:
                   value:
@@ -1094,7 +1092,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetPromptResponse"
               examples:
-                Test-Example:
+                Text-Example:
                   value:
                     success: true
                     data:
@@ -1110,7 +1108,6 @@ paths:
                         provider: "OPEN_AI"
                         name: "gpt-4o"
                         temperature: 0.7
-                      tools: []
                     deprecated: false
                 Message-Example:
                   value:
@@ -2983,6 +2980,7 @@ components:
           description: "This is the reasoning your LLM provided for the tool call."
       required:
         - name
+        - description
 
     GetDatasetResponse:
       type: object
@@ -4072,14 +4070,21 @@ components:
           description: This is the unique identifier for the schema field.
         name:
           type: string
-          description: This is the name of the schema field.
+          description: This is the name of the tool
+        description:
+          type: string
+          description: This is the description of the tool
         mode:
           type: string
           enum: [STRICT, ADDITIONAL, NO_ADDITIONAL]
-          description: This is the type for tool input fields.
+          description: This is the mode for your tool input fields
         structuredSchema:
           $ref: "#/components/schemas/OutputSchema"
           description: This is the schema for your tool input
+      required:
+        - name
+        - description
+        - mode
 
     # UpdatePromptRequest:
     #   type: object
