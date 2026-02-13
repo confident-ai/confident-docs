@@ -341,7 +341,7 @@ paths:
           description: The label name of the prompt.
           example: "PROMPT-LABEL"
 
-  /v1/prompts/{alias}/versions/{versionId}:
+  /v1/prompts/{alias}/versions/{version}:
     get:
       parameters:
         - in: header
