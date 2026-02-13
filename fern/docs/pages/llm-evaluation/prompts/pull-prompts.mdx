@@ -66,7 +66,9 @@ await prompt.pull({ version: "00.00.01" });
 </Tab>
 
 <Tab title="curL" language="curl">
-  <EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}" />
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{versionId}"/>
+
 </Tab>
 
 </Tabs>
@@ -246,7 +248,7 @@ console.log(response.choices[0].message.content);
 
 First, pull the prompt from Confident AI:
 
-<EndpointRequestSnippet endpoint="GET /v1/prompts" />
+<EndpointRequestSnippet endpoint="GET /v1/prompts/" />
 
 Then, interpolate the variables and use the interpolated prompt with OpenAI:
 
@@ -347,24 +349,43 @@ curl -X POST "https://api.openai.com/v1/chat/completions" \
 
 </Steps>
 
-## Pull Prompts By Label
-
-You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
+You can also fetch all the versions associated with a prompt as shown below:
 
 <Tabs>
 
-<Tab title="Version">
+<Tab title="Python" language="python">
 
-```python main.py
+```python
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull(version="00.00.01")
+commits = prompt._get_versions()
 ```
 
 </Tab>
 
-<Tab title="Label">
+<Tab title="Typescript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+const commits = await prompt.getVersions();
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions" />
+
+</Tab>
+
+</Tabs>
+
+## Pull Prompts By Label
+
+You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
 
 ```python main.py
 from deepeval.prompt import Prompt
@@ -375,15 +396,56 @@ prompt.pull(label="staging")
 
 You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions) to learn how to do so.
 
-</Tab>
-
-</Tabs>
-
 <Note>
 
 By pulling via labels, you effectively allow users with sufficient permission to "deploy" new versions of your prompt without going through code.
 
 </Note>
+
+## Pull Prompts By Commit
+
+You can also pull specific snapshots of prompts using it's `alias` and the commit `hash`.
+
+```python main.py
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(hash="bab04ce")
+```
+
+You can also fetch all the commits associated with a prompt as shown below:
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+commits = prompt._get_commits()
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+const commits = await prompt.getCommits();
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/commits" />
+
+</Tab>
+
+</Tabs>
 
 ## How Are Prompts Pulled?
 

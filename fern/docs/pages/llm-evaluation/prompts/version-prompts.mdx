@@ -131,8 +131,8 @@ from deepeval.prompt.api import PromptMessage
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.push(messages=[PromptMessage(role="...", content="...")])
-
-````
+prompt.create_version()
+```
 </Tab>
 
 <Tab title="Text" language="python">
@@ -141,11 +141,18 @@ from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.push(text="...")
-````
+prompt.create_version()
+```
 
 </Tab>
 
 </Tabs>
+
+The `push` method creates a new commit for the changes you made on the Confident AI platform. The `create_version` method creates a new version for the latest commit or for a specific commit if provided.
+
+<Warning>
+  A new version can only be created for commits made after the most recently versioned commit. Commits made before an existing version cannot be versioned.
+</Warning>
 
 <Tip>
   For more advanced push options including model settings, output type, and
