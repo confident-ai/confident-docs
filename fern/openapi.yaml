@@ -4379,6 +4379,12 @@ components:
         testCaseId:
           type: string
           description: The ID of the test case associated with this annotation, if applicable.
+        threadSuppliedId:
+          type: string
+          description: The supplied ID of the thread associated with this annotation, if applicable.
+        userEmail:
+          type: string
+          description: The email of the user who created this annotation.
       required:
         - id
         - rating
