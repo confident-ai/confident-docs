@@ -924,7 +924,7 @@ paths:
               $ref: "#/components/schemas/CreatePromptVersionRequest"
             examples:
               With-Hash:
-                commit: "bab04ce"
+                hash: "bab04ce"
       responses:
         "200":
           description: ""
@@ -1000,14 +1000,14 @@ paths:
                         temperature: 0.7
                     deprecated: false
 
-  /v1/prompts/{alias}/versions/{versionId}:
+  /v1/prompts/{alias}/versions/{version}:
     get:
       x-fern-server-name: Confident AI
       tags:
         - Prompt
       summary: Pull Prompts By Version
       operationId: getPromptByVersion
-      description: Retrieves a prompt with `alias` and `versionId` from your Confident AI account.
+      description: Retrieves a prompt with `alias` and `version` from your Confident AI account.
       responses:
         "200":
           description: ""
@@ -3951,9 +3951,9 @@ components:
     CreatePromptVersionRequest:
       type: object
       properties:
-        commit:
+        hash:
           type: string
-          description: The commit hash of the commit you wanna release a new version of. Only commits above the last versioned commit can be released as new versions. If ommited, the most recent commit will be versioned.
+          description: The hash of the commit you wanna release a new version of. Only commits above the last versioned commit can be released as new versions. If ommited, the most recent commit will be versioned.
 
     CreatePromptVersionResponse:
       type: object
@@ -4211,7 +4211,7 @@ components:
             - id
             - type
             - interpolationType
-            - modelSettings
+            - hash
             - outputType
         deprecated:
           type: boolean
