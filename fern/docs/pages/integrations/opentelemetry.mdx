@@ -1152,6 +1152,13 @@ To create a LLM span, set the `confident.span.type` to `llm`. After that refer t
 - [Optional] `"confident.llm.input_token_count"` (of type `int`) used for updating LLM Span input token count
 - [Optional] `"confident.llm.output_token_count"` (of type `int`) used for updating LLM Span output token count
 
+You can also attribute [Confident AI prompts](/docs/llm-evaluation/prompt-management/pull-prompts) to your LLM spans using prompt specific attributes:
+
+- [Optional] `"confident.llm.prompt_alias"` (of type `string`) used for identifying your prompt on Confident AI
+- [Optional] `"confident.llm.prompt_commit_hash"` (of type `string`) used for tracking which commit of prompt was used
+- [Optional] `"confident.llm.prompt_label"` (of type `string`) used for identifying your prompt by label
+- [Optional] `"confident.llm.prompt_version"` (of type `string`) used for identifying your prompt by version
+
 Given below is the sample code for setting attributes for LLM span type.
 
 <CodeBlocks>
@@ -1160,6 +1167,10 @@ Given below is the sample code for setting attributes for LLM span type.
 with tracer.start_as_current_span("llm_span") as span:
     span.set_attribute("confident.span.type", "llm")
     span.set_attribute("confident.llm.model", "gpt-3.5-turbo")
+    span.set_attribute("confident.span.prompt_alias", prompt.alias) # Must be pulled from Confident AI
+    span.set_attribute("confident.span.prompt_commit_hash", prompt.hash)
+    span.set_attribute("confident.span.prompt_label", prompt.label)
+    span.set_attribute("confident.span.prompt_version", prompt.version)
     span.set_attribute("confident.span.input", [
         json.dumps({"role": "system", "content": "You are a helpful assistant."}),
         json.dumps({"role": "user", "content": input})
@@ -1171,6 +1182,10 @@ with tracer.start_as_current_span("llm_span") as span:
 ```typescript
 span.setAttributes({
   "confident.span.type": "llm",
+  "confident.span.prompt_alias": prompt._alias, // Must match the alias from Confident AI
+  "confident.span.prompt_commit_hash": prompt.hash,
+  "confident.span.prompt_label": prompt.label,
+  "confident.span.prompt_version": prompt.version,
   "confident.llm.model": "gpt-3.5-turbo",
   "confident.span.input": [
     JSON.stringify({ role: "system", content: "You are a helpful assistant." }),
@@ -1184,6 +1199,10 @@ span.setAttributes({
 span.SetAttributes(
     attribute.String("confident.span.type", "llm"),
     attribute.String("confident.llm.model", "gpt-3.5-turbo"),
+    attribute.String("confident.span.prompt_alias", "PROMPT-ALIAS"), // Must match alias on Confident AI
+    attribute.String("confident.span.prompt_commit_hash", "HASH"),
+    attribute.String("confident.span.prompt_label", "LABE;"),
+    attribute.String("confident.span.prompt_version", "VERSION"),
     attribute.StringSlice("confident.span.input", []string{
         `{"role": "system", "content": "You are a helpful assistant."}`,
         `{"role": "user", "content": "What is the capital of France?"}`,
@@ -1196,6 +1215,10 @@ span.SetAttributes(
 span.setAttributes({
     "confident.span.type": "llm",
     "confident.llm.model": "gpt-3.5-turbo",
+    "confident.span.prompt_alias": "PROMPT-ALIAS", # Must match alias on Confident AI
+    "confident.span.prompt_commit_hash": "HASH",
+    "confident.span.prompt_label": "LABEL",
+    "confident.span.prompt_version": "VERSION",
     "confident.span.input": [
         `{"role": "system", "content": "You are a helpful assistant."}`,
         `{"role": "user", "content": "What is the capital of France?"}`
@@ -1207,6 +1230,10 @@ span.setAttributes({
 ```csharp
 span.SetAttribute("confident.span.type", "llm");
 span.SetAttribute("confident.llm.model", "gpt-3.5-turbo");
+span.SetAttribute("confident.span.prompt_alias", "PROMPT-ALIAS");
+span.SetAttribute("confident.span.prompt_commit_hash", "HASH");
+span.SetAttribute("confident.span.prompt_label", "LABEL");
+span.SetAttribute("confident.span.prompt_version", "VERSION");
 span.SetAttribute("confident.span.input", [
     `{"role": "system", "content": "You are a helpful assistant."}`,
     `{"role": "user", "content": "What is the capital of France?"}`

@@ -110,9 +110,10 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
 
     </Tab>
     <Tab title="TypeScript" language="typescript">
-            ```typescript title="index.ts" {5}
-            import { observe, updateLlmSpan } from "deepeval-ts/tracing";
-
+            ```typescript title="index.ts" {6}
+            import { observe, updateLlmSpan, Prompt } from "deepeval-ts/tracing";
+            const confidentPrompt = Prompt({alias: "YOUR_PROMPT_ALIAS"})
+            await confidentPrompt.pull()
             const generateResponse = (prompt: string) => {
                 const output = "Generated response";
                 updateLlmSpan({
@@ -120,6 +121,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
                     outputTokenCount: 25,
                     costPerInputToken: 0,
                     costPerOutputToken: 0,
+                    prompt: confidentPrompt,
                 });
                 return output;
             };
@@ -134,6 +136,7 @@ LLM attributes track the model, prompt, and token usage and costs of language mo
         There are **SIX** optional parameters for `updateLlmSpan`:
 
         - [Optional] `model`: The model used, of type `str`.
+        - [Optional] `prompt`: The prompt of type `Prompt`, which must be pulled prior to updating the span.
         - [Optional] `inputTokenCount`: The number of tokens of type `float` in the input.
         - [Optional] `outputTokenCount`: The number of tokens of type `float` in the generated response.
         - [Optional] `costPerInputToken`: The cost per input token of type `float`.
