@@ -312,9 +312,6 @@ navigation:
           - page: Data Handling
             path: docs/pages/resources/data-handling.mdx
             icon: fa-light fa-shield-check
-          - page: On-Prem Hosting
-            path: docs/pages/resources/on-prem-hosting.mdx
-            icon: fa-light fa-server
           - page: LLM Use Cases
             path: docs/pages/resources/llm-use-cases.mdx
             icon: fa-light fa-list
