@@ -13,6 +13,16 @@ You can pull a prompt version from Confident AI like how you would pull a datase
 
 You should pull prompts once and save it in memory instead of pulling it everytime you need to use it.
 
+<Note>
+
+Confident AI uses a versioning system for prompts similar to Git.
+
+- Each new iteration of a prompt is stored as a new commit, you can create commits directly in the platform or by using the `push` method in the `deepeval` Python or TypeScript SDKs.
+- Any specific commit can be promoted to a version. Versions act as official checkpoints, making it easier to track stable or production-ready prompts.
+- On top of versions, you can assign labels. Labels give a version a clear, human-friendly identifier so you can quickly reference it (for example, “production” or “v1.2-stable”).
+
+</Note>
+
 ## Pull Prompt By Version
 
 <Steps>
@@ -29,11 +39,11 @@ Pull your prompt version by providing the `alias` you've defined:
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.pull()
+prompt.pull(version="latest")
 ```
 
 <Tip>
-  By default, Confident AI will return the latest version of your prompt.
+  By passing `latest` instead of a specific version, Confident AI will return the most recent version of your prompt.
   However, you can also specify the `version` to override this behavior.
 
 ```python
@@ -50,11 +60,11 @@ prompt.pull(version="00.00.01")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.pull();
+await prompt.pull({ version: "latest" });
 ```
 
 <Tip>
-  By default, Confident AI will return the latest version of your prompt.
+  By passing `latest` instead of a specific version, Confident AI will return the most recent version of your prompt.
   However, you can also specify the `version` to override this behavior.
 
 ```typescript
@@ -67,7 +77,7 @@ await prompt.pull({ version: "00.00.01" });
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{versionId}"/>
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/versions/{version}"/>
 
 </Tab>
 
@@ -385,14 +395,41 @@ const commits = await prompt.getVersions();
 
 ## Pull Prompts By Label
 
-You can pull a prompt from Confident AI using its `alias`, you can also pull specific versions of prompts using `version` and `label`.
+You can also pull specific versions of prompts using the `label` you assign to the versions on the platform.
 
-```python main.py
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 prompt.pull(label="staging")
 ```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull({ label: "staging" });
+```
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/labels/{label}"/>
+
+</Tab>
+
+</Tabs>
+
 
 You must manually label each prompt version before pulling it. [Click here](/docs/llm-evaluation/prompt-management/version-prompts#labelling-prompt-versions) to learn how to do so.
 
@@ -406,12 +443,57 @@ By pulling via labels, you effectively allow users with sufficient permission to
 
 You can also pull specific snapshots of prompts using it's `alias` and the commit `hash`.
 
-```python main.py
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+```
+
+<Tip>
+  By default, Confident AI will return the most recent commit of your prompt.
+  However, you can also specify the `hash` to override this behavior.
+
+```python
 prompt.pull(hash="bab04ce")
 ```
+
+</Tip>
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+```
+
+<Tip>
+  By default, Confident AI will return the most recent commit of your prompt.
+  However, you can also specify the `hash` to override this behavior.
+
+```typescript
+await prompt.pull({ hash: "bab04ce" });
+```
+
+</Tip>
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/commits/{hash}"/>
+
+</Tab>
+
+</Tabs>
 
 You can also fetch all the commits associated with a prompt as shown below:
 

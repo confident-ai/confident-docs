@@ -4,7 +4,7 @@ slug: settings/data-residency
 description: Learn about data residency configuration
 ---
 
-By default, all data is stored and processed in the **United States of America**. You can however login to EU for your data to be hosted and processed in the **European Union** instead.
+By default, all data is stored and processed in the **United States of America**. You can however login to EU (European Union) or AU (Australia) for your data to be hosted and processed as you prefer.
 
 Additional data residency options are available on-demand. Contact support@confident-ai.com to ask for the available options.
 
@@ -27,12 +27,16 @@ Customers on one of the annual plans (Team or Enterprise) gets a free, compilmen
 | ------ | -------------- | --------------------- |
 | US     | United States  | Default for all plans |
 | EU     | European Union | Premium plan + add-on |
+| AU     | Australia      | Premium plan + add-on |
 | Custom | On-demand      | Contact support       |
 
 ## Configure Data Region
 
 When using the [Evals API](/docs/api-reference/introduction) or some integrations that rely on [OpenTelemetry](/docs/integrations/opentelemetry), you'll need to change the base and OTEL endpoints:
 
+<Tabs>
+
+<Tab title="EU">
 ```bash
 export CONFIDENT_BASE_URL="https://eu.api.confident-ai.com"
 export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
@@ -43,6 +47,24 @@ Or alternatively, you can run the `set-confident-region` command to switch to fo
 ```bash
 deepeval set-confident-region EU
 ```
+
+</Tab>
+
+<Tab title="AU">
+```bash
+export CONFIDENT_BASE_URL="https://au.api.confident-ai.com"
+export CONFIDENT_OTEL_URL="https://au.otel.confident-ai.com"
+```
+
+Or alternatively, you can run the `set-confident-region` command to switch to for example the AU region:
+
+```bash
+deepeval set-confident-region AU
+```
+
+</Tab>
+
+</Tabs>
 
 ## On-Premises Hosting
 
