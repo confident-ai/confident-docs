@@ -1,91 +1,92 @@
 ---
 title: LLM Tracing Quickstart
-subtitle: Setup LLM observability for your application in less than 5 minutes
+subtitle: Instrument your LLM application for observability in less than 5 minutes
 slug: llm-tracing/quickstart
 ---
 
 ## Overview
 
-Confident AI allows anyone building with any framework, language, and LLMs to setup LLM observability through tracing. Every interaction traced is evals-native, powered by DeepEval. This means apart form tracking latency, cost, and error rates, you can also run evals on:
+This guide shows you how to instrument your LLM app using the `@observe` decorator for Python or the `observe` wrapper for TypeScript.
 
-- Traces
-- Spans, and
-- Threads
+<Note>
+  **Prefer one-line integrations or OpenTelemetry?** You can also instrument
+  your app via [integrations for OpenAI, LangChain, and
+  more](/docs/integrations) or [OpenTelemetry
+  (OTEL)](/docs/integrations/opentelemetry) for any language — no decorator
+  changes needed.
+</Note>
 
-The demo below demonstrates what it looks like on the platform:
+## How it works
 
-<Tabs>
-  <Tab title="Traces">
-    Traces are a single execution of your LLM app, and running evals on traces
-    is akin to the [end-to-end
-    evals](/docs/llm-evaluation/single-turn/end-to-end) for single-turn
-    evaluation in development.
-    <Frame caption="LLM Tracing: Traces with Evals">
-      <video
-        data-video="tracing.traces"
-        controls
-      />
-    </Frame>
-  </Tab>
-  <Tab title="Spans">
-    Spans are individual components such as LLM calls, agents, retrieveres,
-    tools, etc. that make up a trace. Running evals on spans is akin to the
-    [component-level evals](/docs/llm-evaluation/single-turn/component-level)
-    for multi-turn evaluation in development.
-    <Frame caption="LLM Tracing: Spans with Evals">
-      <video
-        data-video="tracing.spans"
-        controls
-      />
-    </Frame>
-  </Tab>
-  <Tab title="Threads">
-    Threads are **a group of traces**, grouped together via a `thread_id` that
-    you provide during tracing. It represents a multi-turn LLM interaction,
-    exactly the same as [E2E multi-turn
-    evals.](/docs/llm-evaluation/multi-turn/end-to-end)
-    <Frame caption="LLM Tracing: Threads with Evals">
-      <video
-        data-video="tracing.threads"
-        controls
-      />
-    </Frame>
-  </Tab>
-</Tabs>
+Tracing works through instrumentation, which can either be manual or through one of Confident AI's integrations:
 
-## How It Works
+1. Decorate or wrap your functions with `@observe` (Python) or `observe` (TypeScript)
+2. Each observed function becomes a **span**
+3. The outermost observed function becomes the **trace** — all nested spans roll up into it
+4. Traces are sent to Confident AI asynchronously with zero latency impact
+5. Once ingested, traces can be evaluated automatically using your configured metrics
 
-You would setup LLM tracing either through one of our [integrations](/docs/integrations), or by decorating your LLM app for Python and Typescript users. Either way, Confident AI will create an execution hierarchy of your LLM app, as well as log all components that were called for each LLM invocation:
+You should also understand the terminology for tracing:
 
-- **Trace**: The overall process of tracking and visualizing the execution flow of your LLM application
-- **Span**: Individual units of work within your application (e.g., LLM calls, tool executions, retrievals)
+<CardGroup cols={3}>
+  <Card title="Trace" icon="route">
+    A single end-to-end execution of your LLM app — the top-level unit of
+    observability.
+  </Card>
+  <Card title="Span" icon="puzzle-piece">
+    An individual component within a trace, such as an LLM call, retrieval, or
+    tool execution.
+  </Card>
+  <Card title="Thread" icon="messages">
+    A group of traces representing a multi-turn conversation, linked by a shared
+    thread ID.
+  </Card>
+</CardGroup>
 
-Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. When you have tracing setup, you can run evaluations on both the trace and span level.
+## Instrument Your AI App
 
-## Trace Your First LLM Call
+<Tip>
 
-<Tip icon="leaf">
-  You'll need to get your API key as shown in the [setup and
-  installation](/docs/setup-and-installation) section before continuing.
+You'll need to get your API key as shown in the [setup and installation](/docs/setup-and-installation) section before continuing.
+
 </Tip>
 
-<Tabs>
-  <Tab title="Python">
-    <Steps>
+<Steps>
 
-      <Step title="Installation">
-        Install DeepEval and setup your tracing environment:
+<Step title="Install DeepEval">
 
-          ```bash
-          pip install -U deepeval
-          ```
-      </Step>
+Instrumentation must be done via code, so first install DeepEval, Confident AI's official open-source SDK:
 
-      <Step title="Login to Confident AI">
-        Get your [Confident AI Project API](https://app.confident-ai.com) key and login:
+  <Tabs>
+    <Tab title="Python">
 
+      ```bash
+      pip install -U deepeval
+      ```
+
+      </Tab>
+    <Tab title="TypeScript">
+      <CodeBlocks>
+
+        ```bash title="npm"
+        npm install deepeval-ts
+        ```
+        ```bash title="yarn"
+        yarn add deepeval-ts
+        ```
+
+      </CodeBlocks>
+    </Tab>
+
+  </Tabs>
+</Step>
+
+  <Step title="Set Your API Key">
+    Get your [Confident AI Project API](https://app.confident-ai.com) key and login:
+
+    <Tabs>
+      <Tab title="Python">
         <CodeBlocks>
-
           ```bash title="Set Env"
           export CONFIDENT_API_KEY=YOUR-API-KEY
           ```
@@ -97,125 +98,264 @@ Each observed function **CREATES A SPAN**, and **MANY SPANS MAKE UP A TRACE**. W
           )
           ```
         </CodeBlocks>
-      </Step>
-
-      <Step title="Setup Tracing">
-        The `@observe` decorator logs whatever it decorates within and is the primary way to instrument your LLM app for tracing.
-
-          ```python title="main.py" {6,17}
-          from openai import OpenAI
-          from deepeval.tracing import observe
-
-          client = OpenAI()
-
-          @observe()
-          def llm_app(query: str) -> str:
-              return client.chat.completions.create(
-                  model="gpt-4o",
-                  messages=[
-                      {"role": "user", "content": query}
-                  ]
-              ).choices[0].message.content
-              return
-
-          # Call app to send trace to Confident AI
-          llm_app("Write me a poem.")
-          ```
-        ✅ You just created a trace with a span inside it. Go to the Observatory to see your traces there.
-
-<Note>
-If your `llm_app` has more than one function, simply decorate those functions with `@observe` too.
-
-In a later section, you'll learn how to create [spans that are LLM specific](/docs/llm-tracing/tracing-features/span-types#llm-span), which allow you to log things like token cost and model name automatically.
-
-</Note>
-      </Step>
-
-    </Steps>
-
-  </Tab>
-
-  <Tab title="TypeScript">
-    <Steps>
-
-      <Step title="Installation">
-        Install DeepEval and setup your tracing environment:
+      </Tab>
+      <Tab title="TypeScript">
         <CodeBlocks>
-
-          ```bash title="npm"
-          npm install deepeval-ts
+          ```bash title="Set Env"
+          export CONFIDENT_API_KEY=YOUR-API-KEY
           ```
-          ```bash title="yarn"
-          yarn add deepeval-ts
-          ```
-
-        </CodeBlocks>
-      </Step>
-
-      <Step title="Login to Confident AI">
-        Get your [Confident AI Project API](https://app.confident-ai.com) key and login.
-
-        <CodeBlocks>
-          ```js title="In code"
+          ```ts title="In code"
           import { traceManager } from 'deepeval-ts/tracing';
 
           traceManager.configure({
               confidentApiKey: "YOUR-API-KEY"
           })
           ```
-          ```bash title="Set Env"
-          export CONFIDENT_API_KEY=YOUR-API-KEY
-          ```
         </CodeBlocks>
-      </Step>
+      </Tab>
+    </Tabs>
 
-      <Step title="Setup Tracing">
-        The `observe` wrapper is the primary way to instrument your LLM application for tracing.
+  </Step>
 
-          ```ts title="index.ts" focus={2,13,16}
-          import OpenAI from 'openai';
-          import { observe } from 'deepeval-ts/tracing';
+  <Step title="Instrument Your App">
+    Decorate or wrap your functions to automatically capture inputs, outputs, and execution flow. Note that each `observe` decorator/wrapper creates a span on the UI.
 
-          const llmApp = async (query: string) => {
-            const openai = new OpenAI();
-            const res = await openai.chat.completions.create({
-              model: "gpt-4o",
-              messages: [{ role: "user", content: query }],
-            });
-            return res.choices[0].message.content;
-          };
+    <Tabs>
+      <Tab title="Python">
+        ```python title="main.py" {6}
+        from openai import OpenAI
+        from deepeval.tracing import observe
 
-          const observedLlmApp = observe({ fn: llmApp });
+        client = OpenAI()
 
-          // Call app to send trace to Confident AI
-          observedLlmApp("Write me a poem.");
-          ```
+        @observe()
+        def llm_app(query: str) -> str:
+            return client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "user", "content": query}
+                ]
+            ).choices[0].message.content
 
-        ✅ You just created a trace with a span inside it. Go to the Observatory to see your traces there.
+        # Call app to send trace to Confident AI
+        llm_app("Write me a poem.")
+        ```
 
-<Note>
-  If your `llmApp` has more than one function, simply wrap those functions in
-  `observe` too and call the wrapped functions in `llmApp` instead.
+      </Tab>
+      <Tab title="TypeScript">
+        ```ts title="index.ts"
+        import OpenAI from 'openai';
+        import { observe } from 'deepeval-ts/tracing';
 
-        In a later section, you'll learn how to create [spans that are LLM specific](/docs/llm-tracing/tracing-features/span-types#llm-span), which allow you to log things like token cost and model name automatically.
+        const llmApp = async (query: string) => {
+          const openai = new OpenAI();
+          const res = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{ role: "user", content: query }],
+          });
+          return res.choices[0].message.content;
+        };
 
-</Note>
-      </Step>
+        const observedLlmApp = observe({ fn: llmApp });
 
-    </Steps>
+        // Call app to send trace to Confident AI
+        observedLlmApp("Write me a poem.");
+        ```
+      </Tab>
+    </Tabs>
 
-  </Tab>
-</Tabs>
+<Frame caption="Tracing Quickstart">
+  <video data-video="tracing.quickstart" controls />
+</Frame>
 
-**Congratulations!** 🎉 Now whenever you run your LLM app, all traces will be logged AND evaluated on Confident AI. Go to the the **Observatory** section on Confident AI to check it out.
+    Done ✅. You just created a trace with a span inside it. Go to the Observatory to see your traces there.
 
 <Tip>
 If you don't see the trace, it is 99.99% because your program exited before the traces had a chance to get posted. Try setting `CONFIDENT_TRACE_FLUSH=YES` if this is the case:
 
 ```bash
-CONFIDENT_TRACE_FLUSH=YES
+CONFIDENT_TRACE_FLUSH=1
 ```
 
 </Tip>
 
-In the next section, we will learn how to run evals for LLM tracing.
+<Note>
+In a later section, you'll learn how to create [spans that are LLM specific](/docs/llm-tracing/features/span-types#llm-span), which allow you to log things like token cost and model name automatically.
+</Note>
+  </Step>
+
+</Steps>
+
+### Update traces & spans
+
+Once inside an observed function, you can enrich the current trace or span with additional data using `update_current_trace` / `update_current_span` (Python) or `updateCurrentTrace` / `updateCurrentSpan` (TypeScript).
+
+<Tabs>
+  <Tab title="Python">
+
+```python highlight={13}
+from deepeval.tracing import observe, update_current_trace, update_current_span
+
+@observe(type="retriever")
+def retriever(query: str):
+    chunks = retrieve(query)
+    update_current_span(input=query, output=chunks)
+    return chunks
+
+@observe()
+def llm_app(query: str):
+    context = retriever(query)
+    res = generate(query, context)
+    update_current_trace(
+        input=query,
+        output=res,
+        tags=["production"],
+        metadata={"app_version": "1.2.3"}
+    )
+    return res
+```
+
+  </Tab>
+  <Tab title="TypeScript">
+
+```typescript highlight={17} maxLines={0}
+import {
+  observe,
+  updateCurrentTrace,
+  updateCurrentSpan,
+} from "deepeval-ts/tracing";
+
+const retriever = (query: string) => {
+  const chunks = retrieve(query);
+  updateCurrentSpan({ input: query, output: chunks });
+  return chunks;
+};
+const observedRetriever = observe({ type: "retriever", fn: retriever });
+
+const llmApp = async (query: string) => {
+  const context = await observedRetriever(query);
+  const res = await generate(query, context);
+  updateCurrentTrace({
+    input: query,
+    output: res,
+    tags: ["production"],
+    metadata: { appVersion: "1.2.3" },
+  });
+  return res;
+};
+const observedLlmApp = observe({ fn: llmApp });
+```
+
+  </Tab>
+</Tabs>
+
+- `update_current_trace` / `updateCurrentTrace` sets data on the **trace** (the outermost observed function) — use it for [input/output](/docs/llm-tracing/features/input-output), [tags](/docs/llm-tracing/features/tags), [metadata](/docs/llm-tracing/features/metadata), [threads](/docs/llm-tracing/features/threads), and [users](/docs/llm-tracing/features/users).
+- `update_current_span` / `updateCurrentSpan` sets data on the **current span** — use it for span-level input/output, metadata, and [online eval test case parameters](/docs/llm-tracing/features/test-cases).
+
+Both can be called multiple times from anywhere inside an observed function — values are merged, with later calls overriding earlier ones.
+
+### Using context manager
+
+For pyhton users, if you prefer not to use the `@observe` decorator, DeepEval also supports the `Observer` context manager with the same arguments:
+
+```python
+from deepeval.tracing import Observer, update_current_span
+
+def generate(prompt: str) -> str:
+    with Observer(type="llm", model="gpt-4"):
+        res = call_llm(prompt)
+        update_current_span(input=prompt, output=res)
+        return res
+```
+
+As you learn more about the `@observe` decorator later on - you can rest assured that everything will automatically apply to context managers as well. This is useful when you can't modify a function's definition or need to instrument a specific code block rather than an entire function.
+
+## Instrument Multi-Turn Apps
+
+If your app handles conversations or multi-turn interactions, you can group traces into a **thread** by providing a thread ID. Each call to your app creates a trace, and traces with the same thread ID are grouped together as a conversation.
+
+<Tabs>
+  <Tab title="Python">
+
+```python title="main.py" {2,13}
+from openai import OpenAI
+from deepeval.tracing import observe, update_current_trace
+
+client = OpenAI()
+
+@observe()
+def llm_app(query: str):
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+
+    update_current_trace(thread_id="your-thread-id", input=query, output=res)
+    return res
+
+llm_app("What's the weather in SF?")
+llm_app("What about tomorrow?")
+```
+
+  </Tab>
+  <Tab title="TypeScript">
+
+```typescript title="index.ts" {2,11} maxLines={0}
+import OpenAI from "openai";
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
+
+const llmApp = async (query: string) => {
+  const openai = new OpenAI();
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  const data = res.choices[0].message.content;
+  updateCurrentTrace({
+    threadId: "your-thread-id",
+    input: query,
+    output: data,
+  });
+  return data;
+};
+
+const observedLlmApp = observe({ fn: llmApp });
+await observedLlmApp("What's the weather in SF?");
+await observedLlmApp("What about tomorrow?");
+```
+
+  </Tab>
+</Tabs>
+
+The thread ID can be any string (e.g., a session ID from your app). The `input` and `output` is recommended to be the raw user text and LLM response respectively — Confident AI uses these as the conversation turns for display and [thread evaluations](/docs/llm-tracing/features/threads).
+
+<Note>
+  For more details on thread I/O conventions, tools called, retrieval context,
+  and running offline evals on threads, see the full
+  [Threads](/docs/llm-tracing/features/threads) page.
+</Note>
+
+## Next steps
+
+Now that you've learnt the very basics of instrumenting your AI app, dive deeper into:
+
+<CardGroup cols={2}>
+  <Card
+    title="Configure Span Types"
+    href="/llm-tracing/features/span-types"
+    icon="cubes"
+    iconType="solid"
+  >
+    Classify spans as LLM, retriever, tool, or agent — and set type-specific
+    attributes like model name, token costs, and embedder config.
+  </Card>
+  <Card
+    title="Online Evals"
+    href="/llm-tracing/online-evals"
+    icon="toggle-on"
+    iconType="solid"
+  >
+    Run evaluations on traces, spans, and threads in real-time as they're
+    ingested into Confident AI to monitor AI quality.
+  </Card>
+</CardGroup>

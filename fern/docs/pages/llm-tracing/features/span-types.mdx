@@ -1,0 +1,299 @@
+---
+subtitle: Categorize your spans by type and set type-specific attributes
+slug: llm-tracing/features/span-types
+---
+
+## Overview
+
+Span types are _optional_ but allow you to classify the most common types of components in AI apps, which includes:
+
+- **LLMs**: Track the model used, prompt version, token usage, and cost per token.
+- **Retrievers**: Track the embedding model, chunk size, and top-k retrieval settings.
+- **Tools**: Track tool descriptions and function calling behavior.
+- **Agents**: Track available tools and agent handoffs for multi-agent orchestration.
+
+This is set via the `type` parameter when observing a function. By classifying span types you can create more tailored UIs on Confident AI, view online evals specific to each span type, and set type-specific attributes instead of using generalized [`metadata`](/docs/llm-tracing/features/metadata).
+
+<Tip>
+
+Confident AI has tailored displays for different span types on the UI, such as displaying prompts for LLMs and chunk sizes for retrievers.
+
+<Frame caption="Span Types on Confident AI">
+  <img
+    data-image="tracing.spanTypes"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+</Tip>
+
+## LLM Spans
+
+An LLM span represents a call to a language model. It tracks the input, output, and token usage of the model.
+
+<Tabs>
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        
+        @observe(type="llm", model="gpt-4")
+        def generate_response(prompt: str) -> str:
+            pass
+        ```
+
+        There are **SIX** optional parameters for `update_llm_span`:
+
+        - [Optional] `model`: The model used, of type `str`.
+        - [Optional] `prompt`: The prompt of type `Prompt`, which must be pulled prior to updating the span.
+        - [Optional] `input_token_count`: The number of tokens of type `float` in the input.
+        - [Optional] `output_token_count`: The number of tokens of type `float` in the generated response.
+        - [Optional] `cost_per_input_token`: The cost per input token of type `float`.
+        - [Optional] `cost_per_output_token`: The cost per output token of type `float`.
+
+If `cost_per_input_token` is not set, setting `input_token_count` will not help calculate the cost. The same applies to output tokens.
+
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from 'deepeval-ts/tracing';
+
+        const generateResponse = (prompt: string): string => {
+            // Implementation
+            return "";
+        };
+
+        const observedGenerateResponse = observe({
+            type: "llm",
+            model: "gpt-4",
+            fn: generateResponse
+        });
+        ```
+
+        There are **SIX** optional parameters for `updateLlmSpan`:
+
+        - [Optional] `model`: The model used, of type `str`.
+        - [Optional] `prompt`: The prompt of type `Prompt`, which must be pulled prior to updating the span.
+        - [Optional] `inputTokenCount`: The number of tokens of type `float` in the input.
+        - [Optional] `outputTokenCount`: The number of tokens of type `float` in the generated response.
+        - [Optional] `costPerInputToken`: The cost per input token of type `float`.
+        - [Optional] `costPerOutputToken`: The cost per output token of type `float`.
+
+If `costPerInputToken` is not set, setting `inputTokenCount` will not help calculate the cost. The same applies to output tokens.
+
+    </Tab>
+
+</Tabs>
+
+<Note>
+
+For more information on setting token cost tracking, [click here.](/docs/llm-tracing/features/token-usage-cost)
+
+</Note>
+
+## Retriever Spans
+
+A Retriever span represents a component that fetches relevant information from a vector store or knowledge base. It's a crucial part of RAG (Retrieval-Augmented Generation) pipelines, handling the embedding and retrieval process.
+
+<Tabs>
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+        from typing import List
+
+        @observe(type="retriever", embedder="text-embedding-ada-002")
+        def retrieve_documents(query: str) -> List[str]:
+            pass
+        ```
+
+        There are **THREE** optional parameters for `update_retriever_span`:
+
+        - [Optional] `embedder`: The name of the embedding model used of type `str`.
+        - [Optional] `chunk_size`: The size of the text chunks retrieved of type `int` from the vector store.
+        - [Optional] `top_k`: The number of text chunks retrieved of type `int` from the vector store.
+
+
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from 'deepeval-ts/tracing';
+
+        const retrieveDocuments = (query: string): string[] => {
+            // Implementation
+            return [];
+        };
+
+        const observedRetrieveDocuments = observe({
+            type: "retriever",
+            embedder: "text-embedding-ada-002",
+            fn: retrieveDocuments
+        });
+        ```
+
+            There are **THREE** optional parameters for `updateRetrieverSpan`:
+
+            - [Optional] `embedder`: The name of the embedding model used of type `str`.
+            - [Optional] `chunkSize`: The size of the text chunks retrieved of type `int` from the vector store.
+            - [Optional] `topK`: The number of text chunks retrieved of type `int` from the vector store.
+
+    </Tab>
+
+</Tabs>
+
+## Tool Spans
+
+A Tool span represents a function that an agent can call to perform a specific task. It's commonly used for function calling in LLM applications.
+
+<Tabs>
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+
+        @observe(type="tool")
+        def web_search(query: str) -> str:
+            pass
+        ```
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from 'deepeval-ts/tracing';
+
+        const webSearch = (query: string): string => {
+            // Implementation
+            return "";
+        };
+
+        const observedWebSearch = observe({
+            type: "tool",
+            fn: webSearch
+        });
+        ```
+    </Tab>
+
+</Tabs>
+
+There is **ONE** mandatory and **THREE** optional parameters for the tool span type:
+
+- `type`: The type of span. Must be `"tool"` for tool spans.
+- [Optional] `description`: A string that describes what the tool does. Defaulted to an empty string.
+- [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the observed function.
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics [here](/docs/llm-tracing/online-evals).
+
+## Agent Spans
+
+An Agent span represents an autonomous entity that can make decisions and interact with other components. It's particularly useful for implementing thinking agents or multi-agent systems.
+
+<Tabs>
+    <Tab title="Python" language="python">
+        ```python title="main.py"
+        from deepeval.tracing import observe
+
+        @observe(
+            type="agent",
+            available_tools=["search", "calculator"],
+            handoff_agents=["research_agent", "math_agent"],
+        )
+        def supervisor_agent(query: str) -> str:
+            pass
+        ```
+
+        There is **ONE** mandatory and **FOUR** optional parameters for the agent span type:
+
+        - `type`: The type of span. Must be `"agent"` for agent spans.
+        - [Optional] `available_tools`: A list of strings specifying the tools this agent can use. Defaulted to an empty list.
+        - [Optional] `handoff_agents`: A list of strings specifying other agents this agent can delegate to. Defaulted to an empty list.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the observed function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics [here](/docs/llm-tracing/online-evals).
+
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+        ```typescript title="index.ts"
+        import { observe } from 'deepeval-ts/tracing';
+
+        const supervisorAgent = (query: string): string => {
+            // Implementation
+            return "";
+        };
+
+        const observedSupervisorAgent = observe({
+            type: "agent",
+            availableTools: ["search", "calculator"],
+            agentHandoffs: ["research_agent", "math_agent"],
+            fn: supervisorAgent
+        });
+        ```
+
+        There is **ONE** mandatory and **FOUR** optional parameters for the agent span type:
+
+        - `type`: The type of span. Must be `"agent"` for agent spans.
+        - [Optional] `availableTools`: A list of strings specifying the tools this agent can use. Defaulted to an empty list.
+        - [Optional] `handoffAgents`: A list of strings specifying other agents this agent can delegate to. Defaulted to an empty list.
+        - [Optional] `name`: A string specifying the display name on Confident AI. Defaulted to the name of the observed function.
+        - [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics [here](/docs/llm-tracing/online-evals).
+
+    </Tab>
+
+</Tabs>
+
+Agents can be nested within other agents, which is useful for implementing hierarchical agent architectures. For instance, a "supervisor" agent might coordinate communication between specialized agents.
+
+## Custom Spans
+
+The most flexible `type` out of all (and the default type if `type` is not provided), custom spans are essential for creating hierarchical structures or grouping related spans together. They provide flexibility in organizing your tracing data.
+
+<Tabs>
+    <Tab title="Python" language="python">
+        ```python
+        from deepeval.tracing import observe
+        
+        @observe(name="RAG Pipeline")
+        def rag_pipeline(query: str) -> str:
+            pass
+        ```
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+        ```typescript
+        import { observe } from 'deepeval-ts/tracing';
+        
+        const ragPipeline = (query: string): string => {
+            // Implementation
+            return "";
+        };
+        
+        const observedRagPipeline = observe({
+            name: "RAG Pipeline",
+            fn: ragPipeline
+        });
+        ```
+    </Tab>
+</Tabs>
+
+There is **ONE** mandatory and **TWO** optional parameters for the Custom span type:
+
+- `type`: The type of span. Anything other than `"llm"`, `"retriever"`, `"tool"`, and `"agent"` is a custom span type. Defaulted to the `name`.
+- [Optional] `name`: A string specifying how this custom span is displayed on Confident AI. Defaulted to the name of the observed function.
+- [Optional] `metrics` A list of strings specifying the names of the online metrics you wish to run upon tracing to Confident AI. Learn more about using online metrics [here](/docs/llm-tracing/online-evals).
+
+The `input` and `output` of a custom span default to the function's input arguments and return value, but you can also [set them dynamically.](/docs/llm-tracing/features/input-output#set-span-io-at-runtime)
+
+## Next Steps
+
+Now that your spans are typed, enrich them further with prompt tracking and custom I/O.
+
+<CardGroup cols={2}>
+  <Card
+    title="Log Prompts"
+    href="/llm-tracing/features/log-prompts"
+    icon="scroll"
+  >
+    Log versioned prompts to LLM spans so you can track which prompt was used
+    for each call in production.
+  </Card>
+  <Card
+    title="Set Input/Output"
+    href="/llm-tracing/features/input-output"
+    icon="i-cursor"
+  >
+    Override the default input and output on traces and spans for better
+    visualization and evaluation.
+  </Card>
+</CardGroup>

@@ -109,7 +109,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application.
 
-For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
+For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
 
 You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
 
@@ -124,27 +124,27 @@ result = agent_executor.invoke(
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/advanced-features/tags).
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/advanced-features/metadata).
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/advanced-features/threads).
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/advanced-features/users).
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 
 <Info>
@@ -180,7 +180,7 @@ llm = ChatOpenAI(
 
 ### Online evals
 
-If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/online-evals). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 
@@ -378,3 +378,4 @@ You can view the evals on [Confident AI](https://app.confident.ai) by clicking o
 <Frame>
   <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
 </Frame>
+````

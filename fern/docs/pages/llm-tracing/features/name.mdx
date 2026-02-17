@@ -1,6 +1,6 @@
 ---
 subtitle: Giving names to your traces for better visbility on Confident AI
-slug: llm-tracing/advanced-features/name
+slug: llm-tracing/features/name
 ---
 
 ## Overview
@@ -9,7 +9,7 @@ Both traces and spans have names, and you can customize them based on your likin
 
 ## Set Name on Trace
 
-You can name a trace at runtime by providing the `name` paramter in `update_current_trace`:
+You can name a trace at runtime by providing the `name` parameter in the update current trace function:
 
 <Tabs>
     <Tab title="Python" language="python">
@@ -57,7 +57,7 @@ By default, the name on a trace is set to `None`.
 
 ## Set Name on Span
 
-The default name for a span is the name of the function/method you're decorating. If you wish to overwrite this behavior, simply provide a `name` to the `update_current_span` function:
+The default name for a span is the name of the function/method you're observing. If you wish to overwrite this behavior, simply provide a `name` to the update current span function:
 
 <Tabs>
     <Tab title="Python" language="python">

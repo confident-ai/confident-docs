@@ -94,7 +94,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Online evals
 
-You can run [online evals](/docs/llm-tracing/evaluations) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
+You can run [online evals](/docs/llm-tracing/online-evals) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
 
 <Steps>
 
@@ -103,11 +103,7 @@ You can run [online evals](/docs/llm-tracing/evaluations) on your LlamaIndex age
 Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LlamaIndex agent.
 
 <Frame caption="Create metric collection">
-  <video
-    data-video="metrics.createCollection"
-    autoPlay
-    controls
-  />
+  <video data-video="metrics.createCollection" autoPlay controls />
 </Frame>
 
 <Warning>
@@ -119,7 +115,7 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Confident AI supports [online evals](/docs/llm-tracing/evaluations) for LlamaIndex applications. Evaluations are configured using `metric_collection` as an argument on the trace context which applies to all spans emitted during the trace.
+Confident AI supports [online evals](/docs/llm-tracing/online-evals) for LlamaIndex applications. Evaluations are configured using `metric_collection` as an argument on the trace context which applies to all spans emitted during the trace.
 
 ```python main.py maxLines=100 focus={5,21}
 import asyncio
@@ -161,9 +157,5 @@ asyncio.run(llm_app())
 You can view the evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
 <Frame>
-<video
-  data-video="evaluation.singleTurnE2E"
-  controls
-  autoPlay
-/>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay />
 </Frame>

@@ -178,7 +178,7 @@ with trace(prompt=prompt):
 
 ### Logging threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/features/threads) here. You can set the `thread_id` in the `trace` context.
 
 ```python main.py
 from deepeval.openai import OpenAI
@@ -200,7 +200,7 @@ with trace(thread_id="test_thread_id_1"):
 
 Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your OpenAI client.
 
-For example, `user_id` can be used to enable user analytics. You can learn more about [user id](/docs/llm-tracing/advanced-features/users) here. Similarly, you can set the `metadata` to attach any metadata to the trace.
+For example, `user_id` can be used to enable user analytics. You can learn more about [user id](/docs/llm-tracing/features/users) here. Similarly, you can set the `metadata` to attach any metadata to the trace.
 
 You can set these attributes in the `trace` context when invoking your OpenAI client.
 
@@ -230,27 +230,27 @@ with trace(
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/advanced-features/tags).
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/advanced-features/metadata).
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/advanced-features/threads).
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/advanced-features/users).
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 
 <Info>
@@ -263,7 +263,7 @@ with trace(
 
 ### Online evals
 
-If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/online-evals). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 

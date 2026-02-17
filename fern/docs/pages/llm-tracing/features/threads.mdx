@@ -1,0 +1,297 @@
+---
+subtitle: Group your traces as threads to evaluate an entire conversation workflow
+slug: llm-tracing/features/threads
+---
+
+## Overview
+
+A "thread" on Confident AI is a group of one or more traces linked by a shared thread ID. This is useful for building conversational AI apps — chatbots, multi-turn agents, etc. — where you want to view and evaluate an entire conversation as a single unit.
+
+Each call to your app creates a trace, and traces with the same thread ID are grouped together chronologically as turns in a conversation.
+
+<Warning>
+  Threads group **traces** together, not spans. Each trace represents one turn
+  in the conversation.
+</Warning>
+
+## Create a Thread
+
+To create a thread, set a `thread_id` on your traces using `update_current_trace` / `updateCurrentTrace`. Any traces that share the same thread ID will be grouped into a single thread.
+
+<Tabs>
+<Tab title="Python" language="python">
+
+```python title="main.py" {13}
+from deepeval.tracing import observe, update_current_trace
+from openai import OpenAI
+
+client = OpenAI()
+
+@observe()
+def llm_app(query: str):
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}]
+    ).choices[0].message.content
+
+    update_current_trace(thread_id="your-thread-id", input=query, output=res)
+    return res
+
+llm_app("What's the weather in SF?")
+llm_app("What about tomorrow?")
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" {12} maxLines={0}
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
+import OpenAI from "openai";
+
+const llmApp = async (query: string) => {
+  const openai = new OpenAI();
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: query }],
+  });
+  const data = res.choices[0].message.content;
+
+  updateCurrentTrace({
+    threadId: "your-thread-id",
+    input: query,
+    output: data,
+  });
+  return data;
+};
+
+const observedLlmApp = observe({ fn: llmApp });
+await observedLlmApp("What's the weather in SF?");
+await observedLlmApp("What about tomorrow?");
+```
+
+</Tab>
+</Tabs>
+
+The `thread_id` / `threadId` can be any string — typically a session ID or conversation ID from your app.
+
+## Set Thread I/O
+
+Although not strictly enforced, you should set the `input` to the raw **user text** and the `output` to the generated **LLM text** for each trace. These are used as the conversation turns for display on Confident AI and for [thread evaluations](/docs/llm-tracing/evaluate-threads).
+
+<Tabs>
+<Tab title="Python" language="python">
+
+```python title="main.py"
+from deepeval.tracing import observe, update_current_trace
+from openai import OpenAI
+
+client = OpenAI()
+
+@observe()
+def llm_app(query: str):
+    messages = {"role": "user", "content": query}
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=messages
+    ).choices[0].message.content
+
+    # ✅ Do this — query is the raw user input
+    update_current_trace(thread_id="your-thread-id", input=query, output=res)
+
+    # ❌ Don't do this — messages is not the raw user input
+    # update_current_trace(thread_id="your-thread-id", input=messages, output=res)
+    return res
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" maxLines={0}
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
+import OpenAI from "openai";
+
+const llmApp = async (query: string) => {
+  const openai = new OpenAI();
+  const messages = [{ role: "user" as const, content: query }];
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages,
+  });
+  const data = res.choices[0].message.content;
+
+  // ✅ Do this — query is the raw user input
+  updateCurrentTrace({
+    threadId: "your-thread-id",
+    input: query,
+    output: data,
+  });
+
+  // ❌ Don't do this — messages is not the raw user input
+  // updateCurrentTrace({ threadId: "your-thread-id", input: messages, output: data });
+  return data;
+};
+const observedLlmApp = observe({ fn: llmApp });
+```
+
+</Tab>
+</Tabs>
+
+You **don't** have to set both `input` and `output` on every trace. If a turn only has a user input or only an LLM output, you can set just one. Confident AI will format the turns accordingly on the UI and for evals.
+
+<Tabs>
+<Tab title="Python" language="python">
+
+```python title="example.py"
+# ✅ Set only input (e.g. user message with no immediate LLM response)
+update_current_trace(thread_id="your-thread-id", input=query)
+
+# ✅ Set only output (e.g. proactive LLM message with no user input)
+update_current_trace(thread_id="your-thread-id", output=res)
+
+# ✅ Omit both (e.g. background processing step in the conversation)
+update_current_trace(thread_id="your-thread-id")
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="example.ts"
+// ✅ Set only input
+updateCurrentTrace({ threadId: "your-thread-id", input: query });
+
+// ✅ Set only output
+updateCurrentTrace({ threadId: "your-thread-id", output: data });
+
+// ✅ Omit both
+updateCurrentTrace({ threadId: "your-thread-id" });
+```
+
+</Tab>
+</Tabs>
+
+<Note>
+  If I/O is not provided, it defaults to the [trace's default I/O
+  values](/docs/llm-tracing/features/input-output#set-trace-io). There must be
+  at least one trace in the thread with an input or output set.
+</Note>
+
+## Set Tools Called
+
+If your LLM app uses tool/function calling, you can log which tools were invoked for a given turn. This is attached to the trace alongside the `output` it helped generate.
+
+<Tabs>
+<Tab title="Python" language="python">
+
+```python title="main.py"
+from deepeval.tracing import observe, update_current_trace
+from deepeval.test_case import ToolCall
+
+@observe()
+def llm_app(query: str):
+    res, tools = call_agent(query)
+    update_current_trace(
+        thread_id="your-thread-id",
+        input=query,
+        output=res,
+        tools_called=[ToolCall(name="WebSearch"), ToolCall(name="Calculator")]
+    )
+    return res
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" maxLines={0}
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
+
+const llmApp = async (query: string) => {
+  const { res, tools } = await callAgent(query);
+  updateCurrentTrace({
+    threadId: "your-thread-id",
+    input: query,
+    output: res,
+    toolsCalled: [{ name: "WebSearch" }, { name: "Calculator" }],
+  });
+  return res;
+};
+const observedLlmApp = observe({ fn: llmApp });
+```
+
+</Tab>
+</Tabs>
+
+## Set Retrieval Context
+
+For RAG-based conversational apps, you can log the retrieval context used to generate a response. This enables Confident AI to evaluate retrieval quality across conversation turns.
+
+<Tabs>
+<Tab title="Python" language="python">
+
+```python title="main.py"
+from deepeval.tracing import observe, update_current_trace
+
+@observe()
+def llm_app(query: str):
+    chunks = retrieve(query)
+    res = generate(query, chunks)
+    update_current_trace(
+        thread_id="your-thread-id",
+        input=query,
+        output=res,
+        retrieval_context=[chunk.text for chunk in chunks]
+    )
+    return res
+```
+
+</Tab>
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" maxLines={0}
+import { observe, updateCurrentTrace } from "deepeval-ts/tracing";
+
+const llmApp = async (query: string) => {
+  const chunks = await retrieve(query);
+  const res = await generate(query, chunks);
+  updateCurrentTrace({
+    threadId: "your-thread-id",
+    input: query,
+    output: res,
+    retrievalContext: chunks.map((c) => c.text),
+  });
+  return res;
+};
+const observedLlmApp = observe({ fn: llmApp });
+```
+
+</Tab>
+</Tabs>
+
+<Tip>
+  You can combine `tools_called` and `retrieval_context` on the same trace —
+  they provide complementary context about how the output was generated for that
+  turn.
+</Tip>
+
+## Next Steps
+
+With threads set up, evaluate conversation quality or add more context to your traces.
+
+<CardGroup cols={2}>
+  <Card
+    title="Evaluate Threads"
+    href="/llm-tracing/evaluate-threads"
+    icon="chart-mixed"
+    iconType="light"
+  >
+    Run online evaluations on entire conversation threads to monitor multi-turn
+    quality.
+  </Card>
+  <Card
+    title="Customize Traces"
+    href="/llm-tracing/features/tags"
+    icon="tags"
+    iconType="light"
+  >
+    Add tags, metadata, and user info to your traces for filtering and analysis.
+  </Card>
+</CardGroup>

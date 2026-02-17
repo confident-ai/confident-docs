@@ -1,0 +1,164 @@
+---
+subtitle: Log prompts to LLM spans for version tracking in production
+slug: llm-tracing/features/log-prompts
+---
+
+## Overview
+
+When you use [prompts managed on Confident AI](/docs/llm-evaluation/prompt-management/version-prompts), you can log the exact prompt version used in each LLM call. Prompt logging works by:
+
+1. Pulling a prompt from Confident AI
+2. Logging it to the LLM span via `update_llm_span` / `updateLlmSpan`
+
+That's it! This lets you monitor are running in production and which prompts performs best over time.
+
+[image on prompt]
+
+<Tip>
+
+If you haven't already, learn how prompt management works on Confident AI [here.](/docs/llm-evaluation/prompt-management/version-prompts)
+
+</Tip>
+
+## Log a Prompt
+
+Prompt logging is only available for [LLM spans](/docs/llm-tracing/features/span-types#llm-spans). Make sure your observed function has `type="llm"` set.
+
+<Steps>
+
+<Step title="Pull and interpolate your prompt">
+
+Pull the prompt version from Confident AI and interpolate any variables.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python title="main.py"
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull()
+interpolated_prompt = prompt.interpolate(name="Joe")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts"
+import { Prompt } from "deepeval-ts";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull();
+const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+```
+
+</Tab>
+
+</Tabs>
+
+<Note>
+
+If you don't have any variables, you must still call `interpolate()` to create a usable copy of your prompt template.
+
+</Note>
+
+</Step>
+
+<Step title="Use the prompt and log it to the span">
+
+Inside an observed LLM function, use the interpolated prompt for generation and log the original prompt object to the span.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python title="main.py" highlight={15}
+from deepeval.tracing import observe, update_llm_span
+from deepeval.prompt import Prompt
+from openai import OpenAI
+
+@observe(type="llm", model="gpt-4o")
+def generate_response(user_input: str) -> str:
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+    prompt.pull()
+    interpolated_prompt = prompt.interpolate(name="Joe")
+
+    response = OpenAI().chat.completions.create(
+        model="gpt-4o",
+        messages=interpolated_prompt,
+    )
+    update_llm_span(prompt=prompt)
+    return response.choices[0].message.content
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" highlight={15} maxLines={0}
+import { observe, updateLlmSpan } from "deepeval-ts/tracing";
+import { Prompt } from "deepeval-ts";
+import OpenAI from "openai";
+
+const generateResponse = async (userInput: string) => {
+  const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+  await prompt.pull();
+  const interpolatedPrompt = prompt.interpolate({ name: "Joe" });
+
+  const openai = new OpenAI();
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: interpolatedPrompt as any[],
+  });
+  updateLlmSpan({ prompt });
+  return response.choices[0].message.content;
+};
+
+const observedGenerateResponse = observe({
+  type: "llm",
+  model: "gpt-4o",
+  fn: generateResponse,
+});
+```
+
+</Tab>
+
+</Tabs>
+
+<Warning>
+
+Always pass the **original pulled prompt object** (not the interpolated version) to `update_llm_span` / `updateLlmSpan`. Confident AI uses it to link the span back to the versioned prompt — passing the interpolated string would log a raw string instead.
+
+</Warning>
+
+</Step>
+
+</Steps>
+
+Once logged, Confident AI will display the prompt alias and version directly on the LLM span in the trace view, making it easy to see exactly which prompt was used for each LLM call.
+
+## Next Steps
+
+With prompts logged, set up cost tracking or refine what data your traces capture.
+
+<CardGroup cols={2}>
+  <Card
+    title="Track LLM Costs"
+    href="/llm-tracing/cost-tracking"
+    icon="dollar-sign"
+    iconType="light"
+  >
+    Track token usage and cost for your LLM spans — manually or automatically.
+  </Card>
+  <Card
+    title="Set Input/Output"
+    href="/llm-tracing/features/input-output"
+    icon="i-cursor"
+    iconType="light"
+  >
+    Override the default input and output on traces and spans for better
+    visualization and evaluation.
+  </Card>
+</CardGroup>

@@ -5,7 +5,6 @@ subtitle: Use Confident AI for LLM observability and evals for Vercel AI SDK on 
 
 The [AI SDK](https://ai-sdk.dev) by vercel is a powerful typescript framework that allows you to use various LLM providers and models for AI based applications. Confident AI allows you to trace and evaluate AI SDK based LLM applications in just a few lines of code.
 
-
 ## Tracing Quickstart
 
 <Tip>
@@ -14,6 +13,7 @@ For users in the EU region, please set the OTEL endpoint to the EU version as sh
 ```bash
 export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 ```
+
 </Tip>
 
 <Steps>
@@ -23,6 +23,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
     ```bash
     npm install ai deepeval-ts
     ```
+
   </Step>
   <Step title="Configure AI SDK">
     Use DeepEval's `configureAiSdkTracing` to trace the LLM operations. 
@@ -160,6 +161,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
     npx ts-node
     ```
     You can directly view the traces on [Confident AI](https://app.confident.ai)'s traces page inside the observatory.
+
   </Step>
 </Steps>
 
@@ -173,35 +175,35 @@ If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-pro
 import { generateText } from "ai";
 import { configureAiSdkTracing, Prompt } from "deepeval-ts";
 
-const prompt = new Prompt({alias: "PROMPT_ALIAS"});
-prompt.pull()
+const prompt = new Prompt({ alias: "PROMPT_ALIAS" });
+prompt.pull();
 const tracer = configureAiSdkTracing({
-    confident_prompt: prompt
+  confident_prompt: prompt,
 });
 
 const { text } = await generateText({
-    model: "openai/gpt-4o",
-    prompt: "How to make the best coffee?",
-    experimental_telemetry: {
-        isEnabled: true,
-        tracer: tracer,
-    },
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    tracer: tracer,
+  },
 });
 
 console.log(text);
 ```
 
 <Note>
-  Logging prompts lets you attribute specific prompts to AI SDK LLM spans.
-  Be sure to **pull the prompt** before logging it, otherwise the prompt will
-  not be visible on Confident AI.
+  Logging prompts lets you attribute specific prompts to AI SDK LLM spans. Be
+  sure to **pull the prompt** before logging it, otherwise the prompt will not
+  be visible on Confident AI.
 </Note>
 
 ### Setting trace attributes
 
 Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your AI SDK applications.
 
-For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here.
+For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
 
 You can set these attributes in the `configureAiSdkTracing` from `deepeval-ts`:
 
@@ -210,42 +212,45 @@ import { generateText } from "ai";
 import { configureAiSdkTracing } from "deepeval-ts";
 
 const tracer = configureAiSdkTracing({
-    threadId: "123",
-    userId: "456"
+  threadId: "123",
+  userId: "456",
 });
 
 const { text } = await generateText({
-    model: "openai/gpt-4o",
-    prompt: "How to make the best coffee?",
-    experimental_telemetry: {
-        isEnabled: true,
-        tracer: tracer,
-    },
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    tracer: tracer,
+  },
 });
 
 console.log(text);
 ```
 
-
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
-  Tags are string labels that help you group related traces. [Learn more](/docs/llm-tracing/advanced-features/tags).
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
-  Attach any metadata to the trace. [Learn more](/docs/llm-tracing/advanced-features/metadata).
+  Attach any metadata to the trace. [Learn
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="threadId" type="str" required={false}>
-  Supply the thread or conversation ID to view and evaluate conversations. [Learn more](/docs/llm-tracing/advanced-features/threads).
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="userId" type="str" required={false}>
-  Supply the user ID to enable user analytics. [Learn more](/docs/llm-tracing/advanced-features/users).
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 
 <Info>
@@ -257,7 +262,7 @@ console.log(text);
 
 ### Online evals
 
-You can run [online evals](/docs/llm-tracing/evaluations) on your AI SDK application by setting a `metricCollection` which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK application by setting a `metricCollection` which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
 
 <Steps>
   <Step title="Create metric collection">

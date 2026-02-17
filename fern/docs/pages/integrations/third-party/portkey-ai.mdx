@@ -197,7 +197,7 @@ print(response.choices[0].message.content)
 
 ### Logging threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in the `trace` context.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. Learn more about [threads](/docs/llm-tracing/features/threads) here. You can set the `thread_id` in the `trace` context.
 
 ```python main.py
 from deepeval.openai import OpenAI
@@ -228,7 +228,7 @@ print(response.choices[0].message.content)
 
 ### Online evals
 
-If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/evaluations). It lets you run evaluations on all incoming traces on Confident AI's server.
+If your OpenAI application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/online-evals). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 

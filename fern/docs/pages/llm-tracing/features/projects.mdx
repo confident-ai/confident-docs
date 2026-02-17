@@ -1,23 +1,23 @@
 ---
 subtitle: Send traces to different projects on Confident AI
-slug: llm-tracing/advanced-features/projects
+slug: llm-tracing/features/projects
 ---
 
 ## Overview
 
-You can specify which project each trace should be sent to by setting the `confident_api_key`. This is especially useful when you need to separate traces to different projects within the same llm application.
+You can specify which project each trace should be sent to by setting the Confident API key on a trace. This is especially useful when you need to separate traces to different projects within the same LLM application.
 
 <Callout>
   The **Confident API key** is unique to each project and can be found in your
   project settings on Confident AI.
 </Callout>
 
-## Set Projects At Runtime
+## Route Traces to Projects
 
 <Tabs>
     <Tab title="Python" language="python">
 
-        You can use the `update_current_trace` function to set the `confident_api_key` for a specific trace.
+        You can use `update_current_trace` to set the `confident_api_key` for a specific trace.
 
             ```python title="main.py" {14,16}
             from deepeval.tracing import observe, update_current_trace
@@ -48,7 +48,7 @@ You can specify which project each trace should be sent to by setting the `confi
     </Tab>
     <Tab title="TypeScript" language="typescript">
 
-        You can use the `updateCurrentTrace` function to set the `confidentApiKey` for a specific trace.
+        You can use `updateCurrentTrace` to set the `confidentApiKey` for a specific trace.
 
             ```typescript title="index.ts" {12,14}
             import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';

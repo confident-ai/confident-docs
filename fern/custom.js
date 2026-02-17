@@ -53,6 +53,7 @@
     "tracing.spans": `${S3_BASE}/llm-tracing:spans.mp4`,
     "tracing.threads": `${S3_BASE}/llm-tracing:threads.mp4`,
     "tracing.costTracking": `${S3_BASE}/llm-tracing:cost-tracking.mp4`,
+    "tracing.quickstart": `${S3_BASE}/tracing:quickstart.mp4`,
 
     // Annotation / Human-in-the-Loop
     "annotation.traces": `${S3_BASE}/annotation:traces.mp4`,
@@ -66,7 +67,6 @@
     "queues.markItems": `${S3_BASE}/queues:mark-items.mp4`,
     "queues.manageItems": `${S3_BASE}/queues:manage-items.mp4`,
 
-    // TODO: Videos to record
     "arena.overview": `${S3_BASE}/arena:overview.mp4`,
     "experiments.overview": `${S3_BASE}/experiments:overview.mp4`,
   };
@@ -112,6 +112,9 @@
   const S3_BASE = "https://confident-docs.s3.us-east-1.amazonaws.com";
 
   const IMAGES = {
+    "tracing.spanTypes": `${S3_BASE}/tracing:span-types.png`,
+    "tracing.onlineEvals": `${S3_BASE}/tracing:online-evals.png`,
+
     "datasets.addImages": `${S3_BASE}/datasets:add-images.png`,
     "datasets.editNonText": `${S3_BASE}/datasets:edit-non-text.png`,
     "datasets.duplicate": `${S3_BASE}/datasets:duplicate.png`,
@@ -186,10 +189,9 @@
       "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/crewai.png",
     "logos.litellm":
       "https://thumb.ac-illust.com/42/425e87b240c970dfc92bfb0252ea7e52_t.jpeg",
-    "logos.vercelaisdk":
-      "https://karmanivero.us/assets/images/logo-vercel.png",
+    "logos.vercelaisdk": "https://karmanivero.us/assets/images/logo-vercel.png",
     "logos.portkey":
-      "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/text-formatting/hexagon-tkv73cir8m2b39ei1hkca.png/hexagon-osek3863mig4att1do9c7.png?_a=DATAiZAAZAA0"
+      "https://assets.streamlinehq.com/image/private/w_300,h_300,ar_1/f_auto/v1/icons/text-formatting/hexagon-tkv73cir8m2b39ei1hkca.png/hexagon-osek3863mig4att1do9c7.png?_a=DATAiZAAZAA0",
   };
 
   // Find all images with data-image attribute and set their src

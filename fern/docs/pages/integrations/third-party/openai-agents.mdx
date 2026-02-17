@@ -87,7 +87,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. You can set the `thread_id` in as `group_id` in the `trace` context.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. You can set the `thread_id` in as `group_id` in the `trace` context.
 
 ```python main.py {7}
 from deepeval.openai_agents import DeepEvalTracingProcessor
@@ -170,27 +170,27 @@ with trace(workflow_name="test_workflow_1", metadata={"test_metadata_1": "test_m
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/advanced-features/tags).
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/advanced-features/metadata).
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/advanced-features/threads).
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/advanced-features/users).
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 
 <Info>

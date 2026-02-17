@@ -28,7 +28,7 @@ tabs:
   integrations:
     slug: integrations
     icon: fa-light fa-plug
-    display-name: Integrations
+    display-name: Integrations & OTEL
   settings:
     slug: settings
     icon: fa-light fa-gear
@@ -214,58 +214,70 @@ navigation:
           - page: Introduction
             path: docs/pages/llm-tracing/introduction.mdx
             icon: fa-light fa-info-circle
-          - page: Quickstart
-            path: docs/pages/llm-tracing/quickstart.mdx
-            icon: fa-light fa-bolt
-          - page: Online & Offline Evaluations
-            path: docs/pages/llm-tracing/online-offline-evaluations.mdx
-            icon: fa-light fa-toggle-on
-          - page: Latency, Cost, and Error Tracking
-            path: docs/pages/llm-tracing/latency-cost-tracking.mdx
-            icon: fa-light fa-stopwatch
-          - section: Advanced Features
+          - section: Instrument Your App
             collapsed: false
+            icon: fa-light fa-code
             contents:
-              - page: Attributes
-                path: docs/pages/llm-tracing/advanced-features/attributes.mdx
-                icon: fa-light fa-table-cells
-              - page: Environment
-                path: docs/pages/llm-tracing/advanced-features/environment.mdx
-                icon: fa-light fa-globe
-              - page: Input/Output
-                path: docs/pages/llm-tracing/advanced-features/input-output.mdx
+              - page: Quickstart
+                path: docs/pages/llm-tracing/quickstart.mdx
+                icon: fa-light fa-bolt
+              - page: Configure Span Types
+                path: docs/pages/llm-tracing/features/span-types.mdx
+                icon: fa-light fa-cubes
+              - page: Log Prompts
+                path: docs/pages/llm-tracing/features/log-prompts.mdx
+                icon: fa-light fa-scroll
+              - page: Track LLM Costs
+                path: docs/pages/llm-tracing/features/token-usage-cost.mdx
+                icon: fa-light fa-dollar-sign
+              - page: Set Input/Output
+                path: docs/pages/llm-tracing/features/input-output.mdx
                 icon: fa-light fa-i-cursor
-              - page: Masking
-                path: docs/pages/llm-tracing/advanced-features/masking.mdx
-                icon: fa-light fa-eye-slash
-              - page: Metadata
-                path: docs/pages/llm-tracing/advanced-features/metadata.mdx
-                icon: fa-light fa-brackets-curly
-              - page: Name
-                path: docs/pages/llm-tracing/advanced-features/name.mdx
-                icon: fa-light fa-signature
-              - page: Projects
-                path: docs/pages/llm-tracing/advanced-features/projects.mdx
-                icon: fa-light fa-layer-group
-              - page: Sampling
-                path: docs/pages/llm-tracing/advanced-features/sampling.mdx
-                icon: fa-light fa-percent
-              - page: Span Types
-                path: docs/pages/llm-tracing/advanced-features/span-types.mdx
-                icon: fa-light fa-gear
-              - page: Tags
-                path: docs/pages/llm-tracing/advanced-features/tags.mdx
-                icon: fa-light fa-tag
-              - page: Threads
-                path: docs/pages/llm-tracing/advanced-features/threads.mdx
+              - page: Thread Traces
+                path: docs/pages/llm-tracing/features/threads.mdx
                 icon: fa-light fa-message-dots
-              - page: Test Cases
-                path: docs/pages/llm-tracing/advanced-features/test-cases.mdx
-                icon: fa-light fa-hashtag
+          - section: Online Evaluations
+            collapsed: false
+            icon: fa-light fa-toggle-on
+            contents:
+              - page: Evaluate Traces & Spans
+                path: docs/pages/llm-tracing/features/online-evals.mdx
+                icon: fa-light fa-diagram-project
+              - page: Evaluate Threads
+                path: docs/pages/llm-tracing/features/evaluate-threads.mdx
+                icon: fa-light fa-comments
+          - section: Customize Traces
+            collapsed: false
+            icon: fa-light fa-pen-to-square
+            contents:
+              - page: Name
+                path: docs/pages/llm-tracing/features/name.mdx
+                icon: fa-light fa-signature
+              - page: Tags
+                path: docs/pages/llm-tracing/features/tags.mdx
+                icon: fa-light fa-tag
+              - page: Metadata
+                path: docs/pages/llm-tracing/features/metadata.mdx
+                icon: fa-light fa-brackets-curly
               - page: Users
-                path: docs/pages/llm-tracing/advanced-features/users.mdx
+                path: docs/pages/llm-tracing/features/users.mdx
                 icon: fa-light fa-user
-            icon: fa-light fa-layer-group
+          - section: Trace Management
+            collapsed: false
+            icon: fa-light fa-sliders
+            contents:
+              - page: Projects
+                path: docs/pages/llm-tracing/features/projects.mdx
+                icon: fa-light fa-layer-group
+              - page: Environment
+                path: docs/pages/llm-tracing/features/environment.mdx
+                icon: fa-light fa-globe
+              - page: Masking
+                path: docs/pages/llm-tracing/features/masking.mdx
+                icon: fa-light fa-eye-slash
+              - page: Sampling
+                path: docs/pages/llm-tracing/features/sampling.mdx
+                icon: fa-light fa-percent
       - section: Human-in-the-Loop
         contents:
           - page: Introduction

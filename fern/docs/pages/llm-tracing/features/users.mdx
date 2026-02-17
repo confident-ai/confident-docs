@@ -1,18 +1,18 @@
 ---
 subtitle: Tracking user info in your traces for observability
-slug: llm-tracing/advanced-features/users
+slug: llm-tracing/features/users
 ---
 
 ## Overview
 
-You can track user interactions with your LLM app by setting the `user_id` in a trace. This allows you to track things such as how much tokens each user is costing you, who interacted with your LLM app the most, etc.
+You can track user interactions with your LLM app by setting the user ID in a trace. This allows you to track things such as how much tokens each user is costing you, who interacted with your LLM app the most, etc.
 
 ## Set Users At Runtime
 
 <Tabs>
     <Tab title="Python" language="python">
 
-        You can use the `update_current_trace` function to set the `user_id` within traces:
+        You can use `update_current_trace` to set the `user_id` within traces:
 
             ```python title="main.py" {13}
             from deepeval.tracing import observe, update_current_trace
@@ -38,7 +38,7 @@ You can track user interactions with your LLM app by setting the `user_id` in a 
     </Tab>
     <Tab title="TypeScript" language="typescript">
 
-        You can use the `updateCurrentTrace` function to set the `userId` within traces:
+        You can use `updateCurrentTrace` to set the `userId` within traces:
 
             ```typescript title="index.ts" {10}
             import { observe, updateCurrentTrace } from 'deepeval-ts/tracing';

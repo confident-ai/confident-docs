@@ -9,8 +9,16 @@ subtitle: Use Confident AI for LLM observability and evals for CrewAI
 
 ## Tracing Quickstart
 
-<div className="space-x-2" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-60px' }}>
-    <Button outlined href="https://colab.research.google.com/github/confident-ai/deepeval/blob/main/examples/tracing/crewai_tracing.ipynb">Try in Google Colab</Button>
+<div
+  className="space-x-2"
+  style={{ display: "flex", justifyContent: "flex-end", marginTop: "-60px" }}
+>
+  <Button
+    outlined
+    href="https://colab.research.google.com/github/confident-ai/deepeval/blob/main/examples/tracing/crewai_tracing.ipynb"
+  >
+    Try in Google Colab
+  </Button>
 </div>
 
 <Steps>
@@ -72,7 +80,7 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 ### Logging threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Set the `thread_id` in the `trace` context and call `crew.kickoff` within the context.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Set the `thread_id` in the `trace` context and call `crew.kickoff` within the context.
 
 ```python main.py {7}
 ...
@@ -102,34 +110,33 @@ with trace(name="crewai_run_1", tags=["crewai"], user_id="crewai_user_1"):
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/advanced-features/tags).
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/advanced-features/metadata).
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/advanced-features/threads).
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/advanced-features/users).
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 <Info>
   Each attribute is **optional**, and works the same way as the [native tracing
   features](/docs/llm-tracing/introduction) on Confident AI.
 </Info>
 </Accordion>
-
 
 ## Evals Usage
 
@@ -174,7 +181,8 @@ Confident AI supports evaluating the input-output pairs of OpenAI Agent spans an
 Run evaluations on the various components of your CrewAI application by setting the `metric_collection` to the DeepEval's wrapper for CrewAI.
 
 <Warning>
-The current CrewAI integration supports metrics with parameters that evaluate **input** and **actual output** in addition to the **Task Completion** metric.
+  The current CrewAI integration supports metrics with parameters that evaluate
+  **input** and **actual output** in addition to the **Task Completion** metric.
 </Warning>
 
 <Tabs>
@@ -237,6 +245,7 @@ crew = Crew(agents=[agent], tasks=[task], metric_collection="test_collection_1")
 
 result = crew.kickoff({"input": "What are the LLMs?"})
 ```
+
 </Tab>
 
 <Tab title="Agent Span">
@@ -268,6 +277,7 @@ crew = Crew(agents=[agent], tasks=[task])
 
 result = crew.kickoff({"input": "What are the LLMs?"})
 ```
+
 </Tab>
 
 <Tab title="LLM Span">
@@ -304,6 +314,7 @@ crew = Crew(agents=[agent], tasks=[task])
 
 result = crew.kickoff({"input": "What are the LLMs?"})
 ```
+
 </Tab>
 </Tabs>
 

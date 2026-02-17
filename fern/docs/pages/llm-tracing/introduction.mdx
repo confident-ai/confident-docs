@@ -1,19 +1,61 @@
 ---
 title: Introduction to LLM Tracing
-subtitle: Trace your LLM applications and evaluate them on a component level.
+subtitle: Instrument your LLM applications for observability and evaluate them on a component level.
 slug: llm-tracing/introduction
 description: Learn about LLM tracing with Confident AI
 ---
 
 ## Overview
 
-Confident AI offers **LLM tracing** for teams to trace and monitor LLM applications. Think Datadog for LLM apps, but with an additional suite of 30+ evaluation metrics to track continuous performance over time.
+Confident AI offers **LLM tracing** for teams to instrument, observe, and quality-monitor AI apps. Think Datadog for AI apps, but with an additional suite of 50+ evaluation metrics to track continuous performance over time.
 
-## Get Started
+There are three ways to instrument your app for tracing on Confident AI:
 
-Get LLM tracing for your LLM app with best in-class-evals.
+| Approach                                                     | Best For                                                                                                                                                                                                     | Language Support                           |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| **`observe` decorator/wrapper**                              | Full control over spans, attributes, and trace structure                                                                                                                                                     | Python, TypeScript                         |
+| **Third-party integrations**                                 | Auto-instrument popular frameworks ([OpenAI](/docs/integrations/third-party/openai), [LangChain](/docs/integrations/third-party/langchain), [Pydantic AI](/docs/integrations/third-party/pydantic-ai), etc.) | Python and/or Typescript                   |
+| [**OpenTelemetry (OTEL)**](/docs/integrations/opentelemetry) | Language-agnostic, standards-based instrumentation                                                                                                                                                           | Python, TypeScript, Go, Ruby, C#, and more |
 
-<CardGroup cols={3}>
+## Why LLM Tracing?
+
+Tracing is the underlying infrastructure that powers online evals, which allows you to **monitor AI quality in production**. and there are three core data types to be aware of:
+
+- **Traces** — a single end-to-end execution of your LLM app
+- **Spans** — individual components within a trace (e.g., LLM calls, retrievals, tool executions)
+- **Threads** — a group of traces representing a multi-turn conversation
+
+By instrumenting your application, every execution is captured and all three can be automatically evaluated against your metrics.
+
+<Tabs>
+  <Tab title="Traces">
+
+    <Frame caption="LLM Tracing: Traces with Evals">
+      <video data-video="tracing.traces" controls />
+    </Frame>
+
+  </Tab>
+  <Tab title="Spans">
+
+    <Frame caption="LLM Tracing: Spans with Evals">
+      <video data-video="tracing.spans" controls />
+    </Frame>
+
+  </Tab>
+  <Tab title="Threads">
+
+    <Frame caption="LLM Tracing: Threads with Evals">
+      <video data-video="tracing.threads" controls />
+    </Frame>
+
+  </Tab>
+</Tabs>
+
+## Get started
+
+Instrument your LLM application using the `@observe` decorator, one-line integrations, or OpenTelemetry (OTEL):
+
+<CardGroup cols={2}>
   <Card
     title="5 Min Quickstart"
     icon="fa-light fa-bolt"
@@ -24,284 +66,68 @@ Get LLM tracing for your LLM app with best in-class-evals.
       <Icon icon="arrow-up-right-from-square" />
     </div>
 
-    Start tracing your LLM applications now by following this short quickstart.
+    Manually instrument your LLM app start tracing in minutes, in either Python or Typescript.
 
   </Card>
   <Card
-    title="Online & Offline Evals"
-    icon="fa-light fa-toggle-on"
+    title="Integrations & OTEL"
+    icon="fa-light fa-plug"
     iconType="solid"
-    href="/llm-tracing/evaluations"
+    href="/integrations"
   >
     <div className='card-link-icon'>
       <Icon icon="arrow-up-right-from-square" />
     </div>
 
-    Run online and offline evaluations for your LLM application's traces, spans and threads.
-
-  </Card>
-  <Card
-    title="Latency and Cost Tracking"
-    icon="fa-light fa-stopwatch"
-    iconType="solid"
-    href="/llm-tracing/latency-cost-tracking"
-  >
-    <div className='card-link-icon'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-
-    Track your LLM application's cost and latency during execution.
+    Auto-instrument with one-line integrations for OpenAI, LangChain, and more — or use OpenTelemetry for any language.
 
   </Card>
 </CardGroup>
 
-## Advanced Features
-
-You can configure tracing on Confident AI in virtually any way you wish:
+## Key capabilities
 
 <CardGroup cols={2}>
-  <Card
-    title="Trace Environments"
-    icon="fa-light fa-globe"
-    iconType="solid"
-    href="/llm-tracing/advanced-features/environment"
-  >
-    <div className='card-link-icon'>
-      <Icon icon="arrow-up-right-from-square" />
-    </div>
-    Set different trace environments for your app.
+  <Card title="Online Evals" icon="toggle-on">
+    Run evaluations on traces, spans, and threads in real-time as they're
+    ingested, or retrospectively.
   </Card>
-
-<Card
-  title="Sampling Rate"
-  icon="fa-light fa-percent"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/sampling"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Configure the trace sampling rate.
-</Card>
-
-<Card
-  title="Any Metadata"
-  icon="fa-light fa-brackets-curly"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/metadata"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Log any custom metadata with your traces.
-</Card>
-
-<Card
-  title="Tags"
-  icon="fa-light fa-tag"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/tags"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Log any tags for better trace organization.
-</Card>
-
-<Card
-  title="Threads/Conversations"
-  icon="fa-light fa-message-lines"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/threads"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Log entire conversations (threads) for multi-turn tracing.
-</Card>
-
-<Card
-  title="Mask PII"
-  icon="fa-light fa-eye-slash"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/masking"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Mask PII for traces to protect sensitive data.
-</Card>
-
-<Card
-  title="User Tracking"
-  icon="fa-light fa-user"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/users"
->
-  <div className="card-link-icon">
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Track user identities or sessions for trace attribution.
-</Card>
-
-<Card
-  title="Custom Span Types"
-  icon="fa-light fa-gear"
-  iconType="solid"
-  href="/llm-tracing/advanced-features/attributes"
->
-  <div className='card-link-icon'>
-    <Icon icon="arrow-up-right-from-square" />
-  </div>
-  Set span and component types for detailed tracing.
-</Card>
-</CardGroup>
-
-## Integrations
-
-You can also setup tracing via 1-line integrations.
-
-<Note>
-  Only Python is supported for itnegrations, with Typescript coming very soon.
-</Note>
-
-<CardGroup cols={3}>
-  <Card
-    title="OpenTelemetry"
-    icon="satellite-dish"
-    href="/integrations/opentelemetry"
-  >
-    Industry-standard observability framework for LLM monitoring.
+  <Card title="Latency & Cost Tracking" icon="stopwatch">
+    Automatically track execution time and token costs across every span in your
+    application.
   </Card>
-  <Card
-    title="OpenAI"
-    icon={
-      <img
-        data-image="logos.openai"
-        alt="OpenAI logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/openai"
-  >
-    Chat completion and responses APIs.
+  <Card title="Customize Traces" icon="pen-to-square">
+    Enrich traces with tags, metadata, user IDs, and thread groupings for
+    filtering and attribution.
   </Card>
-  <Card
-    title="LangChain"
-    icon={
-      <img
-        data-image="logos.langchain"
-        alt="LangChain logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/langchain"
-  >
-    Framework for building AI applications.
-  </Card>
-  <Card
-    title="Pydantic AI"
-    icon={
-      <img
-        data-image="logos.pydantic"
-        alt="Pydantic AI logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/pydantic-ai"
-  >
-    Type-safe agent framework for Python.
-  </Card>
-  <Card
-    title="LangGraph"
-    icon={
-      <img
-        data-image="logos.langgraph"
-        alt="LangGraph logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/langgraph"
-  >
-    Graph-based framework for stateful AI applications.
-  </Card>
-  <Card
-    title="OpenAI Agents"
-    icon={
-      <img
-        data-image="logos.openai"
-        alt="OpenAI logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/openai-agents"
-  >
-    OpenAI's agent framework for intelligent assistants.
-  </Card>
-  <Card
-    title="LlamaIndex"
-    icon={
-      <img
-        data-image="logos.llamaindex"
-        alt="LlamaIndex logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/llama-index"
-  >
-    Data framework for RAG systems and knowledge agents.
-  </Card>
-  <Card
-    title="LiteLLM"
-    icon={
-      <img
-        data-image="logos.portkey"
-        alt="LiteLLM logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/litellm"
-  >
-    Unified API for 100+ LLM providers.
-  </Card>
-  <Card
-    title="Crew AI"
-    icon={
-      <img
-        data-image="logos.crewai"
-        alt="Crew AI logo"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      />
-    }
-    href="/integrations/third-party/crew-ai"
-  >
-    Multi-agent orchestration for collaborative AI workflows.
+  <Card title="Trace Management" icon="sliders">
+    Route traces to projects, separate by environment, mask PII, and control
+    sampling rates.
   </Card>
 </CardGroup>
 
-## FAQs
+## Learn the fundamentals
+
+New to LLM tracing? These concepts will help you get the most out of your setup:
+
+- [Span Types](/docs/llm-tracing/features/span-types) — classify spans as LLM, retriever, tool, or agent
+- [Input/Output](/docs/llm-tracing/features/input-output) — control what data is captured on traces and spans
+- [Threads](/docs/llm-tracing/features/threads) — group traces into multi-turn conversations
 
 <AccordionGroup>
-<Accordion title="What evals are offered by Confident AI LLM tracing?">
-
-You can run evaluations using metrics for **RAG**, **agents**, **chatbots**, on:
-
-1. Traces (end-to-end)
-2. Spans (individual components)
-3. Threads (multi-turn conversations)
-
-And these are be either done in an **online** fashion (run evals as they are being ingested in the platform), or **offline** (run evals retrospectively).
-
-</Accordion>
 <Accordion title="How will tracing affect my app?">
 
 Confident AI tracing is designed to be completely non-intrusive to your application. It:
 
-- Can be disabled/enabled anytime through the `CONFIDENT_TRACING_ENABLED="YES"/"NO"` enviornment variable.
+- Can be disabled/enabled anytime through the `CONFIDENT_TRACING_ENABLED="YES"/"NO"` environment variable.
 - Requires no rewrite of your existing code - just add the `@observe` decorator.
 - Runs asynchronously in the background with zero impact on latency.
 - Fails silently if there are any issues, ensuring your app keeps running.
 - Works with any function signature - you can set input/output at runtime.
+
+</Accordion>
+<Accordion title="What languages and frameworks are supported?">
+
+For the `@observe` decorator, **Python** and **TypeScript** are supported. For integrations, Python is supported with TypeScript coming soon. Via **OpenTelemetry**, you can instrument in any language — including Python, TypeScript, Go, Ruby, and C#. See the [Integrations & OTEL](/docs/integrations) page for the full list.
 
 </Accordion>
 </AccordionGroup>

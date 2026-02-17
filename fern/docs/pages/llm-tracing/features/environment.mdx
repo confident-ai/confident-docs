@@ -1,6 +1,6 @@
 ---
 subtitle: Set your environments during tracing for better debugging
-slug: llm-tracing/advanced-features/environment
+slug: llm-tracing/features/environment
 ---
 
 ## Overview
@@ -8,15 +8,17 @@ slug: llm-tracing/advanced-features/environment
 The environment feature allows you to specify which environment your traces are coming from. This is useful for separating traces from different environments in `"development"`, `"staging"`, `"production"`, or `"testing"`.
 
 <Tip>
-Traces from [component-level evals](/docs/llm-evaluation/single-turn/component-level) are automatically classified in the `"testing"` enviornment.
+  Traces from [component-level
+  evals](/docs/llm-evaluation/single-turn/component-level) are automatically
+  classified in the `"testing"` enviornment.
 </Tip>
 
 ## Configure Environment
 
 You can configure the environment with the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
 
-```bash 
-export CONFIDENT_TRACE_ENVIRONMENT="staging" 
+```bash
+export CONFIDENT_TRACE_ENVIRONMENT="staging"
 ```
 
 Alternatively, you can set the environment directly in code:
@@ -49,9 +51,9 @@ Alternatively, you can set the environment directly in code:
             const openai = new OpenAI();
 
             const llmApp = async (query: string) => {
-                const result = await openai.chat.completions.create({ 
-                    model: "gpt-4o", 
-                    messages: [{ role: "user", content: query }] 
+                const result = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
                 })
                 return result.choices[0].message.content;
             };

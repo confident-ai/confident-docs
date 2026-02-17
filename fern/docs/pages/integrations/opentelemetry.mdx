@@ -510,7 +510,7 @@ Confident AI offers the `https://otel.confident-ai.com` endpoint that accepts Op
 
 ### Advanced configurations
 
-The [enviornment](/llm-tracing/advanced-features/environment) allows you to configure where your trace belongs on Confident AI (defaulted to `"development"`). You can configure the enviornment and sampling rate of traces by setting the following two enviornment variables:
+The [enviornment](/llm-tracing/features/environment) allows you to configure where your trace belongs on Confident AI (defaulted to `"development"`). You can configure the enviornment and sampling rate of traces by setting the following two enviornment variables:
 
 ```bash
 OTEL_RESOURCE_ATTRIBUTES="confident.trace.environment=production"
@@ -518,7 +518,7 @@ OTEL_RESOURCE_ATTRIBUTES="confident.trace.environment=production"
 
 ## Trace-Level Attribute Mappings
 
-These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/advanced-features/attributes). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
+These are the attributes specific to Confident AI traces similar to [tracing features](/docs/llm-tracing/features/span-types). The trace level attributes are set in the span attributes using the `confident.trace.*` namespace.
 
 <Info>
   It is recommended to set trace attributes once in any span in a trace
@@ -530,7 +530,7 @@ These are the attributes specific to Confident AI traces similar to [tracing fea
 
 The trace name is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
 
-- `"confident.trace.name"` (of type `str`) used for updating trace [name](/docs/llm-tracing/advanced-features/name)
+- `"confident.trace.name"` (of type `str`) used for updating trace [name](/docs/llm-tracing/features/name)
 
 <CodeBlocks>
 ```python
@@ -564,7 +564,7 @@ span.SetAttribute("confident.trace.name", "example-trace");
 
 ### Input/Output
 
-You can set [trace input and output](/docs/llm-tracing/advanced-features/input-output#set-trace-io-at-runtime) at runtime using the following attributes:
+You can set [trace input and output](/docs/llm-tracing/features/input-output#set-trace-io-at-runtime) at runtime using the following attributes:
 
 - `"confident.trace.input"` (of type `Any`) used for updating trace input
 - `"confident.trace.output"` (of type `Any`) used for updating trace output
@@ -644,9 +644,9 @@ span.SetAttribute("confident.trace.metric_collection", "<your_metric_collection>
 
 ### Test Case
 
-[LLM test case parameters](/docs/llm-tracing/advanced-features/test-cases) can be used to unit test interactions within your LLM application. They can be set in the span as **trace level attributes** using the `confident.trace.*` namespace.
+[LLM test case parameters](/docs/llm-tracing/features/test-cases) can be used to unit test interactions within your LLM application. They can be set in the span as **trace level attributes** using the `confident.trace.*` namespace.
 
-Given below is the example of running [online evaluation](/docs/llm-tracing/evaluations#online-evaluations) for a span.
+Given below is the example of running [online evaluation](/docs/llm-tracing/online-evals) for a span.
 
 <CodeBlocks>
 
@@ -717,7 +717,7 @@ LLM test case attributes mapping:
 
 ### Tags
 
-[Tags](/docs/llm-tracing/advanced-features/tags) are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
+[Tags](/docs/llm-tracing/features/tags) are simple string labels that make it easy to group related traces together, and cannot be applied to spans.
 
 - `"confident.trace.tags"` (of type `list[str]`) used for updating trace tags
 
@@ -750,7 +750,7 @@ currentSpan.SetAttribute("confident.trace.tags", new[] { "tag1", "tag2" });
 
 ### Metadata
 
-Attach [metadata](/docs/llm-tracing/advanced-features/metadata) to the trace. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+Attach [metadata](/docs/llm-tracing/features/metadata) to the trace. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
 
 - `"confident.trace.metadata"` (of type `str`) used for updating trace metadata
 
@@ -789,7 +789,7 @@ span.set_attribute('confident.trace.metadata', '{"key": "value"}');
 
 ### Thread Id
 
-A [thread](/docs/llm-tracing/advanced-features/threads) on Confident AI is a collection of one or more traces, letting you view full conversations — perfect for chat apps, agents, or any multi-turn interactions.
+A [thread](/docs/llm-tracing/features/threads) on Confident AI is a collection of one or more traces, letting you view full conversations — perfect for chat apps, agents, or any multi-turn interactions.
 
 - `"confident.trace.thread_id"` (of type `str`) used for updating trace **thread id**
 
@@ -826,7 +826,7 @@ span.SetAttribute("confident.trace.thread_id", "123");
 
 ### User Id
 
-Track user interactions by setting [user id](/docs/llm-tracing/advanced-features/users) in a trace — useful for monitoring token usage, identifying top users, and managing costs.
+Track user interactions by setting [user id](/docs/llm-tracing/features/users) in a trace — useful for monitoring token usage, identifying top users, and managing costs.
 
 - `"confident.trace.user_id"` (of type `str`) used for updating trace user id
 
@@ -863,11 +863,11 @@ span.SetAttribute("confident.trace.user_id", "123");
 
 ## Span-Level Attribute Mappings
 
-These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/advanced-features/attributes). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
+These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/features/span-types). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
 
 ### Name
 
-The [name](/docs/llm-tracing/advanced-features/name) of the span is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
+The [name](/docs/llm-tracing/features/name) of the span is displayed in the UI. You can customize it based on your liking for better UI display using the following attribute:
 
 - `"confident.span.name"` (of type `str`) used for updating span name
 
@@ -904,7 +904,7 @@ span.SetAttribute("confident.span.name", "custom_span");
 
 ### Input/Output
 
-You can set span [input and output](/docs/llm-tracing/advanced-features/input-output) at runtime using the following attributes:
+You can set span [input and output](/docs/llm-tracing/features/input-output) at runtime using the following attributes:
 
 - `"confident.span.input"` (of type `Any`) used for updating span input
 - `"confident.span.output"` (of type `Any`) used for updating span output
@@ -984,9 +984,9 @@ span.SetAttribute("confident.span.metric_collection", "<your_metric_collection>"
 
 ### Test Case
 
-[LLM test case parameters](/docs/llm-tracing/advanced-features/test-cases) can be used to unit test interactions within your LLM application. They can be set on the span level in **any span type** using the `confident.span.*` namespace.
+[LLM test case parameters](/docs/llm-tracing/features/test-cases) can be used to unit test interactions within your LLM application. They can be set on the span level in **any span type** using the `confident.span.*` namespace.
 
-Given below is the example of running [online evaluation](/docs/llm-tracing/evaluations#online-evaluations) for a span.
+Given below is the example of running [online evaluation](/docs/llm-tracing/online-evals) for a span.
 
 <CodeBlocks>
 
@@ -1052,7 +1052,7 @@ LLM test case attributes mapping:
 
 ### Metadata
 
-[Metadata](/docs/llm-tracing/advanced-features/metadata) can be attached to the span. This information can be used for filtering, grouping, and analyzing your spans in the observatory.
+[Metadata](/docs/llm-tracing/features/metadata) can be attached to the span. This information can be used for filtering, grouping, and analyzing your spans in the observatory.
 
 - `"confident.span.metadata"` (of type `str`) used for updating span metadata
 
@@ -1092,7 +1092,7 @@ span.SetAttribute("confident.span.metadata", "{\"key\": \"value\"}");
 
 ### Type specific attributes
 
-[Span types](/docs/llm-tracing/advanced-features/span-types) are optional but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
+[Span types](/docs/llm-tracing/features/span-types) are optional but allow you to classify the most common types of components in LLM applications, which includes these 4 default span types:
 
 - `llm`
 - `agent`
@@ -1144,7 +1144,7 @@ This is the default span type. All the attributes that we used above with `confi
 
 #### **LLM**
 
-To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/advanced-features/span-types#llm-span).
+To create a LLM span, set the `confident.span.type` to `llm`. After that refer to the table below for more [LLM span attributes](/docs/llm-tracing/features/span-types#llm-span).
 
 - `"confident.llm.model"` (of type `str`) used for updating LLM model
 - [Optional] `"confident.llm.cost_per_input_token"` (of type `float`) used for updating cost per input token
@@ -1245,7 +1245,7 @@ span.SetAttribute("confident.span.output", "Hello world");
 
 #### **Agent**
 
-To create a Agent span, set the `confident.span.type` to `agent`. After that refer to the table below for more [Agent span attributes](/docs/llm-tracing/advanced-features/span-types#agent-span).
+To create a Agent span, set the `confident.span.type` to `agent`. After that refer to the table below for more [Agent span attributes](/docs/llm-tracing/features/span-types#agent-span).
 
 - `"confident.agent.name"` (of type `str`) used for updating Agent span name
 - [Optional] `"confident.agent.available_tools"` (of type `list[str]`) used for updating Agent span available tools
@@ -1320,7 +1320,7 @@ span.SetAttribute("confident.span.output", `{"output": "output"}`);
 
 #### **Tool**
 
-To create a Tool span, set the `confident.span.type` to `tool`. After that refer to the table below for more [Tool span attributes](/docs/llm-tracing/advanced-features/span-types#tool-span).
+To create a Tool span, set the `confident.span.type` to `tool`. After that refer to the table below for more [Tool span attributes](/docs/llm-tracing/features/span-types#tool-span).
 
 - `"confident.tool.name"` (of type `str`) used for updating Tool span name
 - [Optional] `"confident.tool.description"` (of type `str`) used for updating Tool span description
@@ -1381,7 +1381,7 @@ span.SetAttribute("confident.span.output", `{"output": "output"}`);
 
 #### **Retriever**
 
-To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/advanced-features/span-types#retriever-span).
+To create a Retriever span, set the `confident.span.type` to `retriever`. After that refer to the table below for more [Retriever span attributes](/docs/llm-tracing/features/span-types#retriever-span).
 
 - `"confident.retriever.embedder"` (of type `str`) used for updating Retrieval span embedder model
 - [Optional] `"confident.retriever.top_k"` (of type `int`) used for updating Retrieval span top k

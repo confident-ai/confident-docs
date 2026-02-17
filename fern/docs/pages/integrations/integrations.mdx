@@ -1,6 +1,6 @@
 ---
 slug: integrations
-description: Get started with Confident AI for LLM evaluation and observability
+description: Instrument your LLM app with one-line integrations or via the OpenTelemetry standard
 ---
 
 Confident AI supports a wide range of integrations to seamlessly fit into your existing workflow. Whether you're using native SDKs or third-party frameworks, we've got you covered.
@@ -14,116 +14,184 @@ Integrations come in handy for two different workflows:
 
 All integrations support the former use case. For running evals in development, you'll need to check in each individual integration's documentation pages to know whether they are capable of running end-to-end, component-level, and multi-turn evals.
 
-## Native Integrations
+## OpenTelemetry (OTEL)
 
-<Card
-  title="OpenTelemetry"
-  icon="satellite-dish"
-  href="/integrations/opentelemetry"
->
-  Industry-standard observability framework for comprehensive telemetry data
-  collection.
-</Card>
+[OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is an open-source, vendor-neutral observability framework. Confident AI natively accepts OTEL traces at `https://otel.confident-ai.com`, making it the best option for teams that:
 
-## Third-Party Integrations
+- Use **any programming language** (not just Python/TypeScript)
+- Already have an OTEL-based observability stack
+- Want a **standards-based** approach to tracing with no vendor lock-in
+- Need **distributed tracing** across multiple services
 
 <CardGroup cols={2}>
   <Card
+    title="OpenTelemetry Setup"
+    icon="fa-light fa-satellite-dish"
+    href="/integrations/opentelemetry"
+  >
+    <div className="card-link-icon">
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+    Full quickstart and attribute reference for exporting OTEL traces to Confident
+    AI.
+  </Card>
+  <Card
+    title="Distributed Tracing"
+    icon="fa-light fa-globe"
+    href="/integrations/opentelemetry/distributed-tracing"
+  >
+    <div className="card-link-icon">
+      <Icon icon="arrow-up-right-from-square" />
+    </div>
+    Correlate traces across multiple services and microservices.
+  </Card>
+</CardGroup>
+
+## Third-Party Integrations
+
+Auto-instrument your LLM application with one-line integrations for popular frameworks and providers.
+
+<Note>
+  Only Python is currently supported for third-party integrations, with
+  TypeScript coming very soon.
+</Note>
+
+<CardGroup cols={3}>
+  <Card
     title="OpenAI"
     icon={
-      <img data-image="logos.openai" alt="OpenAI logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.openai"
+        alt="OpenAI logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/openai"
   >
-    Direct integration with OpenAI's chat completion and responses APIs.
+    Chat completion and responses APIs.
   </Card>
   <Card
     title="LangChain"
     icon={
-      <img data-image="logos.langchain" alt="LangChain logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.langchain"
+        alt="LangChain logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/langchain"
   >
-    Popular framework for developing applications with large language models.
+    Framework for building AI applications.
   </Card>
   <Card
     title="Pydantic AI"
     icon={
-      <img data-image="logos.pydantic" alt="Pydantic AI logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.pydantic"
+        alt="Pydantic AI logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/pydantic-ai"
   >
-    Type-safe agent framework built on Pydantic for Python applications.
+    Type-safe agent framework for Python.
   </Card>
   <Card
     title="LangGraph"
     icon={
-      <img data-image="logos.langgraph" alt="LangGraph logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.langgraph"
+        alt="LangGraph logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/langgraph"
   >
-    Graph-based approach to building stateful multi-actor applications with
-    LLMs.
+    Graph-based framework for stateful AI applications.
   </Card>
   <Card
     title="OpenAI Agents"
     icon={
-      <img data-image="logos.openai" alt="OpenAI logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.openai"
+        alt="OpenAI logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/openai-agents"
   >
-    Integration with OpenAI's agent framework for building intelligent
-    assistants.
+    OpenAI's agent framework for intelligent assistants.
   </Card>
   <Card
     title="LlamaIndex"
     icon={
-      <img data-image="logos.llamaindex" alt="LlamaIndex logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.llamaindex"
+        alt="LlamaIndex logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/llama-index"
   >
-    Integration with LlamaIndex framework that makes it easy to build knowledge
-    agents from complex data.
+    Data framework for RAG systems and knowledge agents.
   </Card>
   <Card
     title="Crew AI"
     icon={
-      <img data-image="logos.crewai" alt="Crew AI logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.crewai"
+        alt="Crew AI logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/crew-ai"
   >
-    Multi-agent orchestration framework for collaborative AI workflows.
+    Multi-agent orchestration for collaborative AI workflows.
   </Card>
   <Card
     title="Vercel AI SDK"
     icon={
-      <img data-image="logos.vercelaisdk" alt="Crew AI logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.vercelaisdk"
+        alt="Vercel AI SDK logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/vercel-ai-sdk"
   >
-    The typescript AI SDK by Vercel for all AI based applications.
+    The TypeScript AI SDK by Vercel for all AI-based applications.
   </Card>
 </CardGroup>
 
 ## LLM Gateways
+
+If you use an LLM gateway or proxy, these integrations automatically capture traces across all the providers you route through.
+
 <CardGroup cols={2}>
+  <Card
+    title="LiteLLM"
+    icon={
+      <img
+        data-image="logos.litellm"
+        alt="LiteLLM logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
+    }
+    href="/integrations/third-party/litellm"
+  >
+    Unified API for 100+ LLM providers.
+  </Card>
   <Card
     title="Portkey"
     icon={
-      <img data-image="logos.portkey" alt="Portkey logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+      <img
+        data-image="logos.portkey"
+        alt="Portkey logo"
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      />
     }
     href="/integrations/third-party/portkey-ai"
   >
     Unified interface for interacting with LLMs.
-  </Card>
-
-  <Card
-    title="LiteLLM"
-    icon={
-      <img data-image="logos.litellm" alt="LiteLLM logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-    }
-    href="/integrations/third-party/litellm"
-  >
-    Unified API for calling 100+ LLM APIs using the OpenAI format.
   </Card>
 </CardGroup>

@@ -15,6 +15,7 @@ For users in the EU region, please set the OTEL endpoint to the EU version as sh
 ```bash
 export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 ```
+
 </Tip>
 
 <Steps>
@@ -131,7 +132,7 @@ result = agent.run_sync("What are the LLMs?")
 
 ### Logging threads
 
-Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/advanced-features/threads) here. Pass the `thread_id` to the `ConfidentInstrumentationSettings`.
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Pass the `thread_id` to the `ConfidentInstrumentationSettings`.
 
 <CodeBlocks>
   <CodeBlock title="Synchronous">
@@ -282,27 +283,27 @@ Other trace attributes can also be passed to the `ConfidentInstrumentationSettin
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
-  The name of the trace. [Learn more](/docs/llm-tracing/advanced-features/name).
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
 <ParamField path="tags" type="List[str]" required={false}>
   Tags are string labels that help you group related traces. [Learn
-  more](/docs/llm-tracing/advanced-features/tags).
+  more](/docs/llm-tracing/features/tags).
 </ParamField>
 
 <ParamField path="metadata" type="Dict" required={false}>
   Attach any metadata to the trace. [Learn
-  more](/docs/llm-tracing/advanced-features/metadata).
+  more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
 <ParamField path="thread_id" type="str" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
-  [Learn more](/docs/llm-tracing/advanced-features/threads).
+  [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
 <ParamField path="user_id" type="str" required={false}>
   Supply the user ID to enable user analytics. [Learn
-  more](/docs/llm-tracing/advanced-features/users).
+  more](/docs/llm-tracing/features/users).
 </ParamField>
 
 <Info>
@@ -358,7 +359,7 @@ Send human annotations on the threads or traces on Confident AI. Learn more abou
 
 ### Online evals
 
-You can run [online evals](/docs/llm-tracing/evaluations) on your Pydantic agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
+You can run [online evals](/docs/llm-tracing/online-evals) on your Pydantic agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
 
 <Steps>
   <Step title="Create metric collection">
