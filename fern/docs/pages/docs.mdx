@@ -1,72 +1,86 @@
 ---
-subtitle: Evaluate LLM applications of all sorts, with and without code.
+subtitle: The platform for cross-functional teams to validate AI quality in both development and production
 slug: docs
 description: Get started with Confident AI for LLM evaluation and observability
 ---
 
 ## What is Confident AI?
 
-Confident AI is the end-to-end platform for teams to quality-assure their AI applications — from RAG pipelines and agentic workflows to chatbots and core LLM models.
+Confident AI is the AI Quality platform that helps teams ship reliable AI applications. We provide **evals in development** to catch issues before deployment, and **observability in production** to continuously monitor AI quality at scale.
 
-**LLM evaluation** allows engineers, QAs, and PMs to:
+With Confident AI, teams can:
 
-- **Prevent regressions** - Catch breaking changes before they reach production
-- **Optimize performance** - Find the best prompts, models, and parameters for your use case
-- **Build confidence** - Get data-driven insights into your AI application's quality
-- **Save time** - Automate manual testing with 40+ pre-built evaluation metrics
-- **Enable iteration** - Compare different versions of your AI system objectively
-- **Quality assurance** - Ensure consistent performance across different inputs and scenarios
+- **Experiment in development** - Test different prompts, models, and parameters to find what works best
+- **Iterate on AI apps** - Call your application via HTTPS or prompts to rapidly iterate and evaluate changes
+- **Catch regressions pre-deployment** - Run automated evals in CI/CD to detect breaking changes before they reach users
+- **Monitor quality in production** - Trace every AI execution and score quality in real-time
+- **Get live alerting** - Receive instant notifications when AI quality degrades
+- **Red team for security** - Test for safety vulnerabilities and harden your AI against adversarial attacks
+
+Whether you're building RAG pipelines, agentic workflows, chatbots, or fine-tuning models — Confident AI gives engineers, QAs, PMs, and domain experts the tools to measure, improve, and maintain AI quality across the entire lifecycle, for both functionality and safety.
 
 <Tip title="Confident AI's evals are 100% powered by DeepEval">
-  DeepEval is one of the most widely adopted LLM evaluation framework in the
-  world, with over 10k stars and 20 million daily evaluations.
+  DeepEval is one of the most widely adopted LLM evaluation frameworks in the
+  world, with over 13k stars, 3 million monthly downloads, and 20 million daily evaluations.
+
+It is used by companies such as OpenAI, Google, and Microsoft.
 
 <Frame background="subtle" caption="⭐ DeepEval Star Growth ⭐">
   [![Star History
   Chart](https://api.star-history.com/svg?repos=confident-ai/deepeval&type=Date)](https://www.star-history.com/#confident-ai/deepeval&Date)
 </Frame>
 
-    While DeepEval is like Pytest for LLM apps, Confident AI is the dashboard UI for DeepEval.
-
 </Tip>
 
-## How LLM evals work
+## How AI Quality works
 
-Evaluation on Confident AI has three core components:
+Confident AI approaches AI quality through two complementary workflows:
 
-<CardGroup cols={3}>
-  <Card title="LLM Metrics" icon="chart-line">
-    Automates manual pre-deployment AI testing with 40+ LLM-as-a-Judge metrics.
+<CardGroup cols={2}>
+  <Card title="Experimentation" icon="flask-vial">
+    Iterate rapidly on your AI application.
+
+    - Call your app via HTTPS or prompts to test changes
+    - Compare prompts, models, and parameters
+    - Run 40+ metrics to measure quality
+    - Find the best configuration for your use case
+
+    *Data-driven iteration, not guesswork.*
+
   </Card>
-  <Card title="Dataset Curation" icon="file-pen">
-    Annotate or generate test datasets prepared by QAs and PMs.
-  </Card>
-  <Card title="LLM Tracing" icon="code-branch">
-    Real-time AI execution observability with performance tracking.
+  <Card title="Tracing with Online Evals" icon="code-branch">
+    Full visibility into every AI execution.
+
+    - Trace requests end-to-end with spans
+    - Capture inputs, outputs, latency, and tokens
+    - Debug issues with complete context
+    - Build datasets from real production traffic
+
+    *See exactly what your AI is doing.*
+
   </Card>
 </CardGroup>
 
-You don't strictly need to have a dataset coming into Confident AI to start running evals, as you can setup tracing and run evals on the fly instead.
-
 <Note>
-  Confident AI supports evals and tracing for any [LLM use
-  case](/docs/resources/llm-use-cases), including multi-turn ones.
+  You can start with either component. Many teams begin with tracing to
+  understand their production traffic, then build datasets from real examples
+  for systematic testing.
 </Note>
 
 ## Key capabilities
 
-- Comprehensive single-turn, multi-turn LLM testing
-- Experiment with different versions of prompts and models
-- Detect unexpected breaking changes through evals
-- LLM tracing to debug and monitor in production
-- Track product analytics and user stats
-- Include human-in-the-loop to notice what needs to be worked on
+Confident AI's capabilities differs based on who you are:
+
+- **For Engineers** - Unit-test AI apps in CI/CD, debug with traces, experiment with prompts and models
+- **For QAs** - Build test datasets, run regression suites, validate AI behavior across scenarios
+- **For PMs** - Track quality metrics over time, compare experiments, monitor production health
+- **For SMEs & Annotators** - Label data, review AI outputs, provide human feedback at scale
 
 ## Choose your quickstart
 
 <CardGroup cols={2}>
   <Card
-    title="LLM Evals in Development"
+    title="Evals in Development"
     icon="flask-vial"
     iconType="solid"
     href="/docs/llm-evaluation/quickstart"
@@ -75,35 +89,36 @@ You don't strictly need to have a dataset coming into Confident AI to start runn
       <Icon icon="arrow-up-right-from-square" />
     </div>
 
-    **Best for:** Those that have a dataset or are already doing manual testing
+    **Best for:** Teams ready to systematically test AI quality before deployment
     <br />
 
-    - Create and annotate a dataset
-    - Unit-test for LLM app regressions
-    - Find the best prompts, models, etc.
-    - Learn how to run evals in directly in the UI
+    - Create and annotate golden datasets
+    - Run regression tests to catch breaking changes
+    - Experiment with prompts, models, and parameters
+    - Integrate evals into your CI/CD pipeline
 
-    *Setup your LLM eval pipeline for pre-deployment quality assurance*
+    *Establish quality gates that prevent bad AI from reaching users*
 
   </Card>
   <Card
-    title="LLM Tracing for Production Evals"
-    icon="code-branch"
+    title="Observability in Production"
+    icon="radar"
     iconType="solid"
     href="/llm-tracing/introduction"
   >
 
-    **Best for:** Running ad-hoc evals immediately and building datasets from traced data
+    **Best for:** Teams that want to monitor AI quality in real-time and build datasets from production
     <br />
 
     <div className='card-link-icon'>
       <Icon icon="arrow-up-right-from-square" />
     </div>
-    - Setup LLM observability to trace AI executions
-    - Enable online metrics to run ad-hoc evals in production
-    - Learn how to run offline evals on historical traces
+    - Trace every AI execution with full visibility
+    - Run online evals to score production traffic
+    - Debug issues and identify quality regressions
+    - Build datasets from real user interactions
 
-    *Perfect for those without a dataset to begin with*
+    *Understand how your AI actually performs in the wild*
 
   </Card>
 </CardGroup>
@@ -112,53 +127,61 @@ You don't strictly need to have a dataset coming into Confident AI to start runn
 
 <AccordionGroup>
   <Accordion title="How is this different from DeepEval?">
-    While DeepEval computes the metric results required for data-driven LLM app development, it does not provide the insights required for iteration.
+    DeepEval is the open-source evaluation framework that powers the metrics and testing logic. Confident AI is the platform layer that adds collaboration, visualization, dataset management, production tracing, and team workflows on top.
+
+    Think of DeepEval as the engine, and Confident AI as the full vehicle — you get dashboards, experiment tracking, human-in-the-loop workflows, and production observability all in one place.
 
     [Click here](/docs/resources/why-confident-ai#deepeval-vs-confident-ai) for a more comprehensive comparison.
 
   </Accordion>
 
   <Accordion title="What LLM use cases are supported?">
-    All types of LLM use cases are supported, including summarization, Text-SQL, custom support chatbots, internal RAG QAs, conversational agents, etc.
+    All types of LLM use cases are supported, including summarization, Text-SQL, customer support chatbots, internal RAG QAs, conversational agents, and more.
 
-    These use cases can be of any system, including RAG pipelines, agentic workflows, conversational chatbots, or just a combination of everything (e.g. RAG chatbots, agentic RAG).
+    These can be any architecture — RAG pipelines, agentic workflows, conversational chatbots, or combinations like RAG chatbots and agentic RAG systems.
 
-    Confident AI has tailored metrics and platform capabilities for different types of LLM applications, and it is extremely important to adjust your evaluation strategy depending on your LLM use case. You can read more on the different types of use cases on [this page.](/docs/resources/llm-use-cases)
+    Confident AI has tailored metrics and capabilities for different application types. Your evaluation strategy should match your use case. Learn more about [supported use cases here.](/docs/resources/llm-use-cases)
 
   </Accordion>
 
 <Accordion title="What about complex agentic systems?">
-  Complex agentic systems are definitely supported on Confident AI through [LLM
-  tracing.](/docs/llm-tracing/introduction) One thing to note though is that it
-  is extremely important to decide carefully on what to (not) evaluate in a
-  complex LLM agentic workflow, since trying to evaluate everything means you're
-  actually evaluating nothing.
+  Complex agentic systems are fully supported through [LLM tracing](/docs/llm-tracing/introduction). Tracing gives you visibility into every step of agent execution — tool calls, reasoning chains, and intermediate outputs.
+
+One important consideration: be intentional about what you evaluate. Trying to measure everything often means you're measuring nothing useful. Focus on the outputs and behaviors that matter most for your users.
+
+</Accordion>
+
+<Accordion title="Who uses Confident AI?">
+  Our platform is designed for cross-functional AI teams:
+
+- **Engineers** use evals in CI/CD and traces for debugging
+- **QAs** build test datasets and run regression suites
+- **PMs** track quality metrics and compare experiments
+- **SMEs & Annotators** label data and review AI outputs in human-in-the-loop workflows
+
 </Accordion>
 
 <Accordion title="Is Confident AI enterprise ready?">
-  Yes, Confident AI offers SSO, data segregation for teams, user roles and
-  permissions (with customizations available), and well as the ability to
-  self-host in your cloud premises.
+  Yes. We offer SSO, team-based data segregation, customizable user roles and
+  permissions, and self-hosted deployment options for your cloud environment.
 </Accordion>
 
 <Accordion title="What about HIPAA compliance?">
-  We're proudly HIPAA compliant and are willing to sign BAAs with customers on
-  the [Premium subscription plan or above.](https://confident-ai.com/pricing)
+  We're HIPAA compliant and sign BAAs with customers on the [Premium plan or
+  above.](https://confident-ai.com/pricing)
 </Accordion>
 
 <Accordion title="Can I self-host Confident AI?">
-  Yes, while most users are using the SaaS offering, your organization can
-  deploy Confident AI in your cloud premises (e.g. AWS, Azure, GCP, etc.)
-  through a dockerized manner, which includes integrations with your existing
-  identify providers (e.g. Azure AD, Ping, Okta, etc.) of choice for
-  authentication into Confident AI platform. In our experience, this process
-  takes 1-2 weeks max.
+  Yes. While most teams use our SaaS offering, you can deploy Confident AI in
+  your own cloud (AWS, Azure, GCP) via Docker. We integrate with your identity
+  providers (Azure AD, Okta, Ping, etc.) for authentication. Setup typically
+  takes 1-2 weeks.
 </Accordion>
 
   <Accordion title="What is the pricing?">
-    No credit card upfront is required, and we offer transparent pricing with 4 different tiers which includes a generous free tier. You can view the [full pricing here.](https://confident-ai.com/pricing)
+    No credit card required to start. We offer transparent pricing across 4 tiers, including a generous free tier. [View pricing here.](https://confident-ai.com/pricing)
 
-    We try to make it sure that you only pay for something once you have had the chance to try it out. If you don't think this is the case, please email support@confident-ai.com and we will make things more generous.
+    We want you to experience value before you pay. If something doesn't feel right, email support@confident-ai.com and we'll make it work.
 
   </Accordion>
 </AccordionGroup>
