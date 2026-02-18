@@ -885,67 +885,6 @@ paths:
                     link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/editor/prm_xyz456"
                   deprecated: false
 
-  /v1/prompts/{alias}/versions:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Prompt
-      summary: List Versions
-      operationId: getPromptVersions
-      description: Retrieves a list of all versions associated with a given prompt `alias`.
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PromptVersionsResponse"
-              example:
-                success: true
-                data:
-                  textVersions:
-                    - id: "prm_xyz456"
-                      version: "00.00.01"
-                  messagesVersions: null
-                deprecated: false
-    post:
-      x-fern-server-name: Confident AI
-      tags:
-        - Prompt
-      summary: Create Version
-      operationId: createVersion
-      description: Creates a new version of the specified or latest commit on your Confident AI project.
-      requestBody:
-        required: true
-        description: ""
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreatePromptVersionRequest"
-            examples:
-              With-Hash:
-                hash: "bab04ce"
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreatePromptVersionResponse"
-              examples:
-                With-Hash:
-                  success: true
-                  data:
-                    version: "00.00.01"
-                    hash: "bab04ce"
-                  deprecated: false
-                Without-Hash:
-                  success: true
-                  data:
-                    version: "00.00.01"
-                    hash: "9ace048"
-                  deprecated: false
-
   /v1/prompts/{alias}/labels/{label}:
     get:
       x-fern-server-name: Confident AI
@@ -1051,30 +990,6 @@ paths:
                         name: "gpt-4o"
                         temperature: 0.7
                     deprecated: false
-  
-  /v1/prompts/{alias}/commits:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Prompt
-      summary: List Commits
-      operationId: getPromptCommits
-      description: Retrieves a list of all the commits associated with a prompt
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PromptCommitsResponse"
-              example:
-                success: true
-                data:
-                  commits:
-                    - id: "144aa01d-af4d-4054-83fa-78e2301d94fb"
-                      hash: "bab04ce"
-                      message: "Committed from API"
-                deprecated: false
 
   /v1/prompts/{alias}/commits/{hash}:
     get:
@@ -1128,6 +1043,91 @@ paths:
                         name: "gpt-4o"
                         temperature: 0.7
                     deprecated: false
+
+  /v1/prompts/{alias}/versions:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: List Versions
+      operationId: getPromptVersions
+      description: Retrieves a list of all versions associated with a given prompt `alias`.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptVersionsResponse"
+              example:
+                success: true
+                data:
+                  textVersions:
+                    - id: "prm_xyz456"
+                      version: "00.00.01"
+                  messagesVersions: null
+                deprecated: false
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Create Version
+      operationId: createVersion
+      description: Creates a new version of the specified or latest commit on your Confident AI project.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePromptVersionRequest"
+            examples:
+              With-Hash:
+                hash: "bab04ce"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePromptVersionResponse"
+              examples:
+                With-Hash:
+                  success: true
+                  data:
+                    version: "00.00.01"
+                    hash: "bab04ce"
+                  deprecated: false
+                Without-Hash:
+                  success: true
+                  data:
+                    version: "00.00.01"
+                    hash: "9ace048"
+                  deprecated: false
+
+  /v1/prompts/{alias}/commits:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: List Commits
+      operationId: getPromptCommits
+      description: Retrieves a list of all the commits associated with a prompt
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromptCommitsResponse"
+              example:
+                success: true
+                data:
+                  commits:
+                    - id: "144aa01d-af4d-4054-83fa-78e2301d94fb"
+                      hash: "bab04ce"
+                      message: "Committed from API"
+                deprecated: false
 
   /v1/test-runs/{testRunId}:
     get:
@@ -3959,7 +3959,7 @@ components:
         data:
           type: object
           properties:
-            version: 
+            version:
               type: string
               description: The version id generated by Confident AI of the new version you just released, it is always incremental.
             hash:
@@ -4058,7 +4058,7 @@ components:
         - id
         - type
         - name
-      
+
     Tool:
       type: object
       properties:
@@ -4291,7 +4291,7 @@ components:
         hash:
           type: string
           description: The hash of a commit generated by Confident AI.
-        message: 
+        message:
           type: string
           description: The message associated with a commit, not to be confused with a prompt's message.
       required:

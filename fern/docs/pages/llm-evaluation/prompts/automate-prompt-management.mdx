@@ -1,5 +1,5 @@
 ---
-subtitle: Build automated prompt versioning pipelines via the Evals API
+subtitle: Build automated prompt management pipelines via the Evals API
 slug: llm-evaluation/prompt-management/automate-prompt-management
 ---
 
@@ -7,27 +7,27 @@ slug: llm-evaluation/prompt-management/automate-prompt-management
 
 Instead of manually creating and updating prompts on the platform, you can automate prompt management via the Evals API. This allows you to:
 
-- Push new prompt versions from your codebase or CI/CD pipeline
-- Update existing prompt versions programmatically
-- Optionally configure model settings, output type, and tools to version prompts + models together
-- Integrate prompt versioning into your development workflow
+- Push new prompt commits from your codebase or CI/CD pipeline
+- Promote commits to versions programmatically
+- Optionally configure model settings, output type, and tools to track alongside prompts
+- Integrate prompt management into your development workflow
 
 <Note>
-  Most of this page focuses on the core use case: **versioning prompts**. Model
-  settings, output types, and other configurations are optional add-ons for
-  teams who want to manage their entire LLM configuration (prompt + model) as a
-  single versioned unit.
+  Most of this page focuses on the core use case: **tracking prompt changes via
+  commits**. Model settings, output types, and other configurations are optional
+  add-ons for teams who want to manage their entire LLM configuration (prompt +
+  model) as a single tracked unit.
 </Note>
 
 <Tip>
-  If you haven't already, get familiar with [prompt versioning on the
+  If you haven't already, get familiar with [prompt commits and versions on the
   platform](/llm-evaluation/prompt-management/version-prompts) to understand the
-  relationship between prompts, versions, and labels.
+  relationship between prompts, commits, versions, and labels.
 </Tip>
 
-## Push Prompt Versions
+## Push Prompt Commits
 
-Push a new version of a prompt to Confident AI. If the prompt alias doesn't exist, it will be created automatically.
+Push a new commit of a prompt to Confident AI. If the prompt alias doesn't exist, it will be created automatically. Every push creates a new commit that tracks your changes.
 
 <Tabs>
 
@@ -114,15 +114,11 @@ For **text** prompts:
 
 </Tabs>
 
-Each push creates a new version automatically. Confident AI handles version numbering for you.
+Each push creates a new commit automatically. When you're ready to mark a commit as a stable release, you can promote it to a version. Version numbers are controlled by Confident AI in the format `00.00.0X`.
 
-## Update Prompt Versions
+## Create a Version
 
-<Warning>
-  Updating prompts is no longer supported on Confident AI. All prompt updates are treated as new commits and as such, you can only `push` a new commit using the `push()` method.
-</Warning>
-
-If you need to modify a prompt, simply call `push()` again with your updated content which will create a new commit on the Confident AI platform:
+When you're ready to mark a commit as a stable release, you can promote it to a version. Version numbers are automatically assigned by Confident AI in the format `00.00.0X` (e.g., `00.00.01`, `00.00.02`).
 
 <Tabs>
 
@@ -131,8 +127,16 @@ If you need to modify a prompt, simply call `push()` again with your updated con
 from deepeval.prompt import Prompt
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(text="Updated prompt text.")
-```
+
+# Create a version from the latest commit
+
+prompt.create_version()
+
+# Or create a version from a specific commit
+
+prompt.create_version(hash="COMMIT-HASH")
+
+````
 
 </Tab>
 
@@ -141,29 +145,42 @@ prompt.push(text="Updated prompt text.")
 import { Prompt } from "deepeval-ts";
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
-await prompt.push({ text: "Updated prompt text." });
-```
+
+// Create a version from the latest commit
+await prompt.createVersion();
+
+// Or create a version from a specific commit
+await prompt.createVersion({ hash: "COMMIT-HASH" });
+````
 
 </Tab>
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="POST /v1/prompts" example="Text-Prompt" />
+<EndpointRequestSnippet endpoint="POST /v1/prompts/{alias}/versions" />
 
 </Tab>
 
 </Tabs>
 
+<Warning>
+  A new version can only be created for commits made after the most recently
+  versioned commit. Commits made before an existing version cannot be promoted
+  to a version.
+</Warning>
+
+Once a commit is promoted to a version, you can assign labels (like `staging` or `production`) to it. Labels can only exist on versions, not commits.
+
 ## Adding Model Configs
 
 <Note>
   Model settings, output type, and tools are **completely optional**. You can
-  version and use prompts without any of these — simply pull the prompt and use
-  it with whatever model you choose in your code. These options are for teams
-  who want to co-locate their model configuration with their prompts.
+  track and use prompts without any of these — simply pull the prompt and use it
+  with whatever model you choose in your code. These options are for teams who
+  want to co-locate their model configuration with their prompts.
 </Note>
 
-If you want to manage your model configuration alongside your prompts — treating the prompt + model as a single versioned unit — you can include `model_settings` and `output_type` when pushing or updating.
+If you want to manage your model configuration alongside your prompts — tracking the prompt + model together in each commit — you can include `model_settings` and `output_type` when pushing.
 
 This is useful when:
 
@@ -193,7 +210,7 @@ class ResponseSchema(BaseModel):
 
 prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
 
-# Use with push() to create a new version
+# Use with push() to create a new commit
 prompt.push(
     messages=[
         PromptMessage(role="system", content="You are a helpful assistant."),
@@ -227,15 +244,18 @@ const responseSchema = {
   fields: {
     answer: "string",
     confidence: "float",
-  }
-}
+  },
+};
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
 
 await prompt.push({
   version: "00.00.01",
   messages: [
-    new PromptMessage({ role: "system", content: "You are a helpful assistant." }),
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant.",
+    }),
   ],
   modelSettings: {
     provider: "OPEN_AI",
@@ -258,7 +278,10 @@ await prompt.push({
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="Model-Settings" />
+<EndpointRequestSnippet
+  endpoint="PUT /v1/prompts/{alias}/versions/{version}"
+  example="Model-Settings"
+/>
 
 </Tab>
 
@@ -348,7 +371,7 @@ Specify how variables are interpolated in your prompts:
 
 ## What about Tools?
 
-You can create and update tools using prompts by either pushing prompts with tools or updating them. Tools in Confident AI are identified using their names, passing a tool with a new name creates and tool and passing a tool with an existing name updates the tool on the platform. Here's how you can create / update tools:
+You can create and update tools using prompts by pushing prompts with tools. Tools in Confident AI are identified using their names — passing a tool with a new name creates a tool and passing a tool with an existing name updates the tool on the platform. Each push creates a new commit that tracks the tool configuration. Here's how you can create / update tools:
 
 <Tabs>
 
@@ -371,7 +394,7 @@ tool = Tool(
     structured_schema=ToolInputSchema,
 )
 
-# Use with push() to create a new tool
+# Use with push() to create a new commit with the tool
 prompt.push(
     text="This a prompt for a tool using agent",
     tools=[tool]
@@ -403,38 +426,44 @@ const responseSchema = {
   fields: {
     answer: "string",
     confidence: "float",
-  }
-}
+  },
+};
 
 const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
 const tool = new Tool({
-  name="SearchTool",
-  description="Search functionality",
-  mode=ToolMode.STRICT,
-  structuredSchema=responseSchema
+  name = "SearchTool",
+  description = "Search functionality",
+  mode = ToolMode.STRICT,
+  structuredSchema = responseSchema,
 });
 
 await prompt.push({
   version: "00.00.01",
   messages: [
-    new PromptMessage({ role: "system", content: "You are a helpful assistant." }),
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant.",
+    }),
   ],
-  tools=[tool],
+  tools = [tool],
 });
 
 const tool2 = new Tool({
-  name="SearchTool",
-  description="New search functionality",
-  mode=ToolMode.STRICT,
-  structuredSchema=responseSchema
+  name = "SearchTool",
+  description = "New search functionality",
+  mode = ToolMode.STRICT,
+  structuredSchema = responseSchema,
 });
 
 // Create a new commit with the new updated tool using 'push'
 await prompt.push({
   messages: [
-    new PromptMessage({ role: "system", content: "You are a helpful assistant." }),
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant.",
+    }),
   ],
-  tools=[tool2]
+  tools = [tool2],
 });
 ```
 
@@ -442,7 +471,10 @@ await prompt.push({
 
 <Tab title="curL" language="curl">
 
-<EndpointRequestSnippet endpoint="PUT /v1/prompts/{alias}/versions/{version}" example="Tools" />
+<EndpointRequestSnippet
+  endpoint="PUT /v1/prompts/{alias}/versions/{version}"
+  example="Tools"
+/>
 
 </Tab>
 
@@ -450,10 +482,10 @@ await prompt.push({
 
 ## Prompts in CI/CD
 
-Automate prompt versioning as part of your CI/CD pipeline. A common pattern is to push prompt updates whenever your prompt files change:
+Automate prompt tracking as part of your CI/CD pipeline. A common pattern is to push prompt commits whenever your prompt files change:
 
 ```yaml prompts-ci.yml maxLines={25}
-name: Push Prompt Versions
+name: Push Prompt Commits
 
 on:
   push:
@@ -492,14 +524,15 @@ with open("prompts/assistant.txt") as f:
 prompt = Prompt(alias="assistant-prompt")
 prompt.push(text=prompt_text)
 
-print("Prompt pushed successfully!")
+print("Prompt commit pushed successfully!")
 ```
 
 <Tip>
   Combine automated prompt pushing with [prompt
   labeling](/docs/llm-evaluation/prompt-management/version-prompts#assign-prompt-labels)
   to control which versions are deployed to different environments (e.g.,
-  staging, production).
+  staging, production). Remember that labels can only be assigned to versions,
+  so you'll need to promote commits to versions before labeling them.
 </Tip>
 
 ## Next Steps

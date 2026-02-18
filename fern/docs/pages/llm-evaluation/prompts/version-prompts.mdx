@@ -28,7 +28,7 @@ There are a million places you can keep your prompts - on GitHub, CSV files, in 
   settings, output type, and tools to prompt versions.
 </Tip>
 
-## Different Types of Prompts
+## Types of Prompts
 
 There are two types of prompts you can create:
 
@@ -40,32 +40,37 @@ There are two types of prompts you can create:
   "list", assume it is a single prompt we're talking about.
 </Tip>
 
-## Understanding Prompt Versions
+## Understanding Prompt Versioning
 
 In Confident AI, each prompt is identified by a unique `alias`. This `alias` acts as a unique identifier and refers to a single, specific prompt. Different aliases refer to completely separate prompts.
 
+Every change you make to a prompt is tracked as a **commit**. This ensures complete history and traceability of all prompt modifications. When you're ready to mark a commit as a stable release, you can promote it to a **version**.
+
 <Info title="Example">
-Suppose you have a prompt with the alias `MyPrompt`. This prompt can have multiple versions, such as `0.0.1`, `0.0.2`, ..., up to `1.0.0`.
+Suppose you have a prompt with the alias `MyPrompt`. Every edit creates a new commit. You can then promote specific commits to versions.
 
 ```mermaid
 flowchart TD
     MyPrompt["Alias: MyPrompt"]
-    MyPrompt --> V001["Version 0.0.1"]
-    MyPrompt --> V002["Version 0.0.2"]
-    MyPrompt --> V003[" ... "]
-    MyPrompt --> V100["Version 1.0.0"]
+    MyPrompt --> C1["Commit 1"]
+    MyPrompt --> C2["Commit 2"]
+    MyPrompt --> C3["Commit 3 → Version 00.00.01"]
+    MyPrompt --> C4["Commit 4"]
+    MyPrompt --> C5["Commit 5 → Version 00.00.02"]
 ```
 
 </Info>
 
-A **prompt version** represents a different variation of the same prompt. Each `version` is an iteration or improvement of the original prompt, serving the same purpose but with adjustments—similar to how software versions evolve over time.
+- **Commit**: Every change to a prompt creates a new commit. Commits are automatically tracked and provide a complete history of all modifications.
+- **Version**: A promoted commit that represents a stable release. Version numbers are controlled by Confident AI in the format `00.00.0X` (e.g., `00.00.01`, `00.00.02`).
+- **Label**: Labels (like `staging` or `production`) can only be assigned to versions, not commits. This ensures that only stable, versioned prompts are deployed to different environments.
 
-## Create a Prompt Version
+## Commit a New Prompt
 
-You can create a prompt version in **Project** > **Prompt Studio** through two simple steps:
+You can create a prompt in **Project** > **Prompt Studio** through two simple steps:
 
 1. Create a text or messages prompt
-2. Edit and commit an initial prompt version in the prompt editor
+2. Edit and commit your changes in the prompt editor
 
 <Note>A prompt cannot be both a text and message prompt at the same time.</Note>
 
@@ -99,59 +104,12 @@ You can create a prompt version in **Project** > **Prompt Studio** through two s
 
 </Tabs>
 
-Don't forget to **commit** an initial version of your prompt after you're done
-editing it. Alternately, you can create a prompt version from code.
-
-<Tip>
-You can manage your prompts in any project by configuring a `CONFIDENT_API_KEY`.
-
-- For default usage, set `CONFIDENT_API_KEY` as an environment variable.
-- To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
-
-```python
-from deepeval.prompt import Prompt, PromptMessage
-
-prompt = Prompt(
-  alias="YOUR-PROMPT-ALIAS",
-  messages_template=[PromptMessage(role="...", content="...")],
-  confident_api_key="confident_us...",
-)
-prompt.push()
-```
-
-When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
-
-</Tip>
-
-<Tabs>
-<Tab title="Messages" language="python">
-```python
-from deepeval.prompt import Prompt
-from deepeval.prompt.api import PromptMessage
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(messages=[PromptMessage(role="...", content="...")])
-prompt.create_version()
-```
-</Tab>
-
-<Tab title="Text" language="python">
-```python
-from deepeval.prompt import Prompt
-
-prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
-prompt.push(text="...")
-prompt.create_version()
-```
-
-</Tab>
-
-</Tabs>
-
-The `push` method creates a new commit for the changes you made on the Confident AI platform. The `create_version` method creates a new version for the latest commit or for a specific commit if provided.
+Don't forget to **commit** your changes after you're done editing. Every commit is tracked, and you can later promote any commit to a version. You can also create commits from [code.](/docs/llm-evaluation/prompt-management/automate-prompt-management)
 
 <Warning>
-  A new version can only be created for commits made after the most recently versioned commit. Commits made before an existing version cannot be versioned.
+  A new version can only be created for commits made after the most recently
+  versioned commit. Commits made before an existing version cannot be promoted
+  to a version.
 </Warning>
 
 <Tip>
@@ -222,21 +180,21 @@ You can also include images simply by dragging and dropping something into the t
 
 ## Model Configs
 
-Beyond creating and editing prompt versions, you can also configure model settings, output type, and tools associated with your prompt. This allows you to:
+Beyond creating and editing prompts, you can also configure model settings, output type, and tools associated with your prompt. These configurations are included in each commit, allowing you to:
 
-- Version not just prompts, but also models associated with it
+- Track not just prompt changes, but also model configuration changes
 - Use directly in code when [pulling prompts in code](/docs/llm-evaluation/prompt-management/pull-prompts)
 - Compare the impact of models on the same prompt (and vice versa) when [running experiments on your AI app](/docs/llm-evaluation/experiments)
 
 <Tip>
 
-Keeping model configs for prompt versions on Confident AI does no harm but it doesn't mean you have to use it - for both in code and on the platform in the [Arena](/docs/llm-evaluation/no-code-evals/arena) or when running experiments. However, if model configs confuses you, feel free to leave them out.
+Keeping model configs for prompts on Confident AI does no harm but it doesn't mean you have to use it - for both in code and on the platform in the [Arena](/docs/llm-evaluation/no-code-evals/arena) or when running experiments. However, if model configs confuses you, feel free to leave them out.
 
 </Tip>
 
 ### Model settings
 
-You can configure the model provider, model name, and model parameters for each prompt version. This ensures that when you pull a prompt in code, you also get the exact model configuration needed to run it.
+You can configure the model provider, model name, and model parameters for each prompt. These settings are tracked with each commit, ensuring that when you pull a prompt in code, you also get the exact model configuration needed to run it.
 
 <Frame caption="Configure Model Settings">
   <img
@@ -268,7 +226,7 @@ For an OpenAI GPT-4.1 configuration with custom temperature and max tokens:
 
 ### Output type
 
-You can specify the expected output format for your prompt by selecting an output type:
+You can specify the expected output format for your prompt by selecting an output type. This configuration is tracked with each commit:
 
 - **Text Output**: Standard text response (default)
 - **JSON Output**: Structured JSON response
@@ -301,7 +259,7 @@ The schema will be previewed as a Pydantic `BaseModel` class, making it easy to 
 
 ### Attach tools
 
-You can attach tools to your prompt version for function calling capabilities. This allows your LLM to invoke external tools like web search, APIs, or custom functions.
+You can attach tools to your prompt for function calling capabilities. This allows your LLM to invoke external tools like web search, APIs, or custom functions. Tool configurations are tracked with each commit.
 
 To attach tools:
 
@@ -318,7 +276,7 @@ To attach tools:
 
 ## Assign Prompt Labels
 
-You can also label different versions of your prompt in the **Version History** page so no code changes are required to "deploy" a new version into a certain environment.
+Labels can only be assigned to **versions**, not commits. This ensures that only stable, versioned prompts are deployed to different environments. You can assign labels in the **Version History** page so no code changes are required to "deploy" a new version into a certain environment.
 
 <Frame>
   <video
@@ -329,6 +287,8 @@ You can also label different versions of your prompt in the **Version History** 
     type="video/mp4"
   />
 </Frame>
+
+To assign a label, first promote a commit to a version, then assign the desired label (e.g., `staging`, `production`) to that version.
 
 Only users with [sufficient permissions](/docs/settings/project/roles-and-permissions) are able to modify prompt labels.
 
