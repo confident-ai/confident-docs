@@ -76,16 +76,26 @@ First, install DeepTeam by reaching out to your representative at Confident AI t
 Define your AI system as a model callback function. This is the system you want to red team:
 
 ```python
+from deepteam.test_case import RTTurn, ToolCall
+
 async def model_callback(input: str) -> str:
     # Replace this with your actual LLM application
     # This could be a RAG pipeline, chatbot, agent, etc.
-    return f"I'm a helpful AI assistant. Regarding your input: {input}"
+    return RTTurn(
+        role="assistant",
+        content="Your agent's response here...",
+        retrieval_context=["Your retieval context here"],
+        tools_called=[
+            ToolCall(name="SearchDatabase")
+        ]
+    )
 ```
 
 <Note>
-  The model callback must accept a single string parameter (the adversarial
-  input), return a single string (your AI system's response), and can be async
-  for better performance.
+  The model callback must accept a single string parameter (the adversarial input), 
+  and return an `RTTurn` object with role as `assistant` and content is the actual output of your model (your AI system's response).
+  You can also pass `retrieval_context` and `tools_called` in your `RTTurn` object when testing RAG or agentic systems. 
+  `retrieval_context` can be a list of string and `tools_called` must be a list of `ToolCall` objects.
 </Note>
 
   </Step>
