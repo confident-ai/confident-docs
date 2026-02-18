@@ -254,7 +254,7 @@ paths:
   #             type: string
   #           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/threads/{id}:
+  /v1/evaluate/threads/{threadUuid}:
     post:
       parameters:
         - in: path
@@ -271,7 +271,7 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/traces/{uuid}:
+  /v1/evaluate/traces/{traceUuid}:
     post:
       parameters:
         - in: path
@@ -288,7 +288,7 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/spans/{uuid}:
+  /v1/evaluate/spans/{spanUUid}:
     post:
       parameters:
         - in: path

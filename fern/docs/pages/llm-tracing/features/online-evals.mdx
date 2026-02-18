@@ -206,13 +206,11 @@ If you specify a metric collection but don't provide sufficient test case parame
 
 You can also trigger evaluations on traces and spans that have already been ingested. This is useful for re-evaluating with new metrics or running evals on historical data.
 
-<Warning>
-
-This is currently only available for Python users.
-
-</Warning>
-
 ### Evaluate a trace
+
+<Tabs>
+
+<Tab title="Python" language="python">
 
 ```python title="main.py"
 from deepeval.tracing import evaluate_trace
@@ -222,9 +220,30 @@ evaluate_trace(trace_uuid="your-trace-uuid", metric_collection="Collection Name"
 
 <Tip>The asynchronous version `a_evaluate_trace` is also available.</Tip>
 
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="main.py"
+import { evaluateTrace } from "deepeval-ts/tracing";
+
+await evaluateTrace({
+  traceUuid: "your-trace-uuid",
+  metricCollection: "Collection Name"
+});
+```
+
+</Tab>
+
+</Tabs>
+
 Your trace must already contain the necessary test case parameters — you cannot update them when evaluating retrospectively.
 
 ### Evaluate a span
+
+<Tabs>
+
+<Tab title="Python" language="python">
 
 ```python title="main.py"
 from deepeval.tracing import evaluate_span
@@ -233,6 +252,23 @@ evaluate_span(span_uuid="your-span-uuid", metric_collection="Collection Name")
 ```
 
 <Tip>The asynchronous version `a_evaluate_span` is also available.</Tip>
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="main.py"
+import { evaluateSpan } from "deepeval-ts/tracing";
+
+await evaluateSpan({
+  spanUuid: "your-span-uuid",
+  metricCollection: "Collection Name"
+});
+```
+
+</Tab>
+
+</Tabs>
 
 The metric collection you provide must be a **single-turn** collection.
 

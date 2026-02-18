@@ -556,7 +556,7 @@ paths:
                         content: "I'd like my refund please."
                   deprecated: false
 
-  /v1/evaluate/spans/{uuid}:
+  /v1/evaluate/spans/{spanUuid}:
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -587,7 +587,7 @@ paths:
                     id: "SPAN-ID"
                   deprecated: false
 
-  /v1/evaluate/traces/{uuid}:
+  /v1/evaluate/traces/{traceUuid}:
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -617,7 +617,7 @@ paths:
                     id: "TRACE-ID"
                   deprecated: false
 
-  /v1/evaluate/threads/{id}:
+  /v1/evaluate/threads/{theadUuid}:
     post:
       x-fern-server-name: Confident AI
       tags:
