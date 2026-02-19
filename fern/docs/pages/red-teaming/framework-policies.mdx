@@ -1,10 +1,183 @@
 ---
-subtitle: Learn how to use a safety framework managed on Confident AI
+subtitle: Learn how to use an AI safety framework managed on Confident AI
 slug: red-teaming/framework-policies
 ---
 
-<Warning>
+## Overview
 
-**Confident AI red teaming is in private beta**. Reach out to your support representative at Confident AI to learn more.
+Confident AI provides you access to the latest AI safety frameworks like **OWASP Top 10 for LLMS**, **NIST AI RMF**, **MITRE ATLAS** and more.
 
-</Warning>
+Frameworks in Confident AI are standardized configurations of vulnerabilities and attacks that will be used to red team your AI application during risk assessments. Some frameworks offered by Confident AI by default are:
+
+- **OWASP Top 10 for LLMs**: An AI safety framework curated by the [OWASP community](https://genai.owasp.org) with 10 different risk categories.
+- **OWASP Top 10 Agentic Applications**: Also proposed by the OWASP community, this framework introduces 10 risk categories for agentic applications.
+- **MITRE ATLAS**: A framework designed after a globally-accessible knowledge base of adversary tactics and techniques based on real-world observations proposed by [MITRE ATT&CK](https://attack.mitre.org)
+- **NIST AI RMF**: The NIST AI Risk Management Framework was developed by [NIST](https://www.nist.gov/itl/ai-risk-management-framework) to better manage risks to individuals, organizations, and society associated with AI.
+
+Confident AI offers these frameworks by default and allows you to even configure them based on your AI application needs. 
+
+## Run a Framework Assessment
+
+Here's how you can run risk assessments with a default framework in 2 simple steps:
+
+<Steps>
+    <Step title="Create a Red Teaming Framework">
+        1. Navigate to **Frameworks** tab in the sidebar
+        2. Click on **Add Framework**
+        3. Choose any of the default templates provided (e.g., OWASP Top 10 2025, NIST AI RMF, ...)
+        4. Click **Save**
+
+        <Frame caption="Defining a Framework on Confident AI">
+            <img
+                data-image="settings.project.aiConnection"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
+        
+        This will now redirect you to framework configuration page where you can edit vulnerabilities, configure attack, and customize priorities any time.
+    </Step>
+
+    <Step title="Running a Risk Assessment">
+        <Frame caption="Defining a Framework on Confident AI">
+            <img
+                data-image="settings.project.aiConnection"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
+        1. Click on the **Run Assessment**
+        2. Choose your AI Connection to red team
+        3. View risk assessment on the dashboard
+    </Step>
+</Steps>
+
+You can also give an identifier to your risk assessment before running them which makes it easier to find them later on in the **Risk Profile** section.
+
+## Creating a Custom Framework
+
+Most AI applications are built for different purposes so there's no one size fits all concept when testing AI models for safety, which is why Confident AI allows you to create custom red teaming frameworks that are tailored to your AI application.
+
+Here's how you can easily create a custom red teaming framework and run risk assessments:
+
+<Steps>
+    <Step title="Create a Red Teaming Framework">
+        1. Navigate to **Frameworks** tab in the sidebar
+        2. Click on **Add Framework**
+        3. Choose **Custom Framework Builder** and provide a name and description for your framework
+        4. Click **Save**
+
+        <Frame caption="Defining a Framework on Confident AI">
+            <img
+                data-image="settings.project.aiConnection"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
+        
+        This will now redirect you to framework configuration page where you can edit vulnerabilities, configure attack, and customize priorities any time.
+    </Step>
+
+    <Step title="Creating Risk Categories">
+
+        Each framework is made up of different risk categories which contain a curated set of vulnerabilities and attacks. You can create different risk categories with each category testing one security aspect of your AI application.
+
+        <Frame caption="Defining a Framework on Confident AI">
+            <img
+                data-image="settings.project.aiConnection"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
+
+        Here's how to create a risk category:
+
+        1. Click on the **Add Risk Category**
+        2. Select any vulnerability, vulnerability types and set their priority levels
+        3. Scroll to the bottom and add any attack methods as you prefer
+        4. Click **Save changes**
+
+        You can add as many risk categories as you'd like and curate your own red teaming framework.
+    </Step>
+
+    <Step title="Running a Risk Assessment">
+
+        You can now click on the **Run Assessment** button to run risk assessment on your AI application with your custom red teaming framework.
+
+        <Frame caption="Defining a Framework on Confident AI">
+            <img
+                data-image="settings.project.aiConnection"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
+    </Step>
+
+</Steps>
+
+## Using Frameworks on DeepTeam
+
+`deepteam` allows you to use pre-defined red teaming frameworks like **OWASP, NIST AI RMF, MITRE ATLAS** as well using the `red_team` method. 
+
+Here's how you can use `deepteam` to red team your AI application with a framework:
+
+<Steps>
+    <Step title="Create Your Model Callback">
+
+        Define your AI application as a model callback function. This is how `deepteam` communicates with your AI application for red teaming:
+
+        ```python
+        from deepteam.test_case import RTTurn, ToolCall
+
+        async def model_callback(input: str) -> str:
+            # Replace this with your actual LLM application
+            # This could be a RAG pipeline, chatbot, agent, etc.
+            return RTTurn(
+                role="assistant",
+                content="Your agent's response here...",
+                retrieval_context=["Your retieval context here"],
+                tools_called=[
+                    ToolCall(name="SearchDatabase")
+                ]
+            )
+        ```
+
+        <Note>
+        The model callback must accept a single string parameter (the adversarial input), and return an [`RTTurn`](https://www.trydeepteam.com/docs/red-teaming-test-case#turns) object with role as `assistant` and content being your AI system's response.
+        You can also pass `retrieval_context` and `tools_called` in your `RTTurn` object when testing RAG or agentic systems. `retrieval_context` can be a list of strings and `tools_called` must be a list of `ToolCall` objects.
+        </Note>
+        
+    </Step>
+
+    <Step title="Import and Customize a Framework">
+        
+        You can now import a red teaming framework and customize it as per you needs from `deepteam`'s framework module:
+
+        ```python
+        from deepteam.frameworks import OWASPTop10
+        from deepteam import red_team
+        from somewhere import your_model_callback
+
+        owasp = OWASPTop10(categories=["LLM_01", "LLM_09"]) # Choose your risk categories
+        
+        # Modify framework's attacks and vulnerabilites as needed
+        attacks = owasp.attacks
+        vulnerabilities = owasp.vulnerabilities
+        ```
+        
+    </Step>
+
+    <Step title="Running a Risk Assessment">
+
+        You can now use the `red_team` method to pass your `model_callback` and framework to run a red teaming and get a risk assessment for your AI application using the configured framework:
+
+        ```python
+        red_team(
+            model_callback=model_callback,
+            framework=owasp,
+        )
+        ```
+
+        This will now run a risk assessment and post your result to the Confident AI platform.
+
+        <Note>
+            You need to run `deepteam login` command from the CLI or save your API key as `CONFIDENT_API_KEY` in your env for your risk assessments to be uploaded to the Confident AI platform.
+        </Note>
+    </Step>
+
+</Steps>
