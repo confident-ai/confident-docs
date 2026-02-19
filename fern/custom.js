@@ -176,6 +176,9 @@
     "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
     "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,
 
+    // Selh Hosting
+    "selfHosting.aws.architecture": `${S3_BASE}/self-hosting:aws-architecture.png`,
+
     // Third-Party Logos
     "logos.openai": "https://www.svgrepo.com/show/306500/openai.svg",
     "logos.langchain": "https://logo.svgcdn.com/s/langchain-dark-8x.png",
