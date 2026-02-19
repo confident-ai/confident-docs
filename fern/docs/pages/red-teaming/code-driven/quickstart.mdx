@@ -1,0 +1,180 @@
+---
+subtitle: 5 min quickstart guide for code-driven AI red teaming
+slug: red-teaming/code-driven-assessments/quickstart
+description: Get started with AI red teaming in minutes using DeepTeam
+---
+
+## Overview
+
+Confident AI's red teaming capabilities offer a variety of features to test AI safety and security in development for a pre-deployment workflow, offering a wide range of features for:
+
+- **Vulnerability assessment:** Systematically identify weaknesses like bias, toxicity, PII leakage, and prompt injection vulnerabilities.
+- **Adversarial testing:** Simulate real-world attacks using jailbreaking, prompt injection, and other sophisticated attack methods.
+- **Risk profiling:** Comprehensive evaluation across 40+ vulnerability types with detailed risk assessments and remediation guidance.
+
+You can either run red teaming locally or remotely on Confident AI, both of which uses `deepteam` and gives you the same functionality:
+
+<CardGroup cols={2}>
+  <Card
+    title="Local Red Teaming"
+    icon="laptop"
+    iconType="solid"
+  >
+
+    - Run red teaming locally using `deepteam` with full control over vulnerabilities and attacks
+    - Support for custom vulnerabilities, attack methods, and advanced red teaming algorithms
+
+    **Suitable for:** Python users, development, and pre-deployment security workflows
+
+  </Card>
+  <Card
+    title="Remote Red Teaming"
+    icon="cloud"
+    iconType="solid"
+  >
+
+    - Run red teaming on Confident AI platform with pre-built vulnerability frameworks
+    - Integrated with monitoring, risk assessments, and team collaboration features
+
+    **Suitable for:** Non-python users, continuous monitoring, and production safety assessments
+
+  </Card>
+</CardGroup>
+
+## Create a Risk Assessment
+
+This examples goes through a **comprehensive safety assessment** using **adversarial attacks** to identify vulnerabilities in your AI system.
+
+<Warning>
+  You'll need to get your API key as shown in the [setup and
+  installation](/docs/setup-and-installation) section before continuing.
+</Warning>
+
+Running red teaming locally executes attacks on your machine and uploads results to Confident AI. This gives full control over custom vulnerabilities and attack methods.
+
+<Steps>
+
+  <Step title="Install DeepTeam">
+
+First, install DeepTeam - Confident AI's open-source LLM red teaming framework, by simply running the following command:
+
+```bash
+pip install -U deepteam
+```
+
+<Note>
+  DeepTeam is powered by DeepEval's evaluation framework, so you'll also need to set up your API keys for the underlying LLM providers.
+</Note>
+
+You can now set your API key for Confident AI by running `deepteam login` command from the CLI or by saving it as `CONFIDENT_API_KEY` in your env. This allows you to upload your red teaming results to the Confident AI.
+
+  </Step>
+
+  <Step title="Set up your target model">
+
+Define your AI system as a model callback function. This is the AI application you want to red team:
+
+```python
+from deepteam.test_case import RTTurn, ToolCall
+
+async def model_callback(input: str) -> str:
+    # Replace this with your actual LLM application
+    # This could be a RAG pipeline, chatbot, agent, etc.
+    return RTTurn(
+        role="assistant",
+        content="Your agent's response here...",
+        retrieval_context=["Your retieval context here"],
+        tools_called=[
+            ToolCall(name="SearchDatabase")
+        ]
+    )
+```
+
+<Note>
+  The model callback must accept a single string parameter (the adversarial input), and return an [`RTTurn`](https://www.trydeepteam.com/docs/red-teaming-test-case#turns) object with role as `assistant` and content being your AI system's response.
+  You can also pass `retrieval_context` and `tools_called` in your `RTTurn` object when testing RAG or agentic systems. `retrieval_context` can be a list of strings and `tools_called` must be a list of `ToolCall` objects.
+</Note>
+
+  </Step>
+
+  <Step title="Configure vulnerabilities and attacks">
+
+Choose which vulnerabilities to test for and which attack methods to use:
+
+```python
+from deepteam import red_team
+from deepteam.vulnerabilities import Bias, Toxicity, PIILeakage
+from deepteam.attacks.single_turn import PromptInjection
+from deepteam.attacks.multi_turn import LinearJailbreaking
+
+# Define vulnerabilities to test
+vulnerabilities = [
+    Bias(types=["race", "gender", "political"]),
+    Toxicity(types=["profanity", "insults", "threats"]),
+    PIILeakage(types=["direct_disclosure", "api_and_database_access"])
+]
+
+# Define attack methods
+attacks = [
+    PromptInjection(weight=2),  # Higher weight = more likely to be selected
+    LinearJailbreaking(weight=1)
+]
+```
+
+  </Step>
+
+  <Step title="Run the red team assessment">
+
+Execute the red teaming assessment with your configured parameters:
+
+```python
+# Run comprehensive red teaming
+risk_assessment = red_team(
+    model_callback=model_callback,
+    vulnerabilities=vulnerabilities,
+    attacks=attacks,
+    attacks_per_vulnerability_type=3,
+    max_concurrent=5
+)
+```
+
+This will run red teaming on your `model_callback` using the configured vulnerabilities and attacks and generate a risk assessment which is printed onto your console and also uploaded to the Confident AI platform. You can now view these risk assessments in the Risk Profile section on the Confident AI paltform.
+
+  </Step>
+
+</Steps>
+
+## Best Practices
+
+1. **Start with frameworks**: Use OWASP Top 10 or NIST AI RMF for comprehensive coverage
+2. **Test early and often**: Integrate red teaming into your development cycle
+3. **Focus on your use case**: Customize vulnerabilities based on your application's risks
+4. **Monitor continuously**: Set up ongoing safety assessments for production systems
+5. **Document and remediate**: Keep detailed records of findings and remediation efforts
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Framework-Based Testing"
+    icon="list-check"
+    href="/docs/red-teaming/framework-policies"
+  >
+    Use industry-standard frameworks like OWASP Top 10 and NIST AI RMF for
+    comprehensive security assessments
+  </Card>
+  <Card
+    title="Risk Profile & Assessments"
+    icon="wrench"
+    href="/docs/red-teaming/risk-profile"
+  >
+    Create custom vulnerabilities and attack methods tailored to your specific
+    use case and industry requirements
+  </Card>
+</CardGroup>
+
+<Note>
+  Red teaming works seamlessly with your existing [LLM
+  evaluation](/docs/llm-evaluation/quickstart) and
+  [tracing](/docs/llm-tracing/introduction) workflows on Confident AI.
+</Note>
