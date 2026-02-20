@@ -621,7 +621,7 @@ paths:
                     id: "TRACE-ID"
                   deprecated: false
 
-  /v1/evaluate/threads/{theadUuid}:
+  /v1/evaluate/threads/{threadUuid}:
     post:
       x-fern-server-name: Confident AI
       tags:
