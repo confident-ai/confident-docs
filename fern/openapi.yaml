@@ -2261,7 +2261,6 @@ paths:
               type: "THUMBS_RATING"
               name: "Quality Check"
               explanation: "Response is accurate and helpful"
-              flagged: false
               markAsCompleted: true
       responses:
         "200":
@@ -4498,9 +4497,6 @@ components:
         explanation:
           type: string
           description: This is the explanation for the annotation.
-        flagged:
-          type: boolean
-          description: This determines if the annotation is flagged.
         createdAt:
           type: string
           format: date-time
@@ -4524,7 +4520,6 @@ components:
         - id
         - rating
         - type
-        - flagged
 
     CreateAnnotation:
       type: object
@@ -5344,9 +5339,6 @@ components:
         explanation:
           type: string
           description: Updated explanation for the annotation.
-        flagged:
-          type: boolean
-          description: Updated flagged status.
 
     UpdateAnnotationResponse:
       type: object
@@ -5634,10 +5626,6 @@ components:
         explanation:
           type: string
           description: Explanation for the rating
-        flagged:
-          type: boolean
-          default: false
-          description: Whether the item is flagged
         markAsCompleted:
           type: boolean
           default: true
