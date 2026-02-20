@@ -925,7 +925,7 @@ paths:
                   totalThreads: 100
                 deprecated: false
 
-  /v1/threads/{threadId}:
+  /v1/threads/{threadSuppliedId}:
     get:
       x-fern-server-name: Confident AI
       tags:
