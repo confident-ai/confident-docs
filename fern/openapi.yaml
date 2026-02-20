@@ -4707,6 +4707,12 @@ components:
         totalTraces:
           type: integer
           description: This is the total number of traces in this thread.
+      required:
+        - threadId
+        - suppliedThreadId
+        - createdAt
+        - lastActivity
+        - totalTraces
 
     ThreadDetail:
       type: object
@@ -4755,6 +4761,12 @@ components:
           items:
             $ref: "#/components/schemas/GetTrace"
           description: This is the list of traces in this thread.
+      required:
+        - threadId
+        - suppliedThreadId
+        - createdAt
+        - lastActivity
+        - totalTraces
 
     GetTrace:
       type: object
