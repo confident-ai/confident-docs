@@ -114,6 +114,7 @@
   const IMAGES = {
     "tracing.spanTypes": `${S3_BASE}/tracing:span-types.png`,
     "tracing.onlineEvals": `${S3_BASE}/tracing:online-evals.png`,
+    "tracing.promptObservability": `${S3_BASE}/llm-tracing:prompt-logging.png`,
 
     "datasets.addImages": `${S3_BASE}/datasets:add-images.png`,
     "datasets.editNonText": `${S3_BASE}/datasets:edit-non-text.png`,
