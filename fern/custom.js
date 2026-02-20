@@ -154,6 +154,14 @@
     "concepts.conversationalTestCase": `${S3_BASE}/concepts:conversational-test-case.png`,
     "concepts.conversationalTestCaseSvg": `${S3_BASE}/concepts:conversational-test-case.svg`,
 
+    // Red teaming
+    "redTeaming.chooseFramework": `${S3_BASE}/red-teaming:fameworks:choose-framework.png`,
+    "redTeaming.createFramework": `${S3_BASE}/red-teaming:frameworks:create-framework.png`,
+    "redTeaming.customizeRiskCategory": `${S3_BASE}/red-teaming:frameworks:customize-risk-category.png`,
+    "redTeaming.riskAssessment": `${S3_BASE}/red-teaming:quick-start:risk-assessment.png`,
+    "redTeaming.runRiskAssessment": `${S3_BASE}/red-teaming:quick-start:run-risk-assessment.png`,
+    "redTeaming.riskAssessmentTestCases": `${S3_BASE}/red-teaming:risk-profile:risk-assessment-test-cases.png`,
+
     // Data
     "data.organization": `${S3_BASE}/data-organization.svg`,
 
