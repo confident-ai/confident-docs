@@ -271,13 +271,13 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/threads/{threadUuid}:
+  /v1/evaluate/threads/{threadId}:
     post:
       parameters:
         - in: path
-          name: threadUuid
+          name: threadId
           required: true
-          description: The UUID of the thread you wish to evaluate.
+          description: The thread ID of the thread you wish to evaluate.
           schema:
             type: string
         - in: header

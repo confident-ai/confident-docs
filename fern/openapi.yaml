@@ -621,7 +621,7 @@ paths:
                     id: "TRACE-ID"
                   deprecated: false
 
-  /v1/evaluate/threads/{threadUuid}:
+  /v1/evaluate/threads/{threadId}:
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -1614,9 +1614,9 @@ paths:
       summary: List Annotations
       operationId: listAnnotations
       description: |
-        Retrieves a paginated list of annotations from your Confident AI project. Annotations are user feedback on traces, spans, or threads that include ratings, expected outputs/outcomes, explanations, and flags.
+        Retrieves a paginated list of annotations from your Confident AI project. Annotations are user feedback on traces, spans, or threads that include ratings, expected outputs/outcomes, and explanations.
 
-        Use query parameters to filter annotations by trace UUID, span UUID, thread ID, type, rating range, or flagged status. Results are returned in descending order by creation date with pagination support.
+        Use query parameters to filter annotations by trace UUID, span UUID, thread ID, type, or rating range. Results are returned in descending order by creation date with pagination support.
       parameters:
         - in: header
           name: CONFIDENT_API_KEY
@@ -1656,12 +1656,6 @@ paths:
           schema:
             type: string
           description: Filter annotations with maximum rating (inclusive).
-        - in: query
-          name: flagged
-          schema:
-            type: string
-            enum: ["true", "false"]
-          description: Filter annotations by flagged status.
         - in: query
           name: page
           required: false
@@ -1720,7 +1714,6 @@ paths:
                       name: "Quality Check"
                       expectedOutput: "Provide clear password reset instructions"
                       explanation: "Response correctly guides user through password reset"
-                      flagged: false
                       createdAt: "2025-11-12T10:30:00Z"
                       traceUuid: "trace-uuid-1"
                     - id: "annotation-uuid-2"
@@ -1729,7 +1722,6 @@ paths:
                       name: "Customer Service"
                       expectedOutcome: "Agent successfully resolves user issue"
                       explanation: "Excellent resolution with follow-up"
-                      flagged: false
                       createdAt: "2025-11-12T09:15:00Z"
                       threadId: "thread-id-1"
                   total: 150
@@ -1767,7 +1759,7 @@ paths:
                 id: "ANNOTATION-ID"
               deprecated: false
       description: |
-        Creates a new annotation for a trace, span, or thread in your Confident AI project. Annotations capture human feedback including ratings, expected outputs/outcomes, explanations, and flags.
+        Creates a new annotation for a trace, span, or thread in your Confident AI project. Annotations capture human feedback including ratings, expected outputs/outcomes, and explanations.
 
         **Important validation rules:**
         - For traces and spans: Use `expectedOutput` (not `expectedOutcome`)
@@ -1804,7 +1796,7 @@ paths:
       summary: Get Annotation
       operationId: getAnnotation
       description: |
-        Retrieves a specific annotation by its unique ID. Returns the complete annotation details including rating, type, expected output/outcome, explanation, flagged status, and associated trace/span/thread identifiers.
+        Retrieves a specific annotation by its unique ID. Returns the complete annotation details including rating, type, expected output/outcome, explanation, and associated trace/span/thread identifiers.
 
         This endpoint verifies that the annotation belongs to your project before returning it.
       parameters:
@@ -1838,7 +1830,6 @@ paths:
                     name: "Quality Check"
                     expectedOutput: "Provide clear password reset instructions"
                     explanation: "Response correctly guides user through password reset"
-                    flagged: false
                     createdAt: "2025-11-12T10:30:00Z"
                     traceUuid: "trace-uuid-1"
         "404":
@@ -1854,7 +1845,7 @@ paths:
       summary: Update Annotation
       operationId: updateAnnotation
       description: |
-        Updates an existing annotation's properties such as rating, type, expected output/outcome, explanation, or flagged status.
+        Updates an existing annotation's properties such as rating, type, expected output/outcome, or explanation.
 
         **Validation rules:**
         - Thread annotations cannot have `expectedOutput` (use `expectedOutcome` instead)
@@ -1885,7 +1876,6 @@ paths:
               type: "FIVE_STAR_RATING"
               expectedOutput: "Provide detailed password reset steps with security considerations"
               explanation: "Updated: Response now includes security best practices"
-              flagged: false
       responses:
         "200":
           description: Successfully updated annotation
@@ -4527,9 +4517,6 @@ components:
         testCaseId:
           type: string
           description: The ID of the test case associated with this annotation, if applicable.
-        threadSuppliedId:
-          type: string
-          description: The supplied ID of the thread associated with this annotation, if applicable.
         userEmail:
           type: string
           description: The email of the user who created this annotation.
