@@ -28,6 +28,10 @@ tags:
     description: Run your evals using API
     externalDocs:
       description: Learn about tracing
+  - name: Threads
+    description: Threads API
+    externalDocs:
+      description: Learn about threads
   - name: Prompt
     description: Run your evals using API
     externalDocs:
@@ -834,6 +838,150 @@ paths:
   #                     id: "TRACE-ID"
   #                   deprecated: false
 
+  /v1/threads:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Threads
+      summary: List Threads
+      operationId: listThreads
+      description: Retrieves a list of threads from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the threads to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the maximum number of threads per page. Defaulted to 25.
+        - in: query
+          name: environment
+          required: false
+          schema:
+            type: string
+          description: This filters the threads by the environment where the thread was created, and returns threads from all environments if not specified.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for threads created after the specified start datetime. Defaulted to 30 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for threads created before the specified end datetime. Defaulted to the current time.
+        - in: query
+          name: sortBy
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, lastActivity]
+          description: This determines the field to sort by. Defaulted to `createdAt`.
+        - in: query
+          name: ascending
+          required: false
+          schema:
+            type: boolean
+          description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListThreadsResponse"
+              example:
+                success: true
+                data:
+                  threads:
+                    - threadId: "thread-123"
+                      createdAt: "2025-01-15T10:30:00Z"
+                      lastActivity: "2025-01-15T11:45:00Z"
+                      metadata:
+                        userId: "user-456"
+                      tags:
+                        - "support"
+                      metricCollectionName: "conversation-metrics"
+                      totalTraces: 5
+                  totalThreads: 100
+                deprecated: false
+
+  /v1/threads/{threadId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Threads
+      summary: Get Thread
+      operationId: getThread
+      description: Retrieves a thread by ID from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: threadId
+          required: true
+          schema:
+            type: string
+          description: This is the ID of the thread you wish to retrieve.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetThreadResponse"
+              example:
+                success: true
+                data:
+                  threadId: "thread-123"
+                  createdAt: "2025-01-15T10:30:00Z"
+                  lastActivity: "2025-01-15T11:45:00Z"
+                  metadata:
+                    userId: "user-456"
+                  tags:
+                    - "support"
+                  metricCollectionName: "conversation-metrics"
+                  totalTraces: 5
+                  metricsData:
+                    - metricName: "Answer Relevancy"
+                      score: 0.95
+                  annotations:
+                    - id: "annotation-1"
+                      rating: 5
+                  traces:
+                    - id: "TRACE-ID"
+                      uuid: "trace-uuid-1"
+                      name: "User Message"
+                      created_at: "2025-01-15T10:30:00Z"
+                      ended_at: "2025-01-15T10:30:05Z"
+                      input: "Hello, I need help"
+                      output: "Hi! How can I assist you today?"
+                      environment: "production"
+                deprecated: false
+
   /v1/prompts:
     post:
       x-fern-server-name: Confident AI
@@ -1272,12 +1420,12 @@ paths:
             enum: ["true", "false"]
           description: Filter for conversational (multi-turn) test runs only ("true" or "false").
         - in: query
-          name: sortField
+          name: sortBy
           schema:
             type: string
-            enum: ["created_at", "run_duration"]
-            default: "created_at"
-          description: Field to sort results by ("created_at" or "run_duration").
+            enum: ["createdAt", "runDuration"]
+            default: "createdAt"
+          description: Field to sort results by ("createdAt" or "runDuration").
         - in: query
           name: ascending
           schema:
@@ -1547,8 +1695,8 @@ paths:
           required: false
           schema:
             type: string
-            enum: [created_at]
-          description: This determines the field to sort by. Defaulted to `created_at`.
+            enum: [createdAt]
+          description: This determines the field to sort by. Defaulted to `createdAt`.
         - in: query
           name: ascending
           required: false
@@ -4478,6 +4626,132 @@ components:
         - success
         - data
         - deprecated
+
+    ListThreadsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the threads were successfully retrieved.
+        data:
+          type: object
+          description: This maps to the list of threads retrieved.
+          properties:
+            threads:
+              type: array
+              description: This is the list of threads retrieved.
+              items:
+                $ref: "#/components/schemas/ThreadSummary"
+            totalThreads:
+              type: integer
+              description: This is the total number of threads retrieved.
+          required:
+            - threads
+            - totalThreads
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    GetThreadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the thread was successfully retrieved.
+        data:
+          $ref: "#/components/schemas/ThreadDetail"
+          description: This maps to the thread retrieved.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    ThreadSummary:
+      type: object
+      properties:
+        threadId:
+          type: string
+          description: This is the unique identifier of the thread.
+        createdAt:
+          type: string
+          format: date-time
+          description: This is when the thread was created.
+        lastActivity:
+          type: string
+          format: date-time
+          description: This is when the thread was last active.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is the custom metadata attached to the thread.
+        tags:
+          type: array
+          items:
+            type: string
+          description: This is the list of tags associated with the thread.
+        metricCollectionName:
+          type: string
+          description: This is the name of the metric collection assigned to evaluate the thread.
+        totalTraces:
+          type: integer
+          description: This is the total number of traces in this thread.
+
+    ThreadDetail:
+      type: object
+      properties:
+        threadId:
+          type: string
+          description: This is the unique identifier of the thread.
+        createdAt:
+          type: string
+          format: date-time
+          description: This is when the thread was created.
+        lastActivity:
+          type: string
+          format: date-time
+          description: This is when the thread was last active.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: This is the custom metadata attached to the thread.
+        tags:
+          type: array
+          items:
+            type: string
+          description: This is the list of tags associated with the thread.
+        metricCollectionName:
+          type: string
+          description: This is the name of the metric collection assigned to evaluate the thread.
+        totalTraces:
+          type: integer
+          description: This is the total number of traces in this thread.
+        metricsData:
+          type: array
+          items:
+            type: object
+            properties:
+              metricName:
+                type: string
+              score:
+                type: number
+          description: This is the evaluation metrics data for the thread.
+        annotations:
+          type: array
+          items:
+            type: object
+          description: This is the list of annotations associated with the thread.
+        traces:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetTrace"
+          description: This is the list of traces in this thread.
 
     GetTrace:
       type: object

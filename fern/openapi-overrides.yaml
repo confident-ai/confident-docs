@@ -228,8 +228,8 @@ paths:
           required: false
           schema:
             type: enum
-            enum: [created_at, ended_at]
-          description: This determines the field to sort by. Defaulted to `created_at`.
+            enum: [createdAt, endedAt]
+          description: This determines the field to sort by. Defaulted to `createdAt`.
         - in: query
           name: ascending
           required: false
@@ -254,28 +254,11 @@ paths:
   #             type: string
   #           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/threads/{threadUuid}:
-    post:
-      parameters:
-        - in: path
-          name: id
-          required: true
-          description: The id of the thread you wish to evaluate.
-          schema:
-            type: string
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
-
   /v1/evaluate/traces/{traceUuid}:
     post:
       parameters:
         - in: path
-          name: uuid
+          name: traceUuid
           required: true
           description: The UUID of the trace you wish to evaluate.
           schema:
@@ -288,11 +271,28 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/evaluate/spans/{spanUUid}:
+  /v1/evaluate/threads/{theadUuid}:
     post:
       parameters:
         - in: path
-          name: uuid
+          name: theadUuid
+          required: true
+          description: The UUID of the thread you wish to evaluate.
+          schema:
+            type: string
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/evaluate/spans/{spanUuid}:
+    post:
+      parameters:
+        - in: path
+          name: spanUuid
           required: true
           description: The UUID of the span you wish to evaluate.
           schema:
@@ -399,7 +399,7 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-  
+
   /v1/prompts/{alias}/commits:
     get:
       parameters:
