@@ -304,15 +304,18 @@ navigation:
           - page: Introduction
             path: docs/pages/red-teaming/introduction.mdx
             icon: fa-light fa-user-secret
-          - page: Quickstart
-            path: docs/pages/red-teaming/quickstart.mdx
-            icon: fa-light fa-crosshairs
-          - page: Risk Profiles
-            path: docs/pages/red-teaming/risk-profile.mdx
-            icon: fa-light fa-triangle-exclamation
+          - page: No-Code Assessments
+            path: docs/pages/red-teaming/no-code-assessments.mdx
+            icon: fa-light fa-browsers
           - page: Frameworks & Policies
             path: docs/pages/red-teaming/framework-policies.mdx
             icon: fa-light fa-shield-check
+          - page: Risk Profiles
+            path: docs/pages/red-teaming/risk-profile.mdx
+            icon: fa-light fa-triangle-exclamation
+          - page: Code-Driven Assessments
+            path: docs/pages/red-teaming/code-driven-assessments.mdx
+            icon: fa-light fa-laptop-code
       - section: Resources
         contents:
           - page: Why Confident AI

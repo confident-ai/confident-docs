@@ -1,14 +1,8 @@
 ---
-subtitle: 5 min quickstart guide for AI red teaming
-slug: red-teaming/quickstart
+subtitle: 5 min quickstart guide for code-driven AI red teaming
+slug: red-teaming/code-driven-assessments/quickstart
 description: Get started with AI red teaming in minutes using DeepTeam
 ---
-
-<Note>
-
-Confident AI red teaming is in private beta.
-
-</Note>
 
 ## Overview
 
@@ -62,18 +56,23 @@ Running red teaming locally executes attacks on your machine and uploads results
 
   <Step title="Install DeepTeam">
 
-First, install DeepTeam by reaching out to your representative at Confident AI to get access. The OSS version does not allow access to Confident AI red teaming as of now.
+First, install DeepTeam - Confident AI's open-source LLM red teaming framework, by simply running the following command:
+
+```bash
+pip install -U deepteam
+```
 
 <Note>
-  DeepTeam is powered by DeepEval's evaluation framework, so you'll also need to
-  set up your API keys for the underlying LLM providers.
+  DeepTeam is powered by DeepEval's evaluation framework, so you'll also need to set up your API keys for the underlying LLM providers.
 </Note>
+
+You can now set your API key for Confident AI by running `deepteam login` command from the CLI or by saving it as `CONFIDENT_API_KEY` in your env. This allows you to upload your red teaming results to the Confident AI.
 
   </Step>
 
   <Step title="Set up your target model">
 
-Define your AI system as a model callback function. This is the system you want to red team:
+Define your AI system as a model callback function. This is the AI application you want to red team:
 
 ```python
 from deepteam.test_case import RTTurn, ToolCall
@@ -139,9 +138,15 @@ risk_assessment = red_team(
 )
 ```
 
+This will run red teaming on your `model_callback` using the configured vulnerabilities and attacks and generate a risk assessment which is printed onto your console and also uploaded to the Confident AI platform. You can now view these risk assessments in the Risk Profile section on the Confident AI paltform.
+
   </Step>
 
 </Steps>
+
+<Note>
+  You need to run `deepteam login` command from the CLI or save your API key as `CONFIDENT_API_KEY` in your env for your risk assessments to be uploaded to the Confident AI platform.
+</Note>
 
 ## Best Practices
 
