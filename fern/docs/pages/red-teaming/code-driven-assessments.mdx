@@ -1,7 +1,6 @@
 ---
-subtitle: 5 min quickstart guide for code-driven AI red teaming
-slug: red-teaming/code-driven-assessments/quickstart
-description: Get started with AI red teaming in minutes using DeepTeam
+slug: red-teaming/code-driven-assessments
+description: Get started with AI red teaming in code via DeepTeam
 ---
 
 ## Overview
@@ -12,7 +11,7 @@ Confident AI's red teaming capabilities offer a variety of features to test AI s
 - **Adversarial testing:** Simulate real-world attacks using jailbreaking, prompt injection, and other sophisticated attack methods.
 - **Risk profiling:** Comprehensive evaluation across 40+ vulnerability types with detailed risk assessments and remediation guidance.
 
-You can either run red teaming locally or remotely on Confident AI, both of which uses `deepteam` and gives you the same functionality:
+All vulnerabilities and attacks on DeepTeam are also available on Confident AI.
 
 <CardGroup cols={2}>
   <Card
@@ -56,21 +55,31 @@ Running red teaming locally executes attacks on your machine and uploads results
 
   <Step title="Install DeepTeam">
 
-First, install DeepTeam - Confident AI's open-source LLM red teaming framework, by simply running the following command:
+Install DeepTeam, Confident AI's open-source red teaming framework:
 
 ```bash
 pip install -U deepteam
 ```
 
-<Note>
-  DeepTeam is powered by DeepEval's evaluation framework, so you'll also need to set up your API keys for the underlying LLM providers.
-</Note>
+  </Step>
 
-You can now set your API key for Confident AI by running `deepteam login` command from the CLI or by saving it as `CONFIDENT_API_KEY` in your env. This allows you to upload your red teaming results to the Confident AI.
+  <Step title="Set Your API Key">
+
+Set your Confident AI API key so results are uploaded to the platform:
+
+```bash
+deepteam login
+```
+
+Or set it as an environment variable:
+
+```bash
+export CONFIDENT_API_KEY=YOUR-API-KEY
+```
 
   </Step>
 
-  <Step title="Set up your target model">
+  <Step title="Set Up Your Target Model">
 
 Define your AI system as a model callback function. This is the AI application you want to red team:
 
@@ -91,8 +100,13 @@ async def model_callback(input: str) -> str:
 ```
 
 <Note>
-  The model callback must accept a single string parameter (the adversarial input), and return an [`RTTurn`](https://www.trydeepteam.com/docs/red-teaming-test-case#turns) object with role as `assistant` and content being your AI system's response.
-  You can also pass `retrieval_context` and `tools_called` in your `RTTurn` object when testing RAG or agentic systems. `retrieval_context` can be a list of strings and `tools_called` must be a list of `ToolCall` objects.
+  The model callback must accept a single string parameter (the adversarial
+  input), and return an
+  [`RTTurn`](https://www.trydeepteam.com/docs/red-teaming-test-case#turns)
+  object with role as `assistant` and content being your AI system's response.
+  You can also pass `retrieval_context` and `tools_called` in your `RTTurn`
+  object when testing RAG or agentic systems. `retrieval_context` can be a list
+  of strings and `tools_called` must be a list of `ToolCall` objects.
 </Note>
 
   </Step>
@@ -145,7 +159,32 @@ This will run red teaming on your `model_callback` using the configured vulnerab
 </Steps>
 
 <Note>
-  You need to run `deepteam login` command from the CLI or save your API key as `CONFIDENT_API_KEY` in your env for your risk assessments to be uploaded to the Confident AI platform.
+  You need to run `deepteam login` command from the CLI or save your API key as
+  `CONFIDENT_API_KEY` in your env for your risk assessments to be uploaded to
+  the Confident AI platform.
+</Note>
+
+## Using Security Frameworks
+
+Instead of configuring vulnerabilities and attacks manually, you can use pre-defined security frameworks like **OWASP**, **NIST AI RMF**, and **MITRE ATLAS** via `deepteam`:
+
+```python
+from deepteam.frameworks import OWASPTop10
+from deepteam import red_team
+
+# Run with framework
+red_team(
+    model_callback=model_callback,
+    framework=OWASPTop10(),
+)
+```
+
+Results will be posted to the Confident AI platform automatically.
+
+<Note>
+  These are the same frameworks available in the no-code workflow (OWASP, NIST,
+  MITRE ATLAS), but used programmatically. Note that code-driven assessments do
+  not support the cloud framework builder or CVSS scoring.
 </Note>
 
 ## Best Practices

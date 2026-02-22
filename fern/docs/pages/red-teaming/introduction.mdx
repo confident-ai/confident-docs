@@ -1,75 +1,51 @@
 ---
-subtitle: Proactively identify vulnerabilities and safety issues in your AI applications through adversarial testing.
+title: Introduction to Red Teaming
+subtitle: Proactively identify vulnerabilities and safety issues in your AI applications before they reach production.
 slug: red-teaming/introduction
 description: Get started with Confident AI's Red Teaming for AI safety and security assessment
 ---
 
-## What is Confident AI red teaming?
+## Overview
 
-Red Teaming on Confident AI is a comprehensive adversarial testing platform that helps organizations proactively identify vulnerabilities, safety issues, and harmful behaviors in their AI applications before they reach production.
+Red Teaming on Confident AI is an **adversarial testing platform** for AI safety and security, and can be done in two ways:
 
-**AI Red Teaming** allows security teams, AI engineers, and compliance officers to:
+- **No-code** directly in the platform UI, best for security teams, PMs, and compliance officers, or,
+- **Code-driven** using the `deepteam` framework, best for engineers and AI red teamers.
 
-- **Identify vulnerabilities** - Discover potential attack vectors and safety issues in AI systems
-- **Test robustness** - Evaluate how AI models respond to adversarial inputs and edge cases
-- **Ensure compliance** - Meet regulatory requirements for AI safety and responsible deployment
-- **Prevent harm** - Catch potentially dangerous or biased outputs before they impact users
-- **Build trust** - Demonstrate due diligence in AI safety to stakeholders and customers
-- **Continuous monitoring** - Ongoing assessment of AI systems as they evolve
-
-<Tip title="Confident AI's evals are 100% powered by DeepTeam">
-  Our Red Teaming capabilities are based on industry-standard security frameworks
-  and best practices from cybersecurity, adapted specifically for AI systems.
-
-<Frame background="subtle" caption="⭐ DeepTeam Star Growth ⭐">
-  [![Star History
-  Chart](https://api.star-history.com/svg?repos=confident-ai/deepteam&type=Date)](https://www.star-history.com/#confident-ai/deepteam&Date)
-</Frame>
-
-We incorporate methodologies from NIST AI Risk Management Framework, OWASP Top 10 for LLMs, and MITRE ATLAS to provide comprehensive coverage of AI-specific threats.
-
-</Tip>
-
-## How AI Red Teaming works
-
-Red Teaming on Confident AI has three core components:
-
-<CardGroup cols={3}>
-  <Card title="Risk Profiling" icon="triangle-exclamation">
-    Automated assessment of your AI system's attack surface and vulnerability
-    landscape.
-  </Card>
-  <Card title="Adversarial Testing" icon="crosshairs">
-    Systematic probing with malicious prompts, jailbreaks, and edge cases.
-  </Card>
-  <Card title="Safety Monitoring" icon="shield-check">
-    Continuous evaluation of AI outputs for harmful, biased, or inappropriate
-    content.
-  </Card>
-</CardGroup>
-
-You can run red teaming exercises on any AI application - from chatbots and RAG systems to complex agentic workflows and fine-tuned models.
+The no-code workflow is the more comprehensive option — it leverages the platform's framework builder to produce CVSS scores and full risk profiles. The code-driven workflow uses `deepteam` to orchestrate red teaming runs programmatically.
 
 <Note>
-  Safety testing integrates seamlessly with your existing [LLM
-  evaluation](/docs/llm-evaluation/quickstart) and
-  [tracing](/docs/llm-tracing/introduction) workflows on Confident AI.
+
+Red Teaming integrates seamlessly with your existing [LLM evaluation](/docs/llm-evaluation/quickstart) and [tracing](/docs/llm-tracing/introduction) workflows on Confident AI.
+
 </Note>
 
 ## Key capabilities
 
-- Comprehensive vulnerability scanning for prompt injection, data poisoning, and model extraction
-- Automated jailbreak testing with 50+ attack patterns and techniques
-- Bias and fairness assessment across protected characteristics
-- Content safety evaluation for harmful, toxic, or inappropriate outputs
-- Custom attack scenario creation for industry-specific threats
-- Integration with existing CI/CD pipelines for continuous security testing
-- Detailed risk reports with remediation recommendations
-- Compliance reporting for regulatory frameworks (EU AI Act, NIST, etc.)
+Everything you need to operationalize AI red teaming:
+
+<CardGroup cols={2}>
+  <Card title="Custom Frameworks" icon="cubes">
+    Ships with OWASP Top 10 for LLMs, NIST AI RMF, and more out of the box — or
+    build your own with the framework builder.
+  </Card>
+  <Card title="CVSS Scoring" icon="gauge-high">
+    Get standardized vulnerability severity scoring for every risk assessment
+    you run.
+  </Card>
+  <Card title="Compliance Reporting" icon="file-shield">
+    Generate reports aligned to regulatory frameworks like EU AI Act, NIST, and
+    OWASP Top 10 for LLMs.
+  </Card>
+  <Card title="CI/CD Integration" icon="code">
+    Integrate security testing into your deployment pipelines for continuous
+    assessment.
+  </Card>
+</CardGroup>
 
 ## Choose your workflow
 
-Run risk assessments in the UI without any code or use `deepteam` programatically:
+Run risk assessments in the UI without any code or use `deepteam` programmatically:
 
 <CardGroup cols={2}>
   <Card
@@ -82,75 +58,81 @@ Run risk assessments in the UI without any code or use `deepteam` programaticall
       <Icon icon="arrow-up-right-from-square" />
     </div>
 
-    - No code risk assessments
-    - Custom red teaming framework curation on the UI
+    - Full risk assessments with CVSS scoring
+    - Custom framework builder for comprehensive coverage
 
-    **Best for:** Non-technical team testing AI for security and compliance.
+    **Suitable for:** Security teams, PMs, compliance officers
+
   </Card>
   <Card
-    title="Code-Driven Assessments"
+    title="Red Team Using DeepTeam"
     icon="laptop-code"
     iconType="solid"
-    href="/docs/red-teaming/code-driven-assessments/quickstart"
+    href="/docs/red-teaming/code-driven-assessments"
   >
     <div className='card-link-icon'>
       <Icon icon="arrow-up-right-from-square" />
     </div>
 
-    - Code-based risk assessments using `deepteam`
-    - Custom vulnerabilities and attacks development
+    - Programmatic red teaming orchestration via `deepteam`
+    - Custom vulnerability and attack development
+    - Does not support cloud frameworks or CVSS scoring
 
-    **Best for:** Engineering / Development team iterating on AI for better safety and compliance 
+    **Suitable for:** Engineers, automated testing
 
   </Card>
 </CardGroup>
 
-## FAQs
+<Tip title="Not sure which to pick?">
+  Start with **no-code** — it gives you the most comprehensive assessment out of
+  the box, including CVSS scores and the framework builder. Use code-driven when
+  you need to orchestrate red teaming in CI/CD or develop custom attacks.
+  Results from both workflows appear in the same dashboards.
+</Tip>
+
+## What you can red team
+
+Test your AI systems across all major vulnerability categories:
+
+<CardGroup cols={3}>
+  <Card title="Prompt Injection & Jailbreaks" icon="crosshairs">
+    Probe for prompt manipulation, model exploitation, and adversarial bypass
+    techniques across 50+ attack patterns.
+  </Card>
+  <Card title="Bias & Fairness" icon="scale-balanced">
+    Assess outputs for bias across protected characteristics and demographic
+    groups.
+  </Card>
+  <Card title="Content Safety" icon="shield-check">
+    Evaluate for harmful, toxic, or inappropriate outputs including PII leakage
+    and misinformation.
+  </Card>
+</CardGroup>
+
+## Learn the fundamentals
+
+New to AI red teaming? These concepts will help you get the most out of your setup:
+
+- [What is LLM red teaming?](https://www.confident-ai.com/blog/red-teaming-llms-a-step-by-step-guide) - Step by step guide to red teaming LLMs
+- [Risk Profile](/docs/red-teaming/risk-profile) — understand your AI system's attack surface and top vulnerabilities
+- [Frameworks & Policies](/docs/red-teaming/framework-policies) — learn how to use AI safety frameworks managed on Confident AI
+- [No-Code Quickstart](/docs/red-teaming/no-code-assessments/quickstart) — run your first risk assessment in the platform UI
 
 <AccordionGroup>
   <Accordion title="How is AI Red Teaming different from traditional security testing?">
-    AI Red Teaming focuses on unique vulnerabilities specific to AI systems, such as prompt injection, model poisoning, and adversarial examples. Traditional security testing covers infrastructure and application security, while AI Red Teaming addresses the novel attack vectors introduced by machine learning models and natural language interfaces.
-
-    [Learn more about AI-specific threats](/docs/red-teaming/framework-policies) in our frameworks guide.
-
+    AI Red Teaming targets vulnerabilities specific to AI systems — prompt
+    injection, model poisoning, adversarial examples — rather than
+    infrastructure or application-level security. See our [frameworks
+    guide](/docs/red-teaming/framework-policies) for more detail.
   </Accordion>
-
   <Accordion title="What types of AI systems can be red teamed?">
-    Our platform supports red teaming for all types of AI applications, including:
-    - Conversational AI and chatbots
-    - RAG (Retrieval-Augmented Generation) systems  
-    - Multi-agent workflows and autonomous systems
-    - Fine-tuned and custom models
-    - AI-powered APIs and services
-
-    Each system type has tailored attack scenarios and evaluation criteria.
-
+    All types — conversational AI, RAG systems, multi-agent workflows,
+    fine-tuned models, and AI-powered APIs. Each system type has tailored attack
+    scenarios and evaluation criteria.
   </Accordion>
-
   <Accordion title="Do I need security expertise to use Red Teaming?">
-    No! Our platform is designed to be accessible to teams with varying security expertise. We provide:
-    - Automated risk assessments with guided recommendations
-    - Pre-built attack scenarios and test cases
-    - Clear explanations of vulnerabilities and their impact
-    - Step-by-step remediation guidance
-
-    However, having security expertise on your team will help you get the most value from advanced features.
-
-  </Accordion>
-
-  <Accordion title="Can I run Red Teaming in production environments?">
-    Yes, our Red Teaming platform supports both pre-production testing and continuous production monitoring. For production environments, we offer:
-    - Non-disruptive monitoring modes
-    - Configurable alert thresholds
-    - Integration with existing monitoring systems
-    - Safe testing protocols that don't impact user experience
-
-    You can start with development environments and gradually expand to production as your confidence grows.
-
-  </Accordion>
-
-  <Accordion title="What is the pricing for Red Teaming features?">
-    Red Teaming capabilities are enterprise-only. Contact our team at support@confident-ai.com for a free-trial today.
-
+    No. The platform provides automated risk assessments, pre-built attack
+    scenarios, and step-by-step remediation guidance. Security expertise helps
+    with advanced features, but isn't required to get started.
   </Accordion>
 </AccordionGroup>

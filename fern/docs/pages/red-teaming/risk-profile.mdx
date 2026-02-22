@@ -1,76 +1,115 @@
 ---
+title: Risk Profiles
 subtitle: Risk assessments, top vulnerabilities, incident monitoring, and more.
 slug: red-teaming/risk-profile
 ---
 
 ## Overview
 
-The risk profile page on the Confident AI platform is where you can see all your past risk assessments and the insights into your AI application's most critical vulnerabilities, risk issues and assessment pass rates.
+The risk profile page is where you view all past risk assessments and get insights into your AI application's most critical vulnerabilities, risk issues, and assessment pass rates.
 
-## Risk Profile
+<Tip>
 
-All individual risk assessments in the risk profile page show you various information about that particular assessment like CVSS score, vulnerability coverage, attack surface, remediation priority, and more. Let's go over each of them in the following sections:
+Each risk assessment shows key metrics including CVSS score, vulnerability coverage, attack surface, and remediation priority. The following sections explain each metric.
 
 <Frame caption="Risk profile page">
-    <img
-        data-image="redTeaming.riskAssessment"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-    />
+  <img
+    data-image="redTeaming.riskAssessment"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
-### CVSS (Common Vulnerability Scoring System)
+</Tip>
 
-The **Common Vulnerability Scoring System (CVSS)** is an industry-standard framework for measuring the severity of security vulnerabilities. It provides a numerical score from **0.0 to 10.0**, where higher scores indicate greater severity and potential impact.
+## Key Metrics
 
-Scores are categorized as:
+### CVSS score
 
-- **0.0** → None
-- **0.1 - 3.9** → Low
-- **4.0 - 6.9** → Medium
-- **7.0 - 8.9** → High
-- **9.0 - 10.0** → Critical
+The Common Vulnerability Scoring System (CVSS) is an industry-standard framework for measuring vulnerability severity. It provides a numerical score from 0.0 to 10.0:
 
-The score is calculated based on exploitability and impact to confidentiality, integrity, and availability. Lower scores indicate lower risk while higher scores signal vulnerabilities that should be prioritized.
+| Score      | Severity |
+| ---------- | -------- |
+| 0.0        | None     |
+| 0.1 – 3.9  | Low      |
+| 4.0 – 6.9  | Medium   |
+| 7.0 – 8.9  | High     |
+| 9.0 – 10.0 | Critical |
 
+The score is calculated based on exploitability and impact to confidentiality, integrity, and availability. Higher scores signal vulnerabilities that should be prioritized.
 
-### Remediation Priority
+### Remediation priority
 
-A classification indicating the urgency of addressing a vulnerability, ranging from **P0** to **P4**. Remediation priorities can be assigned to specific vulnerabilities on the platform itself which allows you prioritize certain security aspects of your AI application.
+A classification indicating the urgency of addressing a vulnerability, ranging from P0 (critical) to P4 (low). You can assign remediation priorities to specific vulnerabilities on the platform to help your team triage findings.
 
-- **P0** — Critical issues requiring immediate remediation
-- **P4** — Low-priority issues suitable for deferred mitigation
+- P0 — critical issues requiring immediate remediation
+- P1 — high-priority issues to address soon
+- P2 — medium-priority issues for planned remediation
+- P3 — low-priority issues for deferred mitigation
+- P4 — informational findings
 
-### Vulnerability Coverage
+### Vulnerability coverage
 
-Vulnerability coverage represents the breadth of the assessment — specifically, how many distinct vulnerability categories were evaluated. Higher coverage means the system was tested across a wider range of risk domains, resulting in a more comprehensive security evaluation.
+Vulnerability coverage represents the breadth of your assessment — how many distinct vulnerability categories were evaluated. Higher coverage means the system was tested across a wider range of risk domains.
 
-Maintaining high vulnerability coverage is recommended, as it ensures your AI application is evaluated across diverse risk categories rather than a limited subset.
+Maintaining high coverage ensures your AI application is evaluated across diverse risk categories rather than a limited subset.
 
-### Attack Surface
+### Attack surface
 
-The attack surface refers to the total set of input vectors, interfaces, and interaction pathways through which a model can be influenced or exploited.
+The attack surface is the total set of input vectors, interfaces, and interaction pathways through which a model can be influenced or exploited.
 
-A larger attack surface increases the potential exposure to adversarial behavior if not properly secured. Reducing and tightly controlling the attack surface helps limit opportunities for exploitation and strengthens the overall security posture of the system.
+A larger attack surface increases potential exposure if not properly secured. Reducing and tightly controlling the attack surface helps limit opportunities for exploitation.
 
 ## Test Cases
 
-The Test Cases section displays the complete set of adversarial test cases generated by Confident AI during the risk assessment.
+Each risk assessment generates a set of adversarial test cases. The test cases section displays every attack that was run against your AI application.
 
 <Frame caption="Risk assessment test cases">
-    <img
-        data-image="redTeaming.riskAssessmentTestCases"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-    />
+  <img
+    data-image="redTeaming.riskAssessmentTestCases"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 Each test case includes:
 
-- **Input** — The adversarial prompt generated based on a specific vulnerability and attack. This is the input sent to your AI application.
-- **Output** — The response produced by your AI application when prompted with the adversarial input.
-- **Vulnerability** - The vulnerability that was tested in this particular test cases, this can be any vulnerability like Bias, BFLA, BOLA.
-- **Vulnerability Type** - The specific vulnerability types within the vulnerability tested in this test case, for a vulnerability like Bias, a vulnerability type would be gender, race, religion.
-- **Attack Method** - This is the adversarial attack method that was used to enhance the base vulnerability attack, some examples for attack methods are Roleplay, Linear Jailbreaking, etc.
+- Input — the adversarial prompt generated based on a specific vulnerability and attack, sent to your AI application
+- Output — the response your AI application produced
+- Vulnerability — the vulnerability tested (e.g., Bias, BFLA, BOLA)
+- Vulnerability type — the specific type within the vulnerability (e.g., for Bias: gender, race, religion)
+- Attack method — the adversarial technique used to enhance the base attack (e.g., Roleplay, Linear Jailbreaking)
 
-Each test cases can have a status of either `passed` or `failed` or `errored`. When a test case's status is shown as `failed`, that implies that your AI application generated an unsafe response to the given adversarial input.
+Each test case has a status of `passed`, `failed`, or `errored`. A `failed` status means your AI application generated an unsafe response to the adversarial input.
 
-Together, these test cases provide visibility into how your system behaves under targeted adversarial conditions.
+## Download Assessments
+
+Click **Download Report** to export a PDF overview of your risk assessment. The report includes an executive summary, CVSS scores, vulnerability breakdowns, and remediation recommendations — designed to be shared with non-technical stakeholders such as compliance teams, security reviewers, and leadership.
+
+<Warning>
+  PDF report generation is currently in beta. Formatting and content may change
+  as we refine the output.
+</Warning>
+
+## Next steps
+
+Now that you understand how to read your risk assessments:
+
+<CardGroup cols={2}>
+  <Card
+    title="Frameworks & Policies"
+    icon="shield-check"
+    iconType="solid"
+    href="/docs/red-teaming/framework-policies"
+  >
+    Customize your security frameworks to expand vulnerability coverage and
+    fine-tune attack configurations.
+  </Card>
+  <Card
+    title="Red Team Using DeepTeam"
+    icon="laptop-code"
+    iconType="solid"
+    href="/docs/red-teaming/code-driven-assessments"
+  >
+    Run red teaming programmatically via `deepteam` for CI/CD integration and
+    custom attack development.
+  </Card>
+</CardGroup>

@@ -304,16 +304,16 @@ navigation:
           - page: Introduction
             path: docs/pages/red-teaming/introduction.mdx
             icon: fa-light fa-user-secret
-          - page: No-Code Assessments
+          - page: Quickstart
             path: docs/pages/red-teaming/no-code-assessments.mdx
-            icon: fa-light fa-browsers
+            icon: fa-light fa-bolt
           - page: Frameworks & Policies
             path: docs/pages/red-teaming/framework-policies.mdx
             icon: fa-light fa-shield-check
           - page: Risk Profiles
             path: docs/pages/red-teaming/risk-profile.mdx
             icon: fa-light fa-triangle-exclamation
-          - page: Code-Driven Assessments
+          - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code
       - section: Resources
