@@ -169,6 +169,9 @@
     // Settings - Data Residency
     "settings.dataResidency": `${S3_BASE}/settings:data-residency.png`,
 
+    // Support
+    support: `${S3_BASE}/support.png`,
+
     // Settings - Organization
     "settings.organization.auth": `${S3_BASE}/confident-docs:organization-auth.png`,
     "settings.organization.rolesPermissions": `${S3_BASE}/settings:org:roles-n-permissions.png`,
