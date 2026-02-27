@@ -6,6 +6,11 @@ description: Learn about roles and permissions management
 
 Roles and permissions let you control what each team member can do within a project.
 
+<Tip>
+  For an overview of how roles, policies, and permissions work together, see the
+  [RBAC overview](/settings/rbac).
+</Tip>
+
 <Frame caption="Project Roles & Permissions">
   <img
     data-image="settings.project.rolesPermissions"
@@ -15,19 +20,19 @@ Roles and permissions let you control what each team member can do within a proj
 
 ## Default Roles
 
-Every project comes with three preset roles:
+Every project comes with three preset roles. Each preset role includes all project permissions unless noted otherwise.
 
-- **Owner** — Full access to all resources in the project.
-- **Manager** — Can manage members and resources.
-- **Member** — Read and write access to resources.
+### Owner
 
-## Default Role Permissions
+Full access to all resources in the project. No permission exclusions.
 
-Preset roles include all project permissions except the following:
+### Manager
 
-- **Owner** — Includes everything (no exclusions).
-- **Manager** — Includes everything (no exclusions).
-- **Member** — Includes everything except `project:delete`, `user:manage`, and `iam:manage`. Members cannot delete the project, manage project members (invite, change roles, remove), or manage roles and policies.
+Includes all permissions. Managers have the same access as Owners.
+
+### Member
+
+Includes everything except `project:delete`, `user:manage`, `user:delete`, and `iam:manage`. Members cannot delete the project, assign roles to project members, remove members from the project, or manage roles and policies.
 
 ## Custom Roles
 
@@ -86,6 +91,6 @@ Permissions follow a `resource:action` format. For example, `dataset:read` grant
 - `project`, `apiKey`, `modelCredential`, `modelCost`, `evaluationModel` — Project settings and configuration
 - `iam` — Project roles and policies
 - `transformer`, `aiConnection`, `alertConfig`, `integration` — Integrations and tools
-- `user` — Team member management
+- `user` — Team member management; `user:manage` controls assigning roles to members, while `user:delete` controls removing members from the project
 
 Not every resource will have all actions. For example, dataset doens't have `project_member`, while `annotation_queue` doesn't have `evaluate`. You can find the full list of permissions on the roles & permissions page.

@@ -6,6 +6,11 @@ description: Learn about organization roles and permissions management
 
 Roles and permissions let you control what each team member can do at the organization level—across projects, billing, SSO, and other org-wide settings.
 
+<Tip>
+  For an overview of how roles, policies, and permissions work together, see the
+  [RBAC overview](/settings/rbac).
+</Tip>
+
 <Frame caption="Organization Roles & Permissions">
   <img
     data-image="settings.organization.rolesPermissions"
@@ -15,23 +20,23 @@ Roles and permissions let you control what each team member can do at the organi
 
 ## Default Roles
 
-Every organization comes with three preset roles:
+Every organization comes with three preset roles. Each preset role includes all organization permissions unless noted otherwise.
 
-- **Owner** — Full access to all resources in the organization.
-- **Admin** — Can manage members and resources across the organization.
-- **Member** — Read and write access to resources they have access to.
+### Owner
 
-## Default Role Permissions
+Full access to all resources in the organization, including transferring ownership and removing any member. No permission exclusions.
 
-Preset roles include all organization permissions except the following:
+### Admin
 
-- **Owner** — Includes everything (no exclusions).
-- **Admin** — Includes everything except `sso:manage` and `billing:manage`. Admins cannot manage SSO or billing settings.
-- **Member** — Includes everything except `project:manage`, `organization:manage`, `featureAccess:manage`, `sso:manage`, `apiKey:manage`, `user:manage`, `billing:manage`, `modelCredential:manage`, `modelCost:manage`, `metric:manage`, and `iam:manage`. Members have read access to these areas but cannot change org-wide settings, manage users, or manage roles and policies.
+Includes all permissions. Admins can do everything an Owner can except remove an Owner or transfer ownership to themselves.
 
-## The project:manage permission
+### Member
 
-The organization permission **`project:manage`** controls two important behaviors:
+Includes everything except `project:manage`, `organization:manage`, `featureAccess:manage`, `sso:manage`, `apiKey:manage`, `user:manage`, `user:delete`, `billing:manage`, `modelCredential:manage`, `modelCost:manage`, `metric:manage`, and `iam:manage`. Members have read access to these areas but cannot change org-wide settings, manage or remove users, or manage roles and policies.
+
+## Bypass Project Permissions
+
+The organization permission **`project:manage`** gives unrestricted project access and controls two important behaviors:
 
 1. **Seeing all projects** — Users with `project:manage` can see every project in the organization in the organization projects list. Users without it only see projects they are explicitly members of.
 2. **Bypassing project-level checks** — When accessing a project, users with `project:manage` at the organization level bypass that project's role-based permissions. They effectively have full access to the project regardless of their project role. This is how Owners and Admins can access and manage any project in the org.
@@ -76,8 +81,9 @@ Organization permissions follow the same `resource:action` format as project per
 **Actions:**
 
 - `read` — View resources or settings
-- `manage` — Create, update, or delete (varies by resource)
+- `manage` — Create, update, or configure (varies by resource)
 - `create` — Create new resources (used for `project`)
+- `delete` — Remove resources or users (used for `user`)
 
 **Permission resources (organization):**
 
@@ -86,7 +92,7 @@ Organization permissions follow the same `resource:action` format as project per
 - `featureAccess` — Feature flags and plan-based access
 - `sso` — SSO providers and configuration
 - `apiKey` — Organization API keys
-- `user` — Organization user management
+- `user` — Organization user management; `user:manage` controls assigning roles to users, while `user:delete` controls removing users from the organization
 - `billing` — Billing and subscription
 - `modelCredential`, `modelCost`, `metric` — Org-level model credentials, costs, and metrics
 - `iam` — Organization roles and policies
