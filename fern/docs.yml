@@ -278,6 +278,9 @@ navigation:
               - page: Sampling
                 path: docs/pages/llm-tracing/features/sampling.mdx
                 icon: fa-light fa-percent
+          - page: Troubleshooting
+            path: docs/pages/llm-tracing/troubleshooting.mdx
+            icon: fa-light fa-wrench
       - section: Human-in-the-Loop
         contents:
           - page: Introduction
