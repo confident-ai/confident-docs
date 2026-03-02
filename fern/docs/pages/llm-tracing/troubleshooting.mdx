@@ -1,0 +1,189 @@
+---
+subtitle: Common issues and fixes when using @observe for tracing
+slug: llm-tracing/troubleshooting
+---
+
+## Overview
+
+This page covers common tracing issues caused by Python's concurrency model and process lifecycle. If you're experiencing any of the following, check the relevant sections below:
+
+- **Unexpected new traces appearing** instead of spans nesting under a parent trace.
+- **Traces not showing up** on the Confident AI dashboard after execution.
+- **Trace attributes not set correctly** — output, name, or metadata reflecting the wrong values.
+- **Missing output on streamed responses** — trace appears but with no output.
+
+## Using `@observe` with `ThreadPoolExecutor`
+
+Python's `concurrent.futures.ThreadPoolExecutor` spawns new threads that do **not** inherit `ContextVar` values from the calling thread. Since `deepeval` tracing relies on `ContextVar` to track the active span, submitting an `@observe`-decorated function directly to an executor produces a separate, orphaned trace instead of nesting under the parent.
+
+The fix is to snapshot the caller's context with `contextvars.copy_context()` and use `ctx.run` when submitting work:
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
+from deepeval.tracing import observe
+
+@observe()
+def child_task(item):
+    ...
+
+# ❌ Broken — child_task creates a separate trace
+@observe()
+def parent():
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(child_task, item)
+
+# ✅ Fixed — child_task nests under parent
+@observe()
+def parent():
+    ctx = copy_context()
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(ctx.run, child_task, item)
+```
+
+<Warning>
+  `copy_context()` must be called **inside** the `@observe`-decorated parent
+  function so it captures the active tracing context. Call it **before** each
+  batch of `executor.submit()` calls — the snapshot is point-in-time, so earlier
+  snapshots will be stale if the parent context changes between batches.
+</Warning>
+
+## Traces Not Showing Up
+
+Confident AI uses batch ingestion for traces, so it is normal for a trace to take up to **30 seconds** to appear on the dashboard after it has been posted. If your traces still don't show up after that window, the most likely cause is your process exiting before the background worker finishes posting — common in serverless functions (AWS Lambda, Google Cloud Functions, etc.) and short-lived scripts.
+
+To fix this, set the `CONFIDENT_TRACE_FLUSH` environment variable to force DeepEval to flush traces synchronously before the function returns:
+
+```bash
+export CONFIDENT_TRACE_FLUSH=1
+```
+
+Or set it inline when running a script:
+
+```bash
+CONFIDENT_TRACE_FLUSH=1 python main.py
+```
+
+<Note>
+  With synchronous flushing enabled, the process will not shut down until all
+  pending traces have been posted. This does not add latency to individual
+  function calls, but it may delay script or serverless function exit while
+  traces are being flushed.
+</Note>
+
+## Using `@observe` with `asyncio.run_in_executor()`
+
+`loop.run_in_executor()` delegates work to a thread pool under the hood, so it has the same `ContextVar` propagation issue as `ThreadPoolExecutor` — child spans will create orphaned traces instead of nesting under the parent.
+
+Apply the same `copy_context()` fix:
+
+```python
+import asyncio
+from contextvars import copy_context
+from deepeval.tracing import observe
+
+@observe()
+async def child_task(item):
+    ...
+
+# ❌ Broken — child_task creates a separate trace
+@observe()
+async def parent():
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, child_task, item)
+
+# ✅ Fixed — child_task nests under parent
+@observe()
+async def parent():
+    loop = asyncio.get_event_loop()
+    ctx = copy_context()
+    await loop.run_in_executor(None, ctx.run, child_task, item)
+```
+
+## Undecorated Parent Function
+
+If the outermost calling function is not decorated with `@observe`, there is no parent trace for child spans to nest under. Each `@observe`-decorated function called inside it will create its own independent trace.
+
+```python
+from deepeval.tracing import observe
+
+@observe()
+def retrieve(query):
+    ...
+
+@observe()
+def generate(query, context):
+    ...
+
+# ❌ Broken — retrieve and generate each create separate traces
+def handle_request(query):
+    context = retrieve(query)
+    return generate(query, context)
+
+# ✅ Fixed — both nest under handle_request
+@observe()
+def handle_request(query):
+    context = retrieve(query)
+    return generate(query, context)
+```
+
+This is easy to miss on entry points like Flask route handlers, FastAPI endpoints, or task-queue workers — make sure the top-level function that kicks off your pipeline is decorated.
+
+## Using `@observe` with `multiprocessing`
+
+`multiprocessing.Process` and `concurrent.futures.ProcessPoolExecutor` spawn entirely separate OS processes that do not share memory with the parent. Unlike threads, `contextvars.copy_context()` **cannot** propagate tracing context across process boundaries.
+
+Traces created inside child processes will always be independent, top-level traces. There is no workaround for this — if you need child processes to produce spans that nest under a parent, consider switching to `ThreadPoolExecutor` with the `copy_context()` fix described above.
+
+## `update_current_trace` vs `update_current_span`
+
+`update_current_trace()` updates the **trace** (the top-level unit), not the span of the function it's called in. If you call it from a child `@observe`-decorated function expecting it to set that child's span data, it will set the trace-level fields instead.
+
+To update a child function's own span, use `update_current_span()`:
+
+```python
+from deepeval.tracing import observe, update_current_span, update_current_trace
+
+@observe()
+def get_chat_answer(query):
+    result = ...
+    update_current_span(output=result, name="Get Chat Answer")
+
+@observe()
+def get_related_questions(query):
+    result = ...
+    update_current_span(output=result, name="Get Related Questions")
+
+@observe()
+def handle_message(query):
+    get_chat_answer(query)
+    get_related_questions(query)
+    update_current_trace(name="Handle Message")
+```
+
+Use `update_current_trace()` in the top-level function to set trace-level fields like name, tags, or metadata. Use `update_current_span()` everywhere else.
+
+## Streaming Functions Missing Trace Output
+
+When an `@observe`-decorated function uses `yield` to stream its response (e.g. a FastAPI `StreamingResponse`), the trace output won't be captured automatically because the return value is a generator — not the final assembled text.
+
+To fix this, collect the streamed output and set it explicitly with `update_current_trace()`:
+
+```python
+from fastapi.responses import StreamingResponse
+from deepeval.tracing import observe, update_current_trace
+
+@observe()
+def generate_stream(query):
+    chunks = []
+    for chunk in llm.stream(query):
+        chunks.append(chunk)
+        yield chunk
+    update_current_trace(output="".join(chunks))
+
+@app.post("/chat")
+async def chat(query: str):
+    return StreamingResponse(generate_stream(query))
+```
+
+Without this, the trace will appear on Confident AI with no output.

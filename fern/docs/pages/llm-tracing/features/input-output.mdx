@@ -121,6 +121,47 @@ This example is the same as the one for tracing except for the `update_current_t
 
 The `input` and `output` can be **ANY TYPE** for custom span `type`s, and is useful for visualization on the UI.
 
+## I/O for Streamed Responses
+
+If your `@observe`-decorated function uses `yield` to stream its response, the trace output won't be captured automatically — the return value is a generator, not the final text. Collect the streamed chunks and set the output explicitly:
+
+<Tabs>
+    <Tab title="Python" language="python">
+            ```python title="main.py" {10}
+            from deepeval.tracing import observe, update_current_trace
+            
+            @observe()
+            def stream_response(query: str):
+                chunks = []
+                for chunk in llm.stream(query):
+                    chunks.append(chunk)
+                    yield chunk
+            
+                update_current_trace(input=query, output="".join(chunks))
+            ```
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+            ```typescript title="index.ts" {10} maxLines={0}
+            import { observe, updateCurrentTrace } from "deepeval/tracing";
+
+            const streamResponse = async function* (query: string) {
+                const chunks: string[] = [];
+                for await (const chunk of llm.stream(query)) {
+                    chunks.push(chunk);
+                    yield chunk;
+                }
+
+                updateCurrentTrace({ input: query, output: chunks.join("") });
+            };
+
+            const observedStreamResponse = observe({ fn: streamResponse });
+            ```
+    </Tab>
+
+</Tabs>
+
+Without this, the trace will appear on Confident AI with no output. See the [troubleshooting page](/docs/llm-tracing/troubleshooting#streaming-functions-missing-trace-output) for more details.
+
 ## I/O for Threads
 
 For multu-turn AI apps that [create a thread](/docs/llm-tracing/features/threads) from the traces, it is highly recommended that you provide the **strings** instead, where the `input` will represent the user input, and `output` representing the AI generated output. You can also leave out any `input` or `output` for consecutive user/LLM behaviors.

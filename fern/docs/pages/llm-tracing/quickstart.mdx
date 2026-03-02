@@ -22,7 +22,7 @@ Tracing works through instrumentation, which can either be manual or through one
 
 1. Decorate or wrap your functions with `@observe` (Python) or `observe` (TypeScript)
 2. Each observed function becomes a **span**
-3. The outermost observed function becomes the **trace** — all nested spans roll up into it
+3. The outermost observed function becomes the **trace** — all nested spans roll up into it (see [troubleshooting](/docs/llm-tracing/troubleshooting) if spans are creating separate traces instead of nesting)
 4. Traces are sent to Confident AI asynchronously with zero latency impact
 5. Once ingested, traces can be evaluated automatically using your configured metrics
 
@@ -171,11 +171,13 @@ Instrumentation must be done via code, so first install DeepEval, Confident AI's
     Done ✅. You just created a trace with a span inside it. Go to the Observatory to see your traces there.
 
 <Tip>
-If you don't see the trace, it is 99.99% because your program exited before the traces had a chance to get posted. Try setting `CONFIDENT_TRACE_FLUSH=YES` if this is the case:
+If you don't see the trace, it is 99.99% because your program exited before the traces had a chance to get posted. Try setting `CONFIDENT_TRACE_FLUSH=1` if this is the case:
 
 ```bash
 CONFIDENT_TRACE_FLUSH=1
 ```
+
+See the [troubleshooting page](/docs/llm-tracing/troubleshooting#traces-not-showing-up) for more details.
 
 </Tip>
 
@@ -252,7 +254,7 @@ const observedLlmApp = observe({ fn: llmApp });
 - `update_current_trace` / `updateCurrentTrace` sets data on the **trace** (the outermost observed function) — use it for [input/output](/docs/llm-tracing/features/input-output), [tags](/docs/llm-tracing/features/tags), [metadata](/docs/llm-tracing/features/metadata), [threads](/docs/llm-tracing/features/threads), and [users](/docs/llm-tracing/features/users).
 - `update_current_span` / `updateCurrentSpan` sets data on the **current span** — use it for span-level input/output, metadata, and [online eval test case parameters](/docs/llm-tracing/features/test-cases).
 
-Both can be called multiple times from anywhere inside an observed function — values are merged, with later calls overriding earlier ones.
+Both can be called multiple times from anywhere inside an observed function — values are merged, with later calls overriding earlier ones. Make sure to use the right one — see [`update_current_trace` vs `update_current_span`](/docs/llm-tracing/troubleshooting#update_current_trace-vs-update_current_span) in the troubleshooting page.
 
 ### Using context manager
 

@@ -169,6 +169,9 @@
     // Settings - Data Residency
     "settings.dataResidency": `${S3_BASE}/settings:data-residency.png`,
 
+    // Support
+    support: `${S3_BASE}/support.png`,
+
     // Settings - Organization
     "settings.organization.auth": `${S3_BASE}/confident-docs:organization-auth.png`,
     "settings.organization.rolesPermissions": `${S3_BASE}/settings:org:roles-n-permissions.png`,
@@ -185,6 +188,7 @@
     "settings.project.alerts": `${S3_BASE}/settings:project:alerts.png`,
     "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
     "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,
+    "settings.project.categories": `${S3_BASE}/settings:project:categories.png`,
 
     // Selh Hosting
     "selfHosting.aws.architecture": `${S3_BASE}/self-hosting:aws-architecture.png`,

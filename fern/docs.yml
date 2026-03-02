@@ -269,6 +269,9 @@ navigation:
               - page: Projects
                 path: docs/pages/llm-tracing/features/projects.mdx
                 icon: fa-light fa-layer-group
+              - page: Categories
+                path: docs/pages/llm-tracing/features/categories.mdx
+                icon: fa-light fa-folder-tree
               - page: Environment
                 path: docs/pages/llm-tracing/features/environment.mdx
                 icon: fa-light fa-globe
@@ -278,6 +281,9 @@ navigation:
               - page: Sampling
                 path: docs/pages/llm-tracing/features/sampling.mdx
                 icon: fa-light fa-percent
+          - page: Troubleshooting
+            path: docs/pages/llm-tracing/troubleshooting.mdx
+            icon: fa-light fa-wrench
       - section: Human-in-the-Loop
         contents:
           - page: Introduction
