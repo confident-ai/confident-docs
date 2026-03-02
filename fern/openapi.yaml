@@ -343,6 +343,30 @@ paths:
                     id: "COLLECTION-ID"
                   deprecated: false
 
+  /v1/datasets:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: List Datasets
+      operationId: listDatasets
+      description: Lists all the available datasets in your Confident AI project.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDatasetsResponse"
+              examples:
+                GetDatasets:
+                  success: true
+                  data:
+                    datasets:
+                      - id: "DATASET-ID"
+                        alias: "DATASET-ALIAS"
+                        multiTurn: false
+
   /v1/datasets/{alias}:
     get:
       x-fern-server-name: Confident AI
@@ -536,7 +560,7 @@ paths:
               $ref: "#/components/schemas/SimulateRequest"
             examples:
               SimulationExample:
-                golden:
+                conversationalGolden:
                   scenario: "A frustrated user asking for a refund."
                   userDescription: "A white male who is a customer for over 2 years."
       responses:
@@ -840,6 +864,200 @@ paths:
                         model: "gpt-4o"
                 deprecated: false
 
+  /v1/spans:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: List Spans
+      operationId: getSpan
+      description: Retrieves a list of spans from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the threads to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the maximum number of threads per page. Defaulted to 25.
+        - in: query
+          name: type
+          description: Filter by the specific type of span.
+          schema:
+            type: string
+            enum: [SPAN, AGENT, TOOL, RETRIEVER, LLM]
+        - in: query
+          name: traceUuid
+          description: Filter spans that belong to a specific trace UUID.
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: name
+          description: Filter spans by their exact name.
+          schema:
+            type: string
+        - in: query
+          name: hasError
+          description: Filter for spans that either failed (true) or succeeded (false).
+          schema:
+            type: boolean
+        - in: query
+          name: model
+          description: Filter LLM spans by the model used (e.g., 'gpt-4').
+          schema:
+            type: string
+        - in: query
+          name: promptAlias
+          required: false
+          schema:
+            type: string 
+          description: This filters the spans by the prompt alias used.
+        - in: query
+          name: promptCommitHash
+          required: false
+          schema:
+            type: string
+          description: This filters the spans by the exact prompt commit hash used.
+        - in: query
+          name: promptVersion
+          required: false
+          schema:
+            type: string
+          description: This filters the spans by the prompt version used.
+        - in: query
+          name: promptLabel
+          required: false
+          schema:
+            type: string
+          description: This filters the spans by the prompt label used.
+        - in: query
+          name: embedder
+          description: Filter retriever spans by the embedder model used.
+          schema:
+            type: string
+        - in: query
+          name: topK
+          description: Filter retriever spans by the topK value.
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: chunkSize
+          description: Filter retriever spans by the chunk size.
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: environment
+          required: false
+          schema:
+            type: string
+          description: This filters the threads by the environment where the thread was created, and returns threads from all environments if not specified.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for threads created after the specified start datetime. Defaulted to 30 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for threads created before the specified end datetime. Defaulted to the current time.
+        - in: query
+          name: sortBy
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, lastActivity]
+          description: This determines the field to sort by. Defaulted to `lastActivity`.
+        - in: query
+          name: ascending
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListSpansResponse"
+              example:
+                success: true
+                data:
+                  spans:
+                    - id: "SPAN-ID"
+                      uuid: "SPAN-UUID"
+                      name: "Span Name"
+                      startTime: "2025-01-15T10:30:00Z"
+                      endTime: "2025-01-15T10:30:05Z"
+                      traceUuid: "TRACE-UUID"
+                      status: "SUCCESS"
+                      type: "LLM"
+                      model: "gpt-4o"
+                  totalSpans: 1
+                deprecated: false
+
+  /v1/spans/{spanUuid}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Tracing
+      summary: Retrieve Span
+      operationId: retrieveSpan
+      description: Retrieves a single, detailed span by its unique identifier.
+      parameters:
+        - name: spanUuid
+          in: path
+          required: true
+          description: The unique UUID of the span you want to retrieve.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved the detailed span.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveSpanResponse'
+              examples:
+                LLMSpan:
+                  success: true
+                  data:
+                    id: "SPAN-ID"
+                    uuid: "SPAN-UUID"
+                    name: "Span Name"
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:05Z"
+                    traceUuid: "TRACE-UUID"
+                    status: "SUCCESS"
+                    type: "LLM"
+                    model: "gpt-4o"
+                    promptAlias: "Prompt Alias"
+                  deprecated: false
+
   /v1/threads:
     get:
       x-fern-server-name: Confident AI
@@ -901,7 +1119,8 @@ paths:
           name: ascending
           required: false
           schema:
-            type: boolean
+            type: string
+            enum: [asc, desc]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
       responses:
         "200":
@@ -985,6 +1204,28 @@ paths:
                 deprecated: false
 
   /v1/prompts:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: List Prompts
+      operationId: listPrompts
+      description: Lists all the available prompts in your Confident AI project.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPromptsResponse"
+              examples:
+                GetPrompts:
+                  success: true
+                  data:
+                    prompts:
+                      - id: "PROMPT-ID"
+                        alias: "PROMPT-ALIAS"
+                        type: "TEXT"
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -1643,7 +1884,8 @@ paths:
           name: ascending
           required: false
           schema:
-            type: boolean
+            type: string
+            enum: [asc, desc]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
       responses:
         "200":
@@ -1901,7 +2143,8 @@ paths:
           name: ascending
           required: false
           schema:
-            type: boolean
+            type: string
+            enum: [asc, desc]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
         - in: query
           name: type
@@ -2140,7 +2383,8 @@ paths:
           name: ascending
           required: false
           schema:
-            type: boolean
+            type: string
+            enum: [asc, desc]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
         - in: query
           name: completed
@@ -2796,6 +3040,44 @@ components:
         - success
         - data
 
+    GetDatasetsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the datasets were successfully retrieved."
+        data:
+          type: object
+          description: "This maps to all the datasets retrieved."
+          properties:
+            datasets:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: This is the unique id of the dataset.
+                  alias:
+                    type: string
+                    description: This is the alias of the dataset, which is unique within your project.
+                  multiTurn:
+                    type: boolean
+                    description: This is true if the dataset is multi-turn, which contains multi-turn test cases. Single-turn datasets have `multi_turn` set to false and contain single-turn test cases.
+                required:
+                  - id
+                  - alias
+                  - multiTurn
+          required:
+            - datasets
+        deprecated:
+          type: boolean 
+          description: "This is true if this datasets endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
+
     RetrievedGolden:
       type: object
       properties:
@@ -3266,11 +3548,11 @@ components:
     SimulateRequest:
       type: object
       properties:
-        golden:
+        conversationalGolden:
           $ref: "#/components/schemas/ConversationalGolden"
           description: A Conversational Golden that is used to simulate your conversations
       required:
-        - golden
+        - conversationalGolden
 
     SimulateResponse:
       type: object
@@ -3743,63 +4025,53 @@ components:
           items:
             type: string
           description: This is any tags associated with the trace, which helps with grouping traces and filtering them on the Confident AI platform.
-        # baseSpans:
-        #   type: array
-        #   description: This is the list of base spans associated with the trace.
-        #   items:
-        #     $ref: "#/components/schemas/BaseSpan"
-        # llmSpans:
-        #   type: array
-        #   description: This is the list of LLM spans associated with the trace.
-        #   items:
-        #     $ref: "#/components/schemas/LlmSpan"
-        # retrieverSpans:
-        #   type: array
-        #   description: This is the list of retriever spans associated with the trace.
-        #   items:
-        #     $ref: "#/components/schemas/RetrieverSpan"
-        # toolSpans:
-        #   type: array
-        #   description: This is the list of tool spans associated with the trace.
-        #   items:
-        #     $ref: "#/components/schemas/ToolSpan"
-        # agentSpans:
-        #   type: array
-        #   description: This is the list of agent spans associated with the trace.
-        #   items:
-        #     $ref: "#/components/schemas/AgentSpan"
+        spans:
+          type: array
+          description: This is the list of base spans associated with the trace.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/BaseSpan"
+                title: "BaseSpan"
+              - $ref: "#/components/schemas/LlmSpan"
+                title: "LlmSpan"
+              - $ref: "#/components/schemas/RetrieverSpan"
+                title: "RetrieverSpan"
+              - $ref: "#/components/schemas/ToolSpan"
+                title: "ToolSpan"
+              - $ref: "#/components/schemas/AgentSpan"
+                title: "AgentSpan"
         threadId:
           type: string
           description: This is the unique identifier of the thread associated with the trace.
         userId:
           type: string
           description: This is the unique identifier for your end user for the trace.
-        # metricCollection:
-        #   type: string
-        #   description: This is the metric collection you wish to use to evaluate the trace.
-        # retrievalContext:
-        #   type: array
-        #   items:
-        #     type: string
-        #   description: This is the retrieval context of your trace, which is to be used for evaluation.
-        # context:
-        #   type: array
-        #   items:
-        #     type: string
-        #   description: This is the ideal retrieval context of your trace, which is to be used for evaluation.
-        # expectedOutput:
-        #   type: string
-        #   description: This is the expected output of your trace, which is the ideal actual output and to be used for evaluation.
-        # toolsCalled:
-        #   type: array
-        #   description: This is the tools called by your trace, which is to be used for evaluation.
-        #   items:
-        #     $ref: "#/components/schemas/ToolCallData"
-        # expectedTools:
-        #   type: array
-        #   description: This is the expected tools to be called by the trace, which is to be used for evaluation.
-        #   items:
-        #     $ref: "#/components/schemas/ToolCallData"
+        metricCollection:
+          type: string
+          description: This is the metric collection you wish to use to evaluate the trace.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          description: This is the retrieval context of your trace, which is to be used for evaluation.
+        context:
+          type: array
+          items:
+            type: string
+          description: This is the ideal retrieval context of your trace, which is to be used for evaluation.
+        expectedOutput:
+          type: string
+          description: This is the expected output of your trace, which is the ideal actual output and to be used for evaluation.
+        toolsCalled:
+          type: array
+          description: This is the tools called by your trace, which is to be used for evaluation.
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+        expectedTools:
+          type: array
+          description: This is the expected tools to be called by the trace, which is to be used for evaluation.
+          items:
+            $ref: "#/components/schemas/ToolCallData"
 
     CreateTraceResponse:
       type: object
@@ -3901,6 +4173,62 @@ components:
         - data
         - deprecated
 
+    ListSpansResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the spans were successfully retrieved.
+        data:
+          type: object
+          description: The payload containing the paginated spans and total count.
+          properties:
+            spans:
+              type: array
+              description: The list of spans for the current page.
+              items:
+                $ref: '#/components/schemas/GetSpan'
+            totalSpans:
+              type: integer
+              description: The total number of spans matching the query across all pages.
+          required:
+            - spans
+            - totalSpans
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    RetrieveSpanResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the span was successfully retrieved.
+        data:
+          description: The payload containing the detailed span data.
+          oneOf:
+            - $ref: "#/components/schemas/LlmSpan"
+              title: "LLM Span"
+            - $ref: "#/components/schemas/RetrieverSpan"
+              title: "Retriever Span"
+            - $ref: "#/components/schemas/ToolSpan"
+              title: "Tool Span"
+            - $ref: "#/components/schemas/AgentSpan"
+              title: "Agent Span"
+            - $ref: "#/components/schemas/BaseSpan"
+              title: "Base Span"
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
     EvaluateThreadRequest:
       type: object
       properties:
@@ -3986,6 +4314,45 @@ components:
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    GetPromptsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the prompts were successfully retrieved."
+        data:
+          type: object
+          description: "This maps to all the prompts retrieved."
+          properties:
+            prompts:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: This is the unique id of the dataset.
+                  alias:
+                    type: string
+                    description: This is the alias of the dataset, which is unique within your project.
+                  type:
+                    type: string
+                    enum: [TEXT, LIST]
+                    description: This is the type of the prompt (TEXT or LIST).
+                required:
+                  - id
+                  - alias
+                  - type
+          required:
+            - prompts
+        deprecated:
+          type: boolean 
+          description: "This is true if this prompts endpoint is deprecated."
       required:
         - success
         - data
@@ -4999,7 +5366,9 @@ components:
               items:
                 oneOf:
                   - $ref: "#/components/schemas/TestRunTestCase"
+                    title: "LLMTestCase"
                   - $ref: "#/components/schemas/TestRunConversationalTestCase"
+                    title: "ConversationalTestCase"
               description: The test cases in this test run. Will contain either single-turn test cases or conversational test cases, but not both.
             multiTurn:
               type: boolean
@@ -5097,6 +5466,9 @@ components:
           type: number
           format: float
           description: The cost of evaluating this test case.
+        trace:
+          $ref: "#/components/schemas/Trace"
+          description: "This is the trace dictionary of a test case."
       required:
         - id
         - name
