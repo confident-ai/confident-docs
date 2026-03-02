@@ -1,0 +1,43 @@
+---
+subtitle: Automatically classify incoming traces into categories you define
+slug: llm-tracing/features/categories
+---
+
+## Overview
+
+Categories let you automatically classify incoming traces and spans based on rules you define in your project settings. Once configured, every new trace is evaluated against your categories and assigned a match — giving you a structured way to filter, analyze, and monitor different types of interactions.
+
+If a trace doesn't match any defined category, it remains uncategorized.
+
+## Define Categories
+
+Categories are managed in your project settings on Confident AI:
+
+1. Navigate to **Project Settings** > **Categories**
+2. Click **New Category**
+3. Provide a **Name** (e.g. "Customer Support", "Billing Inquiry") and a **Description** of what the category represents
+
+<Frame caption="Categories Settings">
+  <img
+    data-image="settings.project.categories"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+The description is used to determine whether an incoming trace matches the category, so be specific. For example:
+
+| Category          | Description                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Billing Inquiry   | Queries related to billing issues, invoices, payment methods, and refund requests. |
+| Technical Support | Requests for help with bugs, errors, configuration, or integration issues.         |
+| General Knowledge | Open-ended or informational questions not tied to a specific support workflow.     |
+
+Once saved, all incoming traces will be automatically classified against your defined categories.
+
+## Filtering by Category
+
+After categories are applied, you can filter traces by category in the Observatory to quickly surface specific types of interactions. This is useful for:
+
+- Monitoring the volume of different interaction types over time
+- Running targeted evaluations on specific categories
+- Identifying trends in user behavior across categories
