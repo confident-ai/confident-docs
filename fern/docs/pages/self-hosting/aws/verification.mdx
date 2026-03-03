@@ -74,21 +74,20 @@ aws secretsmanager describe-secret --secret-id confidentai-stage-confident-secre
 kubectl get secret confident-externalsecret -n confident-ai
 ```
 
-### S3 bucket
+### S3 buckets
 
-Verify the bucket exists:
+Verify the buckets exist:
 
 ```bash
 aws s3 ls | grep confidentai
 ```
 
-You should see your bucket (e.g., `confidentai-stage-app-bucket`).
+You should see three buckets (e.g., `confidentai-stage-testcases-bucket`, `confidentai-stage-payloads-bucket`, and `confidentai-stage-chbackups-bucket`).
 
 <Note>
   **S3 is used for file uploads.** If S3 connectivity fails, users won't be able
-  to upload datasets or export reports. The backend uses IRSA (IAM Roles for
-  Service Accounts) to access S3—verify the `confident-s3-sa` service account
-  exists.
+  to upload datasets or export reports. The backend uses EKS Pod Identity to
+  access S3—verify the `confident-s3-sa` service account exists.
 </Note>
 
 ## DNS configuration

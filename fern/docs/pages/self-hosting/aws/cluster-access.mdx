@@ -179,10 +179,10 @@ Expected service accounts:
 | `ecr-credentials-sync` | Used by the ECR credential rotation job                       |
 
 <Note>
-  **Why service accounts?** Service accounts enable "IAM Roles for Service
-  Accounts" (IRSA), which gives pods fine-grained AWS permissions. Instead of
-  giving the whole cluster access to S3, only pods using `confident-s3-sa` can
-  access the bucket. This follows the principle of least privilege.
+  **Why service accounts?** Service accounts enable EKS Pod Identity, which
+  gives pods fine-grained AWS permissions. Instead of giving the whole cluster
+  access to S3, only pods using `confident-s3-sa` can access the buckets. This
+  follows the principle of least privilege.
 </Note>
 
 ### External Secrets

@@ -198,6 +198,9 @@ You need to generate several secure random values. These are used for encrypting
 # Auth secret - used to sign authentication tokens (32+ characters)
 openssl rand -base64 32
 
+# PostgreSQL password - primary database password
+openssl rand -base64 24
+
 # ClickHouse password - analytics database password
 openssl rand -base64 24
 
