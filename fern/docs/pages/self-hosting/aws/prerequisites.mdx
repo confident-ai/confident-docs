@@ -105,18 +105,16 @@ If your organization requires pre-approved IAM policies, work with your cloud se
 
 ## Repository access
 
-Confident AI provides two private GitHub repositories containing the deployment code:
+Confident AI provides a private GitHub repository containing the deployment code:
 
 | Repository            | What it contains                                                                                                                                          |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `confident-terraform` | Terraform code that sets up the complete AWS infrastructure (including VPC, EKS, RDS, S3, etc.) and performs the initial configuration of the EKS cluster |
-| `confident-k8s`       | Kubernetes YAML files that deploy the actual application services                                                                                         |
 
-Your Confident AI representative will grant your GitHub account access to these repositories. Once granted, clone them:
+Your Confident AI representative will grant your GitHub account access to this repository. Once granted, clone it:
 
 ```bash
 git clone git@github.com:confident-ai/confident-terraform.git
-git clone git@github.com:confident-ai/confident-k8s.git
 ```
 
 <Warning>

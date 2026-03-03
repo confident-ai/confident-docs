@@ -7,7 +7,7 @@ description: Deploy Confident AI workloads to EKS
 
 With infrastructure and cluster access ready, you now deploy the Confident AI application services. This step covers:
 
-- Preparing Kubernetes manifests from the `confident-k8s` repository
+- Preparing Kubernetes manifests provided by Confident AI
 - Updating container image tags to the versions provided by Confident AI
 - Configuring the ingress with your domain names and ACM certificate ARN
 - Setting up External Secrets to sync credentials from AWS Secrets Manager
@@ -32,34 +32,27 @@ When you `kubectl apply` a manifest, Kubernetes:
 3. Creates, updates, or deletes resources to match
 4. Continuously ensures the desired state is maintained
 
-### Repository structure
+### Manifest structure
 
-The `confident-k8s` repository contains Kubernetes manifests organized by service:
+The Kubernetes manifests are organized by service:
 
 ```
-confident-k8s/
-├── base/                    # Shared configuration
-│   ├── namespace.yaml       # The confident-ai namespace (already created)
-│   ├── network/
-│   │   └── ingress.yaml     # Load balancer and routing rules
-│   └── common/
-│       └── external-secrets/ # Secrets sync configuration
-├── confident-backend/       # API service
-│   ├── deployment.yaml
-│   └── service.yaml
-├── confident-frontend/      # Web dashboard
-├── confident-evals/         # Evaluation service
-├── confident-otel/          # OpenTelemetry collector
-└── redis/                   # Cache service
+base/                    # Shared configuration
+├── namespace.yaml       # The confident-ai namespace (already created)
+├── network/
+│   └── ingress.yaml     # Load balancer and routing rules
+└── common/
+    └── external-secrets/ # Secrets sync configuration
+confident-backend/       # API service
+├── deployment.yaml
+└── service.yaml
+confident-frontend/      # Web dashboard
+confident-evals/         # Evaluation service
+confident-otel/          # OpenTelemetry collector
+redis/                   # Cache service
 ```
 
 ## Prepare manifests
-
-Navigate to the Kubernetes repository:
-
-```bash
-cd confident-k8s
-```
 
 ### Update image tags
 
