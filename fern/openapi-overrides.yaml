@@ -19,6 +19,70 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
+  /v1/test-runs:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (must be a positive integer, default is 1).
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Number of items per page (max 100, default is 25).
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [COMPLETED, ERRORED, IN_PROGRESS, CANCELLED]
+          description: Filter test runs by status.
+        - in: query
+          name: multiTurn
+          schema:
+            type: string
+            enum: ["true", "false"]
+          description: Filter for conversational (multi-turn) test runs only ("true" or "false").
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: ["createdAt", "runDuration"]
+            default: "createdAt"
+          description: Field to sort results by ("createdAt" or "runDuration").
+        - in: query
+          name: ascending
+          schema:
+            type: string
+            enum: ["asc", "desc"]
+            default: "desc"
+          description: Sort ascending (true) or descending (false).
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: datetime
+          description: ISO 8601 start datetime filter (e.g. "2025-12-31T23:59:59Z").
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: datetime
+          description: ISO 8601 end datetime filter (e.g. "2025-12-31T23:59:59Z").
+
   /v1/test-runs/{testRunId}:
     get:
       parameters:
@@ -92,6 +156,17 @@ paths:
 
   /v1/batch-metrics:
     post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/datasets:
+    get:
       parameters:
         - in: header
           name: CONFIDENT_API_KEY
@@ -234,7 +309,8 @@ paths:
           name: ascending
           required: false
           schema:
-            type: boolean
+            type: string
+            enum: ["asc", "desc"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
 
     /v1/traces/{traceUuid}:
@@ -270,6 +346,151 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+
+  /v1/spans:
+    get:
+        parameters:
+          - in: header
+            name: CONFIDENT_API_KEY
+            required: true
+            description: The API key of your Confident AI project.
+            schema:
+              type: string
+            example: "<PROJECT-API-KEY>"
+          - in: query
+            name: page
+            required: false
+            schema:
+              type: integer
+              minimum: 1
+            description: This specifies the page number of the threads to return. Defaulted to 1.
+          - in: query
+            name: pageSize
+            required: false
+            schema:
+              type: integer
+              minimum: 1
+            description: This specifies the maximum number of threads per page. Defaulted to 25.
+          - in: query
+            name: type
+            description: Filter by the specific type of span.
+            schema:
+              type: string
+              enum: [SPAN, AGENT, TOOL, RETRIEVER, LLM]
+          - in: query
+            name: traceUuid
+            description: Filter spans that belong to a specific trace UUID.
+            schema:
+              type: string
+              format: uuid
+          - in: query
+            name: name
+            description: Filter spans by their exact name.
+            schema:
+              type: string
+          - in: query
+            name: hasError
+            description: Filter for spans that either failed (true) or succeeded (false).
+            schema:
+              type: boolean
+          - in: query
+            name: model
+            description: Filter LLM spans by the model used (e.g., 'gpt-4').
+            schema:
+              type: string
+          - in: query
+            name: promptAlias
+            required: false
+            schema:
+              type: string 
+            description: This filters the spans by the prompt alias used.
+          - in: query
+            name: promptCommitHash
+            required: false
+            schema:
+              type: string
+            description: This filters the spans by the exact prompt commit hash used.
+          - in: query
+            name: promptVersion
+            required: false
+            schema:
+              type: string
+            description: This filters the spans by the prompt version used.
+          - in: query
+            name: promptLabel
+            required: false
+            schema:
+              type: string
+            description: This filters the spans by the prompt label used.
+          - in: query
+            name: embedder
+            description: Filter retriever spans by the embedder model used.
+            schema:
+              type: string
+          - in: query
+            name: topK
+            description: Filter retriever spans by the topK value.
+            schema:
+              type: integer
+              minimum: 0
+          - in: query
+            name: chunkSize
+            description: Filter retriever spans by the chunk size.
+            schema:
+              type: integer
+              minimum: 0
+          - in: query
+            name: environment
+            required: false
+            schema:
+              type: string
+            description: This filters the threads by the environment where the thread was created, and returns threads from all environments if not specified.
+          - in: query
+            name: start
+            required: false
+            schema:
+              type: string
+              format: date-time
+            description: This filters for threads created after the specified start datetime. Defaulted to 30 days ago.
+          - in: query
+            name: end
+            required: false
+            schema:
+              type: string
+              format: date-time
+            description: This filters for threads created before the specified end datetime. Defaulted to the current time.
+          - in: query
+            name: sortBy
+            required: false
+            schema:
+              type: string
+              enum: [createdAt, lastActivity]
+            description: This determines the field to sort by. Defaulted to `lastActivity`.
+          - in: query
+            name: ascending
+            required: false
+            schema:
+              type: string
+              enum: ["asc", "desc"]
+            description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
+
+  /v1/spans/{spanUuid}:
+    get:
+        parameters:
+          - in: header
+            name: CONFIDENT_API_KEY
+            required: true
+            description: The API key of your Confident AI project.
+            schema:
+              type: string
+            example: "<PROJECT-API-KEY>"
+          - in: path
+            name: spanUuid
+            required: true
+            schema:
+              type: string
+            description: This is the span UUID you wish to retrieve.
+            example: "SPAN-UUID"
 
   /v1/evaluate/threads/{threadId}:
     post:
@@ -307,6 +528,15 @@ paths:
 
   /v1/prompts:
     post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+    get:
       parameters:
         - in: header
           name: CONFIDENT_API_KEY
