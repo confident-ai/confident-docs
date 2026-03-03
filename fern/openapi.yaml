@@ -48,6 +48,10 @@ tags:
     description: Projects API
     externalDocs:
       description: Learn about projects
+  - name: Metric Data
+    description: Metric Data API
+    externalDocs:
+      description: Learn about metric data
 
 paths:
   /v1/metrics:
@@ -1622,6 +1626,125 @@ paths:
                               name: "Conversation Completeness"
                               verboseLogs: "..."
                     deprecated: false
+
+  /v1/metrics-data:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metric Data
+      summary: List Metrics Data
+      operationId: listMetricsData
+      description: |
+        Retrieves a paginated list of metric data (evaluation results) from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the metrics data to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: This specifies the maximum number of metrics data per page. Defaulted to 25, capped at 100.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created after the specified start datetime. Defaulted to 60 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created before the specified end datetime. Defaulted to the current time.
+        - in: query
+          name: sortBy
+          required: false
+          schema:
+            type: string
+            enum: [createdAt]
+          description: This determines the field to sort by. Defaulted to `createdAt`.
+        - in: query
+          name: ascending
+          required: false
+          schema:
+            type: string
+            enum: ["true", "false"]
+          description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
+      responses:
+        "200":
+          description: Successfully retrieved list of metrics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMetricsDataResponse"
+              example:
+                success: true
+                data:
+                  metricsData:
+                    - id: "metric-data-uuid-1"
+                      projectId: "PROJECT-ID"
+                      traceUuid: "trace-uuid-1"
+                      spanUuid: null
+                      testCaseId: null
+                      testRunId: null
+                      threadId: null
+                      name: "answer_relevancy"
+                      multiTurn: false
+                      score: 0.85
+                      reason: "The answer is relevant to the question"
+                      success: true
+                      createdAt: "2025-11-12T10:30:00.000Z"
+                      evaluatedAt: "2025-11-12T10:30:02.000Z"
+                      threshold: 0.7
+                      strictMode: false
+                      skipped: false
+                      evaluationModel: "gpt-4o"
+                      error: null
+                      evaluationCost: 0.002
+                      verboseLogs: null
+                      updatedAt: "2025-11-12T10:30:02.000Z"
+                    - id: "metric-data-uuid-2"
+                      projectId: "PROJECT-ID"
+                      traceUuid: null
+                      spanUuid: "span-uuid-1"
+                      testCaseId: null
+                      testRunId: null
+                      threadId: null
+                      name: "faithfulness"
+                      multiTurn: false
+                      score: 0.92
+                      reason: "The output is faithful to the context"
+                      success: true
+                      createdAt: "2025-11-12T09:15:00.000Z"
+                      evaluatedAt: "2025-11-12T09:15:03.000Z"
+                      threshold: 0.8
+                      strictMode: false
+                      skipped: false
+                      evaluationModel: "gpt-4o"
+                      error: null
+                      evaluationCost: 0.003
+                      verboseLogs: null
+                      updatedAt: "2025-11-12T09:15:03.000Z"
+                  totalMetricsData: 150
+                  page: 1
+                  pageSize: 25
 
   /v1/test-runs:
     get:
@@ -5170,43 +5293,93 @@ components:
       properties:
         id:
           type: string
-          description: The id of the metrics data.
+          description: The unique identifier of the metrics data entry.
+        projectId:
+          type: string
+          description: The project this metric data belongs to.
+        traceUuid:
+          type: string
+          nullable: true
+          description: The UUID of the trace this metric data is associated with, if any.
+        spanUuid:
+          type: string
+          nullable: true
+          description: The UUID of the span this metric data is associated with, if any.
+        testCaseId:
+          type: string
+          nullable: true
+          description: The ID of the test case this metric data is associated with, if any.
+        testRunId:
+          type: string
+          nullable: true
+          description: The ID of the test run this metric data is associated with, if any.
+        threadId:
+          type: string
+          nullable: true
+          description: The ID of the thread this metric data is associated with, if any.
+        name:
+          type: string
+          description: The name of the metric.
+        multiTurn:
+          type: boolean
+          description: Whether this metric was evaluated on a multi-turn conversation.
         score:
           type: number
-          description: This is the final metric score.
+          nullable: true
+          description: The final metric score.
         reason:
           type: string
-          description: This is the reason for the metric score, which is generated by the evaluation model at evaluation time.
+          nullable: true
+          description: The reason for the metric score, generated by the evaluation model at evaluation time.
         success:
           type: boolean
-          description: This is true if the metric score is above the threshold.
+          nullable: true
+          description: Whether the metric score is above the threshold.
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the metric data was created.
+        evaluatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The time the metric was evaluated.
         threshold:
           type: number
           format: float
-          description: This is the threshold for the metric, which determines if the metric is passing or failing depending on if the metric score is above or below the threshold.
-        evaluationModel:
-          type: string
-          description: This is the evaluation model used to run the evaluation.
+          description: The threshold for the metric, which determines if the metric is passing or failing.
         strictMode:
           type: boolean
-          description: This is true if the metric was run in strict mode, which outputs a binary score of 0 or 1.
+          description: Whether the metric was run in strict mode, which outputs a binary score of 0 or 1.
+        skipped:
+          type: boolean
+          description: Whether the metric evaluation was skipped.
+        evaluationModel:
+          type: string
+          nullable: true
+          description: The evaluation model used to run the evaluation.
         error:
           type: string
-          description: This is the error message if the evaluation failed.
+          nullable: true
+          description: The error message if the evaluation failed.
         evaluationCost:
           type: number
           format: float
-          description: This is the cost of running the evaluation.
-        name:
-          type: string
-          description: This is the name of the metric.
+          nullable: true
+          description: The cost of running the evaluation.
         verboseLogs:
           type: string
-          description: This is the verbose logs of the evaluation, which breaks down the metric score calculation into individual steps.
+          nullable: true
+          description: The verbose logs of the evaluation, which breaks down the metric score calculation into individual steps.
       required:
         - id
-        - threshold
+        - projectId
         - name
+        - threshold
+        - strictMode
+        - skipped
+        - multiTurn
+        - createdAt
 
     GetSpan:
       type: object
@@ -6047,6 +6220,33 @@ components:
             metricsCreated:
               type: integer
               description: Number of metric data items created
+
+    ListMetricsDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            metricsData:
+              type: array
+              description: List of metric data entries
+              items:
+                $ref: "#/components/schemas/MetricsData"
+            totalMetricsData:
+              type: integer
+              description: Total number of metric data entries matching the query
+            page:
+              type: integer
+              description: Current page number
+            pageSize:
+              type: integer
+              description: Number of items per page
+      required:
+        - success
+        - data
 
     # Projects Schemas
     Project:
