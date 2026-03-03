@@ -1,0 +1,448 @@
+---
+slug: self-hosting/azure/kubernetes-deployment
+description: Deploy Confident AI workloads to AKS
+---
+
+## Overview
+
+With infrastructure and cluster access ready, you now deploy the Confident AI application services. This step covers:
+
+- Preparing Kubernetes manifests from the `confident-k8s` repository
+- Updating container image tags to the versions provided by Confident AI
+- Configuring the ingress with your domain names and TLS settings
+- Setting up External Secrets to sync credentials from Azure Key Vault
+- Deploying services in the correct order: base config → Redis → application services
+- Monitoring deployment status and troubleshooting common issues
+
+After completion, all Confident AI services will be running in your AKS cluster.
+
+## How Kubernetes deployments work
+
+Kubernetes uses YAML manifests to describe what you want to run. A Deployment tells Kubernetes:
+
+- What container image to use
+- How many replicas (copies) to run
+- What environment variables and secrets to inject
+- Resource limits (CPU, memory)
+
+When you `kubectl apply` a manifest, Kubernetes:
+
+1. Reads your desired state
+2. Compares it to current state
+3. Creates, updates, or deletes resources to match
+4. Continuously ensures the desired state is maintained
+
+### Repository structure
+
+The `confident-k8s` repository contains Kubernetes manifests organized by service:
+
+```
+confident-k8s/
+├── base/                    # Shared configuration
+│   ├── namespace.yaml       # The confident-ai namespace (already created)
+│   ├── network/
+│   │   └── ingress.yaml     # Load balancer and routing rules
+│   └── common/
+│       └── external-secrets/ # Secrets sync configuration
+├── confident-backend/       # API service
+│   ├── deployment.yaml
+│   └── service.yaml
+├── confident-frontend/      # Web dashboard
+├── confident-evals/         # Evaluation service
+├── confident-otel/          # OpenTelemetry collector
+└── redis/                   # Cache service
+```
+
+## Prepare manifests
+
+Navigate to the Kubernetes repository:
+
+```bash
+cd confident-k8s
+```
+
+### Update image tags
+
+Container images are stored in Confident AI's AWS ECR. Your Confident AI representative will provide the specific version tags to use.
+
+Open each deployment file and update the `image` field:
+
+| File                                 | What to update           |
+| ------------------------------------ | ------------------------ |
+| `confident-backend/deployment.yaml`  | Backend API image        |
+| `confident-frontend/deployment.yaml` | Frontend dashboard image |
+| `confident-evals/deployment.yaml`    | Evaluation service image |
+| `confident-otel/deployment.yaml`     | OTEL collector image     |
+
+Example change in `confident-backend/deployment.yaml`:
+
+```yaml
+containers:
+  - name: confident-backend
+    image: 128045499490.dkr.ecr.us-east-1.amazonaws.com/confidentai/confident-backend:v1.2.3
+```
+
+<Note>
+**Image tag format:** `<ecr-account>.dkr.ecr.<region>.amazonaws.com/confidentai/<service>:<version>`
+
+The ECR account ID and region are the values provided by Confident AI for ECR access. The version tag (e.g., `v1.2.3`) is what your representative will provide.
+
+</Note>
+
+<Warning>
+  **Use exact tags, not "latest."** Always use specific version tags (e.g.,
+  `v1.2.3`), not `latest`. Specific tags ensure reproducible deployments and
+  make rollbacks possible. Using `latest` can cause unexpected behavior when
+  images are updated.
+</Warning>
+
+### Configure ingress
+
+The ingress defines how external traffic reaches your services. For Azure, this uses NGINX Ingress (not AWS ALB). Edit `base/network/ingress.yaml`:
+
+<Steps>
+
+<Step title="Set the ingress class">
+
+Ensure the ingress uses NGINX:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: confident-ingress
+  namespace: confident-ai
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+```
+
+</Step>
+
+<Step title="Set your domain names">
+
+Find and replace the placeholder hostnames with your actual domains:
+
+```yaml
+spec:
+  tls:
+    - hosts:
+        - app.yourdomain.com
+        - api.yourdomain.com
+        - deepeval.yourdomain.com
+        - otel.yourdomain.com
+      secretName: confident-tls
+  rules:
+    - host: app.yourdomain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: confident-frontend
+                port:
+                  number: 3000
+
+    - host: api.yourdomain.com
+      # ...
+
+    - host: deepeval.yourdomain.com
+      # ...
+
+    - host: otel.yourdomain.com
+      # ...
+```
+
+</Step>
+
+<Step title="Configure TLS">
+
+The `tls` section and `cert-manager.io/cluster-issuer` annotation tell cert-manager to automatically request and renew certificates:
+
+```yaml
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod  # or your ClusterIssuer name
+spec:
+  tls:
+    - hosts:
+        - app.yourdomain.com
+        - api.yourdomain.com
+      secretName: confident-tls
+```
+
+<Note>
+  cert-manager watches for Ingress resources with this annotation and
+  automatically creates Certificate resources, requests certificates from the
+  issuer, and stores them in the specified Kubernetes Secret.
+</Note>
+
+</Step>
+
+</Steps>
+
+### Configure External Secrets
+
+External Secrets syncs credentials from Azure Key Vault into Kubernetes. The configuration needs to match your deployment.
+
+#### Update the secret store
+
+Edit `base/common/external-secrets/secret-store.yaml`:
+
+The `vaultUrl` must match your Key Vault URI (from `terraform output key_vault_uri`):
+
+```yaml
+spec:
+  provider:
+    azurekv:
+      vaultUrl: "https://confidentaisconfidentkv.vault.azure.net/"
+      authType: WorkloadIdentity
+      serviceAccountRef:
+        name: external-secrets-sa
+```
+
+#### Update the secret references
+
+Edit `base/common/external-secrets/external-secrets.yaml`:
+
+The `key` field in each secret reference should match the Key Vault secret names created by Terraform. The secrets use hyphenated names (e.g., `DATABASE-URL`, `BETTER-AUTH-SECRET`):
+
+```yaml
+data:
+  - secretKey: DATABASE_URL
+    remoteRef:
+      key: DATABASE-URL
+  - secretKey: REDIS_URL
+    remoteRef:
+      key: REDIS-URL
+```
+
+<Warning>
+  **Key Vault secret names use hyphens, not underscores.** Azure Key Vault
+  doesn't allow underscores in secret names. The External Secrets config maps
+  hyphenated Key Vault names to underscored Kubernetes secret keys.
+</Warning>
+
+## Deploy services
+
+Deploy in order to ensure dependencies are available when needed.
+
+<Steps>
+
+<Step title="Apply network and secrets configuration">
+
+The namespace already exists (Terraform created it), but apply the network and secrets configuration:
+
+```bash
+kubectl apply -f base/network/
+kubectl apply -f base/common/external-secrets/
+```
+
+</Step>
+
+<Step title="Wait for secrets to sync">
+
+External Secrets needs to pull credentials from Key Vault before pods can start. Watch the sync status:
+
+```bash
+kubectl get externalsecret -n confident-ai -w
+```
+
+Wait until `STATUS` shows `SecretSynced`:
+
+```
+NAME                       STORE                          REFRESH   STATUS
+confident-externalsecret   confident-clustersecretstore   1h        SecretSynced
+```
+
+Press `Ctrl+C` to stop watching once synced.
+
+Verify the Kubernetes secret was created:
+
+```bash
+kubectl get secret confident-externalsecret -n confident-ai
+```
+
+<Warning>
+  **Don't proceed until secrets are synced.** Pods reference this secret for
+  database URLs, API keys, and other credentials. If you deploy before sync
+  completes, pods will fail to start with "secret not found" errors.
+</Warning>
+
+</Step>
+
+<Step title="Deploy Redis">
+
+Redis must be running before the backend, which uses it for caching and job queues:
+
+```bash
+kubectl apply -f redis/
+```
+
+Verify it's running:
+
+```bash
+kubectl get pods -n confident-ai -l app=redis
+```
+
+Wait for `Running` status before continuing.
+
+</Step>
+
+<Step title="Deploy application services">
+
+Now deploy the Confident AI services:
+
+```bash
+kubectl apply -f confident-backend/
+kubectl apply -f confident-frontend/
+kubectl apply -f confident-evals/
+kubectl apply -f confident-otel/
+```
+
+</Step>
+
+</Steps>
+
+## Monitor deployment
+
+### Watch pod status
+
+```bash
+kubectl get pods -n confident-ai -w
+```
+
+All pods should eventually reach `Running` status with all containers ready:
+
+```
+NAME                                  READY   STATUS    RESTARTS   AGE
+confident-backend-xxx-yyy             1/1     Running   0          2m
+confident-frontend-xxx-yyy            1/1     Running   0          2m
+confident-evals-xxx-yyy               1/1     Running   0          2m
+confident-otel-xxx-yyy                1/1     Running   0          2m
+confident-redis-xxx-yyy               1/1     Running   0          3m
+```
+
+<Note>
+  **Backend may restart once during initial deployment.** The backend runs
+  database migrations on startup. If the database isn't ready immediately, it
+  may fail once and then succeed on retry. One or two restarts is normal.
+</Note>
+
+### Check events
+
+If pods aren't starting, check recent events:
+
+```bash
+kubectl get events -n confident-ai --sort-by='.lastTimestamp' | tail -20
+```
+
+## Common deployment issues
+
+### ImagePullBackOff
+
+```
+confident-backend-xxx   0/1   ImagePullBackOff   0   2m
+```
+
+The cluster can't pull the container image. Causes:
+
+1. **ECR credentials not synced:** The CronJob that refreshes ECR tokens hasn't run yet
+2. **Wrong image tag:** The specified version doesn't exist
+3. **Network issues:** Nodes can't reach ECR
+
+**Fix: Manually trigger ECR credential sync:**
+
+```bash
+kubectl create job --from=cronjob/ecr-credentials-sync manual-ecr-sync -n confident-ai
+```
+
+Wait 30 seconds, then check if pods start pulling images.
+
+<Warning>
+  **ECR tokens expire every 12 hours.** The CronJob refreshes them
+  automatically, but on initial deployment, you may need to trigger it manually.
+  If you see ImagePullBackOff after the cluster has been running for a while,
+  the CronJob may have failed—check its logs.
+</Warning>
+
+### CrashLoopBackOff
+
+```
+confident-backend-xxx   0/1   CrashLoopBackOff   5   10m
+```
+
+The container starts but crashes. Check logs to see why:
+
+```bash
+kubectl logs deployment/confident-backend -n confident-ai
+```
+
+Common causes:
+
+| Error in logs              | Cause                           | Fix                                                |
+| -------------------------- | ------------------------------- | -------------------------------------------------- |
+| "ECONNREFUSED" to database | PostgreSQL not accessible       | Check NSG allows traffic from AKS to database subnet |
+| "Secret not found"         | External Secrets not synced     | Wait for sync or check ExternalSecret status       |
+| "Invalid DATABASE_URL"     | Wrong format in Key Vault       | Verify secret value in Azure Portal                |
+| "OPENAI_API_KEY not set"   | Missing secret                  | Verify Key Vault has all required secrets           |
+
+### External Secrets not syncing
+
+```bash
+kubectl describe externalsecret confident-externalsecret -n confident-ai
+```
+
+Look at the `Status` section for error messages. Common issues:
+
+| Error                        | Cause                          | Fix                                                       |
+| ---------------------------- | ------------------------------ | --------------------------------------------------------- |
+| "AccessDenied"               | Managed identity lacks role    | Check Workload Identity has Key Vault Secrets User role   |
+| "SecretNotFound"             | Secret name doesn't match      | Verify secret names in Key Vault match ExternalSecret config |
+| "Invalid ClusterSecretStore" | Store misconfigured            | Check vaultUrl in `secret-store.yaml` matches Key Vault URI |
+
+### Ingress not getting external IP
+
+After applying the ingress, check if it has an address:
+
+```bash
+kubectl get ingress -n confident-ai
+```
+
+The `ADDRESS` column should show the NGINX Ingress load balancer IP. If it's empty:
+
+```bash
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+```
+
+The `EXTERNAL-IP` should show the Azure Load Balancer IP. If it shows `<pending>`:
+
+- **NSG blocking:** The NSG may not allow inbound traffic on ports 80/443
+- **Quota issues:** Public IP quota may be exhausted
+- **Azure Policy:** Policies may block public IP or Load Balancer creation
+
+## Scaling services
+
+Once everything is running, you can scale based on load:
+
+```bash
+# Scale backend for more API capacity
+kubectl scale deployment confident-backend --replicas=3 -n confident-ai
+
+# Scale frontend if dashboard is slow
+kubectl scale deployment confident-frontend --replicas=2 -n confident-ai
+
+# Scale evals for more concurrent evaluations
+kubectl scale deployment confident-evals --replicas=3 -n confident-ai
+```
+
+<Note>
+  **The evals service is most resource-intensive** during evaluation runs. If
+  evaluations are slow or timing out, scaling this service usually helps most.
+</Note>
+
+## Next steps
+
+After all services are running and healthy, proceed to [Verification](/self-hosting/azure/verification) to test the deployment end-to-end.

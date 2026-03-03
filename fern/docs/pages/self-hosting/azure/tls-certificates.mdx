@@ -1,0 +1,169 @@
+---
+slug: self-hosting/azure/tls-certificates
+description: Configure TLS certificates for Confident AI on Azure
+---
+
+## Overview
+
+Terraform installed cert-manager in the AKS cluster, which automates TLS certificate issuance and renewal. In this step, you will:
+
+- Understand how TLS works with NGINX Ingress and cert-manager on Azure
+- Configure a cert-manager ClusterIssuer for certificate provisioning
+- Verify cert-manager is operational
+- Prepare for ingress TLS configuration in later steps
+
+Unlike AWS (which uses ACM), Azure deployments use cert-manager with Let's Encrypt or your organization's certificate authority.
+
+<Note>
+  **If using public AKS mode:** If you configured `confident_public_aks = true`
+  (HTTP-only testing), you can skip this page. Public mode is only recommended
+  for testing, not production.
+</Note>
+
+## How TLS works on Azure
+
+The Azure deployment uses a different TLS approach than AWS:
+
+1. **NGINX Ingress Controller** handles TLS termination (instead of ALB)
+2. **cert-manager** automates certificate requests and renewals
+3. **Let's Encrypt** (or your CA) issues the certificates
+4. Certificates are stored as Kubernetes Secrets
+
+When a user connects to your domain:
+1. DNS resolves to the Azure Load Balancer IP
+2. Load Balancer forwards traffic to NGINX Ingress
+3. NGINX terminates TLS using the certificate from the Kubernetes Secret
+4. NGINX routes the request to the appropriate backend service
+
+## Verify cert-manager is running
+
+cert-manager was installed by Terraform via Helm. Verify it's operational:
+
+```bash
+kubectl get pods -n cert-manager
+```
+
+**Expected output:**
+
+```
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-xxx-yyy                       1/1     Running   0          30m
+cert-manager-cainjector-xxx-yyy            1/1     Running   0          30m
+cert-manager-webhook-xxx-yyy               1/1     Running   0          30m
+```
+
+All three pods should be `Running`.
+
+<Warning>
+**cert-manager pods not running?**
+
+This sometimes happens when AKS wasn't fully ready. Try:
+
+```bash
+terraform apply
+```
+
+Terraform will retry the failed Helm installation.
+
+</Warning>
+
+## Configure a ClusterIssuer
+
+A ClusterIssuer tells cert-manager how to obtain certificates. The most common option is Let's Encrypt.
+
+### Option A: Let's Encrypt (recommended for internet-facing)
+
+Create a file `cluster-issuer.yaml`:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@yourdomain.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+```
+
+Apply it:
+
+```bash
+kubectl apply -f cluster-issuer.yaml
+```
+
+Verify the issuer is ready:
+
+```bash
+kubectl get clusterissuer letsencrypt-prod
+```
+
+**Expected output:**
+
+```
+NAME               READY   AGE
+letsencrypt-prod   True    30s
+```
+
+<Warning>
+**Let's Encrypt requires HTTP-01 challenge validation.** This means:
+- The NGINX Ingress must be accessible from the internet (at least temporarily)
+- Let's Encrypt servers need to reach port 80 on your load balancer
+- If your ingress is internal-only, Let's Encrypt won't work—use Option B instead
+
+</Warning>
+
+<Note>
+  **For testing,** use the Let's Encrypt staging server first to avoid rate limits:
+  `https://acme-staging-v02.api.letsencrypt.org/directory`. Switch to production
+  once confirmed working.
+</Note>
+
+### Option B: Internal CA or self-signed (for private clusters)
+
+If your ingress is internal (not internet-facing), you can't use Let's Encrypt. Options:
+
+1. **Corporate CA:** Work with your PKI team to issue certificates and create Kubernetes TLS secrets manually
+2. **Self-signed:** Use cert-manager's self-signed issuer (browsers will show warnings)
+
+**Self-signed issuer example:**
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+```
+
+<Warning>
+  **Self-signed certificates cause browser warnings.** Users will see "Your
+  connection is not private" errors. This is acceptable for internal testing but
+  not for production use.
+</Warning>
+
+## DNS preparation
+
+Before certificates can be issued, your DNS must point to the NGINX Ingress load balancer. You'll configure this fully during the Verification step, but you can check the load balancer IP now:
+
+```bash
+kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+This returns the Azure Load Balancer IP that your DNS records should point to.
+
+<Note>
+  **Azure Load Balancer uses IP addresses** (not hostnames like AWS ALB). You'll
+  create A records (not CNAME records) pointing your domains to this IP.
+</Note>
+
+## Next steps
+
+After cert-manager is operational and a ClusterIssuer is configured, proceed to [Cluster Access](/self-hosting/azure/cluster-access) to configure kubectl access and verify infrastructure components.

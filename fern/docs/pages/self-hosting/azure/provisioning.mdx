@@ -1,0 +1,324 @@
+---
+slug: self-hosting/azure/provisioning
+description: Provision Azure infrastructure with Terraform
+---
+
+## Overview
+
+This step executes Terraform to create all Azure infrastructure. The process takes 15-25 minutes and provisions:
+
+- Resource Group for all resources
+- VNet with AKS, database, public, and private endpoint subnets plus NAT Gateway
+- AKS cluster with system and worker node pools
+- PostgreSQL Flexible Server with zone-redundant HA
+- Storage Account with blob containers and private endpoint
+- Key Vault with application secrets
+- Managed Identities with Workload Identity federation
+- Helm releases: NGINX Ingress, External Secrets, ArgoCD, cert-manager, ClickHouse Operator
+
+After completion, you will have a fully provisioned Azure environment ready for Kubernetes workloads.
+
+## What happens during provisioning
+
+When you run `terraform apply`, Terraform:
+
+1. **Reads your configuration** from `terraform.tfvars`
+2. **Calculates dependencies** to determine the order resources must be created
+3. **Creates resources** in Azure via API calls
+4. **Tracks state** in your Azure Storage backend so it knows what exists
+5. **Outputs** important values you'll need for subsequent steps
+
+The process is mostly automated, but you'll need to monitor for errors and potentially troubleshoot issues.
+
+## Initialize Terraform
+
+From the `azure` directory, initialize the working directory:
+
+```bash
+terraform init
+```
+
+This command:
+
+- Downloads required provider plugins (AzureRM, Kubernetes, Helm)
+- Configures the Azure Storage backend for state storage
+- Validates your backend configuration
+
+**Expected output:**
+
+```
+Initializing the backend...
+Successfully configured the backend "azurerm"!
+
+Initializing provider plugins...
+- Finding hashicorp/azurerm versions matching "~> 4.0"...
+- Installing hashicorp/azurerm v4.x.x...
+
+Terraform has been successfully initialized!
+```
+
+<Warning>
+**Backend initialization errors** usually mean:
+- The storage account doesn't exist (create it first)
+- You don't have permission to access the storage account
+- The container doesn't exist
+
+If you see "Error loading state," verify your backend configuration in `provider.tf`.
+
+</Warning>
+
+## Review the plan
+
+Before creating anything, preview what Terraform will do:
+
+```bash
+terraform plan
+```
+
+This shows all resources that will be created, modified, or destroyed. For a fresh deployment, you should see only resource additions (green `+` symbols).
+
+**Key resources in the plan:**
+
+| Category       | What's created                                                                           |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| **Networking** | Resource Group, VNet, 4 subnets, NAT Gateway, NSG, Private DNS Zone                     |
+| **Compute**    | AKS cluster, system pool, worker pool, managed identities                                |
+| **Database**   | PostgreSQL Flexible Server, database, Private DNS Zone link                               |
+| **Storage**    | Storage Account, 3 blob containers, private endpoint, lifecycle policy                   |
+| **Security**   | Key Vault, secrets, 3+ managed identities, federated credentials, role assignments       |
+| **Kubernetes** | Namespaces, service accounts, Helm releases                                              |
+
+<Note>
+  **Save the plan for audit purposes:** ```bash terraform plan -out=plan.tfplan
+  ``` You can then apply this exact plan with `terraform apply plan.tfplan`.
+  This is useful if you need approval before applying.
+</Note>
+
+<Warning>
+  **Review the plan carefully if you see any deletions or modifications.** For a
+  new deployment, there should be no `-` (destroy) or `~` (modify) symbols. If
+  you see them, something may be misconfigured.
+</Warning>
+
+## Apply the infrastructure
+
+Once you've reviewed the plan, create the resources:
+
+```bash
+terraform apply
+```
+
+Terraform shows the plan again and asks for confirmation. Type `yes` to proceed.
+
+**Expected duration:** 15-25 minutes
+
+| Resource              | Typical creation time |
+| --------------------- | --------------------- |
+| Resource Group & VNet | 1-2 minutes           |
+| NAT Gateway           | 1-2 minutes           |
+| AKS cluster           | 8-12 minutes          |
+| AKS worker pool       | 3-5 minutes           |
+| PostgreSQL server     | 5-10 minutes          |
+| Key Vault & secrets   | 1-2 minutes           |
+| Helm releases         | 2-3 minutes           |
+
+<Note>
+  **Don't interrupt the process.** If you press Ctrl+C or close your terminal,
+  Terraform may leave resources in a partially created state. If this happens,
+  just run `terraform apply` again—it will pick up where it left off.
+</Note>
+
+## Common provisioning errors
+
+### Permission errors
+
+```
+Error: creating Resource Group: AuthorizationFailed
+```
+
+Your identity lacks permission to create resources. You need:
+
+- `Contributor` role on the subscription
+- `User Access Administrator` for creating role assignments
+- `Key Vault Administrator` for managing secrets
+
+<Warning>
+  **Many organizations restrict role assignment creation.** If you can't get
+  User Access Administrator, you may need a platform team member to run the
+  deployment or pre-create the required role assignments.
+</Warning>
+
+### Quota errors
+
+```
+Error: creating AKS Cluster Node Pool: QuotaExceeded
+```
+
+You've hit an Azure vCPU quota. Common limits:
+
+| Quota                     | Default limit | How to increase          |
+| ------------------------- | ------------- | ------------------------ |
+| Standard DSv5 Family vCPUs | 20-100       | Azure Portal quotas page |
+| Total Regional vCPUs      | 100-200       | Azure Portal quotas page |
+| Public IP Addresses       | 10            | Azure Portal quotas page |
+
+<Warning>
+  **Quota increases can take hours to days.** If you're in a new subscription,
+  request increases before starting deployment.
+</Warning>
+
+### Naming conflicts
+
+```
+Error: creating Storage Account: StorageAccountAlreadyTaken
+```
+
+Storage account names must be globally unique. If you get naming conflicts:
+
+- Change `confident_application_name` to something unique
+- Verify you're not running multiple deployments with the same name
+
+### AKS creation timeout
+
+```
+Error: waiting for AKS Cluster to create: timeout while waiting
+```
+
+AKS can occasionally take longer than expected. Usually just re-running `terraform apply` continues where it left off. If it keeps failing:
+
+- Check Azure Service Health for regional issues
+- Verify your VNet has available IPs
+- Check for Azure Policy restrictions in your subscription
+
+<Warning>
+**Azure Policies can block resource creation.** Many enterprises have policies that:
+- Restrict which regions you can deploy to
+- Require specific tags on all resources
+- Block certain VM sizes
+- Require specific encryption settings
+- Enforce private endpoints
+
+If you get persistent errors, check with your cloud governance team about Azure Policies.
+
+</Warning>
+
+### Provider authentication errors
+
+```
+Error: building AzureRM Client: obtain subscription
+```
+
+Terraform can't authenticate to Azure. Verify:
+
+- `az account show` works
+- Correct subscription is selected
+- Service principal hasn't expired (re-run `az login`)
+
+### Helm release errors
+
+```
+Error: unable to build kubernetes objects from release manifest
+```
+
+This usually means AKS isn't fully ready when Helm tries to install charts. Re-running `terraform apply` typically resolves it.
+
+## Capture important outputs
+
+After successful completion, Terraform displays outputs. Save these—you'll need them for subsequent steps:
+
+```bash
+# View all outputs
+terraform output
+
+# Get specific values
+terraform output cluster_name
+terraform output db_instance_fqdn
+terraform output storage_account_name
+terraform output key_vault_uri
+terraform output argocd_server_url
+```
+
+| Output                 | What it's for                                         |
+| ---------------------- | ----------------------------------------------------- |
+| `cluster_name`         | Used to configure kubectl access                      |
+| `db_instance_fqdn`    | Database hostname (already configured in Key Vault)   |
+| `storage_account_name` | Storage account for uploaded files                   |
+| `key_vault_name`       | Key Vault containing application secrets             |
+| `key_vault_uri`        | Key Vault URI (needed for External Secrets config)   |
+| `argocd_server_url`    | URL to access ArgoCD dashboard                       |
+| `vnet_id`              | Needed for VNet peering or VPN setup                 |
+
+<Note>
+  **You can always retrieve outputs later** by running `terraform output` in the
+  same directory with access to the state file.
+</Note>
+
+## What was deployed
+
+Here's what now exists in your Azure subscription:
+
+### Networking
+
+- **Resource Group** containing all resources
+- **VNet** with DNS support
+- **AKS subnet** — where AKS nodes run
+- **Database subnet** — delegated subnet for PostgreSQL Flexible Server
+- **Public subnet** — for public-facing resources
+- **Private endpoint subnet** — for Storage Account private access
+- **NAT Gateway** — allows AKS nodes to make outbound requests
+- **Network Security Group** — firewall rules for the AKS subnet
+- **Private DNS Zone** — resolves PostgreSQL hostname within the VNet
+
+### Compute (AKS)
+
+- **AKS Cluster** — Kubernetes control plane managed by Azure
+- **System Node Pool** — 2x `Standard_D4s_v5` running system components
+- **Worker Node Pool** — autoscaling pool running application workloads
+- **Workload Identity** — OIDC issuer enabled for pod identity
+
+### Data stores
+
+- **PostgreSQL Flexible Server** — managed database with zone-redundant HA and private DNS
+- **Storage Account** — ZRS-replicated with private endpoint and versioning
+- **Blob Containers** — test cases, payloads, and ClickHouse backups
+- **Key Vault** — contains all application credentials and connection strings
+
+### Kubernetes components (pre-installed via Helm)
+
+- **NGINX Ingress Controller** — routes traffic from Azure Load Balancer to services
+- **External Secrets Operator** — syncs secrets from Key Vault to Kubernetes
+- **ArgoCD** — GitOps tool for managing deployments
+- **cert-manager** — automates TLS certificate lifecycle
+- **ClickHouse Operator** — manages the analytics database
+
+### Security
+
+- **Managed Identities** — separate identities for AKS, storage, external secrets, and ClickHouse backup
+- **Federated Identity Credentials** — links service accounts to managed identities via Workload Identity
+- **Role Assignments** — Network Contributor, Storage Blob Data Contributor, Key Vault Secrets User
+- **NSG rules** — controls traffic to/from AKS subnet
+
+## What to do if provisioning fails
+
+1. **Read the error message carefully.** Terraform errors usually indicate exactly what went wrong.
+
+2. **Don't panic.** Terraform is idempotent—you can run `apply` again and it will continue from where it failed.
+
+3. **Check common causes:**
+
+   - Permissions
+   - Quota limits
+   - Network connectivity
+   - Invalid variable values
+
+4. **If stuck, don't destroy and recreate.** This can leave orphaned resources. Instead, fix the configuration and re-apply.
+
+<Warning>
+  **Never run `terraform destroy` unless you intend to delete everything.** If
+  you're troubleshooting, fix the issue and re-run `apply`. Destroying and
+  recreating can lose data and create inconsistent state.
+</Warning>
+
+## Next steps
+
+After infrastructure is provisioned, proceed to [TLS Certificates](/self-hosting/azure/tls-certificates) to configure HTTPS for your services.

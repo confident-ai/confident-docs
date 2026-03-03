@@ -3,4 +3,53 @@ slug: self-hosting/azure/overview
 description: Deploy Confident AI on Microsoft Azure
 ---
 
-To be documented...
+Deploy Confident AI on your Azure infrastructure for complete control over your evaluation and observability platform.
+
+## Architecture
+
+The Azure deployment uses Terraform to provision a production-ready infrastructure with the following components:
+
+## Core components
+
+<CardGroup cols={3}>
+  <Card title="VNet & Networking" icon="fa-light fa-network-wired">
+    AKS/database/public/private-endpoint subnets with NAT Gateway, NSG, and
+    Private DNS Zone.
+  </Card>
+  <Card title="AKS Cluster" icon="fa-light fa-dharmachakra">
+    Managed Kubernetes with a system node pool and autoscaling worker node pool,
+    Workload Identity, and Azure CNI networking.
+  </Card>
+  <Card title="PostgreSQL Flexible Server" icon="fa-light fa-database">
+    Managed database in a delegated subnet with zone-redundant HA, automated
+    backups, and private DNS resolution.
+  </Card>
+  <Card title="NGINX Ingress + Azure LB" icon="fa-light fa-scale-balanced">
+    NGINX Ingress Controller backed by an Azure Standard Load Balancer with
+    cert-manager for TLS.
+  </Card>
+  <Card title="ArgoCD" icon="fa-light fa-arrows-rotate">
+    GitOps tool for managing Kubernetes deployments.
+  </Card>
+  <Card title="Azure Blob Storage" icon="fa-light fa-bucket">
+    Storage Account with private endpoint and blob containers for test cases,
+    payloads, and ClickHouse backups.
+  </Card>
+</CardGroup>
+
+## Deployed services
+
+The Kubernetes cluster runs the following services:
+
+| Service                 | Namespace                  | Description                                            |
+| ----------------------- | -------------------------- | ------------------------------------------------------ |
+| **confident-backend**   | confident-ai               | Express.js API service handling core platform logic    |
+| **confident-frontend**  | confident-ai               | Next.js web application for the Confident AI dashboard |
+| **confident-evals**     | confident-ai               | FastAPI service for running LLM evaluations            |
+| **confident-otel**      | confident-ai               | OpenTelemetry collector for trace ingestion            |
+| **redis**               | confident-ai               | In-memory cache for session and queue management       |
+| **ArgoCD**              | argocd                     | GitOps continuous delivery                             |
+| **ClickHouse Operator** | clickhouse-operator-system | Manages the analytics database                         |
+| **NGINX Ingress**       | ingress-nginx              | Routes external traffic to services via Azure LB       |
+| **External Secrets**    | confident-ai               | Syncs credentials from Azure Key Vault                 |
+| **cert-manager**        | cert-manager               | Automates TLS certificate issuance and renewal         |

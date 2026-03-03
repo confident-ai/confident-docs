@@ -1,0 +1,208 @@
+---
+slug: self-hosting/azure/requirements
+description: Technologies and resource requirements for Confident AI on Azure
+---
+
+## Overview
+
+Before starting deployment, review these requirements with your infrastructure and security teams. This page covers:
+
+- Technologies that need approval in your environment
+- Resource sizing for staging and production
+- Azure services that will be provisioned
+- Permissions required for deployment
+- Estimated costs and considerations
+
+Understanding these requirements upfront prevents delays caused by missing approvals or insufficient quotas.
+
+## Technologies
+
+Confident AI uses the following technologies. Your organization may require approval before deploying new technologies:
+
+| Technology                    | Version | Purpose                                             |
+| ----------------------------- | ------- | --------------------------------------------------- |
+| **PostgreSQL**                | 17.x    | Primary database (via Azure Database for PostgreSQL) |
+| **ClickHouse**                | Latest  | Analytics database (via ClickHouse Operator)        |
+| **Redis**                     | 7.x     | Session cache and job queues                        |
+| **Kubernetes**                | 1.31+   | Container orchestration (via AKS)                   |
+| **Node.js**                   | 20.x    | Backend and frontend runtime                        |
+| **Python**                    | 3.11+   | Evaluations service runtime                         |
+| **Terraform**                 | 1.5+    | Infrastructure provisioning                         |
+| **Helm**                      | 3.x     | Kubernetes package management                       |
+| **ArgoCD**                    | 2.x     | GitOps continuous delivery                          |
+| **External Secrets Operator** | 0.9+    | Secrets sync from Azure Key Vault                   |
+| **cert-manager**              | 1.17+   | TLS certificate automation                          |
+
+<Note>
+  **Why this tech stack?** PostgreSQL is the application's source of truth.
+  Redis provides fast caching and manages background job queues. Kubernetes
+  enables reliable, scalable container orchestration. External Secrets keeps
+  credentials in Key Vault (your security team's preferred location) while
+  making them available to pods.
+</Note>
+
+<Warning>
+  **Technology approval processes:** Many enterprises have technology review
+  boards or approved software lists. If PostgreSQL, Kubernetes, or Terraform
+  aren't already approved in your environment, initiate that process early—it
+  can take weeks.
+</Warning>
+
+## Resource allocation
+
+Default resource configurations for staging and production environments. These represent starting points—adjust based on your expected workload.
+
+| Resource                   | Staging                                           | Production                                        |
+| -------------------------- | ------------------------------------------------- | ------------------------------------------------- |
+| **AKS System Pool**       | 2x `Standard_D4s_v5` (4 vCPU, 16GB)              | 2x `Standard_D4s_v5` (4 vCPU, 16GB)              |
+| **AKS Worker Pool**       | 4x `Standard_D8s_v5` (8 vCPU, 32GB)              | 4x `Standard_D8s_v5` (8 vCPU, 32GB)              |
+| **AKS Worker Autoscaling** | 2-8 nodes                                        | 2-8 nodes                                         |
+| **PostgreSQL**             | `GP_Standard_D4s_v3` (4 vCPU, 16GB), 64GB storage | `GP_Standard_D4s_v3` (4 vCPU, 16GB), 64GB storage |
+
+### Understanding resource sizing
+
+**AKS worker nodes** run your application containers. More nodes = more capacity for concurrent users and evaluations. The autoscaler adds nodes during high load and removes them when idle.
+
+**AKS system pool** runs Kubernetes system components (CoreDNS, kube-proxy, etc.) on a fixed set of 2 nodes.
+
+**PostgreSQL Flexible Server** stores all application data. The SKU affects query performance; storage grows as you accumulate data.
+
+<Note>
+  **Which service is most resource-intensive?** The evaluations service
+  (`confident-evals`) consumes the most CPU during evaluation runs—it processes
+  LLM outputs and computes metrics. If evaluations are slow, scale this service
+  first before adding nodes.
+</Note>
+
+<Warning>
+**Azure vCPU quotas can block deployment.** Azure subscriptions have default limits on vCPUs per VM family. A typical deployment needs ~40 vCPUs for the Dv5 family (2×4 system + 4×8 worker).
+
+Check your quotas before starting:
+
+- Azure Portal → Subscriptions → Usage + quotas → Filter by "Standard Dv5 Family"
+
+If your limit is low, request an increase—this can take hours to days.
+
+</Warning>
+
+## Azure services
+
+The deployment provisions the following Azure services:
+
+| Service                              | Purpose                                            | Why it's needed                          |
+| ------------------------------------ | -------------------------------------------------- | ---------------------------------------- |
+| **Resource Group**                   | Logical container for all resources                | Organizes and manages lifecycle          |
+| **Virtual Network (VNet)**           | Isolated network with multiple subnets             | Network isolation and security           |
+| **AKS**                             | Managed Kubernetes control plane and nodes         | Runs application containers              |
+| **Azure Database for PostgreSQL**    | Managed PostgreSQL Flexible Server                 | Stores all application data              |
+| **Storage Account**                  | Blob storage for application data                  | File uploads, exports, and backups       |
+| **Key Vault**                        | Secure credential storage                          | Stores API keys, DB passwords, secrets   |
+| **Managed Identities**              | User-assigned identities for Workload Identity     | Grants pods specific Azure permissions   |
+| **NAT Gateway**                     | Outbound internet for AKS subnet                  | Allows pods to call external APIs        |
+| **Network Security Group**          | Firewall rules for AKS subnet                     | Controls inbound/outbound traffic        |
+| **Private DNS Zone**                | DNS resolution for PostgreSQL                      | Private database connectivity            |
+| **Private Endpoint**                | Private access to Storage Account                  | Storage traffic stays on Azure backbone  |
+| **Azure Load Balancer**             | Standard LB for NGINX Ingress                      | Routes traffic to services               |
+
+<Warning>
+
+**Some organizations restrict which Azure services can be used.** Azure Policy or management group policies may prohibit certain services. Verify the services above are allowed in your subscription before proceeding.
+
+Common restrictions that cause issues:
+
+- NAT Gateway (some orgs require shared NAT infrastructure)
+- Key Vault (some orgs require centrally managed vaults)
+- Managed Identity creation (some orgs require pre-provisioned identities)
+- Public IP allocation (some orgs restrict public IPs)
+
+</Warning>
+
+### Outbound network requirements
+
+Confident AI needs to reach external services. Ensure your network allows outbound HTTPS (port 443) to:
+
+| Service               | Why                      |
+| --------------------- | ------------------------ |
+| `api.openai.com`      | Running LLM evaluations  |
+| `*.ecr.amazonaws.com` | Pulling container images |
+| `github.com`          | ArgoCD GitOps syncing    |
+
+<Warning>
+**Corporate proxies and firewalls:** If your organization routes traffic through a proxy or inspects HTTPS, you may need to:
+- Allowlist the domains above
+- Configure proxy settings in the deployment
+- Get certificate exceptions for HTTPS inspection
+
+Network restrictions are a common cause of deployment failures that appear as timeouts or SSL errors.
+
+</Warning>
+
+## Permissions
+
+The identity running Terraform needs the following Azure RBAC roles or equivalent permissions:
+
+- **Contributor** on the subscription or target resource group
+- **User Access Administrator** for creating role assignments
+- **Key Vault Administrator** for managing Key Vault secrets
+
+Terraform creates and manages:
+
+- Resource Groups, VNets, subnets, NSGs, NAT Gateways
+- AKS clusters and node pools
+- PostgreSQL Flexible Servers
+- Storage Accounts and containers
+- Key Vaults and secrets
+- Managed Identities and federated credentials
+- Role assignments
+
+<Warning>
+**Permissions are a common cause of deployment failures.** Most organizations don't grant broad permissions by default.
+
+Options:
+
+1. **Use Contributor + User Access Administrator temporarily** — Simplest for initial deployment. Restrict after success.
+2. **Request specific permissions** — Work with your cloud security team to create a deployment service principal with the permissions above.
+3. **Have a platform team deploy** — If you can't get permissions, have someone who does run Terraform.
+
+</Warning>
+
+## Estimated costs
+
+Azure costs vary by region and usage. Approximate monthly costs for always-on infrastructure:
+
+| Component              | Staging        | Production      |
+| ---------------------- | -------------- | --------------- |
+| AKS Control Plane      | Free (Standard)| Free (Standard) |
+| AKS Nodes (VMs)        | $800-1600      | $800-1600       |
+| PostgreSQL Flexible    | $200           | $200            |
+| NAT Gateway            | $35            | $35             |
+| Storage + Data Transfer| ~$10           | $10-50          |
+| Load Balancer          | $20            | $20             |
+| **Total (approx)**     | **$1100-1900** | **$1100-1900**  |
+
+<Note>
+**These are estimates.** Actual costs depend on:
+- Region (East US 2 is typically cost-effective)
+- Usage (more evaluations = more compute = higher cost)
+- Data volume (PostgreSQL storage, blob objects)
+- Reserved instances (can reduce VM costs 30-50%)
+
+Use Azure Cost Management after deployment to track actual spending.
+
+</Note>
+
+## Pre-deployment checklist
+
+Before proceeding to Prerequisites, verify:
+
+- [ ] Technologies listed above are approved for use
+- [ ] Azure services above can be provisioned (no Azure Policy blocks)
+- [ ] Permissions available or obtainable
+- [ ] vCPU quotas sufficient for desired node count
+- [ ] Outbound network access available or exceptions requested
+- [ ] Budget approved for estimated costs
+- [ ] Security team aware of deployment plan
+
+## Next steps
+
+Once requirements are understood and approved, proceed to [Prerequisites](/self-hosting/azure/prerequisites) to set up your deployment environment.

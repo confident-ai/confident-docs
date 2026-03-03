@@ -1,0 +1,316 @@
+---
+slug: self-hosting/azure/prerequisites
+description: Prerequisites for deploying Confident AI on Azure
+---
+
+## Overview
+
+Before deploying Confident AI, you need to prepare your local environment and gather required information. This page covers:
+
+- Installing required CLI tools (Terraform, Azure CLI, kubectl, Helm)
+- Configuring Azure credentials with appropriate permissions
+- Obtaining repository access from Confident AI
+- Gathering domain, OAuth, and ECR credentials
+- Planning your VNet configuration
+
+Complete all items on this page before proceeding to Configuration.
+
+## Tools
+
+Install the following tools on your local machine (or wherever you'll run the deployment from):
+
+| Tool          | Version  | Purpose                                      | Installation                                                              |
+| ------------- | -------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| **Terraform** | >= 1.5.0 | Provisions all Azure infrastructure          | [terraform.io/downloads](https://www.terraform.io/downloads)              |
+| **Azure CLI** | Latest   | Authenticates with Azure and manages resources | [learn.microsoft.com/cli/azure/install-azure-cli](https://learn.microsoft.com/cli/azure/install-azure-cli) |
+| **kubectl**   | >= 1.28  | Manages Kubernetes workloads on AKS          | [kubernetes.io/docs/tasks/tools](https://kubernetes.io/docs/tasks/tools/) |
+| **Helm**      | >= 3.12  | Installs Kubernetes packages (charts)        | [helm.sh/docs/intro/install](https://helm.sh/docs/intro/install/)         |
+| **Git**       | Latest   | Clones the deployment repositories           | [git-scm.com](https://git-scm.com/)                                       |
+
+Verify installations:
+
+```bash
+terraform version
+az version
+kubectl version --client
+helm version
+```
+
+<Warning>
+  **Corporate laptop restrictions:** Many organizations restrict software
+  installation on managed devices. If you can't install these tools locally,
+  consider: - Using a cloud-based VM (Azure VM) as your deployment
+  workstation - Requesting exceptions from your IT security team - Using
+  pre-approved container images that include these tools
+</Warning>
+
+## Azure credentials
+
+Terraform needs Azure credentials to create resources on your behalf. The identity you use must have Contributor and User Access Administrator roles on the target subscription.
+
+### Option A: Interactive login (recommended for individuals)
+
+```bash
+az login
+az account set --subscription "<your-subscription-id>"
+```
+
+### Option B: Service principal (recommended for CI/CD and teams)
+
+```bash
+az login --service-principal \
+  --username "<app-id>" \
+  --password "<client-secret>" \
+  --tenant "<tenant-id>"
+```
+
+### Option C: Managed Identity (from an Azure VM)
+
+If running Terraform from an Azure VM with a system-assigned managed identity, no explicit login is needed. Ensure the identity has the required role assignments.
+
+Verify access works:
+
+```bash
+az account show
+```
+
+This should return your subscription ID and tenant.
+
+<Warning>
+**Permission errors are the #1 cause of failed deployments.** Before starting, verify your identity has permissions to create:
+- Resource Groups, VNets, subnets, NSGs, NAT Gateways
+- AKS clusters and node pools
+- PostgreSQL Flexible Servers
+- Storage Accounts
+- Key Vaults and secrets
+- Managed Identities and role assignments
+
+If your organization requires pre-approved service principals, work with your cloud security team to get the necessary permissions before proceeding.
+
+</Warning>
+
+<Note>
+  **Using a service principal?** Many organizations prohibit using personal
+  credentials for infrastructure provisioning. If you need to use a service
+  principal, ensure it has the permissions listed above and that
+  you can authenticate with it from your deployment workstation.
+</Note>
+
+## Repository access
+
+Confident AI provides two private GitHub repositories containing the deployment code:
+
+| Repository            | What it contains                                                                                                                                          |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `confident-terraform` | Terraform code that sets up the complete Azure infrastructure (including VNet, AKS, PostgreSQL, Storage, etc.) and performs the initial configuration of the AKS cluster |
+| `confident-k8s`       | Kubernetes YAML files that deploy the actual application services                                                                                         |
+
+Your Confident AI representative will grant your GitHub account access to these repositories. Once granted, clone them:
+
+```bash
+git clone git@github.com:confident-ai/confident-terraform.git
+git clone git@github.com:confident-ai/confident-k8s.git
+```
+
+<Warning>
+**SSH key issues:** If the clone fails with "Permission denied (publickey)", you need to add your SSH key to GitHub. See [GitHub's SSH key documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+**Corporate proxy/firewall:** If git commands hang or timeout, your network may block SSH (port 22). Try using HTTPS instead:
+
+```bash
+git clone https://github.com/confident-ai/confident-terraform.git
+```
+
+</Warning>
+
+## Information to gather
+
+Before running Terraform, you need several pieces of information. Gather these now to avoid interruptions during configuration.
+
+### Azure subscription ID
+
+You need the subscription ID where resources will be deployed:
+
+```bash
+az account show --query id -o tsv
+```
+
+<Warning>
+  **Ensure the correct subscription is selected.** If your organization has
+  multiple subscriptions, verify you're targeting the right one. Deploying to
+  the wrong subscription can be difficult to undo.
+</Warning>
+
+### Domain and URLs
+
+Confident AI needs three URLs configured. These determine where your users and applications access the platform:
+
+| Variable         | What it's for                                                       | Example                      |
+| ---------------- | ------------------------------------------------------------------- | ---------------------------- |
+| **Frontend URL** | Where users open their browser to access the Confident AI dashboard | `https://app.yourdomain.com` |
+| **Backend URL**  | API endpoint that the SDK and integrations call                     | `https://api.yourdomain.com` |
+| **Subdomain**    | Used for authentication cookies—typically your root domain          | `yourdomain.com`             |
+
+<Note>
+  **Why separate frontend and backend URLs?** The frontend serves the web
+  dashboard, while the backend handles API requests. Separating them allows
+  independent scaling and clearer security boundaries. Both URLs will point to
+  the same load balancer but route to different services.
+</Note>
+
+<Warning>
+  **DNS control required:** You must be able to create DNS records (CNAME or A
+  records) for these domains. If your DNS is managed by a different team, loop
+  them in early—DNS changes often require change tickets and approvals.
+</Warning>
+
+### OAuth credentials (Google SSO)
+
+If using Google for user authentication, you need OAuth credentials. Skip this if using a different identity provider (Okta, Azure AD, etc.—these are configured separately).
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new **OAuth 2.0 Client ID** (Web application type)
+3. Add authorized redirect URI: `https://<your-backend-url>/api/auth/callback/google`
+4. Save the **Client ID** and **Client Secret**
+
+<Warning>
+  **OAuth redirect URI must be exact.** The redirect URI must match exactly what
+  you configure in Confident AI. A common mistake is forgetting the
+  `/api/auth/callback/google` path or using HTTP instead of HTTPS.
+</Warning>
+
+### ECR access credentials
+
+Confident AI container images are stored in a private AWS Elastic Container Registry (ECR). Your Confident AI representative will provide credentials that allow your AKS cluster to pull these images:
+
+| Credential                  | What it's for                                              |
+| --------------------------- | ---------------------------------------------------------- |
+| `ecr_aws_access_key_id`     | AWS access key that can authenticate to Confident AI's ECR |
+| `ecr_aws_secret_access_key` | Corresponding secret key                                   |
+| `ecr_aws_account_id`        | The AWS account ID where images are stored                 |
+
+<Note>
+  **Why AWS ECR on Azure?** Confident AI hosts container images in AWS ECR.
+  Terraform configures a CronJob in your AKS cluster that periodically refreshes
+  ECR pull credentials. Your cluster authenticates to ECR, pulls the images, and
+  runs them in your environment—the images never leave your infrastructure after
+  the initial pull.
+</Note>
+
+### Secrets to generate
+
+You need to generate several secure random values. These are used for encrypting sessions, database passwords, and admin access:
+
+```bash
+# Auth secret - used to sign authentication tokens (32+ characters)
+openssl rand -base64 32
+
+# PostgreSQL password - primary database password
+openssl rand -base64 24
+
+# ClickHouse password - analytics database password
+openssl rand -base64 24
+
+# ArgoCD admin password - GitOps dashboard access
+openssl rand -base64 16
+```
+
+<Warning>
+  **Save these values securely.** You'll need them during configuration. Use a
+  password manager or secure notes—don't save them in plain text files or commit
+  them to git. If you lose these values, you may need to redeploy or reset
+  credentials.
+</Warning>
+
+### OpenAI API key
+
+Confident AI uses OpenAI (or compatible LLM providers) to run evaluations. You need an API key with access to models like GPT-4.
+
+<Note>
+  **Outbound network access:** Your AKS cluster needs outbound HTTPS access to
+  `api.openai.com` for evaluations to work. If your organization restricts
+  outbound traffic, ensure this is allowlisted. Alternatively, if you use Azure
+  OpenAI or a self-hosted model, provide those credentials instead.
+</Note>
+
+## Network planning
+
+Terraform can either create a new VNet or deploy into an existing one. Understanding this decision is important because it affects network isolation, connectivity, and security.
+
+### What is a VNet?
+
+A Virtual Network (VNet) is your isolated network in Azure. Think of it as your own private data center in the cloud. Resources inside the VNet can talk to each other, but external access is controlled by gateways and security rules.
+
+### Option A: Create new VNet (recommended for most deployments)
+
+Terraform creates a dedicated VNet for Confident AI with:
+
+- **AKS subnet:** Where AKS worker and system nodes run
+- **Database subnet:** Delegated subnet for PostgreSQL Flexible Server (with service delegation)
+- **Public subnet:** For any future public-facing resources
+- **Private endpoint subnet:** For Storage Account private endpoint access
+- **NAT Gateway:** Allows AKS nodes to make outbound requests (for pulling images, calling APIs)
+
+Default IP ranges:
+
+| Subnet Type          | CIDR Block     | What it means                        |
+| -------------------- | -------------- | ------------------------------------ |
+| **VNet**             | `10.0.0.0/16`  | 65,536 available IP addresses        |
+| **AKS**              | `10.0.1.0/24`  | 256 IPs for AKS nodes               |
+| **Database**         | `10.0.6.0/24`  | 256 IPs for PostgreSQL (delegated)   |
+| **Public**           | `10.0.101.0/24` | 256 IPs for public resources        |
+| **Private Endpoints** | `10.0.7.0/24` | 256 IPs for private endpoint NICs    |
+
+<Note>
+  **CIDR conflicts:** If these IP ranges overlap with your corporate network
+  (e.g., if you already use `10.0.x.x` internally), you'll have routing problems
+  when setting up VPN connectivity. Check with your network team and choose
+  non-overlapping ranges.
+</Note>
+
+### Option B: Use existing VNet
+
+If your organization requires deploying into an existing VNet (common for compliance or network policy reasons), gather:
+
+- **VNet ID** (e.g., `/subscriptions/.../resourceGroups/.../providers/Microsoft.Network/virtualNetworks/...`)
+- **VNet address space** (e.g., `10.0.0.0/16`)
+- **AKS subnet ID** — must have sufficient IPs for nodes and pods
+- **Database subnet ID** — must have `Microsoft.DBforPostgreSQL/flexibleServers` service delegation
+- **Public subnet ID** — for load balancer resources
+
+<Warning>
+**Database subnet delegation is required.** PostgreSQL Flexible Server requires a dedicated subnet with `Microsoft.DBforPostgreSQL/flexibleServers` service delegation. Without this delegation, the database provisioning will fail.
+
+If using an existing VNet, verify the database subnet has this delegation configured or add it before proceeding.
+
+</Warning>
+
+<Warning>
+**Corporate VNet restrictions:** Many organizations have strict policies on what can be created in shared VNets:
+- NSGs may require approval
+- NAT Gateways may need to use existing shared infrastructure
+- Subnet CIDR ranges may be pre-allocated
+- VNet Flow Logs may be required
+
+Work with your network/cloud team to understand these constraints before choosing this option.
+
+</Warning>
+
+## Checklist before proceeding
+
+Before moving to Configuration, verify:
+
+- [ ] All CLI tools installed and working (`terraform`, `az`, `kubectl`, `helm`, `git`)
+- [ ] Azure credentials configured and `az account show` succeeds
+- [ ] Correct subscription selected
+- [ ] Both GitHub repositories cloned successfully
+- [ ] Domain URLs decided and DNS access confirmed
+- [ ] OAuth credentials created (if using Google SSO)
+- [ ] ECR credentials received from Confident AI
+- [ ] Secrets generated and stored securely
+- [ ] VNet decision made (new vs. existing) and relevant IDs gathered
+- [ ] Network team consulted if using existing VNet or if CIDR conflicts possible
+
+## Next steps
+
+Once you have all prerequisites in place, proceed to [Configuration](/self-hosting/azure/configuration) to set up your Terraform variables.
