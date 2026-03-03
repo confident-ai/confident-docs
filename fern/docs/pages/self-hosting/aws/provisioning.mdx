@@ -10,9 +10,9 @@ This step executes Terraform to create all AWS infrastructure. The process takes
 - VPC with public/private subnets and NAT gateway
 - EKS cluster with managed node groups
 - RDS PostgreSQL database with automatic password rotation
-- S3 bucket with VPC endpoint for private access
+- S3 buckets (test cases, payloads, ClickHouse backups) with VPC endpoint for private access
 - Secrets Manager with KMS encryption
-- IAM roles for pod identity (IRSA)
+- IAM roles with EKS Pod Identity for pod-level AWS permissions
 - Helm releases: ALB Controller, External Secrets, ArgoCD, ClickHouse Operator
 
 After completion, you will have a fully provisioned AWS environment ready for Kubernetes workloads.
@@ -31,7 +31,7 @@ The process is mostly automated, but you'll need to monitor for errors and poten
 
 ## Initialize Terraform
 
-From the `aws_tf` directory, initialize the working directory:
+From the `aws` directory, initialize the working directory:
 
 ```bash
 terraform init
@@ -83,7 +83,7 @@ This shows all resources that will be created, modified, or destroyed. For a fre
 | **Networking** | VPC, 4+ subnets, NAT gateway, Internet gateway, route tables, S3 VPC endpoint |
 | **Compute**    | EKS cluster, node group (EC2 instances), security groups                      |
 | **Database**   | RDS PostgreSQL instance, subnet group, security group                         |
-| **Storage**    | S3 bucket, bucket policy                                                      |
+| **Storage**    | S3 buckets (test cases, payloads, ClickHouse backups), bucket policies        |
 | **Security**   | KMS key, Secrets Manager secret, 5+ IAM roles and policies                    |
 | **Kubernetes** | Namespace, service accounts, Helm releases                                    |
 
@@ -137,7 +137,7 @@ Error: creating IAM Role: AccessDenied
 Your IAM user/role lacks permission to create IAM resources. You need:
 
 - `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:CreatePolicy`
-- `iam:CreateOpenIDConnectProvider` (for IRSA)
+- `iam:CreateOpenIDConnectProvider` (for EKS Pod Identity)
 
 <Warning>
   **Many organizations restrict IAM creation.** If you can't get these
@@ -269,7 +269,7 @@ Here's what now exists in your AWS account:
 ### Data stores
 
 - **RDS PostgreSQL** — managed database with encryption and automated backups
-- **S3 Bucket** — private bucket for uploaded files
+- **S3 Buckets** — private buckets for test cases, payloads, and ClickHouse backups
 - **Secrets Manager secret** — contains all application credentials
 
 ### Kubernetes components (pre-installed via Helm)
@@ -282,7 +282,7 @@ Here's what now exists in your AWS account:
 ### Security
 
 - **KMS Key** — encrypts secrets at rest
-- **IAM Roles** — separate roles for EKS, nodes, and pods (IRSA)
+- **IAM Roles** — separate roles for EKS, nodes, and pods (EKS Pod Identity)
 - **Security Groups** — firewall rules for each component
 
 ## What to do if provisioning fails

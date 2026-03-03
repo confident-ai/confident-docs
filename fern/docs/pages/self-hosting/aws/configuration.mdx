@@ -28,7 +28,7 @@ The repository includes template files with sensible defaults. You copy a templa
 Navigate to the AWS Terraform directory:
 
 ```bash
-cd confident-terraform/aws_tf
+cd confident-terraform/aws
 ```
 
 Copy the appropriate environment template:
@@ -155,11 +155,11 @@ confident_node_group_desired_size = 4
 
 **Recommended sizes:**
 
-| Environment | Instance Type | vCPU | Memory | Min/Max Nodes |
-| ----------- | ------------- | ---- | ------ | ------------- |
-| Staging     | `m6i.large`   | 2    | 8 GB   | 2-4           |
-| Production  | `m6i.xlarge`  | 4    | 16 GB  | 2-8           |
-| High volume | `m6i.2xlarge` | 8    | 32 GB  | 4-12          |
+| Environment | Instance Type  | vCPU | Memory | Min/Max Nodes |
+| ----------- | -------------- | ---- | ------ | ------------- |
+| Staging     | `m6i.2xlarge`  | 8    | 32 GB  | 2-8           |
+| Production  | `m6i.2xlarge`  | 8    | 32 GB  | 2-8           |
+| High volume | `m6i.4xlarge`  | 16   | 64 GB  | 4-12          |
 
 <Note>
   **Instance type availability varies by region.** If you get errors about
@@ -186,21 +186,23 @@ confident_rds_allocated_storage     = 20
 confident_rds_max_allocated_storage = 100
 confident_psql_db_name              = "confident_db"
 confident_psql_username             = "confident_admin"
+confident_psql_password             = "<your-generated-password>"
 ```
 
-| Variable                              | What it controls                             |
-| ------------------------------------- | -------------------------------------------- |
-| `confident_psql_instance_class`       | Database instance size—affects performance   |
-| `confident_rds_allocated_storage`     | Initial storage in GB                        |
-| `confident_rds_max_allocated_storage` | Maximum storage (auto-scales up to this)     |
-| `confident_psql_db_name`              | Name of the database created                 |
-| `confident_psql_username`             | Master username (password is auto-generated) |
+| Variable                              | What it controls                         |
+| ------------------------------------- | ---------------------------------------- |
+| `confident_psql_instance_class`       | Database instance size—affects performance |
+| `confident_rds_allocated_storage`     | Initial storage in GB                    |
+| `confident_rds_max_allocated_storage` | Maximum storage (auto-scales up to this) |
+| `confident_psql_db_name`              | Name of the database created             |
+| `confident_psql_username`             | Master username for the database         |
+| `confident_psql_password`             | Master password for the database         |
 
-<Note>
-  **You don't set the database password.** Terraform generates a secure password
-  and stores it in AWS Secrets Manager with automatic rotation every 15 days.
-  This is more secure than static passwords.
-</Note>
+<Warning>
+  **Generate a strong database password.** Use `openssl rand -base64 24` to create a secure
+  random password. This value is stored in AWS Secrets Manager by Terraform. Do not commit
+  it to version control.
+</Warning>
 
 <Warning>
   **RDS instance class affects cost significantly.** `db.t4g.large` costs
@@ -275,6 +277,132 @@ argocd_admin_password         = "<your-generated-password>"
   significant tokens. Ensure your OpenAI account has appropriate rate limits and
   spending caps configured.
 </Warning>
+
+## Resource naming
+
+These variables control internal naming conventions for AWS resources. The defaults are suitable for most deployments:
+
+```hcl
+confident_application_code = "cai"
+confident_environment_code = "s"   # "s" for stage, "p" for prod
+confident_region_prefix    = "deaw"
+confident_tags = {
+  Environment = "stage"
+  Project     = "ConfidentAI"
+}
+```
+
+| Variable                      | What it controls                                                  |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `confident_application_code`  | Short code used in resource identifiers (e.g., RDS instance name) |
+| `confident_environment_code`  | `s` for stage, `p` for prod—used in resource identifiers          |
+| `confident_region_prefix`     | Region abbreviation for resource identifiers                      |
+| `confident_tags`              | Tags applied to all AWS resources                                 |
+
+<Note>
+  **When to change these:** You typically don't need to modify these unless your organization
+  has specific resource naming or tagging requirements.
+</Note>
+
+## EKS access configuration
+
+```hcl
+confident_public_eks   = false
+confident_eks_admin_arn = ""
+```
+
+| Variable                 | What it controls                                                       |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `confident_public_eks`   | When `true`: EKS API is publicly accessible, ALB is internet-facing (HTTP only), ACM/DNS disabled. When `false` (default): private setup with ACM certificates and DNS management. |
+| `confident_eks_admin_arn` | IAM role ARN to grant EKS cluster admin access (e.g., a shared platform team role) |
+
+<Warning>
+**Public EKS is only recommended for testing.** Setting `confident_public_eks = true` disables HTTPS and makes the EKS API server accessible from the internet. Never use this in production.
+</Warning>
+
+## RDS operational settings
+
+These settings control database maintenance and backup windows:
+
+```hcl
+confident_rds_maintenance_window     = "Mon:00:00-Mon:03:00"
+confident_rds_backup_window          = "03:00-06:00"
+confident_rds_backup_retention_period = 7
+```
+
+| Variable                              | What it controls                                     |
+| ------------------------------------- | ---------------------------------------------------- |
+| `confident_rds_maintenance_window`    | Weekly window for automated RDS maintenance (UTC)    |
+| `confident_rds_backup_window`         | Daily window for automated backups (UTC)             |
+| `confident_rds_backup_retention_period` | Number of days to retain automated backups (1-35)  |
+
+<Note>
+  **Schedule maintenance during low-traffic periods.** The defaults use early Monday morning UTC.
+  Adjust to match your team's off-peak hours.
+</Note>
+
+## S3 bucket configuration
+
+Terraform creates separate S3 buckets for different data types:
+
+```hcl
+confident_test_cases_bucket = "testcases"
+confident_payloads_bucket   = "payloads"
+```
+
+| Variable                     | What it controls                                        |
+| ---------------------------- | ------------------------------------------------------- |
+| `confident_test_cases_bucket` | Suffix for the test cases S3 bucket name               |
+| `confident_payloads_bucket`   | Suffix for the payloads S3 bucket name                 |
+
+Bucket names are constructed as `<application_name>-<environment>-<suffix>-bucket` (e.g., `confidentai-stage-testcases-bucket`).
+
+## ClickHouse configuration
+
+ClickHouse serves as the analytics database, deployed via the ClickHouse Operator on EKS:
+
+```hcl
+confident_clickhouse_user             = "default"
+confident_clickhouse_password         = "<your-generated-password>"
+confident_clickhouse_database         = "confident_db"
+confident_clickhouse_operator_version = "0.0.1"
+confident_clickhouse_version          = "25.12"
+confident_clickhouse_shards           = 1
+confident_clickhouse_replicas         = 2
+confident_clickhouse_storage_size     = "500Gi"
+confident_clickhouse_storage_class    = "clickhouse-gp3"
+```
+
+| Variable                                | What it controls                                          |
+| --------------------------------------- | --------------------------------------------------------- |
+| `confident_clickhouse_user`             | ClickHouse username (keep as `default`)                   |
+| `confident_clickhouse_password`         | ClickHouse password                                       |
+| `confident_clickhouse_database`         | Database name within ClickHouse                           |
+| `confident_clickhouse_operator_version` | Helm chart version for the ClickHouse Operator            |
+| `confident_clickhouse_version`          | ClickHouse server version                                 |
+| `confident_clickhouse_shards`           | Number of shards in the cluster                           |
+| `confident_clickhouse_replicas`         | Replicas per shard (2 recommended for 2-AZ clusters)     |
+| `confident_clickhouse_storage_size`     | Persistent volume size per ClickHouse pod                 |
+| `confident_clickhouse_storage_class`    | StorageClass for ClickHouse PVCs (gp3 encrypted)         |
+
+<Warning>
+  **Do not change `confident_clickhouse_user` from `default`.** The ClickHouse Operator expects this
+  username. Changing it will cause connectivity failures.
+</Warning>
+
+### ClickHouse backup
+
+A separate S3 bucket is created for ClickHouse backups:
+
+```hcl
+confident_clickhouse_backup_bucket_name = "ch_backups"
+confident_clickhouse_backup_schedule    = "0 2 * * *"
+```
+
+| Variable                                 | What it controls                              |
+| ---------------------------------------- | --------------------------------------------- |
+| `confident_clickhouse_backup_bucket_name` | Suffix for the ClickHouse backup S3 bucket   |
+| `confident_clickhouse_backup_schedule`    | Cron schedule for automated backups (UTC)    |
 
 ## ECR cross-account access
 

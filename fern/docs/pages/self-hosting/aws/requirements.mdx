@@ -51,12 +51,12 @@ Confident AI uses the following technologies. Your organization may require appr
 
 Default resource configurations for staging and production environments. These represent starting points—adjust based on your expected workload.
 
-| Resource            | Staging                      | Production                     |
-| ------------------- | ---------------------------- | ------------------------------ |
-| **EKS Nodes**       | 2x `m6i.large` (2 vCPU, 8GB) | 4x `m6i.xlarge` (4 vCPU, 16GB) |
-| **EKS Autoscaling** | 2-4 nodes                    | 2-8 nodes                      |
-| **RDS Instance**    | `db.t4g.large` (2 vCPU, 8GB) | `db.m6g.large` (2 vCPU, 8GB)   |
-| **RDS Storage**     | 20GB (max 100GB)             | 50GB (max 500GB)               |
+| Resource            | Staging                            | Production                         |
+| ------------------- | ---------------------------------- | ---------------------------------- |
+| **EKS Nodes**       | 4x `m6i.2xlarge` (8 vCPU, 32GB)   | 4x `m6i.2xlarge` (8 vCPU, 32GB)   |
+| **EKS Autoscaling** | 2-8 nodes                          | 2-8 nodes                          |
+| **RDS Instance**    | `db.t4g.large` (2 vCPU, 8GB)      | `db.t4g.large` (2 vCPU, 8GB)      |
+| **RDS Storage**     | 20GB (max 100GB)                   | 20GB (max 100GB)                   |
 
 ### Understanding resource sizing
 
@@ -72,7 +72,7 @@ Default resource configurations for staging and production environments. These r
 </Note>
 
 <Warning>
-**EC2 service quotas can block deployment.** AWS accounts have default limits on vCPUs. A typical staging deployment needs ~8 vCPUs (2 nodes × 2 vCPU + 2 vCPU for system pods). Production needs more.
+**EC2 service quotas can block deployment.** AWS accounts have default limits on vCPUs. A typical deployment needs ~32 vCPUs (4 nodes × 8 vCPU). Production with autoscaling up to 8 nodes would need 64 vCPUs.
 
 Check your quotas before starting:
 
@@ -95,7 +95,7 @@ The deployment provisions the following AWS services:
 | **Secrets Manager** | Secure credential storage                    | Stores API keys, DB passwords        |
 | **ACM**             | SSL/TLS certificate management               | HTTPS encryption                     |
 | **ALB**             | Application load balancer                    | Routes traffic to services           |
-| **IAM**             | Roles and policies for IRSA                  | Grants pods specific AWS permissions |
+| **IAM**             | Roles and policies for EKS Pod Identity      | Grants pods specific AWS permissions |
 | **KMS**             | Encryption keys for secrets and storage      | Encrypts data at rest                |
 | **NAT Gateway**     | Outbound internet for private subnets        | Allows pods to call external APIs    |
 
@@ -168,14 +168,14 @@ IAM permission errors look like: `Error: creating IAM Role: AccessDenied`
 
 AWS costs vary by region and usage. Approximate monthly costs for always-on infrastructure:
 
-| Component          | Staging      | Production    |
-| ------------------ | ------------ | ------------- |
-| EKS Control Plane  | $75          | $75           |
-| EKS Nodes (EC2)    | $120-240     | $400-800      |
-| RDS Instance       | $100         | $200          |
-| NAT Gateway        | $35          | $35           |
-| S3 + Data Transfer | ~$10         | $10-50        |
-| **Total (approx)** | **$350-500** | **$750-1200** |
+| Component          | Staging        | Production      |
+| ------------------ | -------------- | --------------- |
+| EKS Control Plane  | $75            | $75             |
+| EKS Nodes (EC2)    | $800-1600      | $800-1600       |
+| RDS Instance       | $100           | $100            |
+| NAT Gateway        | $35            | $35             |
+| S3 + Data Transfer | ~$10           | $10-50          |
+| **Total (approx)** | **$1000-1800** | **$1000-1900**  |
 
 <Note>
 **These are estimates.** Actual costs depend on:
