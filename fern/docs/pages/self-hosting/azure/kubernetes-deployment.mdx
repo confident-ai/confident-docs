@@ -1,6 +1,6 @@
 ---
-slug: self-hosting/aws/kubernetes-deployment
-description: Deploy Confident AI workloads to EKS
+slug: self-hosting/azure/kubernetes-deployment
+description: Deploy Confident AI workloads to AKS
 ---
 
 ## Overview
@@ -9,12 +9,12 @@ With infrastructure and cluster access ready, you now deploy the Confident AI ap
 
 - Preparing Kubernetes manifests provided by Confident AI
 - Updating container image tags to the versions provided by Confident AI
-- Configuring the ingress with your domain names and ACM certificate ARN
-- Setting up External Secrets to sync credentials from AWS Secrets Manager
+- Configuring the ingress with your domain names and TLS settings
+- Setting up External Secrets to sync credentials from Azure Key Vault
 - Deploying services in the correct order: base config → Redis → application services
 - Monitoring deployment status and troubleshooting common issues
 
-After completion, all Confident AI services will be running in your EKS cluster.
+After completion, all Confident AI services will be running in your AKS cluster.
 
 ## How Kubernetes deployments work
 
@@ -56,7 +56,7 @@ redis/                   # Cache service
 
 ### Update image tags
 
-Container images are stored in Confident AI's ECR. Your Confident AI representative will provide the specific version tags to use.
+Container images are stored in Confident AI's AWS ECR. Your Confident AI representative will provide the specific version tags to use.
 
 Open each deployment file and update the `image` field:
 
@@ -91,9 +91,27 @@ The ECR account ID and region are the values provided by Confident AI for ECR ac
 
 ### Configure ingress
 
-The ingress defines how external traffic reaches your services. Edit `base/network/ingress.yaml`:
+The ingress defines how external traffic reaches your services. For Azure, this uses NGINX Ingress (not AWS ALB). Edit `base/network/ingress.yaml`:
 
 <Steps>
+
+<Step title="Set the ingress class">
+
+Ensure the ingress uses NGINX:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: confident-ingress
+  namespace: confident-ai
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+```
+
+</Step>
 
 <Step title="Set your domain names">
 
@@ -101,8 +119,15 @@ Find and replace the placeholder hostnames with your actual domains:
 
 ```yaml
 spec:
+  tls:
+    - hosts:
+        - app.yourdomain.com
+        - api.yourdomain.com
+        - deepeval.yourdomain.com
+        - otel.yourdomain.com
+      secretName: confident-tls
   rules:
-    - host: app.yourdomain.com # Your frontend URL hostname
+    - host: app.yourdomain.com
       http:
         paths:
           - path: /
@@ -113,64 +138,39 @@ spec:
                 port:
                   number: 3000
 
-    - host: api.yourdomain.com # Your backend URL hostname
+    - host: api.yourdomain.com
       # ...
 
-    - host: deepeval.yourdomain.com # Evals service hostname
+    - host: deepeval.yourdomain.com
       # ...
 
-    - host: otel.yourdomain.com # OTEL collector hostname (for traces)
+    - host: otel.yourdomain.com
       # ...
 ```
 
 </Step>
 
-<Step title="Add the ACM certificate ARN">
+<Step title="Configure TLS">
 
-Find the `certificate-arn` annotation and add your certificate ARN (from the SSL Certificates step):
-
-```yaml
-annotations:
-  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/abc12345-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-```
-
-<Warning>
-  **The certificate ARN must be exact.** Copy it carefully from `terraform
-  output -raw acm_certificate_arn`. Don't include any trailing `%` characters
-  your terminal might display.
-</Warning>
-
-</Step>
-
-<Step title="Set ALB scheme">
-
-The `scheme` annotation controls whether the load balancer is internal or internet-facing:
+The `tls` section and `cert-manager.io/cluster-issuer` annotation tell cert-manager to automatically request and renew certificates:
 
 ```yaml
-annotations:
-  alb.ingress.kubernetes.io/scheme: internal  # Only accessible via VPN
-  # OR
-  alb.ingress.kubernetes.io/scheme: internet-facing  # Accessible from internet
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod  # or your ClusterIssuer name
+spec:
+  tls:
+    - hosts:
+        - app.yourdomain.com
+        - api.yourdomain.com
+      secretName: confident-tls
 ```
 
 <Note>
-  **Internal vs. internet-facing:** - **Internal:** ALB only gets a private IP.
-  Users must be on VPN or connected network to access. More secure for
-  enterprise deployments. - **Internet-facing:** ALB gets a public IP. Anyone
-  with the URL can reach the login page (authentication still required). Simpler
-  but larger attack surface.
+  cert-manager watches for Ingress resources with this annotation and
+  automatically creates Certificate resources, requests certificates from the
+  issuer, and stores them in the specified Kubernetes Secret.
 </Note>
-
-</Step>
-
-<Step title="Update ExternalDNS annotation (optional)">
-
-If using ExternalDNS to automatically create DNS records:
-
-```yaml
-annotations:
-  external-dns.alpha.kubernetes.io/hostname: app.yourdomain.com,api.yourdomain.com,deepeval.yourdomain.com
-```
 
 </Step>
 
@@ -178,45 +178,44 @@ annotations:
 
 ### Configure External Secrets
 
-External Secrets syncs credentials from AWS Secrets Manager into Kubernetes. The configuration needs to match your deployment.
+External Secrets syncs credentials from Azure Key Vault into Kubernetes. The configuration needs to match your deployment.
 
-#### Update the secret store region
+#### Update the secret store
 
 Edit `base/common/external-secrets/secret-store.yaml`:
+
+The `vaultUrl` must match your Key Vault URI (from `terraform output key_vault_uri`):
 
 ```yaml
 spec:
   provider:
-    aws:
-      service: SecretsManager
-      region: us-east-1 # Match your deployment region
+    azurekv:
+      vaultUrl: "https://confidentaisconfidentkv.vault.azure.net/"
+      authType: WorkloadIdentity
+      serviceAccountRef:
+        name: external-secrets-sa
 ```
 
-#### Update the secret name
+#### Update the secret references
 
 Edit `base/common/external-secrets/external-secrets.yaml`:
 
-The `key` field in each secret reference should match the Terraform-created secret name. The pattern is:
-
-```
-confidentai-<environment>-confident-secret
-```
-
-For example, if you deployed with `confident_environment = "stage"`:
+The `key` field in each secret reference should match the Key Vault secret names created by Terraform. The secrets use hyphenated names (e.g., `DATABASE-URL`, `BETTER-AUTH-SECRET`):
 
 ```yaml
 data:
   - secretKey: DATABASE_URL
     remoteRef:
-      key: confidentai-stage-confident-secret
-      property: DATABASE_URL
+      key: DATABASE-URL
+  - secretKey: REDIS_URL
+    remoteRef:
+      key: REDIS-URL
 ```
 
 <Warning>
-  **Secret name must exactly match.** If the name doesn't match what Terraform
-  created, External Secrets won't find it and pods won't start. You can verify
-  the secret name in AWS Secrets Manager console or via: ```bash aws
-  secretsmanager list-secrets --query 'SecretList[*].Name' ```
+  **Key Vault secret names use hyphens, not underscores.** Azure Key Vault
+  doesn't allow underscores in secret names. The External Secrets config maps
+  hyphenated Key Vault names to underscored Kubernetes secret keys.
 </Warning>
 
 ## Deploy services
@@ -238,7 +237,7 @@ kubectl apply -f base/common/external-secrets/
 
 <Step title="Wait for secrets to sync">
 
-External Secrets needs to pull credentials from Secrets Manager before pods can start. Watch the sync status:
+External Secrets needs to pull credentials from Key Vault before pods can start. Watch the sync status:
 
 ```bash
 kubectl get externalsecret -n confident-ai -w
@@ -296,19 +295,6 @@ kubectl apply -f confident-evals/
 kubectl apply -f confident-otel/
 ```
 
-**Alternative: Deploy all at once**
-
-If you prefer fewer commands:
-
-```bash
-kubectl apply -f base/
-kubectl apply -f redis/
-kubectl apply -f confident-backend/
-kubectl apply -f confident-frontend/
-kubectl apply -f confident-evals/
-kubectl apply -f confident-otel/
-```
-
 </Step>
 
 </Steps>
@@ -345,8 +331,6 @@ If pods aren't starting, check recent events:
 ```bash
 kubectl get events -n confident-ai --sort-by='.lastTimestamp' | tail -20
 ```
-
-This shows what Kubernetes is doing and any errors it encountered.
 
 ## Common deployment issues
 
@@ -393,10 +377,10 @@ Common causes:
 
 | Error in logs              | Cause                           | Fix                                                |
 | -------------------------- | ------------------------------- | -------------------------------------------------- |
-| "ECONNREFUSED" to database | RDS not accessible              | Check security groups allow traffic from EKS       |
+| "ECONNREFUSED" to database | PostgreSQL not accessible       | Check NSG allows traffic from AKS to database subnet |
 | "Secret not found"         | External Secrets not synced     | Wait for sync or check ExternalSecret status       |
-| "Invalid DATABASE_URL"     | Wrong format in Secrets Manager | Verify secret value in AWS Console                 |
-| "OPENAI_API_KEY not set"   | Missing secret                  | Verify secret was created with all required fields |
+| "Invalid DATABASE_URL"     | Wrong format in Key Vault       | Verify secret value in Azure Portal                |
+| "OPENAI_API_KEY not set"   | Missing secret                  | Verify Key Vault has all required secrets           |
 
 ### External Secrets not syncing
 
@@ -406,31 +390,31 @@ kubectl describe externalsecret confident-externalsecret -n confident-ai
 
 Look at the `Status` section for error messages. Common issues:
 
-| Error                        | Cause                     | Fix                                                                 |
-| ---------------------------- | ------------------------- | ------------------------------------------------------------------- |
-| "AccessDeniedException"      | IAM role lacks permission | Check `external-secrets-sa` role has Secrets Manager access         |
-| "ResourceNotFoundException"  | Secret name doesn't match | Verify secret name in Secrets Manager matches ExternalSecret config |
-| "Invalid ClusterSecretStore" | Store misconfigured       | Check region in `secret-store.yaml` matches deployment              |
+| Error                        | Cause                          | Fix                                                       |
+| ---------------------------- | ------------------------------ | --------------------------------------------------------- |
+| "AccessDenied"               | Managed identity lacks role    | Check Workload Identity has Key Vault Secrets User role   |
+| "SecretNotFound"             | Secret name doesn't match      | Verify secret names in Key Vault match ExternalSecret config |
+| "Invalid ClusterSecretStore" | Store misconfigured            | Check vaultUrl in `secret-store.yaml` matches Key Vault URI |
 
-### Ingress not creating ALB
+### Ingress not getting external IP
 
-After applying the ingress, check if an ALB is being created:
+After applying the ingress, check if it has an address:
 
 ```bash
 kubectl get ingress -n confident-ai
 ```
 
-The `ADDRESS` column should show an ALB hostname. If it's empty after a few minutes:
+The `ADDRESS` column should show the NGINX Ingress load balancer IP. If it's empty:
 
 ```bash
-kubectl describe ingress confident-ingress -n confident-ai
+kubectl get svc -n ingress-nginx ingress-nginx-controller
 ```
 
-Look for errors in the events. Common issues:
+The `EXTERNAL-IP` should show the Azure Load Balancer IP. If it shows `<pending>`:
 
-- **Missing subnet tags:** ALB Controller can't find subnets tagged for ELB
-- **IAM permission errors:** The ALB Controller service account lacks permissions
-- **Invalid certificate ARN:** The specified ACM certificate doesn't exist or isn't issued
+- **NSG blocking:** The NSG may not allow inbound traffic on ports 80/443
+- **Quota issues:** Public IP quota may be exhausted
+- **Azure Policy:** Policies may block public IP or Load Balancer creation
 
 ## Scaling services
 
@@ -454,4 +438,4 @@ kubectl scale deployment confident-evals --replicas=3 -n confident-ai
 
 ## Next steps
 
-After all services are running and healthy, proceed to [Verification](/self-hosting/aws/verification) to test the deployment end-to-end.
+After all services are running and healthy, proceed to [Verification](/self-hosting/azure/verification) to test the deployment end-to-end.

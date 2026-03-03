@@ -1,0 +1,483 @@
+---
+slug: self-hosting/azure/configuration
+description: Configure Terraform variables for Confident AI on Azure
+---
+
+## Overview
+
+This step configures all the variables that Terraform uses to provision your infrastructure. You will:
+
+- Copy an environment template (staging or production)
+- Configure VNet settings (new or existing VNet)
+- Set AKS node sizing and scaling parameters
+- Configure PostgreSQL Flexible Server settings
+- Provide domain URLs and authentication secrets
+- Set up ECR cross-account access credentials
+- Configure the Terraform state backend
+
+After completing this page, your `terraform.tfvars` file will contain all values needed to provision infrastructure.
+
+## How Terraform configuration works
+
+Terraform uses variables to customize deployments. Instead of editing the Terraform code directly, you provide values in a `terraform.tfvars` file. This keeps your configuration separate from the code, making updates easier.
+
+The repository includes template files with sensible defaults. You copy a template and fill in your specific values.
+
+## Setup
+
+Navigate to the Azure Terraform directory:
+
+```bash
+cd confident-terraform/azure
+```
+
+Copy the appropriate environment template:
+
+```bash
+# For staging/development environments
+cp vars/staging.vars terraform.tfvars
+
+# For production environments
+cp vars/production.vars terraform.tfvars
+```
+
+<Note>
+  **What's the difference?** Both templates use the same default instance sizes.
+  The key differences are the environment name (`stage` vs `prod`), which affects
+  resource naming. You can adjust all values after copying.
+</Note>
+
+Open `terraform.tfvars` in your editor. The following sections explain each variable group.
+
+## Environment identification
+
+These variables name and identify your deployment:
+
+```hcl
+confident_application_name      = "confidentai"
+confident_environment           = "stage"  # or "prod"
+confident_azure_subscription_id = "<your-subscription-id>"
+confident_azure_region          = "eastus"
+confident_resource_group_name   = "confident"
+```
+
+| Variable                         | What it does                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| `confident_application_name`     | Prefix for all Azure resource names (e.g., `confidentai-stage-aks`)                |
+| `confident_environment`          | Must be exactly `stage` or `prod`—used in resource names and affects some defaults |
+| `confident_azure_subscription_id` | Azure subscription where everything deploys                                       |
+| `confident_azure_region`         | Azure region where everything deploys                                              |
+| `confident_resource_group_name`  | Suffix for the resource group name                                                 |
+
+<Warning>
+**Region selection matters.** Choose a region close to your users and compliant with your data residency requirements. Once deployed, you cannot easily change regions—it requires a full redeployment.
+
+**Organization region restrictions:** Some organizations only allow deployments in specific regions. Verify your region is approved before proceeding.
+
+</Warning>
+
+## VNet configuration
+
+### Option A: Create a new VNet (recommended)
+
+If you're creating a new VNet, configure the address spaces:
+
+```hcl
+confident_vnet_enabled                 = true
+confident_vnet_address_space           = "10.0.0.0/16"
+confident_aks_subnet_cidr              = "10.0.1.0/24"
+confident_database_subnet_cidr         = "10.0.6.0/24"
+confident_public_subnet_cidr           = "10.0.101.0/24"
+confident_private_endpoint_subnet_cidr = "10.0.7.0/24"
+```
+
+| Setting                                  | Default        | What it means                               |
+| ---------------------------------------- | -------------- | ------------------------------------------- |
+| `confident_vnet_address_space`           | `10.0.0.0/16`  | The overall IP range for the VNet           |
+| `confident_aks_subnet_cidr`              | `10.0.1.0/24`  | 256 IPs for AKS nodes                      |
+| `confident_database_subnet_cidr`         | `10.0.6.0/24`  | 256 IPs for PostgreSQL (delegated subnet)   |
+| `confident_public_subnet_cidr`           | `10.0.101.0/24` | 256 IPs for public-facing resources        |
+| `confident_private_endpoint_subnet_cidr` | `10.0.7.0/24`  | 256 IPs for Storage private endpoint        |
+
+<Warning>
+**CIDR conflicts cause connectivity failures.** If your corporate network uses the same IP range (e.g., `10.0.x.x`), you'll have problems connecting via VPN. Common conflict-free alternatives:
+- `172.16.0.0/16` (172.16.x.x)
+- `192.168.0.0/16` (192.168.x.x)
+- `10.100.0.0/16` (10.100.x.x)
+
+Check with your network team before choosing.
+
+</Warning>
+
+### Option B: Use an existing VNet
+
+If deploying into an existing VNet, disable VNet creation and provide the existing resource IDs:
+
+```hcl
+confident_vnet_enabled        = false
+external_vnet_id              = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Network/virtualNetworks/..."
+external_vnet_address_space   = "10.0.0.0/16"
+external_aks_subnet_id        = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Network/virtualNetworks/.../subnets/..."
+external_database_subnet_id   = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Network/virtualNetworks/.../subnets/..."
+external_public_subnet_id     = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Network/virtualNetworks/.../subnets/..."
+```
+
+<Warning>
+**Using an existing VNet requires coordination with your network team.** You need:
+- Subnet IDs with available IP addresses
+- The database subnet must have `Microsoft.DBforPostgreSQL/flexibleServers` service delegation
+- NSGs that don't block required traffic
+- NAT Gateway or outbound internet access for pulling images
+
+Many existing VNets have restrictive NSGs or missing NAT Gateways that will cause deployment failures.
+
+</Warning>
+
+## AKS node configuration
+
+These settings control the VMs that run your Kubernetes workloads:
+
+```hcl
+confident_node_vm_size           = "Standard_D8s_v5"
+confident_node_group_min_size    = 2
+confident_node_group_max_size    = 8
+confident_node_group_desired_size = 4
+confident_kubernetes_version     = "1.31"
+```
+
+| Variable                           | What it controls                                       |
+| ---------------------------------- | ------------------------------------------------------ |
+| `confident_node_vm_size`           | VM size—determines CPU and memory per worker node      |
+| `confident_node_group_min_size`    | Cluster autoscaler won't go below this                 |
+| `confident_node_group_max_size`    | Cluster autoscaler won't exceed this                   |
+| `confident_node_group_desired_size` | How many worker nodes to start with                   |
+| `confident_kubernetes_version`     | AKS Kubernetes version                                 |
+
+**Recommended sizes:**
+
+| Environment | VM Size              | vCPU | Memory | Min/Max Nodes |
+| ----------- | -------------------- | ---- | ------ | ------------- |
+| Staging     | `Standard_D8s_v5`   | 8    | 32 GB  | 2-8           |
+| Production  | `Standard_D8s_v5`   | 8    | 32 GB  | 2-8           |
+| High volume | `Standard_D16s_v5`  | 16   | 64 GB  | 4-12          |
+
+<Note>
+  **AKS also creates a fixed system pool** with 2x `Standard_D4s_v5` nodes for
+  Kubernetes system components. This is separate from the worker pool configured
+  above.
+</Note>
+
+<Warning>
+**Azure vCPU quotas can block deployment.** Azure subscriptions have default limits on how many vCPUs you can run per VM family.
+
+Check your quotas: Azure Portal → Subscriptions → Usage + quotas → Filter by "Standard DSv5 Family"
+
+Request an increase if your limit is below: `(system_nodes × 4) + (desired_worker_nodes × vCPUs per node)`
+
+</Warning>
+
+## Database configuration
+
+PostgreSQL Flexible Server settings:
+
+```hcl
+confident_psql_sku_name              = "GP_Standard_D4s_v3"
+confident_psql_storage_mb            = 65536
+confident_psql_db_name               = "confident_db"
+confident_psql_username              = "confident_admin"
+confident_psql_password              = "<your-generated-password>"
+confident_psql_version               = "17"
+confident_psql_backup_retention_days = 7
+confident_psql_geo_redundant_backup  = false
+confident_psql_high_availability     = true
+```
+
+| Variable                              | What it controls                                     |
+| ------------------------------------- | ---------------------------------------------------- |
+| `confident_psql_sku_name`             | Database SKU—determines CPU and memory               |
+| `confident_psql_storage_mb`           | Maximum storage in MB (65536 = 64GB)                 |
+| `confident_psql_db_name`              | Name of the database created                         |
+| `confident_psql_username`             | Administrator username                               |
+| `confident_psql_password`             | Administrator password                               |
+| `confident_psql_version`              | PostgreSQL version                                   |
+| `confident_psql_backup_retention_days` | Number of days to retain automated backups (1-35)   |
+| `confident_psql_geo_redundant_backup` | Enable geo-redundant backups for disaster recovery   |
+| `confident_psql_high_availability`    | Enable zone-redundant HA (standby in another zone)   |
+
+<Warning>
+  **Generate a strong database password.** Use `openssl rand -base64 24` to create a secure
+  random password. This value is stored in Azure Key Vault by Terraform. Do not commit
+  it to version control.
+</Warning>
+
+<Note>
+  **Zone-redundant HA** is enabled by default. This creates a standby replica in
+  a different availability zone for automatic failover. Disable it for
+  development/testing environments to reduce costs.
+</Note>
+
+## Domain and URL configuration
+
+```hcl
+confident_frontend_url = "https://app.yourdomain.com"
+confident_backend_url  = "https://api.yourdomain.com"
+confident_subdomain    = "yourdomain.com"
+```
+
+| Variable                 | Purpose                        | Example                            |
+| ------------------------ | ------------------------------ | ---------------------------------- |
+| `confident_frontend_url` | Full URL users type in browser | `https://app.confidentai.acme.com` |
+| `confident_backend_url`  | Full URL for API calls         | `https://api.confidentai.acme.com` |
+| `confident_subdomain`    | Root domain for auth cookies   | `acme.com`                         |
+
+<Warning>
+**The subdomain must be the root domain, not a subdomain.**
+
+Correct: `confident_subdomain = "acme.com"`
+Wrong: `confident_subdomain = "confidentai.acme.com"`
+
+Authentication cookies are set on the subdomain and must be accessible by both frontend and backend. If you use the full subdomain, cookies won't work correctly.
+
+</Warning>
+
+## Authentication secrets
+
+```hcl
+confident_better_auth_secret          = "<your-generated-secret>"
+confident_better_auth_trusted_origins = "https://app.yourdomain.com"
+confident_google_client_id            = "<google-oauth-client-id>"
+confident_google_client_secret        = "<google-oauth-client-secret>"
+```
+
+| Variable                                | What it's for                                                               |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| `confident_better_auth_secret`          | Encrypts authentication tokens—use the value you generated in Prerequisites |
+| `confident_better_auth_trusted_origins` | URLs allowed to make authenticated requests—typically your frontend URL     |
+| `confident_google_client_id`            | Google OAuth Client ID (if using Google SSO)                                |
+| `confident_google_client_secret`        | Google OAuth Client Secret (if using Google SSO)                            |
+
+<Warning>
+  **Trusted origins must include the protocol.** Use
+  `https://app.yourdomain.com` not `app.yourdomain.com`. Missing protocol causes
+  authentication to fail silently.
+</Warning>
+
+## External services
+
+```hcl
+openai_api_key                = "<your-openai-api-key>"
+confident_clickhouse_password = "<your-generated-password>"
+argocd_admin_password         = "<your-generated-password>"
+```
+
+| Variable                        | What it's for                                  |
+| ------------------------------- | ---------------------------------------------- |
+| `openai_api_key`                | API key for running LLM evaluations            |
+| `confident_clickhouse_password` | Password for the analytics database            |
+| `argocd_admin_password`         | Admin password for the ArgoCD GitOps dashboard |
+
+<Warning>
+  **OpenAI API key requires sufficient quota.** Evaluations can consume
+  significant tokens. Ensure your OpenAI account has appropriate rate limits and
+  spending caps configured.
+</Warning>
+
+## Resource naming
+
+These variables control internal naming conventions for Azure resources. The defaults are suitable for most deployments:
+
+```hcl
+confident_application_code = "cai"
+confident_environment_code = "s"   # "s" for stage, "p" for prod
+confident_region_prefix    = "azew"
+confident_tags = {
+  Environment = "stage"
+  Project     = "ConfidentAI"
+}
+```
+
+| Variable                      | What it controls                                                  |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `confident_application_code`  | Short code used in resource identifiers (e.g., node pool name)    |
+| `confident_environment_code`  | `s` for stage, `p` for prod—used in resource identifiers          |
+| `confident_region_prefix`     | Region abbreviation for resource identifiers                      |
+| `confident_tags`              | Tags applied to all Azure resources                               |
+
+## AKS access configuration
+
+```hcl
+confident_public_aks                  = false
+confident_aks_admin_group_object_ids = []
+```
+
+| Variable                               | What it controls                                                       |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| `confident_public_aks`                 | When `true`: AKS API is publicly accessible, NGINX Ingress is internet-facing. When `false` (default): private AKS cluster with internal load balancers. |
+| `confident_aks_admin_group_object_ids` | Azure AD group object IDs to grant AKS cluster admin access            |
+
+<Warning>
+**Public AKS is only recommended for testing.** Setting `confident_public_aks = true` makes the AKS API server and ingress accessible from the internet. Never use this in production.
+</Warning>
+
+## Storage configuration
+
+```hcl
+confident_test_cases_container = "testcases"
+confident_payloads_container   = "payloads"
+```
+
+| Variable                        | What it controls                                           |
+| ------------------------------- | ---------------------------------------------------------- |
+| `confident_test_cases_container` | Name suffix for the test cases blob container             |
+| `confident_payloads_container`   | Name suffix for the payloads blob container               |
+
+Container names are constructed as `<application_name>-<environment>-<suffix>` (e.g., `confidentai-stage-testcases`).
+
+## ClickHouse configuration
+
+ClickHouse serves as the analytics database, deployed via the ClickHouse Operator on AKS:
+
+```hcl
+confident_clickhouse_user             = "default"
+confident_clickhouse_password         = "<your-generated-password>"
+confident_clickhouse_database         = "confident_db"
+confident_clickhouse_operator_version = "0.0.1"
+confident_clickhouse_version          = "25.12"
+confident_clickhouse_shards           = 1
+confident_clickhouse_replicas         = 2
+confident_clickhouse_storage_size     = "500Gi"
+confident_clickhouse_storage_class    = "clickhouse-premium"
+```
+
+| Variable                                | What it controls                                           |
+| --------------------------------------- | ---------------------------------------------------------- |
+| `confident_clickhouse_user`             | ClickHouse username (keep as `default`)                    |
+| `confident_clickhouse_password`         | ClickHouse password                                        |
+| `confident_clickhouse_database`         | Database name within ClickHouse                            |
+| `confident_clickhouse_operator_version` | Helm chart version for the ClickHouse Operator             |
+| `confident_clickhouse_version`          | ClickHouse server version                                  |
+| `confident_clickhouse_shards`           | Number of shards in the cluster                            |
+| `confident_clickhouse_replicas`         | Replicas per shard (2 recommended for HA)                  |
+| `confident_clickhouse_storage_size`     | Persistent volume size per ClickHouse pod                  |
+| `confident_clickhouse_storage_class`    | StorageClass for ClickHouse PVCs (Azure Premium_LRS disks) |
+
+<Warning>
+  **Do not change `confident_clickhouse_user` from `default`.** The ClickHouse Operator expects this
+  username. Changing it will cause connectivity failures.
+</Warning>
+
+### ClickHouse backup
+
+A blob container is created within the Storage Account for ClickHouse backups:
+
+```hcl
+confident_clickhouse_backup_container = "chbackups"
+confident_clickhouse_backup_schedule  = "0 2 * * *"
+```
+
+| Variable                                | What it controls                              |
+| --------------------------------------- | --------------------------------------------- |
+| `confident_clickhouse_backup_container` | Name suffix for the ClickHouse backup container |
+| `confident_clickhouse_backup_schedule`  | Cron schedule for automated backups (UTC)     |
+
+<Note>
+  **Backup lifecycle policy:** Terraform configures a lifecycle policy that
+  automatically deletes ClickHouse backup blobs older than 30 days and snapshots
+  older than 7 days.
+</Note>
+
+## ECR cross-account access
+
+These credentials allow your AKS cluster to pull Confident AI container images from AWS ECR:
+
+```hcl
+ecr_aws_access_key_id     = "<provided-by-confident-ai>"
+ecr_aws_secret_access_key = "<provided-by-confident-ai>"
+ecr_aws_account_id        = "<provided-by-confident-ai>"
+ecr_aws_region            = "us-east-1"
+```
+
+<Note>
+  These values are provided by your Confident AI representative. Don't modify
+  them unless instructed.
+</Note>
+
+## Terraform state backend
+
+Terraform tracks what resources it created in a "state file." This should be stored remotely so multiple team members can collaborate and state isn't lost.
+
+Edit `provider.tf` to configure your Azure Storage backend:
+
+```hcl
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "your-company-tfstate-rg"
+    storage_account_name = "yourcompanytfstate"
+    container_name       = "tfstate"
+    key                  = "confident-ai/staging/terraform.tfstate"
+  }
+}
+```
+
+| Setting                | What it does                                                            |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `resource_group_name`  | Resource group containing the state storage account                     |
+| `storage_account_name` | Storage account name for state storage                                  |
+| `container_name`       | Blob container for state files                                          |
+| `key`                  | Path within the container (use different paths for staging vs. production) |
+
+**If the storage account doesn't exist, create it:**
+
+```bash
+az group create --name your-company-tfstate-rg --location eastus
+
+az storage account create \
+  --name yourcompanytfstate \
+  --resource-group your-company-tfstate-rg \
+  --location eastus \
+  --sku Standard_LRS \
+  --encryption-services blob
+
+az storage container create \
+  --name tfstate \
+  --account-name yourcompanytfstate
+```
+
+<Warning>
+**Your organization may have existing Terraform state infrastructure.** Many companies have:
+- Centralized state storage accounts managed by a platform team
+- Required naming conventions
+- Required encryption settings
+- Azure Policy requirements on storage accounts
+
+Check with your infrastructure team before creating a new storage account.
+
+</Warning>
+
+<Warning>
+  **Never delete or modify the state file manually.** Terraform state tracks the
+  mapping between your configuration and real Azure resources. Corrupting it can
+  cause Terraform to lose track of resources, leading to orphaned infrastructure
+  or accidental deletions.
+</Warning>
+
+## Security review checklist
+
+Before proceeding, verify these security considerations:
+
+- [ ] `terraform.tfvars` is in `.gitignore` (never commit secrets)
+- [ ] State storage account has versioning enabled (for recovery from mistakes)
+- [ ] State storage account is encrypted at rest
+- [ ] Identity used has least-privilege permissions
+- [ ] CIDR blocks don't conflict with corporate network
+- [ ] OpenAI API key has appropriate spending limits
+
+```bash
+# Add tfvars to gitignore if not already present
+echo "terraform.tfvars" >> .gitignore
+echo "*.tfvars" >> .gitignore
+```
+
+## Next steps
+
+Once configuration is complete, proceed to [Provisioning](/self-hosting/azure/provisioning) to create the Azure infrastructure.

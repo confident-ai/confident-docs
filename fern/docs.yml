@@ -514,6 +514,27 @@ navigation:
           - page: Overview
             path: docs/pages/self-hosting/azure/overview.mdx
             icon: fa-light fa-map
+          - page: Requirements
+            path: docs/pages/self-hosting/azure/requirements.mdx
+            icon: fa-light fa-clipboard-list
+          - section: Step-by-step guide
+            collapsed: true
+            icon: fa-light fa-list-check
+            contents:
+              - page: Prerequisites
+                path: docs/pages/self-hosting/azure/prerequisites.mdx
+              - page: Configuration
+                path: docs/pages/self-hosting/azure/configuration.mdx
+              - page: Provisioning
+                path: docs/pages/self-hosting/azure/provisioning.mdx
+              - page: TLS Certificates
+                path: docs/pages/self-hosting/azure/tls-certificates.mdx
+              - page: Cluster Access
+                path: docs/pages/self-hosting/azure/cluster-access.mdx
+              - page: Kubernetes Deployment
+                path: docs/pages/self-hosting/azure/kubernetes-deployment.mdx
+              - page: Verification
+                path: docs/pages/self-hosting/azure/verification.mdx
       - section: GCP Deployment
         contents:
           - page: Overview

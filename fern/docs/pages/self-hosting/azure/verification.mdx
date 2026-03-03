@@ -1,0 +1,413 @@
+---
+slug: self-hosting/azure/verification
+description: Verify the Confident AI deployment on Azure
+---
+
+## Overview
+
+You've provisioned infrastructure and deployed the application. This final step verifies everything works correctly. You will:
+
+- Confirm all infrastructure components (AKS, PostgreSQL, Storage, secrets) are healthy
+- Configure DNS to point to your load balancer
+- Test application access via the frontend and backend URLs
+- Run functional tests (user login, project creation, SDK connectivity)
+- Check health endpoints for each service
+- Complete a production readiness checklist
+
+After this step, your deployment is verified and ready for users.
+
+## Infrastructure verification
+
+Before testing the application, verify all infrastructure components are healthy.
+
+### AKS cluster health
+
+```bash
+kubectl get nodes
+```
+
+All nodes should show `Ready`:
+
+```
+NAME                                 STATUS   ROLES    AGE    VERSION
+aks-system-12345678-vmss000000       Ready    <none>   1h     v1.31.x
+aks-system-12345678-vmss000001       Ready    <none>   1h     v1.31.x
+aks-azewcais-12345678-vmss000000     Ready    <none>   1h     v1.31.x
+aks-azewcais-12345678-vmss000001     Ready    <none>   1h     v1.31.x
+```
+
+<Warning>
+
+**Nodes stuck in NotReady?** Check for issues:
+
+```bash
+kubectl describe node <node-name>
+```
+
+Look at the "Conditions" section for clues. Common causes: network plugin issues, insufficient resources, or failed health checks.
+
+</Warning>
+
+### PostgreSQL connectivity
+
+Verify the database is accessible from the cluster by checking backend logs:
+
+```bash
+kubectl logs deployment/confident-backend -n confident-ai | grep -i database
+```
+
+You should see successful connection messages, not connection refused errors.
+
+**Check PostgreSQL status in Azure Portal:**
+
+1. Go to Azure Portal → Azure Database for PostgreSQL → Flexible Servers
+2. Find your server
+3. Status should be "Available"
+
+### Key Vault secrets
+
+Verify secrets exist and External Secrets can read them:
+
+```bash
+# Check External Secrets synced to Kubernetes
+kubectl get secret confident-externalsecret -n confident-ai
+
+# Check Key Vault via CLI
+az keyvault secret list --vault-name $(terraform output -raw key_vault_name) --query '[].name' -o tsv
+```
+
+### Storage Account
+
+Verify the storage account and containers exist:
+
+```bash
+az storage container list \
+  --account-name $(terraform output -raw storage_account_name) \
+  --auth-mode login \
+  --query '[].name' -o tsv
+```
+
+You should see three containers (e.g., `confidentai-stage-testcases`, `confidentai-stage-payloads`, and `confidentai-stage-chbackups`).
+
+<Note>
+  **Storage is used for file uploads.** If storage connectivity fails, users
+  won't be able to upload datasets or export reports. The backend uses Azure
+  Workload Identity to access Storage—verify the `confident-storage-sa` service
+  account exists.
+</Note>
+
+## DNS configuration
+
+The NGINX Ingress controller has an Azure Load Balancer IP. DNS records must point to it.
+
+### Get the Load Balancer IP
+
+```bash
+kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+Example output:
+
+```
+20.85.123.45
+```
+
+<Note>
+  **Azure uses IP addresses, not hostnames.** Unlike AWS ALBs which have
+  hostnames, Azure Load Balancers use static IP addresses. You create DNS A
+  records (not CNAME records) pointing your domains to this IP.
+</Note>
+
+### Create DNS records
+
+Add A records for each hostname you configured in the ingress:
+
+| Record Type | Name                      | Value        |
+| ----------- | ------------------------- | ------------ |
+| A           | `app.yourdomain.com`      | (LB IP)      |
+| A           | `api.yourdomain.com`      | (LB IP)      |
+| A           | `deepeval.yourdomain.com` | (LB IP)      |
+| A           | `otel.yourdomain.com`     | (LB IP)      |
+
+<Warning>
+
+**A records vs. CNAME:**
+
+- **A record:** Points a hostname to an IP address. Used for Azure Load Balancers.
+- **CNAME:** Points a hostname to another hostname. Cannot be used for Azure LB IPs.
+
+</Warning>
+
+<Warning>
+  **Corporate DNS changes may require approval.** If your DNS is managed by an
+  internal team, submit change requests for all four records. Factor in approval
+  time—this can delay verification by hours or days.
+</Warning>
+
+### Verify DNS propagation
+
+After adding records, verify they resolve correctly:
+
+```bash
+nslookup app.yourdomain.com
+nslookup api.yourdomain.com
+```
+
+You should see the Load Balancer IP in the response. If you see "NXDOMAIN" or your old values, wait for DNS propagation (typically 5-30 minutes, up to 48 hours for some providers).
+
+## Application verification
+
+### Frontend access
+
+Open your frontend URL in a browser:
+
+```
+https://app.yourdomain.com
+```
+
+**What you should see:**
+
+1. HTTPS (padlock icon) — certificate is working
+2. Confident AI login page — application is serving
+3. Google OAuth button (if configured) — SSO is set up
+
+<Warning>
+
+**Certificate errors?**
+
+- "NET::ERR_CERT_COMMON_NAME_INVALID" — The certificate doesn't cover this domain. Verify the ingress TLS hosts include the right domain names.
+- "NET::ERR_CERT_DATE_INVALID" — Certificate isn't issued yet. Check cert-manager status: `kubectl get certificate -n confident-ai`
+- "Your connection is not private" — If using self-signed certs, this is expected. For Let's Encrypt, check the ClusterIssuer is ready.
+
+</Warning>
+
+### Backend health check
+
+The backend exposes a health endpoint:
+
+```bash
+curl -s https://api.yourdomain.com/health
+```
+
+**Expected response:**
+
+```json
+{ "status": "ok", "version": "1.2.3" }
+```
+
+<Warning>
+
+**Connection refused or timeout?**
+
+1. **DNS not propagated:** Wait and retry
+2. **NSG blocking:** Check the NSG allows inbound HTTPS
+3. **Ingress not ready:** Check `kubectl get ingress -n confident-ai` for an address
+4. **Backend not running:** Check pod status with `kubectl get pods -n confident-ai`
+
+</Warning>
+
+### Evals health check
+
+```bash
+curl -s https://deepeval.yourdomain.com/health
+```
+
+Expected: `{"status":"healthy"}`
+
+### OTEL collector health
+
+```bash
+curl -s https://otel.yourdomain.com/health
+```
+
+Expected: `{"status":"ok"}`
+
+## Functional testing
+
+### Test 1: User login
+
+1. Navigate to `https://app.yourdomain.com`
+2. Click "Sign in with Google" (or your configured auth provider)
+3. Complete authentication
+4. **Expected:** Redirected to dashboard, user session created
+
+<Warning>
+
+**OAuth errors?**
+
+- "redirect_uri_mismatch" — The redirect URI in Google Console doesn't match. It must be exactly `https://api.yourdomain.com/api/auth/callback/google`.
+- "access_denied" — User not authorized. Check if OAuth app restricts to certain domains.
+- Infinite redirect loop — `confident_subdomain` may be misconfigured. Must be root domain, not full subdomain.
+
+</Warning>
+
+### Test 2: Create a project
+
+1. From the dashboard, click "New Project"
+2. Enter a project name
+3. Click Create
+4. **Expected:** Project created successfully, appears in list
+
+This verifies database connectivity and basic write operations.
+
+### Test 3: API key generation
+
+1. Go to Project Settings → API Keys
+2. Click "Generate API Key"
+3. Copy the generated key
+4. **Expected:** API key displayed (save it—it won't be shown again)
+
+### Test 4: SDK connectivity
+
+From your local machine (or any machine that can reach the backend):
+
+```python
+import deepeval
+
+deepeval.login(
+    api_key="<your-generated-api-key>",
+    confident_api_endpoint="https://api.yourdomain.com"
+)
+
+print(deepeval.check_connection())
+```
+
+**Expected:** `True` or success message
+
+<Warning>
+
+**SDK can't connect?**
+
+- "Connection refused" — Backend not reachable. Check DNS and network connectivity.
+- "401 Unauthorized" — API key invalid. Generate a new one.
+- "SSL certificate verify failed" — Certificate issue. Check the URL is using HTTPS and cert is valid.
+
+If your machine can't reach the backend directly (internal LB), run this test from within the same network (VPN) or from a pod inside the cluster.
+
+</Warning>
+
+### Test 5: Run a simple evaluation
+
+```python
+from deepeval import evaluate
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+
+test_case = LLMTestCase(
+    input="What is the capital of France?",
+    actual_output="Paris is the capital of France.",
+)
+
+metric = AnswerRelevancyMetric()
+evaluate([test_case], [metric])
+```
+
+**Expected:** Evaluation runs and results appear in the dashboard.
+
+<Warning>
+**Evaluation fails with API errors?**
+
+- "OpenAI API error" — `openai_api_key` not configured or invalid
+- "timeout" — Network can't reach OpenAI. Check outbound connectivity to `api.openai.com`
+- "Rate limited" — OpenAI quota exceeded. Check your OpenAI usage limits.
+
+Your cluster needs outbound HTTPS access to OpenAI (or your configured LLM provider).
+
+</Warning>
+
+## Service health checks
+
+Run comprehensive health checks on all services:
+
+```bash
+# All pods should be Running
+kubectl get pods -n confident-ai
+
+# No recent crashes
+kubectl get events -n confident-ai --field-selector type=Warning
+
+# Check each deployment is ready
+kubectl rollout status deployment/confident-backend -n confident-ai
+kubectl rollout status deployment/confident-frontend -n confident-ai
+kubectl rollout status deployment/confident-evals -n confident-ai
+kubectl rollout status deployment/confident-otel -n confident-ai
+```
+
+### View logs for troubleshooting
+
+```bash
+# Backend logs
+kubectl logs -f deployment/confident-backend -n confident-ai
+
+# Frontend logs
+kubectl logs -f deployment/confident-frontend -n confident-ai
+
+# Evals logs
+kubectl logs -f deployment/confident-evals -n confident-ai
+```
+
+## Production readiness checklist
+
+Before announcing the deployment is ready for users, verify:
+
+### Security
+
+- [ ] HTTPS working on all endpoints (padlock icon in browser)
+- [ ] TLS certificate valid and not expiring soon
+- [ ] NSG restricts access appropriately
+- [ ] PostgreSQL not publicly accessible (private DNS only)
+- [ ] Storage Account has no public access
+- [ ] Key Vault has network ACLs configured
+- [ ] `terraform.tfvars` not committed to version control
+
+### High availability
+
+- [ ] At least 2 worker nodes running
+- [ ] At least 2 replicas for backend service (scale if not)
+- [ ] PostgreSQL has zone-redundant HA enabled (if required)
+- [ ] Worker pool autoscaling configured for traffic spikes
+
+### Monitoring (recommended)
+
+- [ ] Azure Monitor configured for AKS
+- [ ] PostgreSQL metrics and alerts enabled
+- [ ] Container Insights enabled
+- [ ] Alerts configured for node health, pod restarts, errors
+
+### Operations
+
+- [ ] Team members have cluster access (see Cluster Access page)
+- [ ] Runbook documented for common issues
+- [ ] Backup strategy confirmed for PostgreSQL
+- [ ] Upgrade path understood for future releases
+
+## What to do if verification fails
+
+**Don't panic.** Most issues have straightforward fixes:
+
+1. **Identify the failing component:** Use the checks above to isolate which part isn't working
+2. **Check logs:** `kubectl logs` for pod issues, Azure Portal for service-level issues
+3. **Review configuration:** Typos in URLs, missing certificates, wrong secret names
+4. **Check network:** NSGs, DNS propagation, VPN connectivity
+5. **Contact support:** If stuck, reach out to your Confident AI representative with:
+   - What step failed
+   - Exact error messages
+   - Results of relevant `kubectl get` commands
+
+## Summary
+
+You've completed the Confident AI deployment on Azure:
+
+1. **Prerequisites** — Installed tools and gathered credentials
+2. **Configuration** — Set up Terraform variables
+3. **Provisioning** — Created Azure infrastructure
+4. **TLS Certificates** — Configured cert-manager and ClusterIssuer
+5. **Cluster Access** — Configured kubectl access
+6. **Kubernetes Deployment** — Deployed application services
+7. **Verification** — Tested everything works
+
+Your deployment is now ready for users. Welcome to Confident AI!
+
+---
+
+**Need help?** Contact your Confident AI representative or email support@confident-ai.com with details about your deployment and any issues encountered.
