@@ -26,7 +26,7 @@ You can also trigger evaluations retrospectively on historical traces and spans.
 Online evaluations for traces and spans follow these steps:
 
 1. You [create a metric collection](/docs/llm-evaluation/metrics/create-on-the-cloud) on Confident AI with the **single-turn** metrics you want to run.
-2. You reference that metric collection by name in the `observe` decorator/wrapper via the metric collection parameter.
+2. You reference that metric collection by name via the `metric_collection` parameter — on the `observe` decorator/wrapper for span-level evals, or via `update_current_trace` for trace-level evals.
 3. Inside your observed function, you set [test case parameters](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets) on the span or trace using the update current span or update current trace function.
 4. When the trace is sent to Confident AI, it runs the metrics in your collection against the test case data you provided.
 5. Results appear on the trace/span in the Confident AI dashboard.
@@ -127,7 +127,7 @@ llm_app("Write me a poem.")
 </Tab>
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="index.ts" {4,11} maxLines={0}
+```typescript title="index.ts" {4,10} maxLines={0}
 import { observe, updateCurrentSpan } from "deepeval/tracing";
 
 const generate = async (prompt: string): Promise<string> => {
@@ -153,25 +153,29 @@ const observedGenerate = observe({
 
 ## Evaluate Traces Online
 
-Similar to spans, but use the update current trace function to set test case parameters. The metric collection **must be set on the root-level (outermost) span**.
+Similar to spans, but use the `update_current_trace`/`updateCurrentTrace` function to set both the metric collection and test case parameters on the trace.
 
 <Tabs>
 <Tab title="Python" language="python">
 
-```python title="main.py" {6,13}
+```python title="main.py" {6,16}
 from deepeval.tracing import observe, update_current_trace
 from openai import OpenAI
 
 client = OpenAI()
 
-@observe(metric_collection="My Collection")
+@observe()
 def llm_app(query: str) -> str:
     res = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": query}]
     ).choices[0].message.content
 
-    update_current_trace(input=query, output=res)
+    update_current_trace(
+      input=query,
+      output=res,
+      metric_collection="My Collection"
+    )
     return res
 
 llm_app("Write me a poem.")
@@ -180,17 +184,20 @@ llm_app("Write me a poem.")
 </Tab>
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="index.ts" {4,11} maxLines={0}
+```typescript title="index.ts" {7} maxLines={0}
 import { observe, updateCurrentTrace } from "deepeval/tracing";
 
 const generate = async (prompt: string): Promise<string> => {
-  updateCurrentTrace({ input: prompt, output: "LLM response" });
+  updateCurrentTrace({
+    input: prompt,
+    output: "LLM response",
+    metricCollection: "My Collection",
+  });
   return "LLM response";
 };
 
 const observedGenerate = observe({
   type: "llm",
-  metricCollection: "My Collection",
   fn: generate,
 });
 ```
@@ -229,7 +236,7 @@ import { evaluateTrace } from "deepeval/tracing";
 
 await evaluateTrace({
   traceUuid: "your-trace-uuid",
-  metricCollection: "Collection Name"
+  metricCollection: "Collection Name",
 });
 ```
 
@@ -262,7 +269,7 @@ import { evaluateSpan } from "deepeval/tracing";
 
 await evaluateSpan({
   spanUuid: "your-span-uuid",
-  metricCollection: "Collection Name"
+  metricCollection: "Collection Name",
 });
 ```
 
@@ -274,7 +281,7 @@ The metric collection you provide must be a **single-turn** collection.
 
 ## Examples
 
-**Quick quiz:** Given the code below, will Confident AI run online evaluations on the trace using metrics in `"Collection 2"` or `"Collection 1"`?
+**Quick quiz:** Given the code below, which metric collection will Confident AI use for the trace, and which for the span?
 
 <Tabs>
 <Tab title="Python" language="python">
@@ -282,12 +289,17 @@ The metric collection you provide must be a **single-turn** collection.
 ```python title="main.py"
 from deepeval.tracing import observe, update_current_span, update_current_trace
 
-@observe(metric_collection="Collection 1")
+@observe()
 def outer_function():
+
     @observe(metric_collection="Collection 2")
     def inner_function():
-        update_current_span(input=..., output=...)
-        update_current_trace(input=..., output=...)
+        update_current_span(input="...", output="...")
+        update_current_trace(
+          input="...",
+          output="...",
+          metric_collection="Collection 1"
+        )
 ```
 
 </Tab>
@@ -325,10 +337,10 @@ const observedOuter = observe({
 
 This is because:
 
-1. The outer function creates the root span — its metric collection is used for trace-level evals
-2. The inner function creates a nested span — its metric collection is used for span-level evals
-3. The update current span call updates the innermost active span (the "inner" span)
-4. The update current trace call always updates the trace regardless of where it's called
+1. The trace-level metric collection is set via `update_current_trace(metric_collection=...)`, which can be called from any span
+2. The inner function's `observe` decorator sets `"Collection 2"` as the metric collection for that span
+3. The `update_current_span` call updates the innermost active span (the "inner" span)
+4. The `update_current_trace` call always updates the trace regardless of where it's called
 
 ## Next Steps
 

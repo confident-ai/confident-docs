@@ -101,11 +101,7 @@ evaluate_thread(thread_id=your_thread_id, metric_collection="My Multi-Turn Colle
 <Tab title="TypeScript" language="typescript">
 
 ```typescript title="index.ts" {25} maxLines={0}
-import {
-  observe,
-  updateCurrentTrace,
-  evaluateThread,
-} from "deepeval/tracing";
+import { observe, updateCurrentTrace, evaluateThread } from "deepeval/tracing";
 import OpenAI from "openai";
 
 const yourThreadId = "your-thread-id";
@@ -205,9 +201,12 @@ from deepeval.tracing import observe, update_current_trace, evaluate_thread
 
 your_thread_id = "your-thread-id"
 
-@observe(metric_collection="Collection 1")
+@observe()
 def llm_app(query: str):
-    update_current_trace(thread_id=your_thread_id)
+    update_current_trace(
+      thread_id=your_thread_id,
+      metric_collection="Collection 1"
+    )
 
 llm_app("Hello")
 evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
@@ -217,11 +216,7 @@ evaluate_thread(thread_id=your_thread_id, metric_collection="Collection 2")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript title="index.ts" maxLines={0}
-import {
-  observe,
-  updateCurrentTrace,
-  evaluateThread,
-} from "deepeval/tracing";
+import { observe, updateCurrentTrace, evaluateThread } from "deepeval/tracing";
 
 const yourThreadId = "your-thread-id";
 
@@ -246,10 +241,10 @@ await evaluateThread({
 **Answer:** **No** — the thread evaluation will produce no results because neither `input` nor `output` has been set on the trace. Without these, Confident AI has no conversation turns to evaluate.
 
 <Warning>
-  The metric collection on the `observe` decorator/wrapper is for
-  **trace-level** single-turn evaluations. For thread evaluations, you need to
-  set `input` and `output` on the trace — these are what become conversation
-  turns — and call the evaluate thread function separately.
+  The `metric_collection` set via `update_current_trace` is for **trace-level**
+  single-turn evaluations. For thread evaluations, you need to set `input` and
+  `output` on the trace — these are what become conversation turns — and call
+  the evaluate thread function separately.
 </Warning>
 
 ## Next Steps
