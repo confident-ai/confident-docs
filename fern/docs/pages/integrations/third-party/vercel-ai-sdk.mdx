@@ -239,8 +239,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
             ```typescript
             import { generateText } from "ai";
 
-            const tracer = configureAiSdkTracing();
-
             const { text } = await generateText({
                 model: "openai/gpt-4o",
                 prompt: "How to make the best coffee?",
@@ -255,8 +253,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
           <Tab title="Stream Text">
             ```typescript
             import { streamText } from "ai";
-
-            const tracer = configureAiSdkTracing();
 
             const result = streamText({
                 model: "openai/gpt-4o",
@@ -275,8 +271,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
           <Tab title="Tool Calling">
             ```typescript
             import { generateText } from "ai";
-
-            const tracer = configureAiSdkTracing();
 
             const result = await generateText({
                 model: "openai/gpt-4o",
@@ -306,8 +300,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
             ```typescript
             import { generateText } from "ai";
 
-            const tracer = configureAiSdkTracing();
-
             const { output } = await generateText({
                 model: "openai/gpt-4o",
                 output: Output.object({
@@ -333,8 +325,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
           <Tab title="Embedding Text">
             ```typescript
             import { embed } from "ai";
-
-            const tracer = configureAiSdkTracing();
 
             const { embedding } = await embed({
                 model: 'openai/text-embedding-3-small',
@@ -482,7 +472,9 @@ const { text } = await generateText({
     isEnabled: true,
     metadata: {
       threadId: "123",
-      userId: "456"
+      userId: "456",
+      traceName: "Trace name here",
+      // You can set trace name here if you didn't set it in the createDeepEvalProcessors options!
     }
   },
 });
