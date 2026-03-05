@@ -65,11 +65,11 @@ paths:
           description: Field to sort results by ("createdAt" or "runDuration").
         - in: query
           name: ascending
+          required: false
           schema:
             type: string
-            enum: ["asc", "desc"]
-            default: "desc"
-          description: Sort ascending (true) or descending (false).
+            enum: ["true", "false"]
+          description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
         - in: query
           name: start
           schema:
@@ -310,7 +310,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: ["asc", "desc"]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
 
     /v1/traces/{traceUuid}:
@@ -471,7 +471,7 @@ paths:
             required: false
             schema:
               type: string
-              enum: ["asc", "desc"]
+              enum: ["true", "false"]
             description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
 
   /v1/spans/{spanUuid}:

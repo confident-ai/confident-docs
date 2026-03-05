@@ -998,7 +998,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [asc, desc]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
       responses:
         "200":
@@ -1124,7 +1124,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [asc, desc]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
       responses:
         "200":
@@ -2008,7 +2008,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [asc, desc]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
       responses:
         "200":
@@ -2267,7 +2267,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [asc, desc]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
         - in: query
           name: type
@@ -2507,7 +2507,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [asc, desc]
+            enum: ["true", "false"]
           description: This determines if the field specified in `sortBy` should be in ascending order. Defaults to `false`.
         - in: query
           name: completed
