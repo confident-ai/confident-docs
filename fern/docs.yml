@@ -400,6 +400,9 @@ navigation:
           - page: Vercel AI SDK
             path: docs/pages/integrations/third-party/vercel-ai-sdk.mdx
             icon: fa-light fa-circle-caret-up
+          - page: Agent Core
+            path: docs/pages/integrations/third-party/agentcore.mdx
+            icon: fa-brands fa-aws
       - section: LLM Gateways
         collapsed: false
         contents:
