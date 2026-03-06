@@ -228,7 +228,6 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AgentCore age
         from deepeval.integrations.agentcore import instrument_agentcore
 
         instrument_agentcore(
-            api_key=os.environ.get("CONFIDENT_API_KEY"),
             trace_metric_collection="my-trace-collection",
         )
 
@@ -253,7 +252,6 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AgentCore age
         from deepeval.integrations.agentcore import instrument_agentcore
 
         instrument_agentcore(
-            api_key=os.environ.get("CONFIDENT_API_KEY"),
             agent_metric_collection="my-agent-collection",
         )
 
@@ -278,7 +276,6 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AgentCore age
         from deepeval.integrations.agentcore import instrument_agentcore
 
         instrument_agentcore(
-            api_key=os.environ.get("CONFIDENT_API_KEY"),
             llm_metric_collection="my-llm-collection",
         )
 
@@ -304,7 +301,6 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AgentCore age
         from deepeval.integrations.agentcore import instrument_agentcore
 
         instrument_agentcore(
-            api_key=os.environ.get("CONFIDENT_API_KEY"),
             tool_metric_collection_map={
                 "get_weather": "my-tool-collection",
             },
