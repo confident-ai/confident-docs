@@ -1,0 +1,342 @@
+---
+slug: integrations/third-party/agentcore
+subtitle: Use Confident AI for LLM observability and evals for Amazon AgentCore
+---
+
+## Overview
+
+[Amazon AgentCore](https://aws.amazon.com/bedrock/agentcore/) is AWS's managed runtime for deploying and scaling AI agents. Confident AI allows you to trace and evaluate AgentCore agents built on frameworks like Strands — in just a few lines of code.
+
+## Tracing Quickstart
+
+<Tip>
+For users in the EU region, please set the OTEL endpoint to the EU version as shown below:
+
+```bash
+export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
+```
+
+</Tip>
+
+<Steps>
+  <Step title="Install Dependencies">
+    Run the following command to install the required packages:
+    ```bash
+    pip install -U deepeval bedrock-agentcore strands-agents
+    ```
+  </Step>
+  <Step title="Instrument AgentCore">
+    Call `instrument_agentcore` once at startup, before your agent runs. It attaches to the active OpenTelemetry `TracerProvider` and begins forwarding spans to Confident AI.
+
+    ```python main.py
+    import os
+    from bedrock_agentcore import BedrockAgentCoreApp
+    from strands import Agent
+    from deepeval.integrations.agentcore import instrument_agentcore
+
+    instrument_agentcore()
+
+    app = BedrockAgentCoreApp()
+    agent = Agent(model="amazon.nova-lite-v1:0")
+
+    @app.entrypoint
+    def invoke(payload):
+        user_message = payload.get("prompt", "Hello! How can I help you today?")
+        result = agent(user_message)
+        return {"result": result.message}
+
+    if __name__ == "__main__":
+        response = invoke({"prompt": "Explain OpenTelemetry in one sentence."})
+        print(f"Agent Response: {response['result']}")
+    ```
+
+    <Note>
+      `instrument_agentcore` is framework-agnostic. It works with any underlying agent framework that AgentCore supports — Strands, LangChain, LangGraph, and CrewAI are all detected automatically.
+    </Note>
+  </Step>
+  <Step title="Run your agent">
+    Invoke your agent by executing the script:
+    ```bash
+    python main.py
+    ```
+    You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+  </Step>
+</Steps>
+
+## Advanced Usage
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to `instrument_agentcore`.
+
+```python main.py
+import os
+from bedrock_agentcore import BedrockAgentCoreApp
+from strands import Agent
+from deepeval.prompt import Prompt
+from deepeval.integrations.agentcore import instrument_agentcore
+
+prompt = Prompt(alias="my-prompt")
+prompt.pull(version="00.00.01")
+
+system_prompt = prompt.interpolate()
+
+instrument_agentcore(
+    confident_prompt=prompt,
+)
+
+app = BedrockAgentCoreApp()
+agent = Agent(model="amazon.nova-lite-v1:0", system_prompt=system_prompt)
+
+@app.entrypoint
+def invoke(payload):
+    user_message = payload.get("prompt", "Hello! How can I help you today?")
+    result = agent(user_message)
+    return {"result": result.message}
+```
+
+<Note>
+  Logging prompts lets you attribute specific prompts to AgentCore LLM spans.
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+### Logging threads
+
+Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Pass the `thread_id` to `instrument_agentcore`.
+
+```python main.py
+import os
+from bedrock_agentcore import BedrockAgentCoreApp
+from strands import Agent
+from deepeval.integrations.agentcore import instrument_agentcore
+
+instrument_agentcore(
+    thread_id="thread_1",
+    user_id="user_1"
+)
+
+app = BedrockAgentCoreApp()
+agent = Agent(model="amazon.nova-lite-v1:0")
+
+@app.entrypoint
+def invoke(payload):
+    user_message = payload.get("prompt", "Hello! How can I help you today?")
+    result = agent(user_message)
+    return {"result": result.message}
+```
+
+<Tip>
+  If your agent framework already sets a `session.id` attribute on spans, AgentCore integration will automatically use it as the `thread_id` when none is explicitly provided.
+</Tip>
+
+### Trace attributes
+
+Other trace attributes can also be passed to `instrument_agentcore`.
+
+```python main.py
+import os
+from bedrock_agentcore import BedrockAgentCoreApp
+from strands import Agent
+from deepeval.integrations.agentcore import instrument_agentcore
+
+instrument_agentcore(
+    name="Name of Trace",
+    tags=["Tag 1", "Tag 2"],
+    metadata={"Key": "Value"},
+    user_id="user_1",
+    thread_id="conversation-abc123",
+    environment="production",
+)
+
+app = BedrockAgentCoreApp()
+agent = Agent(model="amazon.nova-lite-v1:0")
+
+@app.entrypoint
+def invoke(payload):
+    user_message = payload.get("prompt", "Hello! How can I help you today?")
+    result = agent(user_message)
+    return {"result": result.message}
+```
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn more](/docs/llm-tracing/features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn more](/docs/llm-tracing/features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations. [Learn more](/docs/llm-tracing/features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn more](/docs/llm-tracing/features/users).
+</ParamField>
+
+<ParamField path="environment" type="str" required={false}>
+  The deployment environment. Accepted values: `"production"`, `"staging"`, `"development"`, `"testing"`. Defaults to `"development"`.
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-tracing/online-evals) on your AgentCore agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+  <Step title="Create metric collection">
+    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your AgentCore agent.
+    <Frame caption="Create metric collection">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="metrics.createCollection"
+        type="video/mp4"
+      />
+    </Frame>
+    <Warning>
+      Your metric collection must only contain metrics that evaluate the input and actual output of the component it is assigned to.
+    </Warning>
+  </Step>
+  <Step title="Run evals">
+    You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+
+    After instrumenting your AgentCore agent, pass the metric collection name to the respective component:
+
+    <Tabs>
+      <Tab title="Trace">
+        Pass the `trace_metric_collection` parameter to `instrument_agentcore`.
+
+        ```python main.py
+        import os
+        from bedrock_agentcore import BedrockAgentCoreApp
+        from strands import Agent
+        from deepeval.integrations.agentcore import instrument_agentcore
+
+        instrument_agentcore(
+            api_key=os.environ.get("CONFIDENT_API_KEY"),
+            trace_metric_collection="my-trace-collection",
+        )
+
+        app = BedrockAgentCoreApp()
+        agent = Agent(model="amazon.nova-lite-v1:0")
+
+        @app.entrypoint
+        def invoke(payload):
+            user_message = payload.get("prompt", "Hello! How can I help you today?")
+            result = agent(user_message)
+            return {"result": result.message}
+        ```
+      </Tab>
+
+      <Tab title="Agent Span">
+        Pass the `agent_metric_collection` parameter to `instrument_agentcore`.
+
+        ```python main.py
+        import os
+        from bedrock_agentcore import BedrockAgentCoreApp
+        from strands import Agent
+        from deepeval.integrations.agentcore import instrument_agentcore
+
+        instrument_agentcore(
+            api_key=os.environ.get("CONFIDENT_API_KEY"),
+            agent_metric_collection="my-agent-collection",
+        )
+
+        app = BedrockAgentCoreApp()
+        agent = Agent(model="amazon.nova-lite-v1:0")
+
+        @app.entrypoint
+        def invoke(payload):
+            user_message = payload.get("prompt", "Hello! How can I help you today?")
+            result = agent(user_message)
+            return {"result": result.message}
+        ```
+      </Tab>
+
+      <Tab title="LLM Span">
+        Pass the `llm_metric_collection` parameter to `instrument_agentcore`.
+
+        ```python main.py
+        import os
+        from bedrock_agentcore import BedrockAgentCoreApp
+        from strands import Agent
+        from deepeval.integrations.agentcore import instrument_agentcore
+
+        instrument_agentcore(
+            api_key=os.environ.get("CONFIDENT_API_KEY"),
+            llm_metric_collection="my-llm-collection",
+        )
+
+        app = BedrockAgentCoreApp()
+        agent = Agent(model="amazon.nova-lite-v1:0")
+
+        @app.entrypoint
+        def invoke(payload):
+            user_message = payload.get("prompt", "Hello! How can I help you today?")
+            result = agent(user_message)
+            return {"result": result.message}
+        ```
+      </Tab>
+
+      <Tab title="Tool Span">
+        Pass the `tool_metric_collection_map` parameter to `instrument_agentcore`. This maps each tool name to its metric collection.
+
+        ```python main.py
+        import os
+        from bedrock_agentcore import BedrockAgentCoreApp
+        from strands import Agent
+        from strands.tools import tool
+        from deepeval.integrations.agentcore import instrument_agentcore
+
+        instrument_agentcore(
+            api_key=os.environ.get("CONFIDENT_API_KEY"),
+            tool_metric_collection_map={
+                "get_weather": "my-tool-collection",
+            },
+        )
+
+        app = BedrockAgentCoreApp()
+
+        @tool
+        def get_weather(city: str) -> str:
+            """Get the current weather for a city."""
+            return f"The weather in {city} is sunny."
+
+        agent = Agent(model="amazon.nova-lite-v1:0", tools=[get_weather])
+
+        @app.entrypoint
+        def invoke(payload):
+            user_message = payload.get("prompt", "Hello! How can I help you today?")
+            result = agent(user_message)
+            return {"result": result.message}
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+  <Success>
+    All incoming traces will now be evaluated using metrics from your metric
+    collection.
+  </Success>
+</Steps>
+
+You can view evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
+</Frame>
