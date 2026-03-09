@@ -435,6 +435,14 @@ paths:
                   - input: "What is 2 + 2?"
                     customColumnKeyValues:
                       key: "value"
+              Tags:
+                finalized: true
+                goldens:
+                  - input: "How is the weather like in NYC?"
+                    expectedOutput: "No idea"
+                    tags:
+                      - "weather"
+                      - "geography"
       responses:
         "200":
           description: ""
@@ -3247,6 +3255,11 @@ components:
           type: object
           additionalProperties: true
           description: "This is the custom column key values of the LLM application."
+        tags:
+          type: array
+          items:
+            type: string
+          description: "A list of tags associated with this golden."
       required:
         - input
 
@@ -3286,6 +3299,11 @@ components:
           type: object
           additionalProperties: true
           description: "This is the custom column key values of the LLM application."
+        tags:
+          type: array
+          items:
+            type: string
+          description: "A list of tags associated with this golden."
       required:
         - scenario
 
@@ -3338,6 +3356,11 @@ components:
           type: object
           additionalProperties: true
           description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
+        tags:
+          type: array
+          items:
+            type: string
+          description: "A list of tags to associate with this golden."
       required:
         - input
 
@@ -3380,6 +3403,11 @@ components:
           type: object
           additionalProperties: true
           description: "Key-value pairs representing custom table column data for this golden. Keys correspond to the custom column keys defined in the dataset."
+        tags:
+          type: array
+          items:
+            type: string
+          description: "A list of tags to associate with this golden."
       required:
         - scenario
 

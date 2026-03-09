@@ -207,6 +207,59 @@ const multiturnGolden = new ConversationalGolden({
 
 </Tabs>
 
+## Add Tags
+
+You can include tags when pushing goldens. Tags allow you to categorize and filter goldens within a dataset.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import Golden, ConversationalGolden
+
+golden = Golden(
+    input="How tall is Mt. Everest?",
+    tags=["geography", "factual"]
+)
+
+multiturn_golden = ConversationalGolden(
+    scenario="User asking for a refund.",
+    tags=["support", "refund"]
+)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { Golden, ConversationalGolden } from "deepeval";
+
+const golden = new Golden({
+  input: "How tall is Mt. Everest?",
+  tags: ["geography", "factual"],
+});
+
+const multiturnGolden = new ConversationalGolden({
+  scenario: "User asking for a refund.",
+  tags: ["support", "refund"],
+});
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet
+  endpoint="POST /v1/datasets/{alias}"
+  example="Tags"
+/>
+
+</Tab>
+
+</Tabs>
+
 ## Delete Dataset
 
 Delete a dataset programmatically via the Evals API.

@@ -384,6 +384,63 @@ for (const golden of dataset.goldens as Golden[]) {
 
 </Tabs>
 
+## Using Tags
+
+If your dataset has tags, you can access them via the `tags` field on each golden:
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+from deepeval.test_case import LLMTestCase
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+for golden in dataset.goldens:
+    # Access tags
+    tags = golden.tags
+
+    # Filter or use tags in your evaluation logic
+    if "factual" in tags:
+        test_case = LLMTestCase(
+            input=golden.input,
+            actual_output=llm_app(golden.input),
+        )
+        dataset.add_test_case(test_case)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset, Golden, LLMTestCase } from "deepeval";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+for (const golden of dataset.goldens as Golden[]) {
+  // Access tags
+  const tags = golden.tags ?? [];
+
+  // Filter or use tags in your evaluation logic
+  if (tags.includes("factual")) {
+    const testCase = new LLMTestCase({
+      input: golden.input,
+      actualOutput: await llmApp(golden.input),
+    });
+    dataset.addTestCase(testCase);
+  }
+}
+```
+
+</Tab>
+
+</Tabs>
+
 ## Using Images
 
 Any (list of) golden text fields (such as input, scenario, etc.) that contains an image will be in the format of `[DEEPEVAL:IMAGE:url]`. The `url` inside the `[DEEPEVAL:IMAGE:url]` format is a public url that can be accessed by anyone.
