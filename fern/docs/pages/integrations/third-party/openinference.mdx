@@ -21,13 +21,20 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
   <Step title="Install Dependencies">
     Run the following command to install the required packages:
 
-    ```bash 
+    <CodeBlocks>
+    ```python 
     pip install -U deepeval opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
     ```
+    ```typescript
+    npm install deepeval
+    ```
+    </CodeBlocks>
   </Step>
   <Step title="Instrument OpenInference">
     Call `instrument_openinference` once at startup, before your agent runs. It attaches to the active OpenTelemetry `TracerProvider` and begins forwarding spans to Confident AI.
 
+    <Tabs>
+    <Tab title="Python" language="python">
     ```python main.py
     import os
     from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -41,6 +48,53 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
     llm = ChatOpenAI(model="gpt-4o-mini")
     result = llm.invoke("What are LLMs?")
     ```
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+      <Tabs>
+        <Tab title="Standard Setup" language="standard">
+        ```typescript
+        import { instrumentOpenInference } from "deepeval/integrations/openinference";
+        import { registerInstrumentations } from "@opentelemetry/instrumentation";
+        import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
+
+        instrumentOpenInference({
+          name: "OpenInference-TS-App",
+        });
+
+        registerInstrumentations({
+          instrumentations: [new OpenAIInstrumentation()],
+        });
+
+        async function main() {
+          const { default: OpenAI } = await import("openai");
+          const client = new OpenAI();
+          await client.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: "What is OpenInference?" }],
+          });
+        }
+        ```
+        </Tab>
+        <Tab title="Existing OTel" language="existing">
+        ```python main.py
+        import { registerOTel } from "@vercel/otel";
+        import { createOpenInferenceProcessors } from "deepeval/integrations/openinference"; 
+
+        const openInferenceProcessors = createOpenInferenceProcessors();
+
+        export function register() {
+          registerOTel({
+            serviceName: "deepeval-next-app",
+            spanProcessors: [
+              ...openInferenceProcessors,
+            ],
+          });
+        }
+        ```
+        </Tab>
+      </Tabs>
+    </Tab>
+    </Tabs>
 
     <Note>
     Confident AI strictly adheres to OpenInference semantic conventions and will only capture the telemetry data your instrumentors explicitly expose. To get full traces of your entire application flow, please ensure you instrument your application in nested layers by initializing the instrumentors for both your agent framework and your underlying LLM provider.
@@ -49,9 +103,14 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
   <Step title="Run your code">
     Get your traces by running your code as shown here:
 
+    <CodeBlocks>
     ```bash
     python main.py
     ```
+    ```typescript
+    npx tsx file-name.ts
+    ```
+    </CodeBlocks>
     You can directly view the traces on [Confident AI](https://app.confident.ai)'s observatory page
   </Step>
 </Steps>
@@ -62,6 +121,8 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to `instrument_openinference`.
 
+<Tabs>
+<Tab title="Python" language="python">
 ```python main.py
 import os
 from deepeval.prompt import Prompt
@@ -83,6 +144,21 @@ instrument_openinference(
 llm = ChatOpenAI(model="gpt-4o-mini")
 result = llm.invoke(system_prompt)
 ```
+</Tab>
+<Tab title="TypeScript" language="typescript">
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+import { Prompt } from "deepeval";
+
+const prompt = new Prompt({ alias: "my-prompt" });
+await prompt.pull();
+
+instrumentOpenInference({
+  prompt: prompt
+});
+```
+</Tab>
+</Tabs>
 
 <Note>
   Logging prompts lets you attribute specific prompts to OpenInference LLM spans.
@@ -94,6 +170,8 @@ result = llm.invoke(system_prompt)
 
 Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Pass the `thread_id` to `instrument_openinference`.
 
+<Tabs>
+<Tab title="Python" language="python">
 ```python main.py
 import os
 from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -110,11 +188,25 @@ instrument_openinference(
 llm = ChatOpenAI(model="gpt-4o-mini")
 result = llm.invoke("What are LLMs?")
 ```
+</Tab>
+<Tab title="TypeScript" language="typescript">
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+
+instrumentOpenInference({
+  threadId: "thread_123",
+  userId: "user_456",
+});
+```
+</Tab>
+</Tabs>
 
 ### Trace attributes
 
 Other trace attributes can also be passed to `instrument_openinference`.
 
+<Tabs>
+<Tab title="Python" language="python">
 ```python main.py
 import os
 from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -135,6 +227,22 @@ instrument_openinference(
 llm = ChatOpenAI(model="gpt-4o-mini")
 result = llm.invoke("What are LLMs?")
 ```
+</Tab>
+<Tab title="TypeScript" language="typescript">
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+
+instrumentOpenInference({
+  name: "Custom Trace Name",
+  threadId: "thread_123",
+  userId: "user_456",
+  tags: ["production", "v1"],
+  metadata: { "internal_version": "1.0.2" },
+  environment: "production"
+});
+```
+</Tab>
+</Tabs>
 
 <Accordion title='View Trace Attributes'>
 <ParamField path="name" type="str" required={false}>
@@ -196,6 +304,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
 
     <Tabs>
         <Tab title="Trace">
+            <CodeBlocks>
             ```python main.py
             import os
             from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -212,11 +321,21 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
             llm = ChatOpenAI(model="gpt-4o-mini")
             result = llm.invoke("What are LLMs?")
             ```
+            ```typescript
+            import { instrumentOpenInference } from "deepeval/integrations/openinference";
+
+            instrumentOpenInference({
+              name: "Custom Trace Name",
+              traceMetricCollection: "TRACE-METRIC-COLLECTION"
+            });
+            ```
+            </CodeBlocks>
         </Tab>
 
         <Tab title="LLM Span">
             Pass the `llm_metric_collection` parameter to `instrument_openinference`. This evaluates all LLM spans against a specific metric collection.
 
+            <CodeBlocks>
             ```python main.py
             import os
             from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -232,11 +351,20 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
             llm = ChatOpenAI(model="gpt-4o-mini")
             result = llm.invoke("What are LLMs?")
             ```
+            ```typescript
+            import { instrumentOpenInference } from "deepeval/integrations/openinference";
+
+            instrumentOpenInference({
+              name: "Custom Trace Name",
+              llmMetricCollection: "LLM-METRIC-COLLECTION"
+            });
+            ```
+            </CodeBlocks>
         </Tab>
 
         <Tab title="Tool Span">
             Pass the `tool_metric_collection_map` parameter to `instrument_openinference`. This maps each tool name to its metric collection.
-
+            <CodeBlocks>
             ```python main.py
             import os
             from openinference.instrumentation.langchain import LangChainInstrumentor
@@ -265,6 +393,17 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
                 "messages": [("user", "What is the weather in Tokyo?")]
             })
             ```
+            ```typescript
+            import { instrumentOpenInference } from "deepeval/integrations/openinference";
+
+            instrumentOpenInference({
+              name: "Custom Trace Name",
+              tool_metric_collection_map={
+                "get_weather": "test_collection_1",
+              },
+            });
+            ```
+            </CodeBlocks>
         </Tab>
     </Tabs>
 
