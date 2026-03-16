@@ -403,6 +403,9 @@ navigation:
           - page: Agent Core
             path: docs/pages/integrations/third-party/agentcore.mdx
             icon: fa-brands fa-aws
+          - page: Open Inference
+            path: docs/pages/integrations/third-party/openinference.mdx
+            icon: fa-light fa-telescope
       - section: LLM Gateways
         collapsed: false
         contents:
