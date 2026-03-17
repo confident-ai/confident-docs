@@ -33,6 +33,10 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
   <Step title="Instrument OpenInference">
     Call `instrument_openinference` once at startup, before your agent runs. It attaches to the active OpenTelemetry `TracerProvider` and begins forwarding spans to Confident AI.
 
+    <Note>
+      You will also need the specific OpenInference instrumentor for your framework, such as `openinference-instrumentation-langchain`, `openinference-instrumentation-openai` or `@arizeai/openinference-instrumentation-anthropic`, etc.
+    </Note>
+
     <Tabs>
     <Tab title="Python" language="python">
     ```python main.py
@@ -98,7 +102,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
     </Tabs>
 
     <Note>
-    Confident AI strictly adheres to OpenInference semantic conventions and will only capture the telemetry data your instrumentors explicitly expose. To get full traces of your entire application flow, please ensure you instrument your application in nested layers by initializing the instrumentors for both your agent framework and your underlying LLM provider.
+    Confident AI strictly adheres to OpenInference semantic conventions and will only capture the telemetry data your instrumentors explicitly expose. To get full traces of your entire application flow, please ensure you instrument your application in nested layers for full observability from OpenInference.
     </Note>
   </Step>
   <Step title="Run your code">
