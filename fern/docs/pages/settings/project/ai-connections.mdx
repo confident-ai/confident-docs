@@ -41,29 +41,38 @@ Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` req
 
 ### Payload
 
-Configure the JSON payload that Confident AI sends to your endpoint. You can customize this to match your API's expected structure using values from your goldens.
+Configure the payload that Confident AI sends to your endpoint. You can customize this to match your API's expected structure using values from your goldens. There are two ways to configure your payload: the **JSON editor** and the **code editor**.
+
+<Tabs>
+
+  <Tab title="JSON Editor">
+
+The JSON editor lets you visually construct the payload using golden variables. This is the default and works well for most use cases.
 
 Available variables:
 
-| Variable                                   | Description                                        | Type       |
-| ------------------------------------------ | -------------------------------------------------- | ---------- |
-| `golden.input`                             | The input from your golden                         | string     |
-| `golden.actual_output`                     | The actual output from your golden                 | string     |
-| `golden.expected_output`                   | The expected output from your golden               | string     |
-| `golden.retrieval_context`                 | The retrieval context from your golden             | string[]   |
-| `golden.context`                           | The context from your golden                       | string[]   |
-| `golden.expected_tools`                    | The expected tools from your golden                | ToolCall[] |
-| `golden.tools_called`                      | The tools called from your golden                  | ToolCall[] |
-| `golden.additional_metadata`               | Additional metadata from your golden               | object     |
-| `conversationalGolden.turns`               | Turn history for multi-turn evals                  | Turn[]     |
-| `conversationalGolden.context`             | Context for conversational goldens                 | string[]   |
-| `conversationalGolden.scenario`            | Scenario for conversational goldens                | string     |
-| `conversationalGolden.expected_outcome`    | Expected outcome for conversational goldens        | string     |
-| `conversationalGolden.user_description`    | User description for conversational goldens        | string     |
-| `conversationalGolden.additional_metadata` | Additional metadata for conversational goldens     | object     |
-| `prompts`                                  | A dictionary of prompts                            | object     |
-| `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
-| `state`                                    | An object to keep state for multi-turn simulations | object     |
+| Variable                                        | Description                                              | Type       |
+| ----------------------------------------------- | -------------------------------------------------------- | ---------- |
+| `golden.input`                                  | The input from your golden                               | string     |
+| `golden.actual_output`                          | The actual output from your golden                       | string     |
+| `golden.expected_output`                        | The expected output from your golden                     | string     |
+| `golden.retrieval_context`                      | The retrieval context from your golden                   | string[]   |
+| `golden.context`                                | The context from your golden                             | string[]   |
+| `golden.expected_tools`                         | The expected tools from your golden                      | ToolCall[] |
+| `golden.tools_called`                           | The tools called from your golden                        | ToolCall[] |
+| `golden.additional_metadata`                    | Additional metadata from your golden                     | object     |
+| `golden.custom_column_key_values`               | Custom column key-value pairs from your golden           | object     |
+| `conversationalGolden.turns`                    | Turn history for multi-turn evals                        | Turn[]     |
+| `conversationalGolden.context`                  | Context for conversational goldens                       | string[]   |
+| `conversationalGolden.scenario`                 | Scenario for conversational goldens                      | string     |
+| `conversationalGolden.expected_outcome`         | Expected outcome for conversational goldens              | string     |
+| `conversationalGolden.user_description`         | User description for conversational goldens              | string     |
+| `conversationalGolden.additional_metadata`      | Additional metadata for conversational goldens           | object     |
+| `conversationalGolden.custom_column_key_values` | Custom column key-value pairs for conversational goldens | object     |
+| `prompts`                                       | A dictionary of prompts                                  | object     |
+| `testCaseId`                                    | Unique identifier for linking traces to test cases       | string     |
+| `state`                                         | An object to keep state for multi-turn simulations       | object     |
+| `hyperparameters`                               | Hyperparameters configured on the AI connection          | object     |
 
 Example payload:
 
@@ -77,13 +86,99 @@ Example payload:
 }
 ```
 
+Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary.
+
+  </Tab>
+
+  <Tab title="Code Editor">
+
+The code editor gives you full flexibility to construct your payload using Python. Define a `generate_payload` function that receives the golden (either single-turn or conversational) along with optional parameters, and returns a dictionary that becomes the request body sent to your endpoint.
+
+Here's the default implementation:
+
+```python
+from deepeval import Golden, ConversationalGolden
+
+def generate_payload(
+    golden: Union[Golden, ConversationalGolden],
+    prompts: Optional[Dict[str, str]] = None,
+    testCaseId: Optional[str] = None,
+    state: Optional[Any] = None,
+) -> dict:
+
+    if isinstance(golden, Golden):
+        return {
+            "input": golden.input,
+            "context": golden.context,
+            "prompts": prompts
+        }
+
+    elif isinstance(golden, ConversationalGolden):
+        return {
+            "turns": golden.turns,
+            "conversationContext": golden.context,
+            "prompts": prompts
+        }
+```
+
+The `golden` parameter is a `Union[Golden, ConversationalGolden]`—use `isinstance` to check which type you're working with and construct the appropriate payload. This is especially powerful when you need to:
+
+- Apply conditional logic or transformations before sending data
+- Access `golden.custom_column_key_values` to include custom dataset columns
+- Combine multiple golden fields into a single payload key
+- Handle single-turn and multi-turn payloads with different structures
+
+Here's an example that uses custom columns and state:
+
+```python
+from deepeval import Golden, ConversationalGolden
+
+def generate_payload(
+    golden: Union[Golden, ConversationalGolden],
+    prompts: Optional[Dict[str, str]] = None,
+    testCaseId: Optional[str] = None,
+    state: Optional[Any] = None,
+) -> dict:
+
+    if isinstance(golden, Golden):
+        custom = golden.custom_column_key_values or {}
+        return {
+            "input": golden.input,
+            "context": golden.context,
+            "language": custom.get("language", "en"),
+            "region": custom.get("region"),
+            "prompts": prompts,
+            "testCaseId": testCaseId,
+        }
+
+    elif isinstance(golden, ConversationalGolden):
+        custom = golden.custom_column_key_values or {}
+        return {
+            "turns": golden.turns,
+            "conversationContext": golden.context,
+            "scenario": golden.scenario,
+            "difficulty": custom.get("difficulty"),
+            "prompts": prompts,
+            "state": state,
+        }
+```
+
+<Note>
+  `golden.custom_column_key_values` is a dictionary containing any custom
+  columns you've defined in your dataset. This lets you pass arbitrary data
+  through to your endpoint without needing to fit it into the standard golden
+  fields.
+</Note>
+
+  </Tab>
+
+</Tabs>
+
 <Tip>
   The custom payload feature lets you structure the request to match your
   existing API contract—no need to modify your AI app to accept a specific
   format.
 </Tip>
-
-Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary.
 
 ### Headers
 
@@ -127,6 +222,20 @@ def generate(request: dict):
 ```
 
 For more details on working with prompts, see [Prompt Versioning](/docs/llm-evaluation/prompt-management/version-prompts).
+
+### Hyperparameters
+
+Associate hyperparameters with your AI connection to track LLM configuration settings like model name, temperature, and other parameters across evaluation runs. When running evaluations, these hyperparameters are automatically attributed to each test run.
+
+To include hyperparameters in the payload sent to your endpoint, add the `hyperparameters` variable to your payload configuration. The value is a dictionary of string key-value pairs:
+
+```json
+{
+  "model": "gpt-4o",
+  "temperature": "0.7",
+  "max_tokens": "1024"
+}
+```
 
 ### Actual Output Key Path
 
@@ -267,12 +376,42 @@ sequenceDiagram
 
 To enable multiturn state, include `state` in your payload configuration so it gets sent to your endpoint on each turn:
 
+<Tabs>
+
+  <Tab title="JSON Editor">
+
 ```json
 {
   "input": golden.input,
   "state": state
 }
 ```
+
+  </Tab>
+
+  <Tab title="Code Editor">
+
+```python
+from deepeval import Golden, ConversationalGolden
+
+def generate_payload(
+    golden: Union[Golden, ConversationalGolden],
+    prompts: Optional[Dict[str, str]] = None,
+    testCaseId: Optional[str] = None,
+    state: Optional[Any] = None,
+) -> dict:
+
+    if isinstance(golden, ConversationalGolden):
+        return {
+            "turns": golden.turns,
+            "conversationContext": golden.context,
+            "state": state
+        }
+```
+
+  </Tab>
+
+</Tabs>
 
 Here's an example of how your endpoint might handle state:
 
