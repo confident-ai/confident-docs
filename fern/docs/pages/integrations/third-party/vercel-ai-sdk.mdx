@@ -44,7 +44,7 @@ Add the `deepeval` span processor in your `instrumentation.ts` file as shown bel
 <Tab title="Vercel">
 ```typescript
 import { registerOTel } from "@vercel/otel";
-import { createDeepEvalProcessors } from "deepeval/integrations"; 
+import { createDeepEvalProcessors } from "deepeval/integrations/ai-sdk"; 
 
 const deepevalProcessors = createDeepEvalProcessors();
 
@@ -62,7 +62,7 @@ export function register() {
 <Tab title="Custom">
 ```typescript
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { createDeepEvalProcessors } from "deepeval/integrations"; 
+import { createDeepEvalProcessors } from "deepeval/integrations/ai-sdk"; 
 
 const deepevalProcessors = createDeepEvalProcessors();
 
@@ -461,7 +461,6 @@ await setTracingContext(
 ```
 </Tab>
 <Tab title="Existing Otel" language="existing">
-</Tab>
 ```typescript
 import { generateText } from "ai";
 
@@ -481,6 +480,7 @@ const { text } = await generateText({
 console.log(text);
 
 ```
+</Tab>
 </Tabs>
 
 <Accordion title='View Trace Attributes'>
@@ -572,7 +572,6 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK applic
     ```
     </Tab>
     <Tab title="Existing Otel" language="existing">
-    </Tab>
     ```typescript
     import { generateText } from "ai";
 
@@ -589,6 +588,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK applic
     });
     console.log(text);
     ```
+    </Tab>
     </Tabs>
 
   </Step>
