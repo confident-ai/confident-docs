@@ -76,17 +76,18 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
         ```
         </Tab>
         <Tab title="Existing OTel" language="existing">
-        ```python main.py
+        ```typescript
         import { registerOTel } from "@vercel/otel";
         import { createOpenInferenceProcessors } from "deepeval/integrations/openinference"; 
 
-        const openInferenceProcessors = createOpenInferenceProcessors();
+        const deepevalProcessors = createOpenInferenceProcessors();
 
         export function register() {
           registerOTel({
             serviceName: "deepeval-next-app",
             spanProcessors: [
-              ...openInferenceProcessors,
+              // Your existing processors
+              ...deepevalProcessors,
             ],
           });
         }
@@ -104,12 +105,16 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
     Get your traces by running your code as shown here:
 
     <CodeBlocks>
+    <CodeBlock title="Python" language="python">
     ```bash
     python main.py
     ```
-    ```typescript
+    </CodeBlock>
+    <CodeBlock title="TypeScript" language="typescript">
+    ```bash
     npx tsx file-name.ts
     ```
+    </CodeBlock>
     </CodeBlocks>
     You can directly view the traces on [Confident AI](https://app.confident.ai)'s observatory page
   </Step>
@@ -138,7 +143,7 @@ system_prompt = prompt.interpolate()
 LangChainInstrumentor().instrument()
 
 instrument_openinference(
-    confident_prompt=prompt,
+    confident_prompt=prompt, 
 )
 
 llm = ChatOpenAI(model="gpt-4o-mini")
