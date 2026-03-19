@@ -1,0 +1,239 @@
+---
+subtitle: Set up credentials and connect external data sources to generate synthetic goldens
+slug: llm-evaluation/dataset-management/synthetic-data/data-source-connectors
+---
+
+## Overview
+
+Before generating synthetic goldens, you need to connect a data source in **Project Settings** > **Data Sources**. Each connector requires credentials from the source platform. This page walks you through the setup for every supported source type.
+
+<Tabs>
+
+<Tab title="Google Drive">
+
+### Setup Credentials
+
+<Steps>
+  <Step title="Create a Google Cloud Project">
+    Go to [Google Cloud Console](https://console.cloud.google.com/) and create a project (or use an existing one).
+  </Step>
+  <Step title="Enable the Google Drive API">
+    Navigate to **APIs & Services** > **Library**, search for "Google Drive API", and click **Enable**.
+  </Step>
+  <Step title="Create a Service Account">
+    Go to **IAM & Admin** > **Service Accounts** > **Create Service Account**. Give it a name and finish the creation wizard.
+  </Step>
+  <Step title="Download the JSON Key">
+    Click on the service account you just created, go to the **Keys** tab, then **Add Key** > **Create new key** > **JSON**. A file will be downloaded to your machine. It looks like this:
+
+    ```json
+    {
+      "type": "service_account",
+      "project_id": "my-project",
+      "private_key_id": "abc123",
+      "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+      "client_email": "my-sa@my-project.iam.gserviceaccount.com",
+      "client_id": "123456789",
+      ...
+    }
+    ```
+
+  </Step>
+</Steps>
+
+### Prepare Your Data
+
+<Steps>
+  <Step title="Create a Folder in Google Drive">
+    Create a new folder in Google Drive and copy the folder URL. It looks like:
+
+    ```
+    https://drive.google.com/drive/folders/1ABcDeFgHiJkLmNoPqRsTuVwXyZ
+    ```
+
+  </Step>
+  <Step title="Share the Folder with the Service Account">
+    Right-click the folder > **Share**, and add the `client_email` from the downloaded JSON key file (e.g. `my-sa@my-project.iam.gserviceaccount.com`). Give it **Viewer** access.
+  </Step>
+  <Step title="Add Files">
+    Place `.txt`, `.pdf`, or `.docx` files with meaningful text content in the folder. Each file should contain at least a few paragraphs so that chunking produces enough context for golden generation.
+  </Step>
+</Steps>
+
+### Connect in Confident AI
+
+<Steps>
+  <Step title="Add the Data Source">
+    Go to **Project Settings** > **Data Sources** > **Add** and fill in:
+
+    | Field                | Value                                                  |
+    | -------------------- | ------------------------------------------------------ |
+    | Name                 | A descriptive name (e.g. "My Google Drive")            |
+    | Type                 | Google Drive                                           |
+    | Service Account JSON | Paste the entire contents of the downloaded JSON key   |
+    | Folder URL           | The Google Drive folder URL from the previous step     |
+
+  </Step>
+  <Step title="Create a Generation Config">
+    Navigate to **Datasets** > **Automations** > **Generate from Data Source** > **Add generation config** and configure:
+
+    | Field                    | Value                              |
+    | ------------------------ | ---------------------------------- |
+    | Name                     | A name for this config             |
+    | Data Source              | Select the data source you created |
+    | Max Goldens Per Context  | Number of goldens per chunk (e.g. 2) |
+
+  </Step>
+  <Step title="Generate">
+    Click **Generate** to start the synthetic golden generation process.
+  </Step>
+</Steps>
+
+</Tab>
+
+<Tab title="Slack">
+
+### Setup Credentials
+
+<Steps>
+  <Step title="Create a Slack App">
+    Go to [Slack API](https://api.slack.com/apps) > **Create New App** > **From scratch**. Pick a name and select your workspace.
+  </Step>
+  <Step title="Add Bot Token Scopes">
+    Navigate to **OAuth & Permissions** > **Bot Token Scopes** and add the following scopes:
+
+    | Scope               | Purpose                         |
+    | -------------------- | ------------------------------- |
+    | `channels:history`   | Read messages from channels     |
+    | `channels:read`      | List available channels         |
+    | `users:read`         | Resolve user names (optional)   |
+
+  </Step>
+  <Step title="Install to Workspace">
+    Click **Install to Workspace** and copy the **Bot User OAuth Token** (starts with `xoxb-...`).
+  </Step>
+  <Step title="Invite the Bot to Channels">
+    In Slack, go to each channel you want to include and type `/invite @YourBotName` to give the bot access.
+  </Step>
+</Steps>
+
+### Connect in Confident AI
+
+<Steps>
+  <Step title="Add the Data Source">
+    Go to **Project Settings** > **Data Sources** > **Add** and fill in:
+
+    | Field      | Value                                             |
+    | ---------- | ------------------------------------------------- |
+    | Name       | A descriptive name (e.g. "My Slack")              |
+    | Type       | Slack                                             |
+    | Bot Token  | Your Bot User OAuth Token (e.g. `xoxb-1234...`)  |
+
+  </Step>
+  <Step title="Create a Generation Config and Generate">
+    Create a generation config pointing to this data source, then click **Generate**.
+  </Step>
+</Steps>
+
+### What to Expect
+
+- Messages are read from the `channel_messages` stream
+- Each document's text is all messages concatenated chronologically
+- Channels with very few messages may produce empty documents, which are filtered out automatically
+
+</Tab>
+
+<Tab title="Notion">
+
+### Setup Credentials
+
+<Steps>
+  <Step title="Create a Notion Integration">
+    Go to [Notion Integrations](https://www.notion.so/my-integrations) > **New integration**. Pick a name and select the workspace.
+  </Step>
+  <Step title="Copy the Integration Token">
+    Copy the **Internal Integration Token** (starts with `secret_...`).
+  </Step>
+  <Step title="Connect Pages to the Integration">
+    For each Notion page you want to include, click the **...** menu > **Connections** > find your integration > **Connect**.
+
+    <Note>
+      The integration can only access pages that are explicitly shared with it. Pages not connected to the integration will not be included.
+    </Note>
+
+  </Step>
+</Steps>
+
+### Connect in Confident AI
+
+<Steps>
+  <Step title="Add the Data Source">
+    Go to **Project Settings** > **Data Sources** > **Add** and fill in:
+
+    | Field             | Value                                          |
+    | ----------------- | ---------------------------------------------- |
+    | Name              | A descriptive name (e.g. "My Notion")          |
+    | Type              | Notion                                         |
+    | Integration Token | Your Notion integration token (`secret_...`)   |
+
+  </Step>
+  <Step title="Create a Generation Config and Generate">
+    Create a generation config pointing to this data source, then click **Generate**.
+  </Step>
+</Steps>
+
+### What to Expect
+
+- Pages provide titles; blocks provide the actual text content
+- Documents are assembled per page: title + all block text concatenated
+- Pages with only images or embeds and no text content will be filtered out
+
+</Tab>
+
+<Tab title="SharePoint">
+
+### Setup Credentials
+
+<Steps>
+  <Step title="Register an App in Azure">
+    Go to [Azure Portal](https://portal.azure.com/) > **Azure Active Directory** > **App registrations** > **New registration**. Note the **Application (client) ID** and **Directory (tenant) ID**.
+  </Step>
+  <Step title="Create a Client Secret">
+    Navigate to **Certificates & Secrets** > **New client secret**. Copy the **Value** (not the secret ID).
+  </Step>
+  <Step title="Add API Permissions">
+    Go to **API Permissions** > **Add a permission** > **Microsoft Graph** > **Application permissions** and add:
+
+    | Permission         | Purpose                            |
+    | ------------------ | ---------------------------------- |
+    | `Sites.Read.All`   | Read SharePoint site content       |
+    | `Files.Read.All`   | Read files across the organization |
+
+    Click **Grant admin consent** (requires an Azure AD admin).
+
+  </Step>
+</Steps>
+
+### Connect in Confident AI
+
+<Steps>
+  <Step title="Add the Data Source">
+    Go to **Project Settings** > **Data Sources** > **Add** and fill in:
+
+    | Field         | Value                                              |
+    | ------------- | -------------------------------------------------- |
+    | Name          | A descriptive name (e.g. "My SharePoint")          |
+    | Type          | SharePoint                                         |
+    | Tenant ID     | The Directory (tenant) ID from Azure               |
+    | Client ID     | The Application (client) ID from Azure             |
+    | Client Secret | The client secret value you copied                 |
+
+  </Step>
+  <Step title="Create a Generation Config and Generate">
+    Create a generation config pointing to this data source, then click **Generate**.
+  </Step>
+</Steps>
+
+</Tab>
+
+</Tabs>

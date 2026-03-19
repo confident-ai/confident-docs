@@ -1,0 +1,54 @@
+---
+subtitle: Generate synthetic goldens from your own data sources
+slug: llm-evaluation/dataset-management/synthetic-data/introduction
+---
+
+## Overview
+
+Synthetic data generation allows you to automatically create high-quality goldens from your existing data sources — documents stored in Google Drive, messages in Slack channels, pages in Notion, or files in SharePoint. Instead of manually writing goldens one by one, you can connect a data source and let Confident AI generate evaluation-ready goldens at scale.
+
+{/* TODO: expand introduction with architecture overview, supported sources summary, and end-to-end walkthrough */}
+
+## How It Works
+
+At a high level, synthetic data generation follows three steps:
+
+<Steps>
+  <Step title="Connect a Data Source">
+    Navigate to **Project Settings** > **Data Sources** and connect an external source such as Google Drive, Slack, Notion, or SharePoint. Each source type requires its own set of credentials.
+  </Step>
+  <Step title="Create a Generation Config">
+    Under **Datasets** > **Automations**, create a generation configuration that points to your data source. You can control parameters like the maximum number of goldens generated per context chunk.
+  </Step>
+  <Step title="Generate">
+    Click **Generate** and Confident AI will pull documents from your data source, chunk them into contexts, and use an LLM to synthesize goldens — complete with inputs, expected outputs, and context fields.
+  </Step>
+</Steps>
+
+## Supported Data Sources
+
+<CardGroup cols={2}>
+  <Card title="Google Drive" icon="fa-brands fa-google-drive" href="/llm-evaluation/dataset-management/synthetic-data/data-source-connectors#google-drive">
+    Connect a shared folder and generate goldens from .txt, .pdf, and .docx files.
+  </Card>
+  <Card title="Slack" icon="fa-brands fa-slack" href="/llm-evaluation/dataset-management/synthetic-data/data-source-connectors#slack">
+    Generate goldens from channel message histories.
+  </Card>
+  <Card title="Notion" icon="fa-light fa-book" href="/llm-evaluation/dataset-management/synthetic-data/data-source-connectors#notion">
+    Pull page content and generate goldens from your knowledge base.
+  </Card>
+  <Card title="SharePoint" icon="fa-brands fa-microsoft" href="/llm-evaluation/dataset-management/synthetic-data/data-source-connectors#sharepoint">
+    Connect via Azure AD and generate goldens from SharePoint files.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Data Source Connectors" icon="fa-light fa-plug" href="/llm-evaluation/dataset-management/synthetic-data/data-source-connectors">
+    Learn how to set up credentials and connect each supported data source.
+  </Card>
+  <Card title="Manage Datasets" icon="fa-light fa-file-pen" href="/llm-evaluation/dataset-management/manage-datasets">
+    Learn how to review, finalize, and manage the goldens that were generated.
+  </Card>
+</CardGroup>
