@@ -41,7 +41,13 @@ Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` req
 
 ### Payload
 
-Configure the JSON payload that Confident AI sends to your endpoint. You can customize this to match your API's expected structure using values from your goldens.
+Configure the payload that gets sent to your endpoint when Confident AI calls it. **JSON** mode lets you map available variables into a JSON structure, while the **Code** editor lets you write a Python function for conditional logic, data transformation, or full programmatic control over the request body.
+
+<Tabs>
+
+  <Tab title="JSON">
+
+JSON mode lets you define a payload using available variables. You can nest values to match your endpoint's expected structure.
 
 Available variables:
 
@@ -62,8 +68,11 @@ Available variables:
 | `conversationalGolden.user_description`    | User description for conversational goldens        | string     |
 | `conversationalGolden.additional_metadata` | Additional metadata for conversational goldens     | object     |
 | `prompts`                                  | A dictionary of prompts                            | object     |
+| `hyperparameters`                          | A dictionary of hyperparameter key-value pairs     | object     |
 | `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
 | `state`                                    | An object to keep state for multi-turn simulations | object     |
+
+Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](#hyperparameters) for passing hyperparameters to your endpoint.
 
 Example payload:
 
@@ -73,6 +82,7 @@ Example payload:
   "context": golden.context,
   "conversationalContext": conversationalGolden.context,
   "prompts": prompts,
+  "hyperparameters": hyperparameters,
   "turns": conversationalGolden.turns
 }
 ```
@@ -83,7 +93,85 @@ Example payload:
   format.
 </Tip>
 
-Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary.
+  </Tab>
+
+  <Tab title="Code">
+
+Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
+
+Available `golden` attributes when `golden` is a `Golden`:
+
+| Variable                     | Description                            | Type       |
+| ---------------------------- | -------------------------------------- | ---------- |
+| `golden.input`               | The input from your golden             | string     |
+| `golden.actual_output`       | The actual output from your golden     | string     |
+| `golden.expected_output`     | The expected output from your golden   | string     |
+| `golden.retrieval_context`   | The retrieval context from your golden | string[]   |
+| `golden.context`             | The context from your golden           | string[]   |
+| `golden.expected_tools`      | The expected tools from your golden    | ToolCall[] |
+| `golden.tools_called`        | The tools called from your golden      | ToolCall[] |
+| `golden.additional_metadata` | Additional metadata from your golden   | object     |
+
+Available `golden` attributes when `golden` is a `ConversationalGolden`:
+
+| Variable                     | Description                                    | Type     |
+| ---------------------------- | ---------------------------------------------- | -------- |
+| `golden.turns`               | Turn history for multi-turn evals              | Turn[]   |
+| `golden.context`             | Context for conversational goldens             | string[] |
+| `golden.scenario`            | Scenario for conversational goldens            | string   |
+| `golden.expected_outcome`    | Expected outcome for conversational goldens    | string   |
+| `golden.user_description`    | User description for conversational goldens    | string   |
+| `golden.additional_metadata` | Additional metadata for conversational goldens | object   |
+
+Additional parameters:
+
+| Parameter         | Description                                        | Type                       |
+| ----------------- | -------------------------------------------------- | -------------------------- |
+| `prompts`         | A dictionary of prompts                            | `Optional[Dict[str, str]]` |
+| `hyperparameters` | A dictionary of hyperparameter key-value pairs     | `Optional[Dict[str, str]]` |
+| `testCaseId`      | Unique identifier for linking traces to test cases | `Optional[str]`            |
+| `state`           | An object to keep state for multi-turn simulations | `Optional[Any]`            |
+
+```python
+from deepeval import Golden, ConversationalGolden
+
+def generate_payload(
+    golden: Union[Golden, ConversationalGolden],
+    prompts: Optional[Dict[str, str]] = None,
+    hyperparameters: Optional[Dict[str, str]] = None,
+    testCaseId: Optional[str] = None,
+    state: Optional[Any] = None,
+) -> dict:
+
+    if isinstance(golden, Golden):
+        return {
+            "input": golden.input,
+            "context": golden.context,
+            "prompts": prompts,
+            "hyperparameters": hyperparameters
+        }
+
+    elif isinstance(golden, ConversationalGolden):
+        return {
+            "turns": golden.turns,
+            "conversationContext": golden.context,
+            "prompts": prompts,
+            "hyperparameters": hyperparameters
+        }
+```
+
+Whatever the function returns is what gets sent to your endpoint as the POST body.
+
+<Tip>
+  Code mode is great when your AI app expects different payload shapes depending
+  on the type of evaluation, when you need to preprocess golden data before
+  sending it, or when you need to generate dynamic values like UUIDs or
+  timestamps on the fly.
+</Tip>
+
+  </Tab>
+
+</Tabs>
 
 ### Headers
 
@@ -127,6 +215,44 @@ def generate(request: dict):
 ```
 
 For more details on working with prompts, see [Prompt Versioning](/docs/llm-evaluation/prompt-management/version-prompts).
+
+### Hyperparameters
+
+Define optional hyperparameters as string key-value pairs. These are sent to your endpoint as part of the payload and are also logged in test runs and experiments, making it easy to track which configuration was used for each evaluation.
+
+Hyperparameters are useful for passing model configuration values like `temperature`, `model_name`, or `max_tokens` to your AI app without hardcoding them into your endpoint. Since they're logged alongside test run and experiment results, you can compare how different hyperparameter values affect evaluation outcomes.
+
+The `hyperparameters` variable in your payload is a dictionary where both keys and values are strings:
+
+```json
+{
+  "temperature": "0.7",
+  "model": "gpt-4o",
+  "max_tokens": "1024"
+}
+```
+
+Here's an example of how your Python endpoint might use hyperparameters:
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    hyperparameters = request.get("hyperparameters", {})
+
+    response = llm.generate(
+        model=hyperparameters.get("model", "gpt-4o"),
+        temperature=float(hyperparameters.get("temperature", "0.7")),
+        max_tokens=int(hyperparameters.get("max_tokens", "1024")),
+        user=request["input"]
+    )
+
+    return {"output": response}
+```
+
+<Note>
+  Hyperparameter values are always strings. Cast them to the appropriate type
+  (e.g., `float`, `int`) in your endpoint as needed.
+</Note>
 
 ### Actual Output Key Path
 
