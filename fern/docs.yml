@@ -458,6 +458,9 @@ navigation:
           - page: Data Retention
             path: docs/pages/settings/project/data-retention.mdx
             icon: fa-light fa-trash
+          - page: Audit Logs
+            path: docs/pages/settings/project/audit-logs.mdx
+            icon: fa-light fa-list-timeline
           - page: Roles & Permissions
             path: docs/pages/settings/project/roles-and-permissions.mdx
             icon: fa-light fa-user-shield
@@ -478,6 +481,12 @@ navigation:
           - page: SSO
             path: docs/pages/settings/organization/sso.mdx
             icon: fa-light fa-lock
+          - page: Data Retention
+            path: docs/pages/settings/organization/data-retention.mdx
+            icon: fa-light fa-trash
+          - page: Audit Logs
+            path: docs/pages/settings/organization/audit-logs.mdx
+            icon: fa-light fa-list-timeline
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on

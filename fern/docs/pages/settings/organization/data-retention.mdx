@@ -1,18 +1,14 @@
 ---
-subtitle: Configure data retention policies to manage how long your project data is stored.
-slug: settings/project/data-retention
-description: Learn about data retention settings
+subtitle: Configure organization-wide data retention policies that apply across all projects.
+slug: settings/organization/data-retention
+description: Learn about organization data retention settings
 ---
 
-Data retention policies let you control how long different types of data are stored in your project before being automatically deleted.
+Organization-level data retention policies set default retention periods that apply across all projects in your organization. Individual projects can override these defaults by toggling off **Inherit from organization** in their own retention settings.
 
-<Frame caption="Data Retention">
-  <img data-image="settings.project.dataRetention" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+<Frame caption="Organization Data Retention">
+  <img data-image="settings.organization.dataRetention" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
-
-## Inherit from Organization
-
-Each project can optionally inherit its retention policies from the organization. When enabled, the project uses the organization-level retention settings and individual controls are disabled. Toggle **Inherit from organization** off to configure project-specific retention periods.
 
 ## Retention Categories
 
@@ -38,10 +34,9 @@ You select **one** unit per data type — these are not combined. For example, y
 
 To configure retention:
 
-1. Navigate to **Project Settings** → **Data Usage** → **Retention** tab
-2. Optionally toggle off **Inherit from organization** to set project-specific policies
-3. For each data type, select the unit (Forever, Days, Months, or Years) and enter a duration
-4. Click **Save**
+1. Navigate to **Organization Settings** → **Data Retention**
+2. For each data type, select the unit (Forever, Days, Months, or Years) and enter a duration
+3. Click **Save**
 
 <Note>
   Retention cleanup happens daily at midnight UTC. Changing retention settings
@@ -58,3 +53,9 @@ When data is deleted, any child data associated with it gets deleted too. Here's
 - **Traces** — Deleting a trace removes its spans and metrics, but leaves the parent thread intact.
 
 For example, if you set your trace & span retention to 14 days, any traces older than 14 days will be deleted along with all their associated spans and metrics.
+
+<Tip>
+  Projects inherit these organization retention policies by default. To
+  configure project-specific retention periods, go to the project's **Data
+  Usage** → **Retention** tab and toggle off **Inherit from organization**.
+</Tip>

@@ -175,6 +175,8 @@
     // Settings - Organization
     "settings.organization.auth": `${S3_BASE}/confident-docs:organization-auth.png`,
     "settings.organization.rolesPermissions": `${S3_BASE}/settings:org:roles-n-permissions.png`,
+    "settings.organization.dataRetention": `${S3_BASE}/settings:org:data-retention.png`,
+    "settings.organization.auditLogs": `${S3_BASE}/settings:org:audit-logs.png`,
 
     // Settings - Project
     "settings.project.rolesPermissions": `${S3_BASE}/settings:project:roles-n-permissions.png`,
@@ -185,6 +187,7 @@
     "settings.project.aiConnection": `${S3_BASE}/settings:project:ai-connection.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
+    "settings.project.auditLogs": `${S3_BASE}/settings:project:audit-logs.png`,
     "settings.project.alerts": `${S3_BASE}/settings:project:alerts.png`,
     "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
     "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,

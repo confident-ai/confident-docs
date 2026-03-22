@@ -32,7 +32,7 @@ Includes all permissions. Managers have the same access as Owners.
 
 ### Member
 
-Includes everything except `project:delete`, `user:manage`, `user:delete`, and `iam:manage`. Members cannot delete the project, assign roles to project members, remove members from the project, or manage roles and policies.
+Includes everything except `project:delete`, `retentionConfig:manage`, `user:manage`, `user:delete`, and `iam:manage`. Members cannot delete the project, manage retention settings, assign roles to project members, remove members from the project, or manage roles and policies.
 
 ## Custom Roles
 
@@ -89,6 +89,7 @@ Permissions follow a `resource:action` format. For example, `dataset:read` grant
 - `prompt`, `promptVersion`, `promptLabel` — Prompts and their versions
 - `annotationQueue`, `queue_item` — Annotation queues and their items
 - `project`, `apiKey`, `modelCredential`, `modelCost`, `evaluationModel` — Project settings and configuration
+- `retentionConfig` — Data retention settings for traces, spans, test runs, datasets, and prompts (how long each is kept)
 - `iam` — Project roles and policies
 - `transformer`, `aiConnection`, `alertConfig`, `integration` — Integrations and tools
 - `user` — Team member management; `user:manage` controls assigning roles to members, while `user:delete` controls removing members from the project

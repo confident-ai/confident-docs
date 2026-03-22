@@ -1,0 +1,40 @@
+---
+subtitle: View a log of all actions performed in your project.
+slug: settings/project/audit-logs
+description: Learn about project audit logs
+---
+
+Audit logs provide a chronological record of every action performed in your project, helping you track changes, debug issues, and maintain accountability.
+
+<Frame caption="Project Audit Logs">
+  <img
+    data-image="settings.project.auditLogs"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Overview
+
+The audit logs page shows all API and user actions that have occurred in the project. Each log entry includes:
+
+| Column     | Description                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------- |
+| **Date**   | Timestamp of the action (UTC).                                                                 |
+| **Status** | HTTP status code returned by the action (e.g., `200` for success).                             |
+| **Logs**   | The action performed, shown as a method and resource path (e.g., `PUT client.prompts.update`). |
+| **User**   | The email of the user or API key that triggered the action.                                    |
+
+A timeline chart at the top visualizes action volume over time, making it easy to spot spikes or unusual activity.
+
+## Searching Logs
+
+Use the search bar to filter logs by any field — action name, user email, status code, or resource path. This is useful for narrowing down specific changes, such as finding all retention config updates or actions by a particular user.
+
+## Common Actions
+
+Actions follow a `resource.action` naming pattern. Some examples:
+
+- `client.retention-configs.inherit.update` — Updated the inherit-from-organization retention setting
+- `client.retention-configs.retention-policies.create` — Created a retention policy
+- `client.rt-frameworks.schedule.create` / `delete` — Created or deleted a real-time framework schedule
+- `client.prompts.update` — Updated a prompt

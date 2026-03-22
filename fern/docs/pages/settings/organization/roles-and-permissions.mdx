@@ -32,7 +32,7 @@ Includes all permissions. Admins can do everything an Owner can except remove an
 
 ### Member
 
-Includes everything except `project:manage`, `organization:manage`, `featureAccess:manage`, `sso:manage`, `apiKey:manage`, `user:manage`, `user:delete`, `billing:manage`, `modelCredential:manage`, `modelCost:manage`, `metric:manage`, and `iam:manage`. Members have read access to these areas but cannot change org-wide settings, manage or remove users, or manage roles and policies.
+Includes everything except `project:manage`, `organization:manage`, `featureAccess:manage`, `sso:manage`, `apiKey:manage`, `user:manage`, `user:delete`, `billing:manage`, `modelCredential:manage`, `modelCost:manage`, `metric:manage`, `retentionConfig:manage`, and `iam:manage`. Members have read access to these areas but cannot change org-wide settings, manage or remove users, or manage roles and policies.
 
 ## Bypass Project Permissions
 
@@ -95,6 +95,7 @@ Organization permissions follow the same `resource:action` format as project per
 - `user` — Organization user management; `user:manage` controls assigning roles to users, while `user:delete` controls removing users from the organization
 - `billing` — Billing and subscription
 - `modelCredential`, `modelCost`, `metric` — Org-level model credentials, costs, and metrics
+- `retentionConfig` — Data retention settings for traces, spans, test runs, datasets, and prompts (how long each is kept)
 - `iam` — Organization roles and policies
 
 Not every resource has every action. You can see the full list of permissions on the **Roles & Permissions** page in Organization Settings.

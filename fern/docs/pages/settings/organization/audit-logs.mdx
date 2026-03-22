@@ -1,0 +1,40 @@
+---
+subtitle: View a log of all actions performed across your organization.
+slug: settings/organization/audit-logs
+description: Learn about organization audit logs
+---
+
+Organization audit logs provide a centralized view of every action performed across all projects in your organization. This is useful for security reviews, compliance, and understanding activity across teams.
+
+<Frame caption="Organization Audit Logs">
+  <img data-image="settings.organization.auditLogs" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+## Overview
+
+The organization audit logs page shows all API and user actions across every project. Each log entry includes:
+
+| Column      | Description                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| **Date**    | Timestamp of the action (UTC).                                                              |
+| **Status**  | HTTP status code returned by the action (e.g., `200` for success).                          |
+| **Logs**    | The action performed, shown as a method and resource path (e.g., `PUT org.users.role.update`). |
+| **Project** | The project the action was performed in (not shown for org-level actions).                   |
+| **User**    | The email of the user or API key that triggered the action.                                 |
+
+Compared to project-level audit logs, the organization view adds a **Project** column so you can see which project each action belongs to. Organization-level actions (like user role changes) are also included here.
+
+A timeline chart at the top visualizes action volume over time across all projects.
+
+## Searching Logs
+
+Use the search bar to filter logs by any field — action name, user email, project, status code, or resource path. This is useful for auditing specific users' activity across projects or tracking org-wide configuration changes.
+
+## Common Actions
+
+Actions follow a `resource.action` naming pattern. Some examples:
+
+- `org.users.role.update` — Updated a user's organization role
+- `org.retention-configs.retention-policies.create` — Created an org-level retention policy
+- `client.prompts.branches.update` / `delete` — Updated or deleted prompt branches in a project
+- `client.rt-frameworks.schedule.create` / `delete` — Created or deleted a real-time framework schedule
