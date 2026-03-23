@@ -108,6 +108,16 @@ navigation:
               - page: Manage Datasets
                 path: docs/pages/llm-evaluation/dataset-management/manage-datasets.mdx
                 icon: fa-light fa-file-pen
+              - section: Synthetic Data Generation
+                collapsed: false
+                icon: fa-light fa-wand-magic-sparkles
+                contents:
+                  - page: Introduction
+                    path: docs/pages/llm-evaluation/dataset-management/synthetic-data/introduction.mdx
+                    icon: fa-light fa-circle-info
+                  - page: Data Source Connectors
+                    path: docs/pages/llm-evaluation/dataset-management/synthetic-data/data-source-connectors.mdx
+                    icon: fa-light fa-plug
               - section: Datasets in Code
                 collapsed: false
                 icon: fa-light fa-code
