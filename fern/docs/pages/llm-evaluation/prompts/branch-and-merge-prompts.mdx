@@ -1,0 +1,194 @@
+---
+subtitle: Create branches, open pull requests, and merge prompt changes
+slug: llm-evaluation/prompt-management/branch-and-merge-prompts
+---
+
+## Overview
+
+Prompt branching lets you experiment with prompt changes in isolation before merging them into your main prompt. This workflow is modeled after Git-style branching — you create a branch, make commits, open a pull request for review, and merge when ready.
+
+Branching is useful when:
+
+- Multiple team members are iterating on the same prompt simultaneously
+- You want to test changes without affecting the live (main) version
+- You need a review process before prompt changes go into production
+
+<Note>
+  All branches are created off the **main** branch. Every prompt starts with a
+  single main branch that holds the current production-ready version.
+</Note>
+
+## Create a Branch
+
+There are three ways to create a new branch:
+
+1. **From the branch selector** — Click the branch dropdown in the Prompt Studio header and select **New Branch**.
+2. **From the prompt editor** — After committing changes on main, a prompt may appear offering to create a branch for further iteration.
+3. **From the Pull Requests page** — Click **New Pull Request**, which also lets you select or create a source branch.
+
+<Frame caption="Create a new branch" background="subtle">
+
+<video autoPlay loop muted data-video="prompts.createBranch" type="video/mp4" />
+
+</Frame>
+
+When you create a branch, it copies the current state of main as its starting point. You can then edit the prompt freely — your changes only exist on that branch until you merge.
+
+<Tip>
+  Branch names should be descriptive of the changes you're making, like
+  `improve-system-instructions` or `add-few-shot-examples`.
+</Tip>
+
+## Switch Between Branches
+
+Use the branch selector dropdown in the Prompt Studio header to switch between branches. The prompt editor will load the latest commit from whichever branch you select.
+
+<Frame caption="Branch selector">
+  <img
+    data-image="prompts.branchSelector"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Commit to a Branch
+
+Making changes on a branch works the same way as on main — edit your prompt and click **Commit changes**. Each commit is tracked in the branch's history, and you can review the full commit history in the **Commits** tab of a pull request.
+
+<Note>
+  Commits made to a branch after a pull request is opened will automatically
+  appear in the PR's timeline and commit history. If an eval task is configured
+  with a **Commit** trigger, it will run automatically on each new commit — this
+  is separate from any **Pull Request** trigger that only fires when the PR is
+  first opened.
+</Note>
+
+## Rename or Delete a Branch
+
+You can rename or delete a branch from the branch selector dropdown. Click the three-dot menu next to a branch name to see these options.
+
+<Frame caption="Rename or delete a branch">
+  <img
+    data-image="prompts.branchActions"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Warning>
+  Deleting a branch is permanent and cannot be undone. Any unmerged changes on
+  that branch will be lost.
+</Warning>
+
+## Pull Requests
+
+Pull requests let you propose merging a branch's changes into main. They provide a review surface where you can see the diff, commit history, and automated evaluation results before merging.
+
+### Create a Pull Request
+
+You can open a pull request from three places:
+
+1. **Branch selector** — Click the three-dot menu next to a branch and select **New Pull Request**.
+2. **Prompt editor** — After committing to a non-main branch, a button appears to open a PR directly.
+3. **Pull Requests page** — Click the **New Pull Request** button and select the source branch.
+
+<Frame caption="Create a pull request" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  data-video="prompts.createPullRequest"
+  type="video/mp4"
+/>
+
+</Frame>
+
+When creating a PR, you provide a title and an optional description. If eval tasks with a **Pull Request** trigger are configured, they will run automatically when the PR is created.
+
+<Info>
+  If no eval task has a Pull Request trigger configured, a yellow notice will
+  appear in the creation dialog reminding you to set one up. You can navigate
+  directly to the eval action triggers page from the link in the notice.
+</Info>
+
+### Review a Pull Request
+
+The pull request detail page has three tabs:
+
+**General** — Shows the PR description, a timeline of activity (commits pushed, eval runs completed), and the latest eval check results. You can edit the description inline by clicking the edit button.
+
+<Frame caption="Pull request General tab">
+  <img
+    data-image="prompts.pullRequestGeneral"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+**Commits** — Displays the full commit history for the branch. You can click any commit to see its diff, or toggle between diff view and version view using the switch in the top-right corner.
+
+<Frame caption="Pull request Commits tab">
+  <img
+    data-image="prompts.pullRequestCommits"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+**Changes** — Shows the overall diff between the branch and main, so you can see exactly what will change when merged.
+
+<Frame caption="Pull request Changes tab">
+  <img
+    data-image="prompts.pullRequestChanges"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+### Merge or Close a Pull Request
+
+At the bottom of the General tab, you'll find buttons to **Merge** or **Close** the pull request.
+
+- **Merge** applies all of the branch's changes to main. A confirmation dialog will appear to confirm the action. If eval tasks with a **Merge** trigger are configured, they will run automatically after merging.
+- **Close** marks the PR as closed without merging. The branch and its commits remain intact, so you can reopen or reference them later.
+
+<Frame caption="Merge a pull request" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  data-video="prompts.mergePullRequest"
+  type="video/mp4"
+/>
+
+</Frame>
+
+<Warning>
+  Merging is permanent — the branch's latest prompt state will replace main's
+  current state. Make sure to review the Changes tab before merging.
+</Warning>
+
+## Permissions
+
+Branch and pull request actions are governed by the **promptBranch** permission resource. By default:
+
+- **Owners** and **Managers** have full access to create, update, merge, and delete branches and pull requests.
+- **Members** have full access as well, including merge. You can restrict merge access for Members by creating a custom role or policy.
+
+For more details on configuring roles and permissions, see [Project Roles & Permissions](/docs/settings/project/roles-and-permissions).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Eval Actions"
+    icon="play"
+    href="/docs/llm-evaluation/prompt-management/eval-actions"
+  >
+    Set up automated evaluations that trigger on commits, PRs, and merges.
+  </Card>
+  <Card
+    title="Version Prompts"
+    icon="code-branch"
+    href="/docs/llm-evaluation/prompt-management/version-prompts"
+  >
+    Learn about prompt commits, versions, and labels.
+  </Card>
+</CardGroup>

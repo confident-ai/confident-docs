@@ -135,6 +135,12 @@ navigation:
               - page: Version Prompts
                 path: docs/pages/llm-evaluation/prompts/version-prompts.mdx
                 icon: fa-light fa-code-branch
+              - page: Branch & Merge Prompts
+                path: docs/pages/llm-evaluation/prompts/branch-and-merge-prompts.mdx
+                icon: fa-light fa-code-merge
+              - page: Eval Actions
+                path: docs/pages/llm-evaluation/prompts/eval-actions.mdx
+                icon: fa-light fa-circle-play
               - section: Prompts in Code
                 collapsed: false
                 icon: fa-light fa-code
