@@ -33,12 +33,12 @@ To set up an automated eval action, navigate to the **Triggers** tab on the Eval
 
 Each eval task requires:
 
-| Field                 | Description                                                                                                     |
-| --------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **Name**              | A descriptive name for the eval task (e.g., "System prompt quality check").                                     |
-| **Triggers**          | One or more events that cause the evaluation to run: **Commit**, **Pull Request**, **Merge**, or **Version**.   |
-| **Dataset**           | The dataset to evaluate the prompt against. The dataset must have goldens compatible with the selected metrics. |
-| **Metric Collection** | The collection of metrics to score the prompt against.                                                          |
+| Field | Description |
+| --- | --- |
+| **Name** | A descriptive name for the eval task. |
+| **Triggers** | Events that run the evaluation: **Commit**, **Pull Request**, **Merge**, or **Version**. |
+| **Dataset** | The dataset to evaluate against. Must have compatible goldens. |
+| **Metric Collection** | The metrics to score the prompt against. |
 
 ### Triggers
 
@@ -56,17 +56,11 @@ You can assign multiple triggers to a single eval task. Each trigger fires under
   />
 </Frame>
 
-<Info>
+<Note>
   A single eval task can have multiple triggers. For example, you might want a
   task to run on both **Commit** and **Pull Request** events so you get
   continuous feedback during development and a final check when the PR is
   opened.
-</Info>
-
-<Note>
-  Commits made to a branch *after* a pull request is opened will trigger
-  **Commit**-type eval actions — not the **Pull Request** trigger. The Pull
-  Request trigger only fires once, when the PR is first created.
 </Note>
 
 ### Dataset and Metric Requirements
