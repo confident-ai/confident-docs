@@ -70,6 +70,7 @@ Available variables:
 | `prompts`                                  | A dictionary of prompts                            | object     |
 | `hyperparameters`                          | A dictionary of hyperparameter key-value pairs     | object     |
 | `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
+| `turnId`                                   | Unique identifier for linking traces to turns      | string     |
 | `state`                                    | An object to keep state for multi-turn simulations | object     |
 
 Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](#hyperparameters) for passing hyperparameters to your endpoint.
@@ -97,7 +98,7 @@ Example payload:
 
   <Tab title="Code">
 
-Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
+Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, `turnId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
 
 Available `golden` attributes when `golden` is a `Golden`:
 
@@ -125,12 +126,13 @@ Available `golden` attributes when `golden` is a `ConversationalGolden`:
 
 Additional parameters:
 
-| Parameter         | Description                                        | Type                       |
-| ----------------- | -------------------------------------------------- | -------------------------- |
-| `prompts`         | A dictionary of prompts                            | `Optional[Dict[str, str]]` |
-| `hyperparameters` | A dictionary of hyperparameter key-value pairs     | `Optional[Dict[str, str]]` |
-| `testCaseId`      | Unique identifier for linking traces to test cases | `Optional[str]`            |
-| `state`           | An object to keep state for multi-turn simulations | `Optional[Any]`            |
+| Parameter         | Description                                                                  | Type                       |
+| ----------------- | ---------------------------------------------------------------------------- | -------------------------- |
+| `prompts`         | A dictionary of prompts                                                      | `Optional[Dict[str, str]]` |
+| `hyperparameters` | A dictionary of hyperparameter key-value pairs                               | `Optional[Dict[str, str]]` |
+| `testCaseId`      | Unique identifier for linking traces to test cases                           | `Optional[str]`            |
+| `turnId`          | Unique identifier for linking traces to individual turns in multi-turn evals | `Optional[str]`            |
+| `state`           | An object to keep state for multi-turn simulations                           | `Optional[Any]`            |
 
 ```python
 from deepeval import Golden, ConversationalGolden
@@ -140,6 +142,7 @@ def generate_payload(
     prompts: Optional[Dict[str, str]] = None,
     hyperparameters: Optional[Dict[str, str]] = None,
     testCaseId: Optional[str] = None,
+    turnId: Optional[str] = None,
     state: Optional[Any] = None,
 ) -> dict:
 
@@ -491,7 +494,7 @@ def llm_app(input: str, test_case_id: str):
 
 @app.post("/generate")
 def generate(request: dict):
-    test_case_id = request,get("testCaseId")
+    test_case_id = request.get("testCaseId")
     response = llm_app(request["input"], test_case_id)
     return {"output": response}
 ```
@@ -541,6 +544,113 @@ def generate(request: dict):
   Once linked, you can view the full trace for each test case directly from the
   evaluation results, making it easy to debug failures and understand model
   behavior.
+</Tip>
+
+### Linking Individual Turns to Traces (Multi-Turn)
+
+For multi-turn evaluations, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup alongside `testCaseId`. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation results.
+
+```mermaid
+sequenceDiagram
+    participant C as Confident AI
+    participant E as Your Endpoint
+    participant T as Tracing
+
+    Note over C,E: Turn 1
+    C->>E: { testCaseId, turnId, ...payload }
+    E->>T: Create trace with testCaseId + turnId
+    E-->>C: Return actual_output
+
+    Note over C,E: Turn 2
+    C->>E: { testCaseId, turnId, ...payload }
+    E->>T: Create trace with testCaseId + turnId
+    E-->>C: Return actual_output
+
+    T-->>C: Send traces to Confident AI
+    Note over C: Each turn linked to its trace
+```
+
+Include both `testCaseId` and `turnId` in your payload configuration:
+
+```json
+{
+  "input": golden.input,
+  "testCaseId": testCaseId,
+  "turnId": turnId,
+  "state": state
+}
+```
+
+Then, pass both identifiers to your tracing implementation:
+
+<Tabs>
+
+  <Tab title="Python">
+
+```python
+from deepeval.tracing import observe, update_current_trace
+
+@observe()
+def llm_app(input: str, test_case_id: str, turn_id: str):
+    update_current_trace(test_case_id=test_case_id, turn_id=turn_id)
+
+    response = llm.generate(user=input)
+    return response
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+    turn_id = request.get("turnId")
+    response = llm_app(request["input"], test_case_id, turn_id)
+    return {"output": response}
+```
+
+  </Tab>
+  <Tab title="LangChain">
+
+```python
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+    turn_id = request.get("turnId")
+
+    result = agent_executor.invoke(
+        {"input": request["input"]},
+        config={"callbacks": [CallbackHandler(test_case_id=test_case_id, turn_id=turn_id)]}
+    )
+    return {"output": result["output"]}
+```
+
+  </Tab>
+  <Tab title="LangGraph">
+
+```python
+from langgraph.prebuilt import create_react_agent
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+    turn_id = request.get("turnId")
+
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": request["input"]}]},
+        config={"callbacks": [CallbackHandler(test_case_id=test_case_id, turn_id=turn_id)]}
+    )
+    return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+</Tabs>
+
+<Tip>
+  With `turnId` linked, you can click "Open trace" on any individual turn in the
+  evaluation results to see the full trace for that specific turn.
 </Tip>
 
 ## Testing Your Connection
