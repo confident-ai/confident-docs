@@ -1,0 +1,219 @@
+---
+slug: self-hosting/aws/quickstart
+description: Quick setup guide for Confident AI's AWS infrastructure and Kubernetes workloads using Terraform
+---
+
+## Overview
+
+This is the streamlined setup guide for getting Confident AI running on AWS. It covers cloning the repository, configuring variables, provisioning infrastructure with Terraform, and deploying workloads via ArgoCD.
+
+If you want detailed explanations of each step, see the [step-by-step guide](/self-hosting/aws/prerequisites) instead. This page assumes you already have the required tools installed and AWS credentials configured — see [Requirements](/self-hosting/aws/requirements) and [Prerequisites](/self-hosting/aws/prerequisites) for details.
+
+## Core components
+
+All cloud resources are defined in `.tf` (Terraform) files in the `aws_tf` directory:
+
+<CardGroup cols={3}>
+  <Card title="VPC & Networking" icon="fa-light fa-network-wired">
+    Public/private/database subnets with NAT Gateway, Internet Gateway, and S3 VPC Endpoint.
+  </Card>
+  <Card title="EKS Cluster" icon="fa-light fa-dharmachakra">
+    Managed Kubernetes with autoscaling node groups and EBS CSI driver.
+  </Card>
+  <Card title="Bastion Host" icon="fa-light fa-tower-observation">
+    Secure jump host for accessing private resources inside the VPC.
+  </Card>
+  <Card title="RDS PostgreSQL" icon="fa-light fa-database">
+    Managed database in isolated subnets with automated backups and encryption.
+  </Card>
+  <Card title="ACM Certificates" icon="fa-light fa-lock">
+    SSL/TLS certificate management for HTTPS termination.
+  </Card>
+  <Card title="S3 Storage" icon="fa-light fa-bucket">
+    Private bucket with VPC endpoint for application data.
+  </Card>
+</CardGroup>
+
+<Note>
+  ECR (`ecr.tf`) is only used for syncing secrets into the EKS cluster — it handles cross-account image pull credentials, not hosting your own images.
+</Note>
+
+## Get started
+
+<Steps>
+
+<Step title="Clone the repository">
+
+```bash
+git clone git@github.com:confident-ai/confident-terraform.git
+cd confident-terraform/aws_tf
+```
+
+</Step>
+
+<Step title="Configure your variables">
+
+Copy an environment template and save it as `terraform.tfvars`:
+
+```bash
+# For staging
+cp vars/staging.vars terraform.tfvars
+
+# For production
+cp vars/production.vars terraform.tfvars
+```
+
+Open `terraform.tfvars` and set the following variables:
+
+| Variable | Description |
+| --- | --- |
+| `confident_psql_db_name` | Database name |
+| `confident_psql_username` | Database username |
+| `confident_psql_password` | Database password |
+| `confident_better_auth_secret` | Auth token signing secret |
+| `confident_better_auth_trusted_origins` | Allowed authenticated request origins |
+| `confident_google_client_id` | Google OAuth Client ID |
+| `confident_google_client_secret` | Google OAuth Client Secret |
+| `confident_subdomain` | Root domain for cookies |
+| `confident_frontend_url` | Dashboard URL (e.g., `https://app.yourdomain.com`) |
+| `confident_backend_url` | API URL (e.g., `https://api.yourdomain.com`) |
+| `confident_clickhouse_password` | ClickHouse analytics DB password |
+| `confident_public_eks` | Whether EKS API is publicly accessible |
+| `argocd_admin_password` | ArgoCD dashboard admin password |
+| `ecr_aws_access_key_id` | ECR cross-account access key |
+| `ecr_aws_secret_access_key` | ECR cross-account secret key |
+| `ecr_aws_account_id` | ECR AWS account ID |
+| `ecr_aws_region` | ECR AWS region |
+| `code_executor_lambda_enabled` | Toggle for Lambda code executor |
+| `code_executor_lambda_image_uri` | Lambda code executor image URI |
+
+<Warning>
+**Lambda code executor image:** First pull the image from `128045499490.dkr.ecr.us-east-1.amazonaws.com/confident-code-sandbox-lambda:<tag>`, push it to your own ECR, then use its URI in `code_executor_lambda_image_uri`. Lambda requires the image to be in your AWS account's private ECR.
+</Warning>
+
+For detailed explanations of each variable, see the [Configuration](/self-hosting/aws/configuration) page.
+
+</Step>
+
+<Step title="Provision infrastructure">
+
+```bash
+terraform init
+terraform apply
+```
+
+Approve when prompted. This takes 15-25 minutes and provisions the VPC, EKS cluster, RDS database, S3 bucket, Secrets Manager, IAM roles, and Helm releases.
+
+</Step>
+
+<Step title="Set up External Secrets">
+
+External Secrets syncs credentials from AWS Secrets Manager into Kubernetes.
+
+Edit `app/base/common/external-secrets/external-secrets.yaml` and update the `key` field for each secret block. Set it based on your `confident_environment` variable:
+
+- **Staging:** `confidentai-stage-confident-secret`
+- **Production:** `confidentai-prod-confident-secret`
+
+Then in `app/base/common/secret-store/secret-store.yaml`, update the `region:` field to match your `confident_aws_region` value.
+
+</Step>
+
+<Step title="Configure Ingress subnets and ACM certificate">
+
+In `app/base/network/ingress.yaml`, update the annotations block with your ACM certificate ARN and subnet IDs:
+
+```yaml
+annotations:
+  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/your-certificate-id
+  alb.ingress.kubernetes.io/subnets: subnet-abc,subnet-xyz,subnet-pqr
+```
+
+<Note>
+  The `alb.ingress.kubernetes.io/subnets` value should match the subnets used by your EKS cluster (often private subnets). Make sure your ACM certificate is issued in the same AWS region as your load balancer.
+</Note>
+
+</Step>
+
+<Step title="Set up ArgoCD for deployments">
+
+<Warning>
+  ArgoCD installation via Terraform is enabled in `helm-charts.tf` (lines 69-104). If the Terraform runner's context window is exceeded, you'll need to install ArgoCD manually using Helm.
+</Warning>
+
+To install ArgoCD manually:
+
+```bash
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+helm install argocd argo/argo-cd \
+  --namespace argocd \
+  --create-namespace \
+  --version 9.4.5 \
+  --set server.service.type=LoadBalancer \
+  --set server.service.loadBalancerClass=service.k8s.aws/nlb \
+  --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"=<internet-facing | internal> \
+  --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-subnets"="subnet-abc\,subnet-xyz\,subnet-pqr" \
+  --set server.ingress.enabled=false \
+  --set configs.secret.argocdServerAdminPassword='<your_admin_password>'
+```
+
+A few things to keep in mind:
+
+- Replace `<internet-facing | internal>` based on your setup — use `internet-facing` if `confident_public_eks` is `true`, otherwise `internal`.
+- Replace `<your_admin_password>` with the same value you provided to the `argocd_admin_password` Terraform variable.
+- Make sure you have the correct AWS credentials and kubectl context set for your cluster before running the Helm command.
+
+Once ArgoCD is running:
+
+1. Get the ArgoCD load balancer URL from `terraform output`
+2. Log in to ArgoCD in your browser
+3. Connect ArgoCD to the repository
+4. Provide the path to `app/argocd/app-of-apps.yaml` to start automated deployment of all Kubernetes workloads
+
+<Note>
+  ArgoCD deploys everything described in `app-of-apps.yaml`. You may need to approve access or confirm secrets sync depending on your cluster security settings.
+</Note>
+
+</Step>
+
+<Step title="Install Datadog in EKS">
+
+To install the Datadog Agent on your EKS cluster, use the official Datadog Helm chart:
+
+```bash
+helm repo add datadog https://helm.datadoghq.com
+helm repo update
+
+helm install datadog-operator datadog/datadog-operator \
+  --namespace datadog \
+  --create-namespace \
+  --set image.tag=1.2.0 \
+  --set clusterName=<your-eks-cluster-name>
+```
+
+Replace `<your-eks-cluster-name>` with your EKS cluster name (available from `terraform output` or the AWS console). Use your actual Datadog API Key and Application Key for authentication.
+
+<Note>
+  For further configuration (tags, proxy, extra features), see the [Datadog Helm chart documentation](https://github.com/DataDog/helm-charts/tree/main/charts/datadog).
+</Note>
+
+Done ✅ All major components and workloads are handled via Terraform and ArgoCD (app-of-apps pattern).
+
+</Step>
+
+</Steps>
+
+## Next steps
+
+You've completed the quickstart setup. Here's what to do next:
+
+<CardGroup cols={2}>
+  <Card title="Verification" icon="fa-light fa-circle-check" href="/self-hosting/aws/verification">
+    Test your deployment end-to-end — DNS, health checks, user login, and SDK connectivity.
+  </Card>
+  <Card title="Step-by-step Guide" icon="fa-light fa-list-check" href="/self-hosting/aws/prerequisites">
+    Detailed walkthrough of each deployment step with troubleshooting guidance.
+  </Card>
+</CardGroup>
