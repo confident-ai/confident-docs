@@ -513,6 +513,9 @@ navigation:
           - page: Overview
             path: docs/pages/self-hosting/aws/overview.mdx
             icon: fa-light fa-map
+          - page: Quickstart
+            path: docs/pages/self-hosting/aws/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: Requirements
             path: docs/pages/self-hosting/aws/requirements.mdx
             icon: fa-light fa-clipboard-list
