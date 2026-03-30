@@ -450,7 +450,7 @@ Set the state key path to `["state"]`.
 
 ## Linking Test Cases to Traces
 
-When running evaluations through an AI Connection, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
+For single-turn evaluations, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
 
 ```mermaid
 sequenceDiagram
@@ -485,10 +485,8 @@ from deepeval.tracing import observe, update_current_trace
 
 @observe()
 def llm_app(input: str, test_case_id: str):
-    # Link the trace to the test case
     update_current_trace(test_case_id=test_case_id)
 
-    # Your generation logic here
     response = llm.generate(user=input)
     return response
 
@@ -535,6 +533,21 @@ def generate(request: dict):
         config={"callbacks": [CallbackHandler(test_case_id=test_case_id)]}
     )
     return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.test_case_id", test_case_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
 ```
 
   </Tab>
@@ -639,6 +652,21 @@ def generate(request: dict):
         config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
     )
     return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.turn_id", turn_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
 ```
 
   </Tab>

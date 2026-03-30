@@ -861,6 +861,80 @@ span.SetAttribute("confident.trace.user_id", "123");
 
 </CodeBlocks>
 
+### Test Case Id
+
+For single-turn evaluations via [AI Connections](/docs/settings/project/ai-connections), Confident AI sends a `testCaseId` in the payload to your endpoint. Pass it as the `test_case_id` attribute on your trace to link the trace back to its test case — letting you click through to the full trace directly from evaluation results.
+
+- `"confident.trace.test_case_id"` (of type `str`) used for linking the trace to a test case in evaluation results
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.test_case_id", test_case_id)
+```
+
+```typescript
+span.setAttributes({
+  "confident.trace.test_case_id": testCaseId,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.test_case_id", testCaseId),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.test_case_id": testCaseId,
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.test_case_id", testCaseId);
+```
+
+</CodeBlocks>
+
+### Turn Id
+
+For multi-turn evaluations via [AI Connections](/docs/settings/project/ai-connections), Confident AI sends a `turnId` in the payload for each turn. Pass it as the `turn_id` attribute on your trace to link each turn's trace to the specific turn in the conversation.
+
+- `"confident.trace.turn_id"` (of type `str`) used for linking the trace to a specific turn in multi-turn evaluation results
+
+<CodeBlocks>
+
+```python
+with tracer.start_as_current_span("custom_span") as span:
+    span.set_attribute("confident.trace.turn_id", turn_id)
+```
+
+```typescript
+span.setAttributes({
+  "confident.trace.turn_id": turnId,
+});
+```
+
+```go
+span.SetAttributes(
+    attribute.String("confident.trace.turn_id", turnId),
+)
+```
+
+```ruby
+span.setAttributes({
+    "confident.trace.turn_id": turnId,
+});
+```
+
+```csharp
+span.SetAttribute("confident.trace.turn_id", turnId);
+```
+
+</CodeBlocks>
+
 ## Span-Level Attribute Mappings
 
 These are the attributes specific to Confident AI spans similar to [tracing features](/docs/llm-tracing/features/span-types). The span level attributes are set in the span attributes using the `confident.span.*` namespace.
