@@ -498,6 +498,38 @@ def generate(request: dict):
 ```
 
   </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      testCaseId: "tc_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
+```
+
+  </Tab>
   <Tab title="LangChain">
 
 ```python
@@ -614,6 +646,38 @@ def generate(request: dict):
     turn_id = request.get("turnId")
     response = llm_app(request["input"], turn_id)
     return {"output": response}
+```
+
+  </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      turnId: "turn_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
 ```
 
   </Tab>

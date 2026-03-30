@@ -529,6 +529,181 @@ const commits = await prompt.getCommits();
 
 </Tabs>
 
+## Pull Prompts By Branch
+
+You can also pull specific snapshots of prompts using it's `alias` and the branch name.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.prompt import Prompt
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.pull(branch="MY-BRANCH-NAME")
+```
+
+<Tip>
+  By default, Confident AI will return the most recent commit of your branch.
+</Tip>
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.pull({ branch: "MY-BRANCH-NAME"});
+```
+
+<Tip>
+  By default, Confident AI will return the most recent commit of your prompt.
+</Tip>
+
+</Tab>
+
+<Tab title="curL" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/prompts/{alias}/commits/{hash}" />
+
+You can pass the `branch` query parameter to specify the branch you want to pull the latest commit from.
+
+</Tab>
+
+</Tabs>
+
+### Branch Operations
+
+You can also perform branch operations such as creating a new branch, updating a branch name, deleting a branch and listing all branches.
+
+<Tabs>
+
+<Tab title="List Branches">
+
+  <CodeBlocks>
+    <CodeBlock title="Python" language="python">
+    ```python
+    from deepeval.prompt import Prompt
+
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+    prompt.get_branches()
+    ```
+    </CodeBlock>
+    <CodeBlock title="TypeScript" language="typescript">
+    ```typescript
+    import { Prompt } from "deepeval";
+
+    const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+    await prompt.getBranches();
+    ```
+    </CodeBlock>
+    <CodeBlock title="curL" language="curL">
+    ```bash
+      curl https://api.confident-ai.com/v1/prompts/PROMPT-ALIAS/branches \
+        -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>"
+    ```
+    </CodeBlock>
+  </CodeBlocks>
+
+</Tab>
+
+<Tab title="Create Branch">
+
+  <CodeBlocks>
+    <CodeBlock title="Python" language="python">
+    ```python
+    from deepeval.prompt import Prompt
+
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+    prompt.create_branch(branch="NEW-BRANCH")
+    ```
+    </CodeBlock>
+    <CodeBlock title="TypeScript" language="typescript">
+    ```typescript
+    import { Prompt } from "deepeval";
+
+    const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS"});
+    await prompt.createBranch({ branch: "NEW-BRANCH"});
+    ```
+    </CodeBlock>
+    <CodeBlock title="curL" language="curl">
+    ```bash
+      curl -X POST https://api.confident-ai.com/v1/prompts/PROMPT-ALIAS/branches \
+        -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+        -H "Content-Type: application/json"
+    ```
+    </CodeBlock>
+  </CodeBlocks>
+
+</Tab>
+
+<Tab title="Update Branch">
+
+  <CodeBlocks>
+    <CodeBlock title="Python" language="python">
+    ```python
+    from deepeval.prompt import Prompt
+
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS", branch="OLD-BRANCH-NAME")
+    prompt.update_branch(name="NEW-BRANCH-NAME")
+    ```
+    </CodeBlock>
+    <CodeBlock title="TypeScript" language="typescript">
+    ```typescript
+    import { Prompt } from "deepeval";
+
+    const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS", branch: "OLD-BRANCH-NAME" });
+    await prompt.updateBranch({ name: "NEW-BRANCH-NAME"});
+    ```
+    </CodeBlock>
+    <CodeBlock title="curL" language="curl">
+    ```bash
+      curl -X PUT https://api.confident-ai.com/v1/prompts/PROMPT-ALIAS/branches/BRANCH-ID \
+        -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "name": "RenamedBranch"
+        }'
+    ```
+    </CodeBlock>
+  </CodeBlocks>
+
+</Tab>
+
+<Tab title="Delete Branch">
+
+  <CodeBlocks>
+    <CodeBlock title="Python" language="python">
+    ```python
+    from deepeval.prompt import Prompt
+
+    prompt = Prompt(alias="YOUR-PROMPT-ALIAS", branch="OLD-BRANCH-NAME")
+    prompt.delete_branch(branch="NEW-BRANCH-NAME")
+    ```
+    </CodeBlock>
+    <CodeBlock title="TypeScript" language="typescript">
+    ```typescript
+    import { Prompt } from "deepeval";
+
+    const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS", branch: "OLD-BRANCH-NAME" });
+    await prompt.deleteBranch({ branch: "NEW-BRANCH-NAME"});
+    ```
+    </CodeBlock>
+    <CodeBlock title="curL" language="curl">
+    ```bash
+      curl -X DELETE https://api.confident-ai.com/v1/prompts/PROMPT-ALIAS/branches/BRANCH-ID \
+        -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>"
+    ```
+    </CodeBlock>
+  </CodeBlocks>
+
+</Tab>
+
+</Tabs>
+
 ## How Are Prompts Pulled?
 
 Confident AI automatically caches prompts on the client side to **minimize API call latency and ensure prompt availability**, which is especially useful in production environments.

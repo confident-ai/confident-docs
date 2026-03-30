@@ -672,6 +672,13 @@ paths:
             type: string
           description: The unique hash of the commit.
           example: "bab04ce"
+        - name: branch
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The unique name of a branch.
+          example: "MY-BRANCH"
 
   /v1/prompts/{alias}/branches:
     get:
@@ -707,7 +714,7 @@ paths:
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
 
-  /v1/prompts/{alias}/branches/{branchId}:
+  /v1/prompts/{alias}/branches/{branch}:
     put:
       parameters:
         - in: header
@@ -724,7 +731,7 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: branchId
+        - name: branch
           in: path
           required: true
           schema:
@@ -747,7 +754,7 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: branchId
+        - name: branch
           in: path
           required: true
           schema:
