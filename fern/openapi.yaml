@@ -1524,6 +1524,111 @@ paths:
                       message: "Committed from API"
                 deprecated: false
 
+  /v1/prompts/{alias}/branches:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: List Branches
+      operationId: getPromptBranches
+      description: Retrieves a list of all the branches associated with a prompt
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPromptBranchesResponse"
+              example:
+                success: true
+                data:
+                  branches:
+                    - id: "br_123456"
+                      name: "main"
+                    - id: "br_123789"
+                      name: "NewBranch"
+                deprecated: false
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Create Branch
+      operationId: createPromptBranch
+      description: Creates a new branch with the specified name diverging from the main branch's head commit of your prompt.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePromptBranchRequest"
+            example:
+              branch: "NewBranch"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePromptBranchResponse"
+              examples:
+                With-Hash:
+                  success: true
+                  data:
+                    name: "NewBranch"
+                    id: "br_123456"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/<PROMPT_ID>?branch=NewBranch"
+                  deprecated: false
+
+  /v1/prompts/{alias}/branches/{branchId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Update Branch
+      operationId: updatePromptBranch
+      description: Updates the name of an existing branch in your prompt on Confident AI.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePromptBranchRequest"
+            example:
+              name: "RenamedBranch"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePromptBranchResponse"
+              example:
+                success: true
+                data:
+                  id: "br_123456"
+                deprecated: false
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Prompt
+      summary: Delete Branch
+      operationId: deletePromptBranch
+      description: Deletes an existing branch from your prompt on Confident AI.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePromptBranchResponse"
+              example:
+                success: true
+                data:
+                  id: "br_123456"
+                deprecated: false
+
   /v1/test-runs/{testRunId}:
     get:
       x-fern-server-name: Confident AI
@@ -4437,6 +4542,131 @@ components:
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    CreatePromptBranchRequest:
+      type: object
+      properties:
+        branch:
+          type: string
+          description: The unique name of the branch to create in the prompt.
+      required:
+        - branch
+        
+    CreatePromptBranchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the prompt branch was successfully created."
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+              description: "This is the name of the newly created prompt branch."
+            id:
+              type: string
+              description: "This is the ID of the newly created prompt branch."
+          required:
+            - name
+            - id
+        link:
+          type: string
+          description: "This is the URL to the prompt branch on the Confident AI platform."
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
+      required:
+        - success
+        - data
+        - link
+        - deprecated
+
+    UpdatePromptBranchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the branch you're trying to update.
+        required:
+          - branch
+
+    UpdatePromptBranchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the prompt branch was successfully deleted."
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "This is the id of the updated prompt branch."
+          required:
+            - id
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
+
+    ListPromptBranchesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the prompt branches were successfully retrieved."
+        data:
+          type: object
+          properties:
+            branches:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: "This is the unique id of the prompt branch."
+                  name:
+                    type: string
+                    description: "This is the name of the prompt branch."
+                required:
+                  - id
+                  - name
+          required:
+            - branches
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
+
+    DeletePromptBranchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the prompt branch was successfully deleted."
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "This is the ID of the deleted prompt branch."
+          required:
+            - id
+        deprecated:
+          type: boolean
+          description: "This is true if this endpoint is deprecated."
       required:
         - success
         - data
