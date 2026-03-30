@@ -450,7 +450,7 @@ Set the state key path to `["state"]`.
 
 ## Linking Test Cases to Traces
 
-When running evaluations through an AI Connection, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
+For single-turn evaluations, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
 
 ```mermaid
 sequenceDiagram
@@ -485,10 +485,8 @@ from deepeval.tracing import observe, update_current_trace
 
 @observe()
 def llm_app(input: str, test_case_id: str):
-    # Link the trace to the test case
     update_current_trace(test_case_id=test_case_id)
 
-    # Your generation logic here
     response = llm.generate(user=input)
     return response
 
@@ -538,6 +536,21 @@ def generate(request: dict):
 ```
 
   </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.test_case_id", test_case_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
+```
+
+  </Tab>
 </Tabs>
 
 <Tip>
@@ -546,9 +559,9 @@ def generate(request: dict):
   behavior.
 </Tip>
 
-### Linking Individual Turns to Traces (Multi-Turn)
+## Linking Turns to Traces
 
-For multi-turn evaluations, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup alongside `testCaseId`. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation results.
+For multi-turn evaluations, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation results.
 
 ```mermaid
 sequenceDiagram
@@ -557,31 +570,30 @@ sequenceDiagram
     participant T as Tracing
 
     Note over C,E: Turn 1
-    C->>E: { testCaseId, turnId, ...payload }
-    E->>T: Create trace with testCaseId + turnId
+    C->>E: { turnId, ...payload }
+    E->>T: Create trace with turnId
     E-->>C: Return actual_output
 
     Note over C,E: Turn 2
-    C->>E: { testCaseId, turnId, ...payload }
-    E->>T: Create trace with testCaseId + turnId
+    C->>E: { turnId, ...payload }
+    E->>T: Create trace with turnId
     E-->>C: Return actual_output
 
     T-->>C: Send traces to Confident AI
     Note over C: Each turn linked to its trace
 ```
 
-Include both `testCaseId` and `turnId` in your payload configuration:
+Include `turnId` in your payload configuration:
 
 ```json
 {
   "input": golden.input,
-  "testCaseId": testCaseId,
   "turnId": turnId,
   "state": state
 }
 ```
 
-Then, pass both identifiers to your tracing implementation:
+Then, pass the `turnId` to your tracing implementation:
 
 <Tabs>
 
@@ -591,17 +603,16 @@ Then, pass both identifiers to your tracing implementation:
 from deepeval.tracing import observe, update_current_trace
 
 @observe()
-def llm_app(input: str, test_case_id: str, turn_id: str):
-    update_current_trace(test_case_id=test_case_id, turn_id=turn_id)
+def llm_app(input: str, turn_id: str):
+    update_current_trace(turn_id=turn_id)
 
     response = llm.generate(user=input)
     return response
 
 @app.post("/generate")
 def generate(request: dict):
-    test_case_id = request.get("testCaseId")
     turn_id = request.get("turnId")
-    response = llm_app(request["input"], test_case_id, turn_id)
+    response = llm_app(request["input"], turn_id)
     return {"output": response}
 ```
 
@@ -615,12 +626,11 @@ from deepeval.integrations.langchain import CallbackHandler
 
 @app.post("/generate")
 def generate(request: dict):
-    test_case_id = request.get("testCaseId")
     turn_id = request.get("turnId")
 
     result = agent_executor.invoke(
         {"input": request["input"]},
-        config={"callbacks": [CallbackHandler(test_case_id=test_case_id, turn_id=turn_id)]}
+        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
     )
     return {"output": result["output"]}
 ```
@@ -635,14 +645,28 @@ from deepeval.integrations.langchain import CallbackHandler
 
 @app.post("/generate")
 def generate(request: dict):
-    test_case_id = request.get("testCaseId")
     turn_id = request.get("turnId")
 
     result = agent.invoke(
         {"messages": [{"role": "user", "content": request["input"]}]},
-        config={"callbacks": [CallbackHandler(test_case_id=test_case_id, turn_id=turn_id)]}
+        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
     )
     return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.turn_id", turn_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
 ```
 
   </Tab>
