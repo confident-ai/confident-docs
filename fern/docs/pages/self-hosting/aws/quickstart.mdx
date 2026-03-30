@@ -178,6 +178,49 @@ Once ArgoCD is running:
 
 </Step>
 
+<Step title="Update Clickhouse `_migrations` table to ReplicatedMergeTree">
+  <Warning>
+    In the default schema, the `_migrations` table is created with a different engine type (such as `MergeTree`) instead of `ReplicatedMergeTree`.  
+    <br /><br />
+    <strong>This step should be executed only once after your first successful application deployment and before performing any further migrations</strong>, to ensure high availability and correct distributed behavior in Clickhouse.
+  </Warning>
+
+  To safely update the `_migrations` table to use `ReplicatedMergeTree`, run the following command:
+
+  ```bash
+  kubectl exec confident-clickhouse-clickhouse-0-0-0 -n clickhouse -- \
+    clickhouse-client \
+    --password="$(kubectl get secret clickhouse-credentials -n clickhouse -o jsonpath='{.data.password}' | base64 -d)" \
+    -d confident_db \
+    -q "
+  RENAME TABLE IF EXISTS _migrations TO _migrations_old;
+
+  CREATE TABLE IF NOT EXISTS _migrations
+  ON CLUSTER confident_db
+  (
+      uid UUID DEFAULT generateUUIDv4(),
+      version UInt32,
+      checksum String,
+      migration_name String,
+      applied_at DateTime DEFAULT now()
+  )
+  ENGINE = ReplicatedMergeTree
+  ORDER BY version;
+
+  DROP TABLE IF EXISTS _migrations_old;
+  "
+  ```
+
+  - Run this command <strong>after</strong> your application's initial deployment.
+  - This operation safely migrates the existing `_migrations` table to use `ReplicatedMergeTree`, ensuring high availability and avoiding inconsistencies in future schema migrations.
+  - If your cluster uses a different table or database name, adjust `confident_db` and `_migrations` accordingly.
+
+  <Info>
+    This step is <strong>one-time only</strong> and must be run before you perform any additional application updates.
+  </Info>
+</Step>
+
+
 <Step title="Install Datadog in EKS">
 
 To install the Datadog Agent on your EKS cluster, use the official Datadog Helm chart:
