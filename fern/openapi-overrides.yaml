@@ -306,6 +306,15 @@ paths:
             enum: [createdAt, endedAt]
           description: This determines the field to sort by. Defaulted to `createdAt`.
         - in: query
+          name: metadata
+          required: false
+          style: deepObject
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+          description: Filter traces by metadata key-value pairs. Supports multiple keys using bracket notation.
+        - in: query
           name: ascending
           required: false
           schema:
@@ -721,7 +730,7 @@ paths:
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
 
-  /v1/prompts/{alias}/branches/{branch}:
+  /v1/prompts/{alias}/branches/{name}:
     put:
       parameters:
         - in: header
@@ -738,13 +747,13 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: branch
+        - name: name
           in: path
           required: true
           schema:
             type: string
           description: The unique name of the branch you're trying to update.
-          example: "BRANCH-ID"
+          example: "BRANCH-NAME"
     delete:
       parameters:
         - in: header
@@ -761,13 +770,13 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
-        - name: branch
+        - name: name
           in: path
           required: true
           schema:
             type: string
           description: The unique name of the branch you're trying to update.
-          example: "BRANCH-ID"
+          example: "BRANCH-NAME"
 
   /v1/projects:
     get:
