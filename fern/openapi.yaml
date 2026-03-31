@@ -1580,7 +1580,7 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/prompt-studio/<PROMPT_ID>?branch=NewBranch"
                   deprecated: false
 
-  /v1/prompts/{alias}/branches/{branch}:
+  /v1/prompts/{alias}/branches/{name}:
     put:
       x-fern-server-name: Confident AI
       tags:
