@@ -647,6 +647,13 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
+        - name: branch
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The unique name of a branch.
+          example: "MY-BRANCH"
 
   /v1/prompts/{alias}/commits/{hash}:
     get:
@@ -672,6 +679,95 @@ paths:
             type: string
           description: The unique hash of the commit.
           example: "bab04ce"
+        - name: branch
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The unique name of a branch.
+          example: "MY-BRANCH"
+
+  /v1/prompts/{alias}/branches:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+
+  /v1/prompts/{alias}/branches/{branch}:
+    put:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: branch
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique name of the branch you're trying to update.
+          example: "BRANCH-ID"
+    delete:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique alias of the prompt.
+          example: "PROMPT-ALIAS"
+        - name: branch
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique name of the branch you're trying to update.
+          example: "BRANCH-ID"
 
   /v1/projects:
     get:
