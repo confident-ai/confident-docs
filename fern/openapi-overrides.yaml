@@ -647,6 +647,13 @@ paths:
             type: string
           description: The unique alias of the prompt.
           example: "PROMPT-ALIAS"
+        - name: branch
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The unique name of a branch.
+          example: "MY-BRANCH"
 
   /v1/prompts/{alias}/commits/{hash}:
     get:
@@ -674,7 +681,7 @@ paths:
           example: "bab04ce"
         - name: branch
           in: query
-          required: true
+          required: false
           schema:
             type: string
           description: The unique name of a branch.
