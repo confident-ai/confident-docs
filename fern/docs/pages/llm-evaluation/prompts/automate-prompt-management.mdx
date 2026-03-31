@@ -47,6 +47,24 @@ prompt.push(
 )
 ```
 
+<Tip>
+
+You can also push commits to a specific branch by passing the `branch` parameter to `push()` method or instantiating the `Prompt` object with a `branch` argument. Defaults to `main` if not specified.
+
+```python
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS", branch="my-new-branch")
+prompt.push(
+    messages=[
+        PromptMessage(role="system", content="You are a helpful assistant called {name}."),
+    ]
+)
+```
+
+</Tip>
+
 For **text** prompts:
 
 ```python main.py
@@ -89,6 +107,26 @@ await prompt.push({
 });
 ```
 
+<Tip>
+
+You can also push commits to a specific branch by passing the `branch` parameter to `push()` method or instantiating the `Prompt` object with a `branch` argument. Defaults to `main` if not specified.
+
+```typescript
+import { Prompt, PromptMessage } from "deepeval";
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS", branch: "my-new-branch" });
+await prompt.push({
+  messages: [
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant called {name}.",
+    }),
+  ],
+});
+```
+
+</Tip>
+
 For **text** prompts:
 
 ```ts index.ts
@@ -105,6 +143,12 @@ await prompt.push({ text: "You are a helpful assistant called {name}." });
 For **message** prompts:
 
 <EndpointRequestSnippet endpoint="POST /v1/prompts" example="List-Prompt" />
+
+<Tip>
+
+You can also push commits to a specific branch by passing the `branch` parameter in your request body. Defaults to `main` if not specified.
+
+</Tip>
 
 For **text** prompts:
 
