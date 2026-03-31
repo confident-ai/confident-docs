@@ -498,6 +498,38 @@ def generate(request: dict):
 ```
 
   </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      testCaseId: "tc_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
+```
+
+  </Tab>
   <Tab title="LangChain">
 
 ```python
@@ -549,6 +581,68 @@ def generate(request: dict):
         response = llm.generate(user=request["input"])
         return {"output": response}
 ```
+
+  </Tab>
+  <Tab title="Vercel AI SDK">
+
+```typescript
+import { generateText } from "ai";
+
+const { text } = await generateText({
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    metadata: {
+      testCaseId: "tc_123",
+    }
+  },
+});
+console.log(text);
+```
+
+  </Tab>
+  <Tab title="OpenInference">
+<CodeBlocks>
+```python
+import os
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from langchain_openai import ChatOpenAI
+from deepeval.integrations.openinference import instrument_openinference
+
+LangChainInstrumentor().instrument()
+
+instrument_openinference(
+  test_case_id="tc_123",
+)
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+result = llm.invoke("What are LLMs?")
+```
+
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
+
+instrumentOpenInference({
+  testCaseId: "tc_123",
+});
+
+registerInstrumentations({
+  instrumentations: [new OpenAIInstrumentation()],
+});
+
+async function main() {
+  const { default: OpenAI } = await import("openai");
+  const client = new OpenAI();
+  await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: "What is OpenInference?" }],
+  });
+}
+```
+</CodeBlocks>
 
   </Tab>
 </Tabs>
@@ -617,6 +711,38 @@ def generate(request: dict):
 ```
 
   </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      turnId: "turn_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
+```
+
+  </Tab>
   <Tab title="LangChain">
 
 ```python
@@ -668,6 +794,68 @@ def generate(request: dict):
         response = llm.generate(user=request["input"])
         return {"output": response}
 ```
+
+  </Tab>
+  <Tab title="Vercel AI SDK">
+
+```typescript
+import { generateText } from "ai";
+
+const { text } = await generateText({
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    metadata: {
+      turnId: "turn_123",
+    }
+  },
+});
+console.log(text);
+```
+
+  </Tab>
+  <Tab title="OpenInference">
+<CodeBlocks>
+```python
+import os
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from langchain_openai import ChatOpenAI
+from deepeval.integrations.openinference import instrument_openinference
+
+LangChainInstrumentor().instrument()
+
+instrument_openinference(
+  turn_id="turn_123",
+)
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+result = llm.invoke("What are LLMs?")
+```
+
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
+
+instrumentOpenInference({
+  turnId: "turn_123",
+});
+
+registerInstrumentations({
+  instrumentations: [new OpenAIInstrumentation()],
+});
+
+async function main() {
+  const { default: OpenAI } = await import("openai");
+  const client = new OpenAI();
+  await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: "What is OpenInference?" }],
+  });
+}
+```
+</CodeBlocks>
 
   </Tab>
 </Tabs>
