@@ -264,13 +264,13 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
-        - in: query
-          name: page
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-          description: This specifies the page number of the traces to return. Defaulted to 1.
+        # - in: query
+        #   name: page
+        #   required: false
+        #   schema:
+        #     type: integer
+        #     minimum: 1
+        #   description: This specifies the page number of the traces to return. Defaulted to 1.
         - in: query
           name: pageSize
           required: false
@@ -305,6 +305,12 @@ paths:
             type: enum
             enum: [createdAt, endedAt]
           description: This determines the field to sort by. Defaulted to `createdAt`.
+        - in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+          description: This is used for pagination, and should be set to the `nextCursor` value returned in the previous response to get the next page of results
         - in: query
           name: metadata
           required: false
