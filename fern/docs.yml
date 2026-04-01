@@ -250,6 +250,9 @@ navigation:
             collapsed: false
             icon: fa-light fa-toggle-on
             contents:
+              - page: Trigger Moments
+                path: docs/pages/llm-tracing/features/trigger-moments.mdx
+                icon: fa-light fa-clock
               - page: Evaluate Traces & Spans
                 path: docs/pages/llm-tracing/features/online-evals.mdx
                 icon: fa-light fa-diagram-project
