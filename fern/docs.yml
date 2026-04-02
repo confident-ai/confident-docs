@@ -291,6 +291,9 @@ navigation:
               - page: Sampling
                 path: docs/pages/llm-tracing/features/sampling.mdx
                 icon: fa-light fa-percent
+              - page: Dropping Traces
+                path: docs/pages/llm-tracing/features/dropping-traces.mdx
+                icon: fa-light fa-trash-can
           - page: Troubleshooting
             path: docs/pages/llm-tracing/troubleshooting.mdx
             icon: fa-light fa-wrench
@@ -513,6 +516,9 @@ navigation:
           - page: Overview
             path: docs/pages/self-hosting/aws/overview.mdx
             icon: fa-light fa-map
+          - page: Quickstart
+            path: docs/pages/self-hosting/aws/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: Requirements
             path: docs/pages/self-hosting/aws/requirements.mdx
             icon: fa-light fa-clipboard-list

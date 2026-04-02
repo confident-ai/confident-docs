@@ -1,0 +1,71 @@
+---
+subtitle: Conditionally dropping traces before they are sent to Confident AI
+slug: llm-tracing/features/dropping-traces
+---
+
+## Overview
+
+Dropping lets you silently discard a trace based on runtime conditions. Unlike sampling, which randomly drops a percentage of traces, this gives you full programmatic control over which traces are sent.
+
+<Info>
+  This is useful when you want to conditionally exclude traces — for example,
+  skipping health checks, internal test requests, or traces that don't meet
+  certain criteria.
+</Info>
+
+## Drop a Trace
+
+To drop the current trace, call `update_current_trace` (Python) or `updateCurrentTrace` (TypeScript) with `drop` set to `True`/`true`. The trace will be silently discarded and never sent to the observatory.
+
+<Tabs>
+    <Tab title="Python" language="python">
+            ```python title="main.py" {9-10}
+            from deepeval.tracing import observe, update_current_trace
+            from openai import OpenAI
+            
+            client = OpenAI()
+            
+            @observe()
+            def llm_app(query: str):
+                if "health" in query.lower():
+                    update_current_trace(drop=True)
+                    return "OK"
+
+                return client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": query}]
+                ).choices[0].message.content
+            
+            llm_app("/health")          # this trace is dropped
+            llm_app("Write me a poem.") # this trace is sent
+            ```
+    </Tab>
+    <Tab title="TypeScript" language="typescript">
+            ```typescript title="index.ts" {6-7}
+            import { observe, updateCurrentTrace } from 'deepeval/tracing';
+            import OpenAI from 'openai';
+
+            const llmApp = async (query: string) => {
+                if (query.toLowerCase().includes("health")) {
+                    updateCurrentTrace({ drop: true });
+                    return "OK";
+                }
+
+                const openai = new OpenAI();
+                const response = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: query }]
+                });
+                return response.choices[0].message.content;
+            };
+
+            const observedLlmApp = observe({ fn: llmApp });
+
+            observedLlmApp("/health");          // This trace is dropped
+            observedLlmApp("Write me a poem."); // This trace is sent
+            ```
+    </Tab>
+
+</Tabs>
+
+<Note>Dropped traces are discarded entirely — they will not appear in the observatory or count towards usage.</Note>

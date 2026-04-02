@@ -70,6 +70,7 @@ Available variables:
 | `prompts`                                  | A dictionary of prompts                            | object     |
 | `hyperparameters`                          | A dictionary of hyperparameter key-value pairs     | object     |
 | `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
+| `turnId`                                   | Unique identifier for linking traces to turns      | string     |
 | `state`                                    | An object to keep state for multi-turn simulations | object     |
 
 Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](#hyperparameters) for passing hyperparameters to your endpoint.
@@ -97,7 +98,7 @@ Example payload:
 
   <Tab title="Code">
 
-Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
+Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, `turnId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
 
 Available `golden` attributes when `golden` is a `Golden`:
 
@@ -125,12 +126,13 @@ Available `golden` attributes when `golden` is a `ConversationalGolden`:
 
 Additional parameters:
 
-| Parameter         | Description                                        | Type                       |
-| ----------------- | -------------------------------------------------- | -------------------------- |
-| `prompts`         | A dictionary of prompts                            | `Optional[Dict[str, str]]` |
-| `hyperparameters` | A dictionary of hyperparameter key-value pairs     | `Optional[Dict[str, str]]` |
-| `testCaseId`      | Unique identifier for linking traces to test cases | `Optional[str]`            |
-| `state`           | An object to keep state for multi-turn simulations | `Optional[Any]`            |
+| Parameter         | Description                                                                  | Type                       |
+| ----------------- | ---------------------------------------------------------------------------- | -------------------------- |
+| `prompts`         | A dictionary of prompts                                                      | `Optional[Dict[str, str]]` |
+| `hyperparameters` | A dictionary of hyperparameter key-value pairs                               | `Optional[Dict[str, str]]` |
+| `testCaseId`      | Unique identifier for linking traces to test cases                           | `Optional[str]`            |
+| `turnId`          | Unique identifier for linking traces to individual turns in multi-turn evals | `Optional[str]`            |
+| `state`           | An object to keep state for multi-turn simulations                           | `Optional[Any]`            |
 
 ```python
 from deepeval import Golden, ConversationalGolden
@@ -140,6 +142,7 @@ def generate_payload(
     prompts: Optional[Dict[str, str]] = None,
     hyperparameters: Optional[Dict[str, str]] = None,
     testCaseId: Optional[str] = None,
+    turnId: Optional[str] = None,
     state: Optional[Any] = None,
 ) -> dict:
 
@@ -501,7 +504,7 @@ Set the state key path to `["state"]`.
 
 ## Linking Test Cases to Traces
 
-When running evaluations through an AI Connection, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
+For single-turn evaluations, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
 
 ```mermaid
 sequenceDiagram
@@ -536,18 +539,48 @@ from deepeval.tracing import observe, update_current_trace
 
 @observe()
 def llm_app(input: str, test_case_id: str):
-    # Link the trace to the test case
     update_current_trace(test_case_id=test_case_id)
 
-    # Your generation logic here
     response = llm.generate(user=input)
     return response
 
 @app.post("/generate")
 def generate(request: dict):
-    test_case_id = request,get("testCaseId")
+    test_case_id = request.get("testCaseId")
     response = llm_app(request["input"], test_case_id)
     return {"output": response}
+```
+
+  </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      testCaseId: "tc_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
 ```
 
   </Tab>
@@ -589,12 +622,301 @@ def generate(request: dict):
 ```
 
   </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    test_case_id = request.get("testCaseId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.test_case_id", test_case_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
+```
+
+  </Tab>
+  <Tab title="Vercel AI SDK">
+
+```typescript
+import { generateText } from "ai";
+
+const { text } = await generateText({
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    metadata: {
+      testCaseId: "tc_123",
+    }
+  },
+});
+console.log(text);
+```
+
+  </Tab>
+  <Tab title="OpenInference">
+<CodeBlocks>
+```python
+import os
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from langchain_openai import ChatOpenAI
+from deepeval.integrations.openinference import instrument_openinference
+
+LangChainInstrumentor().instrument()
+
+instrument_openinference(
+  test_case_id="tc_123",
+)
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+result = llm.invoke("What are LLMs?")
+```
+
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
+
+instrumentOpenInference({
+  testCaseId: "tc_123",
+});
+
+registerInstrumentations({
+  instrumentations: [new OpenAIInstrumentation()],
+});
+
+async function main() {
+  const { default: OpenAI } = await import("openai");
+  const client = new OpenAI();
+  await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: "What is OpenInference?" }],
+  });
+}
+```
+</CodeBlocks>
+
+  </Tab>
 </Tabs>
 
 <Tip>
   Once linked, you can view the full trace for each test case directly from the
   evaluation results, making it easy to debug failures and understand model
   behavior.
+</Tip>
+
+## Linking Turns to Traces
+
+For multi-turn evaluations, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation results.
+
+```mermaid
+sequenceDiagram
+    participant C as Confident AI
+    participant E as Your Endpoint
+    participant T as Tracing
+
+    Note over C,E: Turn 1
+    C->>E: { turnId, ...payload }
+    E->>T: Create trace with turnId
+    E-->>C: Return actual_output
+
+    Note over C,E: Turn 2
+    C->>E: { turnId, ...payload }
+    E->>T: Create trace with turnId
+    E-->>C: Return actual_output
+
+    T-->>C: Send traces to Confident AI
+    Note over C: Each turn linked to its trace
+```
+
+Include `turnId` in your payload configuration:
+
+```json
+{
+  "input": golden.input,
+  "turnId": turnId,
+  "state": state
+}
+```
+
+Then, pass the `turnId` to your tracing implementation:
+
+<Tabs>
+
+  <Tab title="Python">
+
+```python
+from deepeval.tracing import observe, update_current_trace
+
+@observe()
+def llm_app(input: str, turn_id: str):
+    update_current_trace(turn_id=turn_id)
+
+    response = llm.generate(user=input)
+    return response
+
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+    response = llm_app(request["input"], turn_id)
+    return {"output": response}
+```
+
+  </Tab>
+  <Tab title="TypeScript">
+
+```typescript
+import OpenAI from "openai";
+import { instrumentOpenAI } from "deepeval/openai";
+import { setTracingContext } from "deepeval/tracing";
+
+const client = new OpenAI();
+instrumentOpenAI(client);
+
+const main = async () => {
+  await setTracingContext(
+    { 
+      turnId: "turn_123" 
+    },
+    async () => {
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: "What is the weather in France?" },
+        ],
+      });
+      console.log(response);
+    }
+  );
+};
+
+main();
+```
+
+  </Tab>
+  <Tab title="LangChain">
+
+```python
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+
+    result = agent_executor.invoke(
+        {"input": request["input"]},
+        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
+    )
+    return {"output": result["output"]}
+```
+
+  </Tab>
+  <Tab title="LangGraph">
+
+```python
+from langgraph.prebuilt import create_react_agent
+from deepeval.integrations.langchain import CallbackHandler
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": request["input"]}]},
+        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
+    )
+    return {"output": result["messages"][-1].content}
+```
+
+  </Tab>
+  <Tab title="OpenTelemetry">
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    turn_id = request.get("turnId")
+
+    with tracer.start_as_current_span("llm_app") as span:
+        span.set_attribute("confident.trace.turn_id", turn_id)
+
+        response = llm.generate(user=request["input"])
+        return {"output": response}
+```
+
+  </Tab>
+  <Tab title="Vercel AI SDK">
+
+```typescript
+import { generateText } from "ai";
+
+const { text } = await generateText({
+  model: "openai/gpt-4o",
+  prompt: "How to make the best coffee?",
+  experimental_telemetry: {
+    isEnabled: true,
+    metadata: {
+      turnId: "turn_123",
+    }
+  },
+});
+console.log(text);
+```
+
+  </Tab>
+  <Tab title="OpenInference">
+<CodeBlocks>
+```python
+import os
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from langchain_openai import ChatOpenAI
+from deepeval.integrations.openinference import instrument_openinference
+
+LangChainInstrumentor().instrument()
+
+instrument_openinference(
+  turn_id="turn_123",
+)
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+result = llm.invoke("What are LLMs?")
+```
+
+```typescript
+import { instrumentOpenInference } from "deepeval/integrations/openinference";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
+
+instrumentOpenInference({
+  turnId: "turn_123",
+});
+
+registerInstrumentations({
+  instrumentations: [new OpenAIInstrumentation()],
+});
+
+async function main() {
+  const { default: OpenAI } = await import("openai");
+  const client = new OpenAI();
+  await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: "What is OpenInference?" }],
+  });
+}
+```
+</CodeBlocks>
+
+  </Tab>
+</Tabs>
+
+<Tip>
+  With `turnId` linked, you can click "Open trace" on any individual turn in the
+  evaluation results to see the full trace for that specific turn.
 </Tip>
 
 ## Testing Your Connection
