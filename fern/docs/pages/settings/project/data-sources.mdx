@@ -1,0 +1,80 @@
+---
+subtitle: Connect external data sources to automatically generate evaluation datasets from your documents and messages.
+slug: settings/project/data-sources
+description: Learn about data sources for dataset generation
+---
+
+Data sources let you connect external platforms to Confident AI so you can automatically generate evaluation datasets from your existing documents and messages, rather than creating test cases manually.
+
+<Frame caption="Manage Data Sources">
+  <img data-image="settings.project.dataSources" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+## Supported Data Sources
+
+| Source | Description |
+| -------------- | --------------------------------------------- |
+| Google Drive | Retrieves documents from a specific folder |
+| SharePoint | Accesses documents from Microsoft SharePoint |
+| Slack | Syncs messages from Slack channels |
+| Notion | Fetches content from Notion pages and databases |
+
+## Create a Data Source
+
+1. Navigate to **Project Settings** > **Data Sources**
+2. Click **New Data Source**
+3. Enter a unique **Name** for the data source
+4. Select a **Type** from the dropdown (Google Drive, SharePoint, Slack, or Notion)
+5. Click **Save**
+
+## Configure Credentials
+
+After creating a data source, you need to provide credentials so Confident AI can access the external platform. Click into the data source to open its detail page and fill in the required fields.
+
+**Google Drive** requires:
+- **Service Account JSON** - Credentials from a Google Cloud service account
+- **Folder URL** - URL of the Google Drive folder to sync
+
+**SharePoint** requires:
+- **Tenant ID** - Azure tenant identifier
+- **Client ID** - Azure app registration client ID
+- **Client Secret** - Azure app registration secret
+
+**Slack** requires:
+- **Bot Token** - Slack bot token (starts with `xoxb-`)
+
+**Notion** requires:
+- **Integration Token** - Notion integration secret token
+
+## Connect and Sync
+
+Once credentials are saved, click **Connect** to establish the connection. After connecting:
+
+- **Manual sync** - Click **Sync** to pull the latest data at any time
+- **Automatic sync** - Configure a sync schedule to keep data up to date automatically
+
+### Sync Schedule
+
+You can set the sync frequency to one of the following intervals:
+
+- Every hour
+- Every 2 hours
+- Every 6 hours (default)
+- Every 12 hours
+- Every 24 hours
+
+Toggle **Sync Enabled** on or off to control whether automatic syncing is active.
+
+## Use Data Sources for Dataset Generation
+
+Once a data source is connected and synced, you can use it to auto-generate evaluation datasets. When creating a dataset, link a generation configuration to a data source and Confident AI will process the synced content to produce test cases (goldens) automatically.
+
+## Manage Data Sources
+
+From the data sources list, use the action buttons on any row to **Sync**, **Edit**, or **Delete** a data source.
+
+To disconnect a data source without deleting it, open the detail page and click **Disconnect**. This removes the connection but preserves the data source configuration.
+
+<Note>
+  Data Sources is a premium feature currently in beta. You must be on the Premium plan or above to configure data sources.
+</Note>

@@ -1,0 +1,59 @@
+---
+subtitle: Define categories to automatically classify traces and threads into logical groups.
+slug: settings/project/categories
+description: Learn about trace and thread categories
+---
+
+Categories let you automatically classify incoming traces and threads into user-defined groups. This helps surface patterns, segment data by use case or topic, and organize your observability data.
+
+<Frame caption="Configure Categories">
+  <img data-image="settings.project.categories" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+The categories page has two tabs: **Trace Categories** and **Thread Categories**.
+
+## Trace Categories
+
+Trace categories classify individual traces as they are ingested. A trace is categorized immediately when it matches any enabled category.
+
+### Sample Rate
+
+The **Sample Rate** controls the probability that an incoming trace will be categorized. Set a value between `0.0` and `1.0` (e.g. `0.5` means 50% of traces will be categorized). This lets you control the overhead of categorization on high-volume projects.
+
+### Create a Trace Category
+
+1. Navigate to **Project Settings** > **Categories** > **Trace Categories**
+2. Click **New Category**
+3. Enter a **Name** (e.g. "Customer Support", "Billing Inquiry")
+4. Enter a **Description** (e.g. "Queries related to billing issues, invoices, payment methods, and refund requests")
+5. Click **Save**
+
+## Thread Categories
+
+Thread categories classify multi-turn conversations (threads). Unlike trace categories, threads are categorized after a period of inactivity rather than immediately.
+
+### Sample Rate
+
+The **Sample Rate** controls the probability that an idle thread will be categorized. Set a value between `0.0` and `1.0`.
+
+### Time Limit
+
+The **Time Limit** (in seconds) defines how long a thread must be idle before it becomes eligible for categorization. When a new trace arrives after this idle period, the thread is categorized. For example, a time limit of `300` means a thread must be inactive for 5 minutes before it is categorized.
+
+### Create a Thread Category
+
+1. Navigate to **Project Settings** > **Categories** > **Thread Categories**
+2. Optionally adjust the **Time Limit** and **Sample Rate**
+3. Click **New Category**
+4. Enter a **Name** and **Description**
+5. Click **Save**
+
+## Manage Categories
+
+Each category in the list has a toggle to **enable or disable** it without deleting it. Disabled categories are not applied to incoming data.
+
+Use the three-dot menu on any category to **Edit** or **Delete** it.
+
+<Note>
+  Categories is a premium feature. You must be on the Premium plan or above to use auto-categorization.
+</Note>
