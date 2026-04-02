@@ -291,6 +291,9 @@ navigation:
               - page: Sampling
                 path: docs/pages/llm-tracing/features/sampling.mdx
                 icon: fa-light fa-percent
+              - page: Dropping Traces
+                path: docs/pages/llm-tracing/features/dropping-traces.mdx
+                icon: fa-light fa-trash-can
           - page: Troubleshooting
             path: docs/pages/llm-tracing/troubleshooting.mdx
             icon: fa-light fa-wrench
