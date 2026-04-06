@@ -461,7 +461,7 @@ navigation:
             icon: fa-light fa-globe
           - page: Confident Agent
             path: docs/pages/settings/project/confident-agent.mdx
-            icon: fa-light fa-tunnel
+            icon: fa-light fa-plug
           - page: Model Costs
             path: docs/pages/settings/project/model-costs.mdx
             icon: fa-light fa-dollar-sign
