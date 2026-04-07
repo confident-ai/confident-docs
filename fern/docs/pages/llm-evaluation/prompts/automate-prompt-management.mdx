@@ -114,7 +114,10 @@ You can also push commits to a specific branch by passing the `branch` parameter
 ```typescript
 import { Prompt, PromptMessage } from "deepeval";
 
-const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS", branch: "my-new-branch" });
+const prompt = new Prompt({
+  alias: "YOUR-PROMPT-ALIAS",
+  branch: "my-new-branch",
+});
 await prompt.push({
   messages: [
     new PromptMessage({
@@ -386,20 +389,116 @@ Here are the list of available model providers:
 | `PORTKEY`     | Portkey (gateway)            |
 | `LITE_LLM`    | LiteLLM (gateway)            |
 
-### Output configurations
+### Output types
 
-You can also configure structured outputs:
+You can optionally set an output type when pushing a prompt. This controls what format the LLM response should follow:
 
-| Field         | Type         | Default | Description                                                       |
-| ------------- | ------------ | ------- | ----------------------------------------------------------------- |
-| output_type   | `OutputType` | `TEXT`  | Output format (TEXT, JSON, or SCHEMA)                             |
-| output_schema | `BaseModel`  | `None`  | Pydantic model for structured output (when output_type is SCHEMA) |
+| Type     | Description                                          |
+| -------- | ---------------------------------------------------- |
+| `TEXT`   | Plain text output (default)                          |
+| `JSON`   | JSON formatted output                                |
+| `SCHEMA` | Structured output validated against a defined schema |
 
-**Output Types:**
+<Tabs>
 
-- `TEXT` - Plain text output
-- `JSON` - JSON formatted output
-- `SCHEMA` - Structured output validated against a Pydantic schema
+<Tab title="Python" language="python">
+  ```python prompt.push( text="You are a helpful assistant.",
+  output_type=OutputType.JSON, ) ```
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+```typescript
+await prompt.push({
+  text: "You are a helpful assistant.",
+  outputType: OutputType.JSON,
+});
+```
+</Tab>
+
+</Tabs>
+
+### Output schema
+
+When `output_type` is set to `SCHEMA`, you can define a structured schema that the LLM response should conform to. This is useful when you need typed, validated responses from your LLM.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py maxLines={0}
+from deepeval.prompt import Prompt
+from deepeval.prompt.api import PromptMessage, OutputType
+from pydantic import BaseModel
+from typing import List
+
+class Source(BaseModel):
+    url: str
+    title: str
+
+class ResponseSchema(BaseModel):
+    answer: str
+    confidence: float
+    tags: List[str]
+    sources: List[Source]
+
+prompt = Prompt(alias="YOUR-PROMPT-ALIAS")
+prompt.push(
+    messages=[
+        PromptMessage(role="system", content="You are a helpful assistant."),
+    ],
+    output_type=OutputType.SCHEMA,
+    output_schema=ResponseSchema,
+)
+```
+
+The `output_schema` parameter accepts any Pydantic `BaseModel` class. Supported field types include primitives (`str`, `int`, `float`, `bool`), nested `BaseModel` classes, and `List[...]` for arrays of any supported type.
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```ts index.ts maxLines={0}
+import { Prompt, PromptMessage, OutputType } from "deepeval";
+
+const responseSchema = {
+  name: "ResponseSchema",
+  fields: {
+    answer: "string",
+    confidence: "float",
+    tags: ["string"],
+    sources: [{ url: "string", title: "string" }],
+  },
+};
+
+const prompt = new Prompt({ alias: "YOUR-PROMPT-ALIAS" });
+await prompt.push({
+  messages: [
+    new PromptMessage({
+      role: "system",
+      content: "You are a helpful assistant.",
+    }),
+  ],
+  outputType: OutputType.SCHEMA,
+  outputSchema: responseSchema,
+});
+```
+
+The `outputSchema` parameter accepts a `SchemaDefinition` object with a `name` and `fields` map. Field values can be:
+
+- A **string** for primitives: `"string"`, `"integer"`, `"float"`, `"boolean"`
+- An **object** for nested types: `{ url: "string", title: "string" }`
+- A **single-element array** for lists: `["string"]` or `[{ url: "string" }]`
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+  Once you've pushed a prompt with a schema, learn how to [pull and use it with
+  your LLM
+  provider](/docs/llm-evaluation/prompt-management/pull-prompts#using-output-type)
+  to get structured responses validated against your schema.
+</Tip>
 
 ### Interpolation types
 
