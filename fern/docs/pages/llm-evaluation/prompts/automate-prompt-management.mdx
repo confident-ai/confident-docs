@@ -402,17 +402,25 @@ You can optionally set an output type when pushing a prompt. This controls what 
 <Tabs>
 
 <Tab title="Python" language="python">
-  ```python prompt.push( text="You are a helpful assistant.",
-  output_type=OutputType.JSON, ) ```
+
+```python
+prompt.push(
+    text="You are a helpful assistant.",
+    output_type=OutputType.JSON,
+)
+```
+
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
+
 ```typescript
 await prompt.push({
   text: "You are a helpful assistant.",
   outputType: OutputType.JSON,
 });
 ```
+
 </Tab>
 
 </Tabs>
