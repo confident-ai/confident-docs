@@ -456,12 +456,14 @@ navigation:
           - page: Alerts
             path: docs/pages/settings/project/alerts.mdx
             icon: fa-light fa-bell
-          - page: AI Connections
+          - section: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
             icon: fa-light fa-globe
-          - page: Confident Agent
-            path: docs/pages/settings/project/confident-agent.mdx
-            icon: fa-light fa-plug
+            collapsed: false
+            contents:
+              - page: Confident Agent
+                path: docs/pages/settings/project/confident-agent.mdx
+                icon: fa-light fa-plug
           - page: Model Costs
             path: docs/pages/settings/project/model-costs.mdx
             icon: fa-light fa-dollar-sign
