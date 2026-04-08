@@ -208,6 +208,7 @@ class Golden(BaseModel):
     additional_metadata: Optional[Dict] = None
     comments: Optional[str] = None
     custom_column_key_values: Optional[Dict[str, str]] = None
+    tags: Optional[List[str]] = None
 
     # Fields that you should ideally not populate
     actual_output: Optional[str] = None
@@ -240,6 +241,7 @@ class ConversationalGolden(BaseModel):
     additional_metadata: Optional[Dict] = None
     comments: Optional[str] = None
     custom_column_key_values: Optional[Dict[str, str]] = None
+    tags: Optional[List[str]] = None
 
     # Fields that you should ideally not populate
     turns: Optional[Turn] = None
@@ -255,7 +257,7 @@ class ConversationalGolden(BaseModel):
 
 </Tabs>
 
-You'll notice that goldens are more opinionated and contains a `custom_column_key_values` field that you can edit either on the platform or via code.
+You'll notice that goldens are more opinionated and contains `custom_column_key_values` and `tags` fields that you can edit either on the platform or via code.
 
 ## Datasets
 
