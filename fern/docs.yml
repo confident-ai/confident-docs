@@ -441,15 +441,21 @@ navigation:
         icon: fa-light fa-user-shield
       - section: Project Settings
         contents:
-          - page: Team Members
-            path: docs/pages/settings/project/team-members.mdx
-            icon: fa-light fa-user-plus
           - page: API Keys
             path: docs/pages/settings/project/api-keys.mdx
             icon: fa-light fa-key
-          - page: Evaluation Models
-            path: docs/pages/settings/project/evaluation-models.mdx
-            icon: fa-light fa-brain
+          - page: Team Members
+            path: docs/pages/settings/project/team-members.mdx
+            icon: fa-light fa-user-plus
+          - page: Roles & Permissions
+            path: docs/pages/settings/project/roles-and-permissions.mdx
+            icon: fa-light fa-user-shield
+          - page: AI Connections
+            path: docs/pages/settings/project/ai-connections.mdx
+            icon: fa-light fa-globe
+          - page: Transformers
+            path: docs/pages/settings/project/transformers.mdx
+            icon: fa-light fa-wand-magic-sparkles
           - page: Integrations
             path: docs/pages/settings/project/integrations.mdx
             icon: fa-light fa-puzzle-piece
@@ -470,18 +476,27 @@ navigation:
           - page: Data Usage
             path: docs/pages/settings/project/data-usage.mdx
             icon: fa-light fa-chart-bar
+          - page: Model Costs
+            path: docs/pages/settings/project/model-costs.mdx
+            icon: fa-light fa-dollar-sign
+          - page: Evaluation Models
+            path: docs/pages/settings/project/evaluation-models.mdx
+            icon: fa-light fa-brain
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star
+          - page: Categories
+            path: docs/pages/settings/project/categories.mdx
+            icon: fa-light fa-tags
+          - page: Data Sources
+            path: docs/pages/settings/project/data-sources.mdx
+            icon: fa-light fa-database
           - page: Data Retention
             path: docs/pages/settings/project/data-retention.mdx
             icon: fa-light fa-trash
           - page: Audit Logs
             path: docs/pages/settings/project/audit-logs.mdx
             icon: fa-light fa-list-timeline
-          - page: Roles & Permissions
-            path: docs/pages/settings/project/roles-and-permissions.mdx
-            icon: fa-light fa-user-shield
       - section: Organization Settings
         contents:
           - page: Projects

@@ -1,0 +1,63 @@
+---
+subtitle: Create Python-based transformers to extract and reshape data from AI app responses before evaluation.
+slug: settings/project/transformers
+description: Learn about data transformers
+---
+
+Transformers are Python functions that preprocess and reshape data before it runs through evaluation pipelines. They let you extract the exact fields needed for evaluation, even from nested or non-standard response structures from your AI application.
+
+<Frame caption="Manage Transformers">
+  <img data-image="settings.project.transformers" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+## Create a Transformer
+
+To create a new transformer:
+
+1. Navigate to **Project Settings** > **Transformers**
+2. Click **New Transformer**
+3. Enter a unique **Name** for the transformer
+4. Optionally add a **Description** to help you remember what the transformer does
+5. Write your Python function in the code editor
+6. Click **Save**
+
+Every transformer must define a `transformer` function that accepts a `data` parameter and returns the transformed result:
+
+```python
+from typing import Any
+
+def transformer(data: Any):
+    # Your logic to process the data here
+    return data
+```
+
+The `from typing import Any` import and the `def transformer(data: Any):` function signature are fixed and cannot be modified.
+
+## Test a Transformer
+
+The built-in debugger lets you verify your transformer before saving:
+
+1. Enter mock input data in the **Input** panel (Python syntax, e.g. `{"key": "value"}`)
+2. Click **Test** to execute the transformer against the input
+3. View the result in the **Output** panel
+
+Test data is persisted locally so you can iterate without re-entering it each time.
+
+## Use Transformers in AI Connections
+
+Transformers are used in [AI Connections](/docs/settings/project/ai-connections) as an alternative to JSON key paths for extracting data from AI app responses. You can assign a transformer for each of the following fields:
+
+- **Actual Output** - Extracts the main response from your AI app
+- **Retrieval Context** - Extracts retrieval context from responses
+- **Tools Called** - Extracts tool call information
+- **State** - Extracts state data from responses
+
+When configuring an AI Connection, select the **Transformer** tab in any parsing section and choose the transformer you want to use from the dropdown.
+
+## Manage Transformers
+
+From the transformers list, use the three-dot menu on any row to **Edit** or **Delete** a transformer.
+
+<Note>
+  Transformers is a premium feature. You must be on the Premium plan or above to create and use transformers.
+</Note>
