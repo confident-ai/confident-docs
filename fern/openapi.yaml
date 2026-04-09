@@ -4853,7 +4853,7 @@ components:
           description: This is the name of the schema field.
         type:
           type: string
-          enum: [OBJECT, STRING, FLOAT, INTEGER, BOOLEAN, NULL]
+          enum: [OBJECT, ARRAY, STRING, FLOAT, INTEGER, BOOLEAN, NULL]
           description: This is the data type for schema fields.
         required:
           type: boolean
