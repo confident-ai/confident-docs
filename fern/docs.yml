@@ -450,9 +450,6 @@ navigation:
           - page: Roles & Permissions
             path: docs/pages/settings/project/roles-and-permissions.mdx
             icon: fa-light fa-user-shield
-          - page: AI Connections
-            path: docs/pages/settings/project/ai-connections.mdx
-            icon: fa-light fa-globe
           - page: Transformers
             path: docs/pages/settings/project/transformers.mdx
             icon: fa-light fa-wand-magic-sparkles
