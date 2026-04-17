@@ -6,7 +6,7 @@ tags: ["Observability", "Integrations", "Evals", "Quality of Life"]
 
 TGIF! Thank god it's features, here's what we shipped this week:
 
-Confident AI goes multi-player—and kills the context switch while it's at it. **Comments** are now live across traces, spans, threads, and test cases, and when someone @-mentions you, it lands in your Slack with a direct link back to the exact trace. No more "screenshot this span and DM it to me," no more five-tab scavenger hunts, no more "wait, which trace ID?" The conversation happens exactly where the data lives. That loop works because we also gave **Slack & Discord** a full glow-up this week—1-click setup, way more signals you can pipe through. And to the voice AI crowd: **WebSocket response mode** for AI Connections just shipped. We're coming for you. **Custom Dashboards** also picked up enough new widgets that the beta sticker is barely hanging on. Plenty more under the hood—scroll down.
+Confident AI goes multi-player—and kills the context switch while it's at it. **Comments** are now live across traces, spans, threads, and test cases, and when someone @-mentions you, it lands in your Slack with a direct link back to the exact trace. No more "screenshot this span and DM it to me," no more five-tab scavenger hunts, no more "wait, which trace ID?" The conversation happens exactly where the data lives. That loop works because we also gave **Slack & Discord** a full glow-up this week—1-click setup, way more signals you can pipe through. And to the voice AI crowd: **WebSocket response mode** for AI Connections just shipped. We're coming for you. **Custom Dashboards** also picked up enough new widgets that the beta sticker is barely hanging on. Oh, and **Claude Opus 4.7** is now available everywhere—Arena, Experiments, Evaluations, Platform. Plus **Prompt Auto-Refinement** on failing test cases, traces, and spans, and **image support on annotations**. Scroll down, there's a lot.
 
 <Frame>![Changelog April 17, 2026](/assets/changelog/2026-04-17.png)</Frame>
 
@@ -19,6 +19,9 @@ Confident AI goes multi-player—and kills the context switch while it's at it. 
 - **Native Annotation Test Cases** - Annotations are now first-class test cases. Turn human feedback directly into evaluation data without any glue code or CSV gymnastics. _Noted_.
 - **Tables & Big Number Widgets for Custom Dashboards** - Two new widget types land in Custom Dashboards: Tables for row-by-row detail and Big Number for the one metric that matters most. Dashboards are inching closer to general availability—_count_ on it.
 - **Bar & Stacked Bar Graphs for Custom Dashboards** - Bar and stacked bar charts join the Custom Dashboards widget lineup. Stack, compare, and break down your metrics any way you like. Raise the _bar_.
+- **Prompt Auto-Refinement** - Point at a failing test case (single-turn or multi-turn), trace, or span, and Confident AI will auto-refine the prompt for you—no more staring at a broken output and guessing which instruction to tweak. Your prompts, on autopilot. _Refined_ to taste.
+- **Image Support on Annotations** - Annotations can now include images. Attach a screenshot of what went wrong, what it should've looked like, or the exact UI state that broke things. Human feedback with receipts. _Picture_ perfect.
+- **Claude Opus 4.7 Everywhere** - Opus 4.7 is now available across Arena, Experiments, Evaluations, and the Platform. Pick your battles, pick your model. A true _magnum opus_.
 
 ### Changed
 
