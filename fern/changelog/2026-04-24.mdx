@@ -1,0 +1,26 @@
+---
+tags: ["Evals", "Observability", "Datasets"]
+---
+
+## Better Work Is No Work
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+The best annotation work is the annotation work you never had to do. **Auto-Annotate** now takes the first pass across traces, spans, threads, and test cases, so your team can stop hand-labeling the obvious stuff and save human judgment for the weird, expensive, "why did the model say _that_?" moments. Multi-turn workflows got more automatic too: threads can become datasets with scenarios, ingestion tasks keep them fresh, and platform models can jump straight into simulations. Oh, and three beta stickers hit the floor this week: **Code Execution**, **Queue Automations**, and **Dataset Workflows** are officially stable. Less clicking. More knowing.
+
+<Frame>![Changelog April 24, 2026](/assets/changelog/2026-04-24.png)</Frame>
+
+### Added
+
+- **Auto-Annotate Across Everything** - Auto-Annotate now works on traces, spans, threads, and test cases. Let Confident AI take the first pass at labeling the chaos, then bring humans in where judgment actually matters. Less grunt work, more signal. _Annotated_ for your convenience.
+- **Thread Ingestion to Multi-Turn Datasets** - Turn real user threads into multi-turn datasets, complete with scenarios. Your production conversations are no longer trapped in observability land—they can become eval fuel with a few clicks. From thread to test bed, no copy-paste pilgrimage required. _Thread_ the needle.
+- **Automated Thread Ingestion Tasks** - Multi-turn datasets can now stay fresh automatically with thread ingestion tasks. Set the rules, let the pipeline run, and keep your evals fed with the kinds of conversations users are actually having. The dataset now has a metabolism. _Ingest_ wisely.
+- **Platform Models in Multi-Turn Simulations** - Multi-turn simulations now support platform models. Bring the same model access you use across Confident AI into richer conversation testing, without detouring through yet another config maze. Simulations just got more _well-modeled_.
+- **Prompts Tab in Multi-Turn Test Cases** - Multi-turn test cases now have a dedicated Prompts tab, so you can inspect, edit, and understand the prompt behavior driving each conversation. Fewer mystery failures, fewer "where did that instruction come from?" moments. _Promptly_ handled.
+
+### Changed
+
+- **Arena Full-Screen Viewer** - Arena now supports a full-screen viewer, because sometimes your model comparison deserves more than a cramped corner of the page. Go wide, judge harder. _Arena_ seating upgraded.
+- **Aggregated Turn Metadata in Arena** - Arena now renders aggregated metadata for each turn, including tokens, latency, and cost. Compare outputs with the receipts attached, because vibes are useful but tokens still get billed. _Meta_ made visible.
+- **Relay Agent Pub-Sub Architecture** - Relay Agent now supports a pub-sub architecture, making it more flexible for event-driven setups and distributed workflows. Your agent relay grew a nervous system. _Published_ and subscribed.
+- **Code Execution, Queue Automations & Dataset Workflows Are Stable** - Code Execution, Queue Automations, and Dataset Workflows are out of beta and officially stable. The beta badges are gone, the features are staying, and your production workflows can stop side-eyeing the disclaimer. _Stable_ geniuses.
