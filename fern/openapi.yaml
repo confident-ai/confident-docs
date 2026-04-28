@@ -2135,8 +2135,10 @@ paths:
                       createdAt: "2025-11-12T10:30:00Z"
                       traceUuid: "trace-uuid-1"
                       user:
+                        id: "user-uuid-1"
                         email: "user1@example.com"
                         name: "User One"
+                        image: "https://example.com/user1.png"
                     - id: "annotation-uuid-2"
                       rating: 5
                       type: "FIVE_STAR_RATING"
@@ -2146,8 +2148,10 @@ paths:
                       createdAt: "2025-11-12T09:15:00Z"
                       threadId: "thread-id-1"
                       user:
+                        id: "user-uuid-2"
                         email: "user2@example.com"
                         name: "User Two"
+                        image: "https://example.com/user2.png"
                   total: 150
                   page: 1
                   pageSize: 25
@@ -2259,8 +2263,10 @@ paths:
                     createdAt: "2025-11-12T10:30:00Z"
                     traceUuid: "trace-uuid-1"
                     user:
+                      id: "user-uuid-1"
                       email: "user1@example.com"
                       name: "User One"
+                      image: "https://example.com/user1.png"
         "404":
           description: Annotation not found
           content:
@@ -5157,6 +5163,10 @@ components:
     UserReference:
       type: object
       properties:
+        id:
+          type: string
+          nullable: true
+          description: The id of the user.
         email:
           type: string
           nullable: true
@@ -5165,9 +5175,15 @@ components:
           type: string
           nullable: true
           description: The name of the user.
+        image:
+          type: string
+          nullable: true
+          description: The image of the user.
       required:
+        - id
         - email
         - name
+        - image
 
     Annotation:
       type: object
