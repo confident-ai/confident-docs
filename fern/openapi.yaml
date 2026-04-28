@@ -2134,6 +2134,9 @@ paths:
                       explanation: "Response correctly guides user through password reset"
                       createdAt: "2025-11-12T10:30:00Z"
                       traceUuid: "trace-uuid-1"
+                      user:
+                        email: "user1@example.com"
+                        name: "User One"
                     - id: "annotation-uuid-2"
                       rating: 5
                       type: "FIVE_STAR_RATING"
@@ -2142,7 +2145,12 @@ paths:
                       explanation: "Excellent resolution with follow-up"
                       createdAt: "2025-11-12T09:15:00Z"
                       threadId: "thread-id-1"
+                      user:
+                        email: "user2@example.com"
+                        name: "User Two"
                   total: 150
+                  page: 1
+                  pageSize: 25
     post:
       x-fern-server-name: Confident AI
       tags:
@@ -2250,6 +2258,9 @@ paths:
                     explanation: "Response correctly guides user through password reset"
                     createdAt: "2025-11-12T10:30:00Z"
                     traceUuid: "trace-uuid-1"
+                    user:
+                      email: "user1@example.com"
+                      name: "User One"
         "404":
           description: Annotation not found
           content:
@@ -5143,6 +5154,21 @@ components:
         - id
         - version
 
+    UserReference:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+          description: The email address of the user.
+        name:
+          type: string
+          nullable: true
+          description: The display name of the user.
+      required:
+        - email
+        - name
+
     Annotation:
       type: object
       properties:
@@ -5184,9 +5210,16 @@ components:
         testCaseId:
           type: string
           description: The ID of the test case associated with this annotation, if applicable.
+        user:
+          allOf:
+            - $ref: "#/components/schemas/UserReference"
+          nullable: true
+          description: The user who created this annotation.
         userEmail:
           type: string
-          description: The email of the user who created this annotation.
+          nullable: true
+          deprecated: true
+          description: The email address of the user created this annotation. The field is being deprecated. Please use `user.email` instead. 
       required:
         - id
         - rating
@@ -6007,17 +6040,17 @@ components:
             total:
               type: integer
               description: Total number of annotations matching the filter criteria.
-            limit:
+            page:
+              type: integer
+              description: Current page number of annotations returned in this response.
+            pageSize:
               type: integer
               description: Maximum number of annotations returned in this response.
-            offset:
-              type: integer
-              description: Number of annotations skipped in this response.
           required:
             - annotations
             - total
-            - limit
-            - offset
+            - page
+            - pageSize
       required:
         - success
         - data
