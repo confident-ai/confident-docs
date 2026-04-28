@@ -5165,11 +5165,9 @@ components:
       properties:
         id:
           type: string
-          nullable: true
           description: The id of the user.
         email:
           type: string
-          nullable: true
           description: The email address of the user.
         name:
           type: string
