@@ -5164,7 +5164,7 @@ components:
         name:
           type: string
           nullable: true
-          description: The display name of the user.
+          description: The name of the user.
       required:
         - email
         - name
