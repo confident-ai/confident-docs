@@ -125,6 +125,7 @@
     "datasets.multiTurn.aiConnectionConfig": `${S3_BASE}/datasets:multi-turn:ai-connection-config.png`,
     "datasets.singleTurn.promptConfig": `${S3_BASE}/datasets:single-turn:prompt-config.png`,
     "datasets.singleTurn.aiConnectionConfig": `${S3_BASE}/datasets:single-turn:ai-connection-config.png`,
+    "datasets.scheduleDatasetEvals": `${S3_BASE}/datasets:scheduled-dataset-evals.png`,
 
     "experiments.resultsComparison": `${S3_BASE}/experiments:results-comparison.png`,
     "experiments.runDialog": `${S3_BASE}/experiments:run-dialog.png`,
@@ -162,6 +163,7 @@
     "redTeaming.riskAssessment": `${S3_BASE}/red-teaming:quick-start:risk-assessment.png`,
     "redTeaming.runRiskAssessment": `${S3_BASE}/red-teaming:quick-start:run-risk-assessment.png`,
     "redTeaming.riskAssessmentTestCases": `${S3_BASE}/red-teaming:risk-profile:risk-assessment-test-cases.png`,
+    "redTeaming.scheduledRedTeamFramework": `${S3_BASE}/red-teaming:scheduled-red-team-framework.png`,
 
     // Data
     "data.organization": `${S3_BASE}/data-organization.svg`,

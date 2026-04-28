@@ -37,7 +37,54 @@ Give your AI connection a unique name to identify it within your project.
 
 ### AI App Endpoint
 
-Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` requests and returns a JSON response containing the actual output of your AI app.
+Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` requests and returns any response containing the actual output of your AI app.
+
+You can choose between _HTTP Response_, _HTTP Streaming_, and _SSE Streaming_ modes.
+
+- **HTTP Response**: The endpoint returns a HTTP response containing the actual output.
+- **HTTP Streaming**: The endpoint returns a stream of HTTP responses containing the actual output.
+- **SSE Streaming**: The endpoint returns a stream of SSE events containing the actual output.
+
+<Note>
+  The default mode is *HTTP Response*.
+</Note>
+
+<Tip>
+If your endpoint returns a custom response format like JSON or any other formats, you can configure the actual output key path or use a transformer to extract the actual output from the response. See [Actual Output Key Path](#actual-output-key-path) and [Transformers](#transformers) for more details.
+</Tip>
+
+### Streaming Mode
+
+For _SSE Streaming_ and _HTTP Streaming_ modes, your endpoints can return either strings, JSON objects, or custom formats that can be processed using transformers for each chunks.
+
+<Tabs>
+  <Tab title="Strings">
+    For string chunks, Confident AI collects all chunks and returns a single string.
+    
+    Your model generates: 
+    ```
+    ["Hello", "World", "!"]
+    ```
+    Confident AI response: 
+    ```
+    "Hello World!"
+    ```
+  </Tab>
+  <Tab title="JSON">
+    For JSON objects, Confident AI parses the JSON object for each chunk and returns the final output.
+
+    Your model generates:
+
+    ```
+    [{"chunk": "Hello"}, {"chunk": "World"}, {"chunk": "!"}]
+    ```
+    Confident AI response after extraction: 
+    
+    ```
+    "Hello World!"
+    ```
+  </Tab>
+</Tabs>
 
 ### Payload
 
@@ -310,6 +357,12 @@ def generate(request: dict):
   Hyperparameter values are always strings. Cast them to the appropriate type
   (e.g., `float`, `int`) in your endpoint as needed.
 </Note>
+
+### Transformers
+
+Transformers are a powerful way to apply custom logic to the actual output of your AI app. You can use transformers to extract the actual output from a custom response format using custom Python code.
+
+You can add your own transformers by navigating to **Project Settings** → **Transformers** and clicking **Create Transformer**.
 
 ### Actual Output Key Path
 
