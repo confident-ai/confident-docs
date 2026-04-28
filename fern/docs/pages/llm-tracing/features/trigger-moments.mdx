@@ -1,0 +1,103 @@
+---
+subtitle: When and where to run online evaluations in your application
+slug: llm-tracing/features/trigger-moments
+description: Define evaluation trigger moments for traces, spans, and threads on Confident AI.
+---
+
+## Overview
+
+Trigger moments are the points in your application where online evaluations should run.
+
+Instead of evaluating only in offline test environments, trigger moments let you evaluate behavior during real application flows. This makes it easier to catch regressions, monitor quality in production, and evaluate the parts of your system that matter most.
+
+👉 [Run your first eval](https://app.confident-ai.com/auth/signup)
+
+## Why Trigger Moments Matter
+
+Most LLM applications do not fail everywhere. They fail at specific decision points.
+
+Examples include:
+
+- before returning a final response
+- after a tool call finishes
+- after a retrieval step
+- after a multi-step agent completes a task
+- at the end of a conversation or thread
+
+Running online evaluations at these moments helps teams measure quality closer to where real failures happen.
+
+## Common Trigger Moments
+
+### Before returning a response
+
+Run an evaluation before the user sees the final output.
+
+This is useful when you want to check things like correctness, policy adherence, hallucination risk, or answer relevancy before a response is delivered.
+
+### After generating a response
+
+Run an evaluation immediately after a response is created.
+
+This is useful for monitoring quality over time, comparing model behavior across versions, and scoring outputs without blocking the user experience.
+
+### After tool execution
+
+Run an evaluation after a tool or workflow step finishes.
+
+This is useful for validating whether the right tool was used, whether arguments were correct, and whether the result supports the final outcome.
+
+### On traces and spans
+
+Run evaluations on specific traces or spans in your application.
+
+This is useful when you want to evaluate individual steps in a larger workflow rather than only scoring the final result.
+
+### On threads or conversations
+
+Run evaluations at the thread level for multi-turn systems.
+
+This is useful for measuring qualities like turn relevancy, role adherence, and conversation completeness across an entire interaction.
+
+## When To Use Trigger Moments
+
+Trigger moments are useful when:
+
+- you want visibility into production behavior
+- you need to evaluate more than just final outputs
+- you are debugging agentic or multi-step workflows
+- you want online monitoring in addition to offline evals
+
+## Trigger Moments in Confident AI
+
+In Confident AI, trigger moments are used to define when online evaluations should run against traces, spans, or threads.
+
+This lets you evaluate live application behavior at the point where quality matters most, instead of waiting for issues to show up later in dashboards or user feedback.
+
+Use trigger moments when setting up online evaluations for:
+
+- traces and spans
+- multi-step LLM workflows
+- threaded or conversational applications
+
+👉 [Try this on your own app](https://app.confident-ai.com/auth/signup)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Evaluate Traces & Spans"
+    icon="fa-light fa-diagram-project"
+    iconType="solid"
+    href="/docs/llm-tracing/online-evals"
+  >
+    Configure metric collections and run online evals on traces and spans.
+  </Card>
+  <Card
+    title="Evaluate Threads"
+    icon="fa-light fa-comments"
+    iconType="solid"
+    href="/docs/llm-tracing/evaluate-threads"
+  >
+    Run thread-level evaluations on multi-turn conversations.
+  </Card>
+</CardGroup>
