@@ -76,6 +76,7 @@ Permissions follow a `resource:action` format. For example, `dataset:read` grant
 - `read` — View resources
 - `update` — Modify existing resources
 - `delete` — Remove resources
+- `merge` — Merge changes into the target resource (used for `promptBranch`)
 - `evaluate` — Run evaluations on the resource
 - `assign` — Assign resources to users or queues
 - `manage` — Includes `create`, `update`, and `delete` (varies by resource)
@@ -87,6 +88,7 @@ Permissions follow a `resource:action` format. For example, `dataset:read` grant
 - `trace`, `span`, `thread`, `endUser` — Observability data
 - `testRun`, `testCase`, `experiment` — Evaluation runs
 - `prompt`, `promptVersion`, `promptLabel` — Prompts and their versions
+- `promptBranch` — Prompt branches and pull requests; `create` (create branches and PRs), `update` (rename branches, commit to branches, edit PR descriptions), `merge` (merge PRs into main), and `delete` (delete branches, close PRs).
 - `annotationQueue`, `queue_item` — Annotation queues and their items
 - `project`, `apiKey`, `modelCredential`, `modelCost`, `evaluationModel` — Project settings and configuration
 - `retentionConfig` — Data retention settings for traces, spans, test runs, datasets, and prompts (how long each is kept)
