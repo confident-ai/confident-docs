@@ -225,7 +225,61 @@ Whatever the function returns is what gets sent to your endpoint as the POST bod
 
 ### Headers
 
-Add any headers required by your endpoint, such as API keys, authentication tokens, or content type specifications. These headers are sent with every request to your AI app.
+Add any custom headers required by your endpoint as key-value pairs, such as API keys or content type specifications. These headers are sent with every request to your AI app.
+
+### Authorization
+
+Configure authentication for requests to your AI app endpoint. The Authorization tab has two sections: **Secrets Manager** and **Authentication**.
+
+#### Secrets Manager
+
+A secrets manager lets you securely retrieve authentication credentials at runtime from a cloud vault, instead of storing them directly on the platform.
+
+To enable a secrets manager:
+
+1. Toggle the secrets manager **on**
+2. Select a provider (e.g. **Azure Key Vault**)
+3. Enter your **Vault URL** (e.g., `https://your-vault.vault.azure.net`)
+4. Enter your **Tenant ID**, **Client ID**, and **Client Secret** to authenticate to the vault
+
+<Note>
+  For self-hosted deployments, the secrets manager is always enabled and uses
+  managed identities for authentication, so no secrets provider credentials are
+  required.
+</Note>
+
+#### Authentication
+
+Select an authentication type from the dropdown:
+
+| Type  | Description                                                                                |
+| ----- | ------------------------------------------------------------------------------------------ |
+| None  | No authentication is applied                                                               |
+| Auth0 | Exchanges client credentials for a Bearer token via Auth0's OAuth2 client credentials flow |
+| HMAC  | Computes an HMAC-SHA256 signature of the request payload and sends it as a header          |
+
+**Auth0** requires the following fields:
+
+| Field                              | Description                                                                                              |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Auth0 Domain                       | Your Auth0 tenant domain (e.g., `your-tenant.auth0.com`)                                                 |
+| Audience                           | The API identifier this token is authorized to access                                                    |
+| Client ID / Client ID Name         | Your Auth0 application client ID, or the name of the secret in your vault if using a secrets manager     |
+| Client Secret / Client Secret Name | Your Auth0 application client secret, or the name of the secret in your vault if using a secrets manager |
+
+**HMAC** requires the following fields:
+
+| Field                    | Description                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| Header Key               | The HTTP header name where the signature is sent (e.g., `X-Signature`)              |
+| Signature Prefix         | An optional prefix prepended to the signature (e.g., `sha256=`)                     |
+| Secret Key / Secret Name | The signing key, or the name of the secret in your vault if using a secrets manager |
+
+<Tip>
+  You can use a secrets manager with Auth0 to store your client credentials in a
+  key vault. Instead of entering the actual Client ID and Client Secret, provide
+  the names of the secrets in your vault and they will be retrieved at runtime.
+</Tip>
 
 ### Prompts
 
