@@ -1,0 +1,26 @@
+---
+tags: ["Observability", "Evals", "Security"]
+---
+
+## Health Check Yourself
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+This week is about knowing when things are healthy, knowing exactly how risky they are, and knowing your API keys cannot accidentally do too much damage. **Health Dashboards** give you a live pulse on evals, error rates, cost, and the signals that tell you whether your AI system is chilling or quietly catching fire. **Comment Notifications** keep the collaboration loop moving when someone tags you on the thing that needs attention. **Customizable risk assessments, attack methods, and vulnerabilities** let you shape red teaming around the threats your app actually cares about. And on the platform side, API keys and model credentials got a serious security glow-up: read-only keys, cleaner credential flows, org/project scoping, and suffixes that make keys easier to recognize before someone pastes the wrong secret into the wrong place. Prevention: still less annoying than incident response.
+
+<Frame>![Changelog May 1, 2026](/assets/changelog/2026-05-01.png)</Frame>
+
+### Added
+
+- **Health Dashboards** - Keep tabs on the health of your AI systems with dashboards for eval performance, error rates, cost, and the signals that tell you whether everything is fine or the model is doing interpretive dance in production. Less staring at charts hoping vibes improve, more knowing when to act. _Health_ is wealth.
+- **Comment Notifications** - Comments now come with notifications, so tagged teammates actually see the thread, jump back into context, and help fix the thing instead of discovering it three standups later. Your comments have a pulse now. _Notify_ and conquer.
+- **Customizable Risk Assessments** - Risk assessments are now fully customizable, including attack methods and vulnerabilities for custom evaluation steps. Test the risks that actually matter to your app instead of accepting a one-size-fits-all threat menu. Choose your own _adventure_, but make it adversarial.
+- **Read-Only API Keys** - Create API keys that can read but not write. Perfect for analytics, internal tooling, dashboards, and anything that should look around without touching the furniture. Least privilege just got easier to _key_ into.
+- **Model Credentials Flows** - Model credential setup now has dedicated flows, making it easier to add, manage, and route provider credentials without turning setup into a scavenger hunt. Your models asked for better paperwork. We delivered. _Credential_ where it's due.
+
+### Changed
+
+- **Org- and Project-Scoped API Keys** - API keys are now scoped to organizations or projects, with suffixes that make their scope easier to identify at a glance. Fewer mystery keys, fewer "wait, which environment is this?" moments, fewer self-inflicted footguns. _Scope_ creep, but the good kind.
+- **Auto-Formatted JSON in Dataset Goldens** - JSON in dataset goldens now auto-formats on save. Your goldens stay readable, your diffs stay sane, and nobody has to pretend one-line JSON blobs build character. _Format_ fortune favors the bold.
+
+Next week is **Reliability Week**. Bring a helmet.
