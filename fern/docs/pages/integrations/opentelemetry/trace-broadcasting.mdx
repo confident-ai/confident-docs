@@ -15,23 +15,16 @@ Common reasons teams broadcast traces:
 - **Specialized backends** — use a general-purpose APM (Datadog, Tempo, Jaeger) for service monitoring, and Confident AI for LLM-specific evaluation.
 - **Sampling separation** — keep 100% of traces locally for debugging, but only send a sampled subset externally.
 
-Two architectures achieve this:
-
-| Approach                       | Where broadcast happens   | When to use                                                                                       |
-| ------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------- |
-| **OpenTelemetry Collector**    | A separate trace server   | Recommended for production. Buffering, retries, sampling, and PII scrubbing are all centralized.  |
-| **Multi-exporter in SDK**      | Inside the application    | Simpler. Good for single-service apps or when you don't want to run a Collector.                  |
+There are two equivalent ways to broadcast: configure an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) (a small standalone binary) that fans out traces, or attach multiple exporters directly inside your application. Both produce the same result.
 
 <Note>
   Confident AI does **not** support gRPC for OTLP — only HTTP. Use `otlphttp`
   (Collector) or `OTLPSpanExporter` from the `proto-http` package (SDK).
 </Note>
 
-## Approach 1: Collector
+## Architecture
 
-The [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) receives OTLP from your services and broadcasts to multiple destinations. Every exporter listed in a pipeline gets a copy of every span — no extra config required.
-
-### Architecture
+### Via the Collector
 
 ```mermaid
 sequenceDiagram
@@ -49,7 +42,39 @@ sequenceDiagram
     end
 ```
 
-### Configuration
+Recommended for production — buffering, retries, sampling, and PII scrubbing all live in one centralized place.
+
+### Via the SDK
+
+```mermaid
+sequenceDiagram
+    participant Code as Your Code
+    participant Provider as TracerProvider
+    participant ProcA as BatchSpanProcessor A
+    participant ProcB as BatchSpanProcessor B
+    participant Warehouse as Data Warehouse
+    participant Confident as Confident AI
+
+    Code->>Provider: span ends
+
+    par Independent export
+        Provider->>ProcA: onEnd(span)
+        ProcA->>Warehouse: OTLP export
+    and
+        Provider->>ProcB: onEnd(span)
+        ProcB->>Confident: OTLP/HTTP export
+    end
+```
+
+Simpler — good for single-service apps. Each `BatchSpanProcessor` batches and retries independently, so a failure on one destination doesn't affect the other.
+
+## Setup
+
+Pick whichever flavor fits your stack — both achieve the same broadcast.
+
+<Tabs>
+
+<Tab title="Collector (YAML)">
 
 ```yaml title="otel-collector-config.yaml"
 receivers:
@@ -76,84 +101,9 @@ service:
       exporters: [otlphttp/warehouse, otlphttp/confident]
 ```
 
-Listing both exporters in the same `traces` pipeline is all that's needed — every span goes to both.
+Load this into a running OpenTelemetry Collector — see the [official Collector docs](https://opentelemetry.io/docs/collector/installation/) for deployment options. Listing both exporters in the same pipeline is all that's needed; every span goes to both.
 
-### Selective broadcast
-
-To send only LLM-tagged spans to Confident AI while keeping 100% in the warehouse, use the [`routing` connector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/routingconnector):
-
-```yaml title="otel-collector-config.yaml"
-connectors:
-  routing:
-    default_pipelines: [traces/warehouse]
-    table:
-      - context: span
-        statement: route() where attributes["confident.span.type"] != nil
-        pipelines: [traces/warehouse, traces/confident]
-```
-
-### Sampling
-
-To keep 100% locally but only sample 10% (plus all errors) to Confident AI:
-
-```yaml title="otel-collector-config.yaml"
-processors:
-  tail_sampling/confident:
-    decision_wait: 10s
-    policies:
-      - name: errors
-        type: status_code
-        status_code: { status_codes: [ERROR] }
-      - name: random
-        type: probabilistic
-        probabilistic: { sampling_percentage: 10 }
-```
-
-Apply it to the Confident AI pipeline only, leaving the warehouse pipeline unsampled.
-
-### PII scrubbing
-
-Strip or hash sensitive fields before they leave your network:
-
-```yaml title="otel-collector-config.yaml"
-processors:
-  attributes/redact:
-    actions:
-      - { key: user.email, action: hash }
-      - { key: http.request.header.authorization, action: delete }
-```
-
-Then add `attributes/redact` to the pipeline's `processors` list.
-
-## Approach 2: Multi-Exporter SDK
-
-Attach two `BatchSpanProcessor`s to a single `TracerProvider`. Each batches and retries independently — backpressure on one destination doesn't affect the other.
-
-### Architecture
-
-```mermaid
-sequenceDiagram
-    participant Code as Your Code
-    participant Provider as TracerProvider
-    participant ProcA as BatchSpanProcessor A
-    participant ProcB as BatchSpanProcessor B
-    participant Warehouse as Data Warehouse
-    participant Confident as Confident AI
-
-    Code->>Provider: span ends
-
-    par Independent export
-        Provider->>ProcA: onEnd(span)
-        ProcA->>Warehouse: OTLP export
-    and
-        Provider->>ProcB: onEnd(span)
-        ProcB->>Confident: OTLP/HTTP export
-    end
-```
-
-### Setup
-
-<Tabs>
+</Tab>
 
 <Tab title="Python">
 
@@ -309,6 +259,57 @@ using var provider = Sdk.CreateTracerProviderBuilder()
 </Tabs>
 
 After this, emit spans as you normally would — every span flows to both destinations.
+
+## Advanced Collector Features
+
+These features are unique to the Collector path. They let you change broadcast behavior without touching application code.
+
+### Selective broadcast
+
+To send only LLM-tagged spans to Confident AI while keeping 100% in the warehouse, use the [`routing` connector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/routingconnector):
+
+```yaml title="otel-collector-config.yaml"
+connectors:
+  routing:
+    default_pipelines: [traces/warehouse]
+    table:
+      - context: span
+        statement: route() where attributes["confident.span.type"] != nil
+        pipelines: [traces/warehouse, traces/confident]
+```
+
+### Sampling
+
+To keep 100% locally but only sample 10% (plus all errors) to Confident AI:
+
+```yaml title="otel-collector-config.yaml"
+processors:
+  tail_sampling/confident:
+    decision_wait: 10s
+    policies:
+      - name: errors
+        type: status_code
+        status_code: { status_codes: [ERROR] }
+      - name: random
+        type: probabilistic
+        probabilistic: { sampling_percentage: 10 }
+```
+
+Apply it to the Confident AI pipeline only, leaving the warehouse pipeline unsampled.
+
+### PII scrubbing
+
+Strip or hash sensitive fields before they leave your network:
+
+```yaml title="otel-collector-config.yaml"
+processors:
+  attributes/redact:
+    actions:
+      - { key: user.email, action: hash }
+      - { key: http.request.header.authorization, action: delete }
+```
+
+Then add `attributes/redact` to the pipeline's `processors` list.
 
 ## Combining with Distributed Tracing
 
