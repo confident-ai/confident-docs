@@ -387,6 +387,9 @@ navigation:
               - page: Distributed Tracing
                 path: docs/pages/integrations/opentelemetry/distributed-tracing.mdx
                 icon: fa-light fa-globe
+              - page: Trace Broadcasting
+                path: docs/pages/integrations/opentelemetry/trace-broadcasting.mdx
+                icon: fa-light fa-tower-broadcast
       - section: Third-Party Integrations
         contents:
           - page: OpenAI
