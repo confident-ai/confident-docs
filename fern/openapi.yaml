@@ -1023,6 +1023,8 @@ paths:
                       traceUuid: "TRACE-UUID"
                       status: "SUCCESS"
                       type: "LLM"
+                      provider: "OpenAI"
+                      integration: "LangChain"
                       model: "gpt-4o"
                   totalSpans: 1
                 deprecated: false
@@ -1062,6 +1064,8 @@ paths:
                     traceUuid: "TRACE-UUID"
                     status: "SUCCESS"
                     type: "LLM"
+                    provider: "OpenAI"
+                    integration: "LangChain"
                     model: "gpt-4o"
                     promptAlias: "Prompt Alias"
                   deprecated: false
@@ -5752,6 +5756,12 @@ components:
         model:
           type: string
           description: This is the LLM model used in an LLM span.
+        provider:
+          type: string
+          description: This is the LLM provider used in an LLM span.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
         outputTokenCost:
           type: number
           format: float
