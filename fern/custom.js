@@ -229,7 +229,7 @@ function runOnDomUpdates(callback) {
 
   const STICKY_CTA = {
     title: "Need help setting up?",
-    subtitle: "For teams planning production evaluation workflows",
+    subtitle: "For teams evaluating Confident AI in production",
     action: "Talk to us",
   };
 
