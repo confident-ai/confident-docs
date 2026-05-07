@@ -720,6 +720,8 @@ paths:
                 llmSpans:
                   - uuid: "<SPAN-UUID>"
                     name: "OpenAI Call"
+                    provider: "OpenAI"
+                    integration: "LangChain"
                     model: "gpt-4o"
                     input: "What is the capital of France?"
                     output: "The capital of France is Paris."
@@ -865,6 +867,8 @@ paths:
                         traceUuid: "TRACE-UUID"
                         status: "SUCCESS"
                         type: "LLM"
+                        provider: "OpenAI"
+                        integration: "LangChain"
                         model: "gpt-4o"
                 deprecated: false
 
@@ -3897,6 +3901,9 @@ components:
           items:
             $ref: "#/components/schemas/ToolCallData"
           description: This is the expected tools to be called by the span, which is to be used for evaluation.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
       required:
         - uuid
         - name
@@ -3973,6 +3980,12 @@ components:
         model:
           type: string
           description: This is the LLM model used in the span.
+        provider:
+          type: string
+          description: This is the model provider used in the LLM span.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
         promptAlias:
           type: string
           description: This is the alias of your prompt which is stored on Confident AI.
@@ -4059,6 +4072,9 @@ components:
         expectedOutput:
           type: string
           description: This is the expected output of your span, which is the ideal actual output and to be used for evaluation.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
         toolsCalled:
           type: array
           items:
@@ -4099,6 +4115,9 @@ components:
         error:
           type: string
           description: This is the error message, if an error occurred inside the span.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
         status:
           type: string
           enum: [SUCCESS, ERRORED]
@@ -4167,6 +4186,9 @@ components:
         output:
           type: string
           description: This is the output of the span.
+        integration:
+          type: string
+          description: This is the integration associated with the span.
         error:
           type: string
           description: This is the error message, if an error occurred inside the span.
