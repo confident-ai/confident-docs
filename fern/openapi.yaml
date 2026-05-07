@@ -3986,7 +3986,7 @@ components:
           description: This is the LLM model used in the span.
         provider:
           type: string
-          description: This is the model provider used in the LLM span.
+          description: This is the provider of the generation model used in the span.
         integration:
           type: string
           description: This is the integration associated with the span.
