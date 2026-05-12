@@ -1393,6 +1393,9 @@ You can pull and manage your prompts in any project by configuring a `CONFIDENT_
 - For default usage, set `CONFIDENT_API_KEY` as an environment variable.
 - To target a specific project, pass a `confident_api_key` directly when creating the `Prompt` object.
 
+<Tabs>
+  <Tab title="Python" language="python">
+
 ```python
 from deepeval.prompt import Prompt, PromptMessage
 
@@ -1401,6 +1404,21 @@ prompt = Prompt(
   confident_api_key="confident_us...",
 )
 ```
+
+  </Tab>
+  <Tab title="TypeScript" language="typescript">
+
+```typescript
+import { Prompt } from "deepeval";
+
+const prompt = new Prompt({
+  alias: "YOUR-PROMPT-ALIAS",
+  confidentApiKey: "confident_us...",
+});
+```
+
+  </Tab>
+</Tabs>
 
 When both are provided, the `confident_api_key` passed to `Prompt` always takes precedence over the environment variable.
 
