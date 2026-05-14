@@ -1,0 +1,322 @@
+---
+slug: self-hosting/gcp/provisioning
+description: Provision GCP infrastructure with Terraform
+---
+
+## Overview
+
+This step executes Terraform to create all GCP infrastructure. The process takes 15-25 minutes and provisions:
+
+- Enabled GCP APIs for all required services
+- VPC with GKE, database, public, and PSC subnets plus Cloud NAT
+- GKE cluster with system and worker node pools
+- Cloud SQL for PostgreSQL with regional HA
+- GCS buckets with uniform access and Private Google Access
+- Secret Manager with application secrets
+- Service accounts with Workload Identity bindings
+- Helm releases: NGINX Ingress, External Secrets, ArgoCD, cert-manager, ClickHouse Operator
+
+After completion, you will have a fully provisioned GCP environment ready for Kubernetes workloads.
+
+## What happens during provisioning
+
+When you run `terraform apply`, Terraform:
+
+1. **Reads your configuration** from `terraform.tfvars`
+2. **Calculates dependencies** to determine the order resources must be created
+3. **Creates resources** in GCP via API calls
+4. **Tracks state** in your GCS backend so it knows what exists
+5. **Outputs** important values you'll need for subsequent steps
+
+The process is mostly automated, but you'll need to monitor for errors and potentially troubleshoot issues.
+
+## Initialize Terraform
+
+From the `gcp` directory, initialize the working directory:
+
+```bash
+terraform init
+```
+
+This command:
+
+- Downloads required provider plugins (Google, Kubernetes, Helm)
+- Configures the GCS backend for state storage
+- Validates your backend configuration
+
+**Expected output:**
+
+```
+Initializing the backend...
+Successfully configured the backend "gcs"!
+
+Initializing provider plugins...
+- Finding hashicorp/google versions matching "~> 5.0"...
+- Installing hashicorp/google v5.x.x...
+
+Terraform has been successfully initialized!
+```
+
+<Warning>
+**Backend initialization errors** usually mean:
+- The state bucket doesn't exist (create it first)
+- You don't have permission to access the bucket
+- The bucket is in a different project than expected
+
+If you see "Error loading state," verify your backend configuration in `provider.tf`.
+
+</Warning>
+
+## Review the plan
+
+Before creating anything, preview what Terraform will do:
+
+```bash
+terraform plan
+```
+
+This shows all resources that will be created, modified, or destroyed. For a fresh deployment, you should see only resource additions (green `+` symbols).
+
+**Key resources in the plan:**
+
+| Category       | What's created                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| **Networking** | VPC, 4 subnets, Cloud NAT, firewall rules, Cloud DNS private zone                          |
+| **Compute**    | GKE cluster, system pool, worker pool, service accounts                                     |
+| **Database**   | Cloud SQL instance, database, Private Service Access peering                                |
+| **Storage**    | GCS buckets (3), private service connect endpoint, lifecycle policies                       |
+| **Security**   | Secret Manager secrets, 3+ service accounts, Workload Identity bindings, IAM role bindings  |
+| **Kubernetes** | Namespaces, service accounts, Helm releases                                                 |
+
+<Note>
+  **Save the plan for audit purposes:** ```bash terraform plan -out=plan.tfplan
+  ``` You can then apply this exact plan with `terraform apply plan.tfplan`.
+  This is useful if you need approval before applying.
+</Note>
+
+<Warning>
+  **Review the plan carefully if you see any deletions or modifications.** For a
+  new deployment, there should be no `-` (destroy) or `~` (modify) symbols. If
+  you see them, something may be misconfigured.
+</Warning>
+
+## Apply the infrastructure
+
+Once you've reviewed the plan, create the resources:
+
+```bash
+terraform apply
+```
+
+Terraform shows the plan again and asks for confirmation. Type `yes` to proceed.
+
+**Expected duration:** 15-25 minutes
+
+| Resource              | Typical creation time |
+| --------------------- | --------------------- |
+| API enablement & VPC  | 1-2 minutes           |
+| Cloud NAT             | 1-2 minutes           |
+| GKE cluster           | 8-12 minutes          |
+| GKE worker pool       | 3-5 minutes           |
+| Cloud SQL instance    | 5-10 minutes          |
+| Secret Manager        | 1-2 minutes           |
+| Helm releases         | 2-3 minutes           |
+
+<Note>
+  **Don't interrupt the process.** If you press Ctrl+C or close your terminal,
+  Terraform may leave resources in a partially created state. If this happens,
+  just run `terraform apply` again—it will pick up where it left off.
+</Note>
+
+## Common provisioning errors
+
+### Permission errors
+
+```
+Error: creating Project: PermissionDenied
+```
+
+Your identity lacks permission to create resources. You need:
+
+- `Editor` role on the project (or custom equivalent)
+- `Project IAM Admin` for creating IAM bindings
+- `Secret Manager Admin` for managing secrets
+
+<Warning>
+  **Many organizations restrict IAM binding creation.** If you can't get
+  Project IAM Admin, you may need a platform team member to run the
+  deployment or pre-create the required IAM bindings.
+</Warning>
+
+### Quota errors
+
+```
+Error: creating GKE Cluster Node Pool: QuotaExceeded
+```
+
+You've hit a GCP CPU quota. Common limits:
+
+| Quota                     | Default limit | How to increase             |
+| ------------------------- | ------------- | --------------------------- |
+| N2 CPUs (per region)      | 24-100        | GCP Console quotas page     |
+| In-use IP addresses       | 8             | GCP Console quotas page     |
+| External IP addresses     | 8             | GCP Console quotas page     |
+
+<Warning>
+  **Quota increases can take hours to days.** If you're in a new project,
+  request increases before starting deployment.
+</Warning>
+
+### Naming conflicts
+
+```
+Error: googleapi: Error 409: The bucket you tried to create already exists
+```
+
+GCS bucket names must be globally unique. If you get naming conflicts:
+
+- Change `confident_application_name` to something unique
+- Verify you're not running multiple deployments with the same name
+
+### GKE creation timeout
+
+```
+Error: waiting for GKE Cluster to create: timeout while waiting
+```
+
+GKE can occasionally take longer than expected. Usually just re-running `terraform apply` continues where it left off. If it keeps failing:
+
+- Check GCP Service Health for regional issues
+- Verify your VPC has available secondary ranges
+- Check for Org Policy restrictions in your project
+
+<Warning>
+**Organization Policies can block resource creation.** Many enterprises have policies that:
+- Restrict which regions you can deploy to (`gcp.resourceLocations`)
+- Require specific labels on all resources
+- Block external IPs (`compute.vmExternalIpAccess`)
+- Require CMEK encryption
+- Enforce VPC Service Controls
+
+If you get persistent errors, check with your cloud governance team about Organization Policies.
+
+</Warning>
+
+### Provider authentication errors
+
+```
+Error: google: could not find default credentials
+```
+
+Terraform can't authenticate to GCP. Verify:
+
+- `gcloud auth application-default login` was run
+- `gcloud auth list` shows your active account
+- `GOOGLE_APPLICATION_CREDENTIALS` is set if using a service account key
+
+### Helm release errors
+
+```
+Error: unable to build kubernetes objects from release manifest
+```
+
+This usually means GKE isn't fully ready when Helm tries to install charts. Re-running `terraform apply` typically resolves it.
+
+## Capture important outputs
+
+After successful completion, Terraform displays outputs. Save these—you'll need them for subsequent steps:
+
+```bash
+# View all outputs
+terraform output
+
+# Get specific values
+terraform output cluster_name
+terraform output db_instance_connection_name
+terraform output gcs_bucket_name
+terraform output secret_manager_prefix
+terraform output argocd_server_url
+```
+
+| Output                       | What it's for                                          |
+| ---------------------------- | ------------------------------------------------------ |
+| `cluster_name`               | Used to configure kubectl access                       |
+| `db_instance_connection_name` | Cloud SQL instance connection name (host)             |
+| `gcs_bucket_name`            | GCS bucket for uploaded files                          |
+| `secret_manager_prefix`      | Prefix for application secrets in Secret Manager       |
+| `argocd_server_url`          | URL to access ArgoCD dashboard                         |
+| `vpc_id`                     | Needed for VPC peering or VPN setup                    |
+
+<Note>
+  **You can always retrieve outputs later** by running `terraform output` in the
+  same directory with access to the state file.
+</Note>
+
+## What was deployed
+
+Here's what now exists in your GCP project:
+
+### Networking
+
+- **VPC Network** with DNS support
+- **GKE subnet** — where GKE nodes run (with secondary ranges for pods and services)
+- **Database PSA range** — allocated range for Cloud SQL VPC peering
+- **Public subnet** — for public-facing resources
+- **Private Service Connect subnet** — for GCS private endpoint access
+- **Cloud NAT** — allows GKE nodes to make outbound requests
+- **Firewall rules** — controls traffic to/from the GKE subnet
+- **Cloud DNS Private Zone** — resolves Cloud SQL hostname within the VPC
+
+### Compute (GKE)
+
+- **GKE Cluster** — Kubernetes control plane managed by Google
+- **System Node Pool** — 2x `n2-standard-4` running system components
+- **Worker Node Pool** — autoscaling pool running application workloads
+- **Workload Identity** — federation enabled for pod identity
+
+### Data stores
+
+- **Cloud SQL for PostgreSQL** — managed database with regional HA and private DNS
+- **GCS Buckets** — uniform-access buckets with versioning and Private Google Access
+- **GCS Buckets** — test cases, payloads, and ClickHouse backups
+- **Secret Manager** — contains all application credentials and connection strings
+
+### Kubernetes components (pre-installed via Helm)
+
+- **NGINX Ingress Controller** — routes traffic from Cloud Load Balancer to services
+- **External Secrets Operator** — syncs secrets from Secret Manager to Kubernetes
+- **ArgoCD** — GitOps tool for managing deployments
+- **cert-manager** — automates TLS certificate lifecycle
+- **ClickHouse Operator** — manages the analytics database
+
+### Security
+
+- **Service Accounts** — separate identities for GKE, storage, external secrets, and ClickHouse backup
+- **Workload Identity Bindings** — links Kubernetes service accounts to GCP service accounts
+- **IAM Role Bindings** — Storage Object Admin, Secret Manager Secret Accessor, Cloud SQL Client
+- **Firewall rules** — controls traffic to/from GKE nodes
+
+## What to do if provisioning fails
+
+1. **Read the error message carefully.** Terraform errors usually indicate exactly what went wrong.
+
+2. **Don't panic.** Terraform is idempotent—you can run `apply` again and it will continue from where it failed.
+
+3. **Check common causes:**
+
+   - Permissions
+   - Quota limits
+   - Network connectivity
+   - Invalid variable values
+
+4. **If stuck, don't destroy and recreate.** This can leave orphaned resources. Instead, fix the configuration and re-apply.
+
+<Warning>
+  **Never run `terraform destroy` unless you intend to delete everything.** If
+  you're troubleshooting, fix the issue and re-run `apply`. Destroying and
+  recreating can lose data and create inconsistent state.
+</Warning>
+
+## Next steps
+
+After infrastructure is provisioned, proceed to [TLS Certificates](/self-hosting/gcp/tls-certificates) to configure HTTPS for your services.
