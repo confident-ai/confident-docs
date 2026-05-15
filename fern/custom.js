@@ -178,6 +178,7 @@ function runOnDomUpdates(callback) {
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
     "settings.project.auditLogs": `${S3_BASE}/settings:project:audit-logs.png`,
     "settings.project.alerts": `${S3_BASE}/settings:project:alerts.png`,
+    "settings.project.evaluationRules": `${S3_BASE}/settings:project:evaluation-rules.png`,
     "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
     "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,
     "settings.project.categories": `${S3_BASE}/settings:project:categories.png`,
@@ -237,27 +238,32 @@ function runOnDomUpdates(callback) {
   const INLINE_CTAS = {
     "self-hosting": {
       title: "Planning a private deployment?",
-      subtitle: "Get a clear deployment path across architecture, security, and rollout",
+      subtitle:
+        "Get a clear deployment path across architecture, security, and rollout",
       action: "Talk to deployment team",
     },
     "self-hosting-aws": {
       title: "Planning AWS deployment?",
-      subtitle: "Avoid infrastructure surprises across EKS, networking, IAM, and ownership",
+      subtitle:
+        "Avoid infrastructure surprises across EKS, networking, IAM, and ownership",
       action: "Talk to deployment team",
     },
     "self-hosting-security": {
       title: "Preparing for a security review?",
-      subtitle: "Align security, compliance, and private deployment requirements before rollout",
+      subtitle:
+        "Align security, compliance, and private deployment requirements before rollout",
       action: "Talk to security team",
     },
-    "setup": {
+    setup: {
       title: "Rolling this out for your team?",
-      subtitle: "Plan the fastest path from setup to a production evaluation workflow",
+      subtitle:
+        "Plan the fastest path from setup to a production evaluation workflow",
       action: "Talk to us",
     },
     "api-reference": {
       title: "Building a production pipeline?",
-      subtitle: "Design a scalable API workflow for evals, datasets, traces, and prompts",
+      subtitle:
+        "Design a scalable API workflow for evals, datasets, traces, and prompts",
       action: "Talk to an expert",
     },
     "settings-org": {
@@ -272,25 +278,29 @@ function runOnDomUpdates(callback) {
     },
     "ai-connections": {
       title: "Need help setting up?",
-      subtitle: "Connect your app reliably across endpoints, auth, payloads, and streaming",
+      subtitle:
+        "Connect your app reliably across endpoints, auth, payloads, and streaming",
       action: "Talk to us",
     },
-    "datasets": {
+    datasets: {
       title: "Curating datasets across your team?",
-      subtitle: "Keep collaboration, annotation, and dataset quality organized at scale",
+      subtitle:
+        "Keep collaboration, annotation, and dataset quality organized at scale",
       action: "Book a demo",
     },
-    "experiments": {
+    experiments: {
       title: "Running experiments across teams?",
-      subtitle: "Find winning prompts and models with results your team can share",
+      subtitle:
+        "Find winning prompts and models with results your team can share",
       action: "Book a demo",
     },
     "ci-cd": {
       title: "Setting up evals in CI/CD?",
-      subtitle: "Catch regressions before they ship with release-ready eval gates",
+      subtitle:
+        "Catch regressions before they ship with release-ready eval gates",
       action: "Talk to an expert",
     },
-    "integrations": {
+    integrations: {
       title: "Connecting this to your stack?",
       subtitle: "Bring traces and evals into the tools your team already uses",
       action: "Talk to an expert",
@@ -302,22 +312,26 @@ function runOnDomUpdates(callback) {
     },
     "framework-policies": {
       title: "Building a custom security framework?",
-      subtitle: "Turn internal AI policies into repeatable tests and audit-ready reports",
+      subtitle:
+        "Turn internal AI policies into repeatable tests and audit-ready reports",
       action: "Talk to security team",
     },
     "annotation-queues": {
       title: "Coordinating human review at scale?",
-      subtitle: "Keep annotation work organized as reviewers, queues, and datasets grow",
+      subtitle:
+        "Keep annotation work organized as reviewers, queues, and datasets grow",
       action: "Book a demo",
     },
     "data-handling": {
       title: "Going through a security review?",
-      subtitle: "Get the data controls and compliance materials your team needs",
+      subtitle:
+        "Get the data controls and compliance materials your team needs",
       action: "Talk to us",
     },
     "why-confident-ai": {
       title: "Evaluating vs your current stack?",
-      subtitle: "See how evaluation, tracing, safety, and collaboration work together",
+      subtitle:
+        "See how evaluation, tracing, safety, and collaboration work together",
       action: "Book a demo",
     },
   };
@@ -326,7 +340,8 @@ function runOnDomUpdates(callback) {
     {
       match: "llm-tracing/introduction",
       title: "Monitoring AI in production?",
-      subtitle: "Connect traces, alerts, dashboards, and evals in one production workflow",
+      subtitle:
+        "Connect traces, alerts, dashboards, and evals in one production workflow",
       action: "Book a demo",
     },
     {
@@ -338,25 +353,29 @@ function runOnDomUpdates(callback) {
     {
       match: "llm-evaluation/quickstart",
       title: "Scaling beyond prototype?",
-      subtitle: "Move from local tests to a repeatable evaluation process for your team",
+      subtitle:
+        "Move from local tests to a repeatable evaluation process for your team",
       action: "Talk to us",
     },
     {
       match: "llm-evaluation/dataset-management",
       title: "Curating datasets across your team?",
-      subtitle: "Keep collaboration, annotation, and dataset quality organized at scale",
+      subtitle:
+        "Keep collaboration, annotation, and dataset quality organized at scale",
       action: "Book a demo",
     },
     {
       match: "llm-evaluation/prompts",
       title: "Managing prompts in production?",
-      subtitle: "Prompt versioning, A/B testing, and rollbacks for production teams",
+      subtitle:
+        "Prompt versioning, A/B testing, and rollbacks for production teams",
       action: "Book a demo",
     },
     {
       match: "llm-evaluation/code-driven",
       title: "Setting up evals in CI/CD?",
-      subtitle: "Catch regressions before they ship with release-ready eval gates",
+      subtitle:
+        "Catch regressions before they ship with release-ready eval gates",
       action: "Talk to an engineer",
     },
     {
@@ -368,19 +387,22 @@ function runOnDomUpdates(callback) {
     {
       match: "self-hosting",
       title: "Planning a private deployment?",
-      subtitle: "Get a clear deployment path across cloud, security, and rollout needs",
+      subtitle:
+        "Get a clear deployment path across cloud, security, and rollout needs",
       action: "Talk to deployment team",
     },
     {
       match: "llm-tracing",
       title: "Ready to monitor AI in production?",
-      subtitle: "Connect traces, alerts, dashboards, and evals in one production workflow",
+      subtitle:
+        "Connect traces, alerts, dashboards, and evals in one production workflow",
       action: "Book a demo",
     },
     {
       match: "api-reference",
       title: "Building a production pipeline?",
-      subtitle: "Design a scalable API workflow for evals, datasets, traces, and prompts",
+      subtitle:
+        "Design a scalable API workflow for evals, datasets, traces, and prompts",
       action: "Talk to an engineer",
     },
     {
@@ -398,7 +420,8 @@ function runOnDomUpdates(callback) {
     {
       match: "human-in-the-loop",
       title: "Coordinating annotators across teams?",
-      subtitle: "Keep annotation work organized as reviewers, queues, and datasets grow",
+      subtitle:
+        "Keep annotation work organized as reviewers, queues, and datasets grow",
       action: "Book a demo",
     },
     {
@@ -443,7 +466,10 @@ function runOnDomUpdates(callback) {
 
   function getCurrentSlug() {
     const path = (window.location && window.location.pathname) || "";
-    return path.replace(/^\/+/, "").replace(/^docs\//, "").replace(/\/$/, "");
+    return path
+      .replace(/^\/+/, "")
+      .replace(/^docs\//, "")
+      .replace(/\/$/, "");
   }
 
   function getAnalyticsPage(slug) {

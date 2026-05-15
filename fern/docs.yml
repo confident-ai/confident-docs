@@ -482,6 +482,9 @@ navigation:
           - page: Evaluation Models
             path: docs/pages/settings/project/evaluation-models.mdx
             icon: fa-light fa-brain
+          - page: Evaluation Rules
+            path: docs/pages/settings/project/evaluation-rules.mdx
+            icon: fa-light fa-toggle-on
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star
