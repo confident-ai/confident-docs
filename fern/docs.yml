@@ -476,9 +476,6 @@ navigation:
           - page: Data Usage
             path: docs/pages/settings/project/data-usage.mdx
             icon: fa-light fa-chart-bar
-          - page: Model Costs
-            path: docs/pages/settings/project/model-costs.mdx
-            icon: fa-light fa-dollar-sign
           - page: Evaluation Models
             path: docs/pages/settings/project/evaluation-models.mdx
             icon: fa-light fa-brain

@@ -12,14 +12,6 @@ Thread evaluations let you evaluate an entire multi-turn conversation as a singl
   Spans](/docs/llm-tracing/online-evals).
 </Note>
 
-<Tip>
-  To evaluate threads automatically without calling the evaluate thread function
-  from your code, configure [Evaluation
-  Rules](/docs/settings/project/evaluation-rules) in Project Settings—a thread
-  rule waits for the conversation to be idle for a configurable time limit, then
-  runs your multi-turn metric collection.
-</Tip>
-
 ## How It Works
 
 Thread evaluations follow these steps:
@@ -51,6 +43,14 @@ sequenceDiagram
     CAI->>CAI: Run multi-turn metrics
     CAI->>CAI: Store results on thread
 ```
+
+<Tip>
+  To evaluate threads automatically without calling the evaluate thread function
+  from your code, configure [Evaluation
+  Rules](/docs/settings/project/evaluation-rules) in Project Settings—a thread
+  rule waits for the conversation to be idle for a configurable time limit, then
+  runs your multi-turn metric collection.
+</Tip>
 
 ## How Thread Evals Differ
 

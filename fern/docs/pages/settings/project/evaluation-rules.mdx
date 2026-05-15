@@ -63,8 +63,6 @@ Filters narrow down which traces, spans, or threads a rule applies to. Use filte
 
 For example, you can configure a `Trace` rule that only fires when `metadata.env` equals `cloud`, or a `Span` rule that only matches `LLM` spans whose latency exceeds a threshold.
 
-The available filter categories depend on the data model. Span-specific categories (such as span type, model, or provider) are not available on `Trace` or `Thread` rules—switching the data model on an existing rule prunes any incompatible filters automatically.
-
 <Tip>
   Leave **Filters** empty to match every entity for the chosen data model.
 </Tip>
