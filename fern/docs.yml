@@ -476,12 +476,12 @@ navigation:
           - page: Data Usage
             path: docs/pages/settings/project/data-usage.mdx
             icon: fa-light fa-chart-bar
-          - page: Model Costs
-            path: docs/pages/settings/project/model-costs.mdx
-            icon: fa-light fa-dollar-sign
           - page: Evaluation Models
             path: docs/pages/settings/project/evaluation-models.mdx
             icon: fa-light fa-brain
+          - page: Evaluation Rules
+            path: docs/pages/settings/project/evaluation-rules.mdx
+            icon: fa-light fa-toggle-on
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star
@@ -565,6 +565,9 @@ navigation:
           - page: Overview
             path: docs/pages/self-hosting/azure/overview.mdx
             icon: fa-light fa-map
+          - page: Quickstart
+            path: docs/pages/self-hosting/azure/quickstart.mdx
+            icon: fa-light fa-bolt
           - page: Requirements
             path: docs/pages/self-hosting/azure/requirements.mdx
             icon: fa-light fa-clipboard-list
@@ -591,6 +594,30 @@ navigation:
           - page: Overview
             path: docs/pages/self-hosting/gcp/overview.mdx
             icon: fa-light fa-map
+          - page: Quickstart
+            path: docs/pages/self-hosting/gcp/quickstart.mdx
+            icon: fa-light fa-bolt
+          - page: Requirements
+            path: docs/pages/self-hosting/gcp/requirements.mdx
+            icon: fa-light fa-clipboard-list
+          - section: Step-by-step guide
+            collapsed: true
+            icon: fa-light fa-list-check
+            contents:
+              - page: Prerequisites
+                path: docs/pages/self-hosting/gcp/prerequisites.mdx
+              - page: Configuration
+                path: docs/pages/self-hosting/gcp/configuration.mdx
+              - page: Provisioning
+                path: docs/pages/self-hosting/gcp/provisioning.mdx
+              - page: TLS Certificates
+                path: docs/pages/self-hosting/gcp/tls-certificates.mdx
+              - page: Cluster Access
+                path: docs/pages/self-hosting/gcp/cluster-access.mdx
+              - page: Kubernetes Deployment
+                path: docs/pages/self-hosting/gcp/kubernetes-deployment.mdx
+              - page: Verification
+                path: docs/pages/self-hosting/gcp/verification.mdx
   - tab: changelog
 
 navbar-links:

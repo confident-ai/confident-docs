@@ -21,6 +21,13 @@ You can also trigger evaluations retrospectively on historical traces and spans.
   Threads](/docs/llm-tracing/evaluate-threads).
 </Note>
 
+<Tip>
+  Prefer not to set `metric_collection` from your SDK? Configure [Evaluation
+  Rules](/docs/settings/project/evaluation-rules) in Project Settings to
+  automatically run a metric collection on incoming traces and spans that match
+  your filters.
+</Tip>
+
 ## How It Works
 
 Online evaluations for traces and spans follow these steps:

@@ -1,0 +1,26 @@
+---
+tags: ["Evals", "Observability", "Quality of Life"]
+---
+
+## Plot Twist
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+Welcome to **Reliability Week**. The plot has thickened—literally. **Test Runs** got a full analytics layer with heatmaps, bar graphs, and line-over-time charts that slice by any dimension you want (datasets, identifiers, hyperparams, models, prompts), so you can finally watch the trend instead of squinting at one run at a time. **Offline Classification** lets you classify traces and threads after the fact, and reclassify to backfill labels on data that came in before your rules existed. **Auto-Surfaced Signals** flips the question on its head—instead of you asking the data what's wrong, the platform tells you. **Multi-Turn Evals** leveled up across the board with variable interpolation, streaming prompts, and AI Connections support. And the views you actually live in—regression testing, thread displayer, test cases, Observatory tables—got a wave of polish.
+
+<Frame>![Changelog May 8, 2026](/assets/changelog/2026-05-08.png)</Frame>
+
+### Added
+
+- **Advanced Test Run Analysis** - The Test Runs page got an entire analytics layer. Aggregate every metric across every test run as a heatmap, bar graph, or line over time, and slice the view by any dimension that matters—datasets, identifiers, hyperparameters, models, prompts. Compare two slices side-by-side, toggle between Avg Score and Pass Rate, and watch the trend instead of squinting at a single run. Vibes are out, signal is in. _Run_ the numbers.
+- **Offline Classification** - Classifiers now run offline. Classify traces and threads after the fact, and reclassify to backfill labels on data that came in before your rules existed (or got tagged wrong the first time around). Your old data finally caught up with your new rules. _Classify_ later, sleep easier.
+- **Auto-Surfaced Signals** - Confident AI now auto-recommends signals on your traces, surfacing patterns, regressions, and weird-looking outliers without you needing to know what to look for. The dashboard tells you what's interesting, not the other way around. _Signal_ acquired.
+- **Multi-Turn Eval Upgrades** - Multi-turn evals leveled up across the board: variable interpolation lets dynamic context, prior-turn references, and templated content play nicely across the whole conversation, and end-to-end support for streaming prompts and AI Connections means real-time conversations finally get real evals. No fake setup required. _Turn_ up the volume.
+
+### Changed
+
+- **Trace Comparison in Regression Testing** - Regression testing now lets you diff traces, not just metric scores. When something regresses, see the actual trace-level difference instead of inferring it from a number that went down. _Trace_ the regression.
+- **Detail Displayer Upgrades** - Both the Thread Displayer and Test Case Displayer got serious glow-ups this week. Component-level spans in threads are easier to scan and faster to navigate, and the Test Case Displayer got a polish pass that makes inspecting individual cases noticeably less squint-inducing. Cleaner hierarchy, faster context switching, fewer wrong clicks. _Detail_-oriented.
+- **Revamped Test Cases Page** - The Test Cases page picked up new tabs for end-to-end classification, component-level classification, and surfaced alignment insights. See exactly where each case lands across your eval pipeline at a glance, instead of clicking through three views to piece it together. _Cases_ in point.
+- **Sticky Column Headers in Observatory Tables** - Column headers now stay pinned at the top of Observatory tables. Scroll to row 9,432 and still know which column is which. _Stuck_ with you, in a good way.
+- **Faster Test Case & Conversation Loading** - Single-turn and multi-turn test cases now load dramatically faster, even on the gnarliest traces and longest conversations. Less waiting, more inspecting—on theme for Reliability Week. _Load_ off your shoulders.

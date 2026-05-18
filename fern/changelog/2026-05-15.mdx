@@ -1,0 +1,19 @@
+---
+tags: ["Evals", "Observability", "Datasets"]
+---
+
+## The Rules Have Changed
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+This week is about doing less. Online evals run themselves on rules you define in the UI, signals auto-classify into the issues actually showing up, and dataset reruns remember exactly how you set them up last time. Less wiring, more shipping.
+
+<Frame>![Changelog May 15, 2026](/assets/changelog/2026-05-15.png)</Frame>
+
+### Added
+
+- **Evaluation Rules** - Set up workflows to run online evals directly from the UI—no API call required. Pick your triggers, pick your metrics, pick your scope, and let the platform run the loop for you. Online evals used to be an API-only sport. Not anymore. _Rule_ of thumb: less code, more coverage.
+- **Prompt Editing in AI Connections** - AI Connections now support prompt editing inside Arena and Experiments. Tweak prompts inline while you compare and iterate, without rebuilding the connection or leaving the page. _Prompt_ and proper.
+- **Evaluation Config History for Datasets** - Every dataset run now saves its evaluation config to history. Rerun the same dataset later and bring back the exact same setup with one click. Reproducibility, but without the ritual. _History_ doesn't have to repeat itself manually.
+- **Auto-Classified Signals** - Signals now auto-classify themselves into the issues actually surfacing across your traces. Find out what's wrong before you knew to look for it. _Signal_ found, noise filtered.
+- **Context & Retrieval Context for Multi-Turn Test Cases** - Multi-turn test cases now support context and retrieval context fields. Test your RAG-powered conversations the same way you test single-turn outputs—same fields, more turns. _Context_ collapse: averted.
