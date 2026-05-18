@@ -755,6 +755,29 @@ paths:
                     output: "Let me look that up for you."
                     startTime: "2025-01-15T10:30:00Z"
                     endTime: "2025-01-15T10:30:02Z"
+              Multimodal-Attachments:
+                uuid: "<TRACE-UUID>"
+                name: "PDF summarization"
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                status: "SUCCESS"
+                input:
+                  messages:
+                    - "Summarize this document: [DEEPEVAL:PDF:doc-id-1]"
+                attachments:
+                  doc-id-1:
+                    mimeType: "application/pdf"
+                    dataBase64: "<BASE64-PDF-BYTES>"
+                llmSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "LLM"
+                    model: "gpt-4o"
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:05Z"
+                    status: "SUCCESS"
+                    input:
+                      text: "User attached [DEEPEVAL:PDF:doc-1]"
+                    output: "Summary of the document..."
       responses:
         "200":
           description: ""
@@ -4256,6 +4279,20 @@ components:
           items:
             type: string
 
+    TraceAttachment:
+      type: object
+      description: Payload for a multimodal attachment referenced by id in `[DEEPEVAL:IMAGE:…]` or `[DEEPEVAL:PDF:…]` markers. Provide either a `url`, or `dataBase64` with `mimeType`.
+      properties:
+        url:
+          type: string
+          description: Public URL of the attachment.
+        dataBase64:
+          type: string
+          description: Base64-encoded file bytes.
+        mimeType:
+          type: string
+          description: MIME type of the attachment (required when using `dataBase64`).
+
     Trace:
       type: object
       required:
@@ -4343,6 +4380,11 @@ components:
           description: This is the expected tools to be called by the trace, which is to be used for evaluation.
           items:
             $ref: "#/components/schemas/ToolCallData"
+        attachments:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/TraceAttachment"
+          description: Map of attachment ids to payloads for all `[DEEPEVAL:IMAGE:…]` and `[DEEPEVAL:PDF:…]` markers in this trace. Define attachments at the trace level with same ids for same instances.
 
     CreateTraceResponse:
       type: object
