@@ -741,6 +741,25 @@ paths:
                     output: "Let me look that up for you."
                     startTime: "2025-01-15T10:30:00Z"
                     endTime: "2025-01-15T10:30:02Z"
+              Thread-Metadata:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                threadId: "<THREAD-ID>"
+                thread:
+                  metadata:
+                    dvaVersion: "1.4.2"
+                    client: "acme-corp"
+                    agentId: "support-agent"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
               User-Id:
                 uuid: "<TRACE-UUID>"
                 input: "What is the capital of France?"
@@ -799,6 +818,12 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
                   deprecated: false
                 Thread-Id:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
+                Thread-Metadata:
                   success: true
                   data:
                     id: "TRACE-ID"
@@ -4351,6 +4376,15 @@ components:
         threadId:
           type: string
           description: This is the unique identifier of the thread associated with the trace.
+        thread:
+          type: object
+          description: Thread-level fields applied to the thread record. Only takes effect when `threadId` is also set; successive ingestions merge metadata keys for the same `threadId`.
+          properties:
+            metadata:
+              type: object
+              additionalProperties: true
+              nullable: true
+              description: Custom key/value metadata to attach to the thread. Values can be any JSON-serializable type and are stringified server-side.
         userId:
           type: string
           description: This is the unique identifier for your end user for the trace.

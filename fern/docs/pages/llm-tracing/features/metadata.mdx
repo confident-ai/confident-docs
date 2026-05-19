@@ -5,7 +5,7 @@ slug: llm-tracing/features/metadata
 
 ## Overview
 
-With Confident AI, you can attach additional metadata to both traces and spans. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
+With Confident AI, you can attach additional metadata to traces, spans, and threads. This information can be used for filtering, grouping, and analyzing your traces in the observatory.
 
 ## Add Metadata
 
@@ -69,3 +69,7 @@ Each metadata argument is a dictionary whose keys are strings and whose values a
         </CodeBlock>
     </Tab>
 </Tabs>
+
+## Thread-Level Metadata
+
+You can also attach metadata to **threads** — useful for tagging production conversations with attributes like DVA version, client, or agent ID. See [Set Thread Metadata](/docs/llm-tracing/features/threads#set-thread-metadata) for the payload shape.
