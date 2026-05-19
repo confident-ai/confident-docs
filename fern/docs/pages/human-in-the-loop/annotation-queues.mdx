@@ -178,3 +178,43 @@ For items that you've queued for annotation, you can always manage them via the 
     autoPlay
   />
 </Frame>
+
+## Auto-Ingestion and Assignment Strategies
+
+Beyond manually adding items, you can configure **ingestion tasks** that pull matching production data into a queue every 5 minutes. Each task supports filters, sample rate, and an assignment strategy that controls how new items are routed to reviewers.
+
+### Assignment Strategies
+
+When an ingestion task creates new queue items, the **assignment strategy** decides which reviewer each item goes to:
+
+- **Single user** — every ingested item is assigned to one reviewer. Pick this when you have a dedicated annotator for a queue.
+- **Round robin** — ingested items rotate through the reviewer list in the configured order. The cursor is persisted, so items keep distributing evenly across runs.
+- **Random** — each ingested item is assigned to a uniformly random reviewer from the list.
+
+<Tip>
+  Round robin and random both require at least one reviewer. The reviewer list
+  order matters for round robin — it's the rotation order. Reordering or
+  adding/removing reviewers resets the rotation cursor to the start of the
+  list.
+</Tip>
+
+### Notifying Assignees
+
+Whenever items are assigned (either via auto-ingestion or a manual reassign in the queue), the new assignees receive:
+
+- An **in-app notification** in the bell-icon inbox, with a deep link to the queue
+- An **email** summarizing how many items were assigned to them in that batch
+
+Notifications are batched per recipient per event — a 50-item ingestion run produces one notification (and one email) per assignee, not 50.
+
+### Configuring an Ingestion Task
+
+Open **Queue Settings → Ingestion Tasks** and create a new task. The strategy dropdown adapts the reviewer picker:
+
+- **Single user** shows a single-user picker.
+- **Round robin** and **Random** show a multi-user picker; the order you add reviewers is the rotation order for round robin.
+
+<Note>
+  Reviewers must be members of the project. Adding a non-member to the reviewer
+  list is rejected at save time.
+</Note>
