@@ -175,6 +175,71 @@ updateCurrentTrace({ threadId: "your-thread-id" });
   at least one trace in the thread with an input or output set.
 </Note>
 
+## Set Thread Fields
+
+You can attach custom metadata and tags to a thread to label production conversations with attributes like DVA version, client, agent ID, or status flags. Both are filterable and groupable across the observatory, which makes it easy to slice production traffic.
+
+Thread fields are set by including a `thread` object on any trace you ingest into the thread. `thread.id` is an alternate, idiomatic way to specify the thread — it's equivalent to top-level `threadId` and either one is sufficient. Metadata values can be any JSON-serializable type (stringified server-side), and tags are an array of strings.
+
+```json title="POST /v1/traces"
+{
+  "uuid": "<TRACE-UUID>",
+  "input": "What's the weather in SF?",
+  "output": "It's 65°F and sunny.",
+  "startTime": "2025-01-15T10:30:00Z",
+  "endTime": "2025-01-15T10:30:05Z",
+  "thread": {
+    "id": "your-thread-id",
+    "metadata": {
+      "dvaVersion": "1.4.2",
+      "client": "acme-corp",
+      "agentId": "support-agent"
+    },
+    "tags": ["vip", "billing"]
+  }
+}
+```
+
+<Note>
+  `thread.metadata` and `thread.tags` only take effect when a thread id is
+  resolvable — either via `thread.id` or top-level `threadId`. Requests without
+  one are rejected with a 400. If both `thread.id` and `threadId` are sent they
+  must match.
+</Note>
+
+Successive ingestions for the same thread **merge** metadata keys, so you can build up a thread's metadata incrementally across turns. Sending the same key again overwrites the previous value. Tags **replace** any previously stored value, so always send the full set you want on the thread:
+
+```json title="Subsequent trace — merges into existing thread metadata"
+{
+  "uuid": "<NEXT-TRACE-UUID>",
+  "threadId": "your-thread-id",
+  "startTime": "2025-01-15T10:31:00Z",
+  "endTime": "2025-01-15T10:31:05Z",
+  "thread": {
+    "metadata": {
+      "agentId": "support-agent-v2",
+      "escalated": true
+    }
+  }
+}
+```
+
+After the two requests above, the thread's metadata is:
+
+```json
+{
+  "dvaVersion": "1.4.2",
+  "client": "acme-corp",
+  "agentId": "support-agent-v2",
+  "escalated": true
+}
+```
+
+<Tip>
+  You can view a thread's metadata and tags directly from the platform on the
+  thread details page.
+</Tip>
+
 ## Set Tools Called
 
 If your LLM app uses tool/function calling, you can log which tools were invoked for a given turn. This is attached to the trace alongside the `output` it helped generate.

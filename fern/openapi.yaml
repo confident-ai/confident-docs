@@ -741,6 +741,29 @@ paths:
                     output: "Let me look that up for you."
                     startTime: "2025-01-15T10:30:00Z"
                     endTime: "2025-01-15T10:30:02Z"
+              Thread-Metadata:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                threadId: "<THREAD-ID>"
+                thread:
+                  id: "<THREAD-ID>"
+                  metadata:
+                    dvaVersion: "1.4.2"
+                    client: "acme-corp"
+                    agentId: "support-agent"
+                  tags:
+                    - "vip"
+                    - "billing"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
               User-Id:
                 uuid: "<TRACE-UUID>"
                 input: "What is the capital of France?"
@@ -799,6 +822,12 @@ paths:
                   link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
                   deprecated: false
                 Thread-Id:
+                  success: true
+                  data:
+                    id: "TRACE-ID"
+                  link: "https://app.confident-ai.com/project/<PROJECT_ID>/observatory/traces/TRACE-ID"
+                  deprecated: false
+                Thread-Metadata:
                   success: true
                   data:
                     id: "TRACE-ID"
@@ -4351,6 +4380,24 @@ components:
         threadId:
           type: string
           description: This is the unique identifier of the thread associated with the trace.
+        thread:
+          type: object
+          description: Thread-level fields applied to the thread record. `thread.id` is an alternate way to specify the thread (must match top-level `threadId` if both are provided). `metadata` and `tags` only take effect when a thread id is resolvable; successive ingestions merge metadata keys, while tags replace any prior value.
+          properties:
+            id:
+              type: string
+              description: The thread id. Equivalent to top-level `threadId`; if both are set they must match.
+            metadata:
+              type: object
+              additionalProperties: true
+              nullable: true
+              description: Custom key/value metadata to attach to the thread. Values can be any JSON-serializable type and are stringified server-side. Successive ingestions for the same thread merge metadata keys.
+            tags:
+              type: array
+              items:
+                type: string
+              nullable: true
+              description: Tags to set on the thread. Replaces any previously stored tags.
         userId:
           type: string
           description: This is the unique identifier for your end user for the trace.
