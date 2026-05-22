@@ -279,9 +279,6 @@ navigation:
               - page: Projects
                 path: docs/pages/llm-tracing/features/projects.mdx
                 icon: fa-light fa-layer-group
-              - page: Categories
-                path: docs/pages/llm-tracing/features/categories.mdx
-                icon: fa-light fa-folder-tree
               - page: Environment
                 path: docs/pages/llm-tracing/features/environment.mdx
                 icon: fa-light fa-globe
@@ -294,6 +291,9 @@ navigation:
               - page: Dropping Traces
                 path: docs/pages/llm-tracing/features/dropping-traces.mdx
                 icon: fa-light fa-trash-can
+          - page: Signals
+            path: docs/pages/llm-tracing/features/signals.mdx
+            icon: fa-light fa-signal-stream
           - page: Troubleshooting
             path: docs/pages/llm-tracing/troubleshooting.mdx
             icon: fa-light fa-wrench
@@ -305,19 +305,27 @@ navigation:
           - page: Collect Feedback
             path: docs/pages/human-in-the-loop/collect-feedback.mdx
             icon: fa-light fa-user-check
-          - page: Leave Annotations on UI
-            path: docs/pages/human-in-the-loop/annotation-queues.mdx
+          - section: Annotation Queues
             icon: fa-light fa-list-check
-          # - section: Leave Annotations on UI
-          #   icon: fa-light fa-pen-to-square
-          #   collapsed: false
-          #   contents:
-          #     - page: Annotate as a Standalone Task
-          #       path: docs/pages/human-in-the-loop/adhoc-annotations.mdx
-          #       icon: fa-light fa-eye
-          #     - page: Annotation Queues
-          #       path: docs/pages/human-in-the-loop/annotation-queues.mdx
-          #       icon: fa-light fa-list-check
+            collapsed: false
+            contents:
+              - page: Overview
+                path: docs/pages/human-in-the-loop/annotation-queues.mdx
+                icon: fa-light fa-list-check
+              - page: Eval Alignment
+                path: docs/pages/human-in-the-loop/eval-alignment.mdx
+                icon: fa-light fa-handshake-angle
+              - page: Error Analysis
+                path: docs/pages/human-in-the-loop/error-analysis.mdx
+                icon: fa-light fa-bullseye-arrow
+      - section: Reporting & Analytics
+        contents:
+          - page: Dashboards
+            path: docs/pages/reporting-analytics/dashboards.mdx
+            icon: fa-light fa-chart-line
+          - page: Executive Insights
+            path: docs/pages/reporting-analytics/executive-insights.mdx
+            icon: fa-light fa-sparkles
       - section: Red Teaming
         contents:
           - page: Introduction
@@ -485,8 +493,8 @@ navigation:
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star
-          - page: Categories
-            path: docs/pages/settings/project/categories.mdx
+          - page: Classifiers
+            path: docs/pages/settings/project/classifiers.mdx
             icon: fa-light fa-tags
           - page: Data Sources
             path: docs/pages/settings/project/data-sources.mdx
@@ -619,6 +627,14 @@ navigation:
               - page: Verification
                 path: docs/pages/self-hosting/gcp/verification.mdx
   - tab: changelog
+
+redirects:
+  - source: /docs/llm-tracing/features/categories
+    destination: /docs/llm-tracing/features/signals
+    permanent: true
+  - source: /docs/settings/project/categories
+    destination: /docs/settings/project/classifiers
+    permanent: true
 
 navbar-links:
   - type: minimal
