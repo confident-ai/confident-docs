@@ -26,6 +26,15 @@ To configure your evaluation model:
 
 Alternatively, toggle **Inherit from Organization** to use the model credentials configured at the [organization level](/settings/settings/organization/model-credentials) instead of configuring them per-project.
 
+<Note>
+  **OpenAI `gpt-5` model family.** OpenAI requires the org whose key handles the call to be **verified** before it will serve `gpt-5` (and certain other gated SKUs). If you select `gpt-5` and the call returns a verification error:
+
+  - **BYO key** — verify your own org at [platform.openai.com](https://platform.openai.com) under **Organization → General**.
+  - **Pooled (Confident-managed) key** — pick a non-gated SKU like `gpt-5.4` or `gpt-5.4-mini` instead, or contact support.
+
+  Other Confident features (Classifiers, Error Analysis, Test Run summarizers, Auto-Annotation, [Executive Insights](/docs/reporting-analytics/executive-insights)) all use `gpt-5.4` / `gpt-5.4-mini` by default and aren't affected unless you explicitly pick `gpt-5`.
+</Note>
+
 ## Available Providers
 
 There are three categories of providers you can configure. To set up any provider, click the three-dot menu (⋮) on the right side of the row and enter your API key or configuration details.

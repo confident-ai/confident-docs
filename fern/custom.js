@@ -181,7 +181,29 @@ function runOnDomUpdates(callback) {
     "settings.project.evaluationRules": `${S3_BASE}/settings:project:evaluation-rules.png`,
     "settings.project.modelCosts": `${S3_BASE}/settings:project:model-costs.png`,
     "settings.project.dataUsage": `${S3_BASE}/settings:project:data-usage.png`,
-    "settings.project.categories": `${S3_BASE}/settings:project:categories.png`,
+    "settings.project.classifiers": `${S3_BASE}/settings:project:classifiers.png`,
+    "settings.project.classifierDetail": `${S3_BASE}/settings:project:classifier-detail.png`,
+    "settings.project.executiveInsights": `${S3_BASE}/settings:project:executive-insights.png`,
+
+    "tracing.signals.overview": `${S3_BASE}/tracing:signals:overview.png`,
+    "tracing.signals.detail": `${S3_BASE}/tracing:signals:detail.png`,
+    "tracing.signals.observatoryFilter": `${S3_BASE}/tracing:signals:observatory-filter.png`,
+
+    "dashboards.overview": `${S3_BASE}/dashboards:overview.png`,
+    "dashboards.timeSeriesEditor": `${S3_BASE}/dashboards:time-series-editor.png`,
+    "dashboards.categoricalEditor": `${S3_BASE}/dashboards:categorical-editor.png`,
+    "dashboards.widgetExport": `${S3_BASE}/dashboards:widget-export.png`,
+
+    "reports.overview": `${S3_BASE}/reports:overview.png`,
+    "reports.fullDocument": `${S3_BASE}/reports:full-document.png`,
+
+    "queues.exportCsv": `${S3_BASE}/queues:export-csv.png`,
+    "queues.ingestionTasks": `${S3_BASE}/queues:ingestion-tasks.png`,
+    "queues.ingestionTaskCreate": `${S3_BASE}/queues:ingestion-task-create.png`,
+    "queues.evalAlignment": `${S3_BASE}/queues:eval-alignment.png`,
+    "queues.evalAlignmentBreakdown": `${S3_BASE}/queues:eval-alignment-breakdown.png`,
+    "queues.errorAnalysis": `${S3_BASE}/queues:error-analysis.png`,
+    "queues.errorAnalysisRun": `${S3_BASE}/queues:error-analysis-run.png`,
 
     "selfHosting.aws.architecture": `${S3_BASE}/self-hosting:aws-architecture.png`,
     "selfHosting.azure.architecture": `${S3_BASE}/self-hosting:azure-architecture.png`,

@@ -1,0 +1,178 @@
+---
+subtitle: Configure trace and thread classifiers that auto-label your data with the labels you define.
+slug: settings/project/classifiers
+description: Learn how to configure classifiers and labels that automatically tag traces and threads.
+---
+
+A **classifier** is an LLM-driven rule that reads each ingested trace (or idle thread) and tags it with one of the **labels** you define — or with no label, if nothing fits. The labels it produces show up as **Signals** in the platform and as filterable dimensions across the Observatory and Dashboards.
+
+<Frame caption="Configure Classifiers">
+  <img
+    data-image="settings.project.classifiers"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+The Classifiers page has two tabs: **Trace Classifiers** and **Thread Classifiers**. They behave the same way conceptually, but differ in _when_ they run and what data they see.
+
+<Note>
+  Looking for the analytics surface? Once you have classifiers running, see
+  [Signals](/docs/llm-tracing/features/signals) for the runtime view,
+  drill-downs, and worked examples.
+</Note>
+
+## How a Classifier Thinks
+
+When a classifier runs, the underlying LLM receives:
+
+1. The classifier's **description** — what is this classifier looking for?
+2. The list of **labels** with each label's **description** — when do I assign this label?
+3. The trace or thread payload — input, output, metadata, error, tags, and (for threads) the conversation turns.
+
+The model picks one label or returns "no match." There is no rule engine, no metadata-based pre-filtering, and no regex. Everything depends on how the descriptions read against the data.
+
+<Tip>
+  Specificity matters. Vague label descriptions yield vague labels. Concrete
+  examples in each description (e.g. "label as `Negative` if the user expresses
+  frustration, gives up, or restates the same question because of a wrong
+  answer") drive accuracy more than any other lever.
+</Tip>
+
+## Trace Classifiers
+
+Trace classifiers run **immediately** on each ingested trace, subject to the **Sample Rate**.
+
+### Create a Trace Classifier
+
+<Steps>
+
+<Step title="Open Trace Classifiers">
+
+Navigate to **Project Settings** → **Classifiers** → **Trace Classifiers** and click **New Classifier**.
+
+</Step>
+
+<Step title="Open the detail page">
+
+Clicking **New Classifier** drops you on the classifier's **detail page** — that's where you set everything below.
+
+</Step>
+
+<Step title="Name and describe the classifier">
+
+Pick a unique **Name** (e.g. `Failure Mode`, `Customer Intent`) and write a clear **Description** of what the classifier is looking for.
+
+</Step>
+
+<Step title="Add labels">
+
+Add one row per label — either by clicking **New Label** and entering a Name and Description manually, or by using **Generate Labels** to auto-suggest them from your recent data (see below).
+
+Each label's Description is the most important field. Treat it like an instruction to a careful human reviewer.
+
+</Step>
+
+<Step title="Enable">
+
+Flip the **Enabled** toggle in Settings to start running the classifier on the next ingestion tick.
+
+</Step>
+
+</Steps>
+
+### Sample Rate
+
+The trace **Sample Rate** controls the probability that an incoming trace is classified. Pick a value between `0.0` and `1.0` — `0.5` means roughly half of incoming traces get classified. Sampling is shared across all enabled trace classifiers, so this is the right knob for controlling cost and overhead at high volume.
+
+## Thread Classifiers
+
+Thread classifiers behave the same as trace classifiers, except they run on a multi-turn conversation **after a period of inactivity** instead of on every ingest. This lets the conversation settle before you grade things like sentiment, resolution, or escalation.
+
+### Create a Thread Classifier
+
+The flow is identical to trace classifiers — pick **Thread Classifiers** in the tab switcher, then **New Classifier** and follow the same steps.
+
+### Sample Rate
+
+The thread **Sample Rate** controls the probability that an idle thread will be classified. The same `0.0` — `1.0` semantics apply.
+
+### Time Limit
+
+The **Time Limit** (in seconds) defines how long a thread must be idle before it is eligible for classification. When the next trace arrives after this idle window, the thread is classified.
+
+For example, a time limit of `300` means a thread must sit idle for five minutes before it is eligible. Set this long enough that follow-up turns from the user have stopped arriving, but not so long that you miss the conversation entirely.
+
+## The Classifier Detail Page
+
+Each classifier has a dedicated detail page where you edit its **Name**, **Description**, **Labels**, and runtime **Settings**. Open it by clicking a classifier from the list (or right after creating one).
+
+<Frame caption="The classifier detail page">
+  <img
+    data-image="settings.project.classifierDetail"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Labels can be added one at a time with **New Label** (Name + Description) or auto-suggested in bulk via **Generate Labels**. Each row has its own enable toggle and an edit / delete kebab.
+
+### Generate Labels
+
+If you don't yet know what labels you need, **Generate Labels** proposes a set from your recent traces or threads. Click **Configure Generation** first to set the prompt and clustering parameters, then **Generate Labels** to run the pipeline:
+
+1. **Summarizing** — the configured model summarizes a sample of your recent traces or threads using the **Summary prompt**.
+2. **Clustering** — summaries are grouped into the configured **Number of clusters** with K-means.
+3. **Labeling** — each cluster is turned into a candidate label (name + description) and shown on the row as **Recommended**.
+
+Recommended rows show **Accept** (✓) and **Decline** (✕) actions instead of the regular kebab menu. Accepted labels become regular labels and start running on the next ingestion tick; declined labels are deleted. Re-running generation while recommendations are still pending discards the old ones first.
+
+<Tip>
+  The configuration fields — **Summary prompt**, **Number of clusters**, and an
+  optional **Sample size** — control what data and how many candidate themes the
+  pipeline produces. Keep the prompt focused on what you want to discover (e.g.
+  *failure modes*, *user intents*) and the resulting labels stay focused too.
+</Tip>
+
+### Auto Classify
+
+Inside Settings, the **Auto Classify** toggle is separate from **Enabled**:
+
+- **Enabled** — turns the classifier on or off entirely.
+- **Auto Classify** — when on, the classifier may **propose new labels** (saved as Recommended on the labels list) when none of your existing labels fit a trace or thread. When off, the classifier can only choose from the labels you've already defined or return _no match_.
+
+Leave Auto Classify on if you want to keep discovering edge cases, and off if you want a fixed taxonomy.
+
+## Manage Classifiers
+
+Each row in the classifier list has a **toggle** to enable or disable the classifier without deleting it. A disabled classifier stops running on incoming data but keeps its configuration and any historical labels it produced.
+
+Use the three-dot menu (⋮) on a row to **Edit** or **Delete** a classifier. Deleting a classifier removes it and all of its label definitions, but historical labels already attached to traces and threads remain on those entities for filtering.
+
+<Note>
+  Classifiers is a premium feature. You must be on the Premium plan or above to
+  enable auto-classification on a project.
+</Note>
+
+## Cost & Billing
+
+Each classification logs usage that rolls into your project's metered billing. See **Project Settings → [Data Usage](/docs/settings/project/data-usage)** under the **Signals** line for live usage and projected cost.
+
+<CardGroup cols={2}>
+  <Card
+    title="Signals"
+    icon="signal-stream"
+    iconType="light"
+    href="/docs/llm-tracing/features/signals"
+  >
+    See how labels show up across the platform — the Signals page, label
+    drill-downs, and Observatory filters — with a worked example.
+  </Card>
+  <Card
+    title="Dashboards"
+    icon="chart-line"
+    iconType="light"
+    href="/docs/reporting-analytics/dashboards"
+  >
+    Break a metric down by classifier label, or trend a single label's volume
+    over time on a dashboard widget.
+  </Card>
+</CardGroup>

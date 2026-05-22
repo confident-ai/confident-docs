@@ -19,14 +19,15 @@ The Overview tab provides a breakdown of usage by data type over a selected time
 
 ### Usage Summary
 
-Usage is broken down into four categories:
+Usage is broken down into five categories:
 
-| Data Type                  | Description                                                      | Billing                 |
-| -------------------------- | ---------------------------------------------------------------- | ----------------------- |
-| Traces                     | Top-level observability units representing complete interactions | Contributes to GB usage |
-| Spans                      | Individual operations within traces                              | Contributes to GB usage |
-| Online Evals (metric data) | Evaluations run on production traces, spans, and threads         | Counted separately      |
-| Test Runs                  | Evaluation runs from experiments and test suites                 | Counted separately      |
+| Data Type                  | Description                                                                       | Billing                 |
+| -------------------------- | --------------------------------------------------------------------------------- | ----------------------- |
+| Traces                     | Top-level observability units representing complete interactions                  | Contributes to GB usage |
+| Spans                      | Individual operations within traces                                               | Contributes to GB usage |
+| Online Evals (metric data) | Evaluations run on production traces, spans, and threads                          | Counted separately      |
+| Test Runs                  | Evaluation runs from experiments and test suites                                  | Counted separately      |
+| Signals                    | [Classifier](/docs/settings/project/classifiers) runs on traces and idle threads  | Counted separately      |
 
 The summary shows:
 
@@ -55,6 +56,12 @@ You can view the data in three ways:
 This section shows your online evaluation usage over time. Online evals are evaluations run on your production traces and spans in real-time. You'll be charged based on the total number of metric evaluations run beyond your plan's included limits.
 
 The chart displays the number of online evals executed per month, helping you track evaluation volume and identify usage trends.
+
+### Signals Ran Per Month
+
+This section shows your [classifier](/docs/settings/project/classifiers) usage over time. Each classifier evaluation on a trace or idle thread is counted as one signal run. You'll be charged based on the total number of signals run beyond your plan's included allowance.
+
+The chart displays the number of signals executed per month, scoped to whichever sample rates you've configured for trace and thread classifiers in **Project Settings → Classifiers**.
 
 ## Cost Insights
 
@@ -85,3 +92,9 @@ Tracks your trace and span data consumption against your plan's GB-months allowa
 Tracks the number of online evaluations run on your production traces, spans, and threads in real-time. Online evals are evaluations that run automatically on incoming observability data, as opposed to test runs which are triggered manually or via CI/CD.
 
 The progress bar shows your current eval count against your plan's included allowance.
+
+### Signals Usage
+
+Tracks the number of [classifier](/docs/settings/project/classifiers) runs against your project's traces and threads. Each enabled classifier that processes an item counts as one signal run, subject to the configured trace and thread sample rates.
+
+The progress bar shows your current signal count against your plan's included allowance. To control overhead, lower the sample rate on individual classifiers in **Project Settings → Classifiers**, or disable classifiers you no longer need.
