@@ -182,6 +182,54 @@ paths:
                 success: true
                 deprecated: false
 
+  /v1/metric/{name}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Metrics
+      summary: Pull Metric
+      operationId: pullCustomMetric
+      description: Retrieves a single metric by `name` from your Confident AI project.
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the metric.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PullMetricResponse"
+              examples:
+                Single-Turn:
+                  value:
+                    success: true
+                    data:
+                      id: "METRIC-ID-1"
+                      name: Correctness
+                      criteria: Determine if the `actual output` is correct based on the `expected output`.
+                      requiredParameters:
+                        - actualOutput
+                        - expectedOutput
+                      multiTurn: false
+                    deprecated: false
+                Multi-Turn:
+                  value:
+                    success: true
+                    data:
+                      id: "METRIC-ID-2"
+                      name: Professionalism
+                      criteria: Determine whether the assistant has acted professionally throughout the conversation.
+                      requiredParameters:
+                        - role
+                        - content
+                      multiTurn: true
+                    deprecated: false
+
   /v1/batch-metrics:
     post:
       x-fern-server-name: Confident AI
@@ -2990,6 +3038,23 @@ components:
         deprecated:
           type: boolean
           description: "This is true if this metrics endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
+
+    PullMetricResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the metric was successfully retrieved."
+        data:
+          $ref: "#/components/schemas/Metric"
+          description: "This maps to the metric retrieved."
+        deprecated:
+          type: boolean
+          description: "This is true if this metric endpoint is deprecated."
       required:
         - success
         - data
