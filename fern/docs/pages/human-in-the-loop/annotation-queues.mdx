@@ -96,10 +96,7 @@ First create an annotation queue. In this entire example, we'll be showing an an
 </Warning>
 
 <Frame caption="Create Annotation Queue">
-  <video
-    data-video="queues.createQueue"
-    autoPlay
-  />
+  <video data-video="queues.createQueue" autoPlay />
 </Frame>
 
 </Step>
@@ -108,7 +105,7 @@ First create an annotation queue. In this entire example, we'll be showing an an
 
 You can add traces, spans, and threads to an annotation queue literally whenever you see one of them on the platform. This mainly includes the **Observatory** for **Traces**, **Spans**, and **Threads**, but also [component-level testing reports](/docs/llm-evaluation/single-turn/end-to-end#llm-tracing-for-local-e2e-testing) where traces and spans are displayed.
 
-You can add to multiple queues at once, and even assign a team member to annotate the items you're queueing.
+You can add to multiple queues at once, and even assign a team member to annotate the items you're queueing. Anyone you assign — at queue time or later from **Queue Settings** — gets an in-app notification and an email summarizing what's been routed to them.
 
 <Tip>
   If you don't see any avaiable queues to add to, make sure you've created a
@@ -117,12 +114,14 @@ You can add to multiple queues at once, and even assign a team member to annotat
 </Tip>
 
 <Frame caption="Add Traces to Queues">
-  <video
-    data-video="queues.addTraces"
-    controls
-    autoPlay
-  />
+  <video data-video="queues.addTraces" controls autoPlay />
 </Frame>
+
+<Tip>
+  Want this to happen automatically as new data arrives? Skip ahead to
+  [Auto-Ingestion](#auto-ingestion) to set up an ingestion task that funnels
+  matching production data into the queue every few minutes.
+</Tip>
 
 </Step>
 
@@ -131,11 +130,7 @@ You can add to multiple queues at once, and even assign a team member to annotat
 After you've added items into your annotation queue, they will be visible in your annotation queue for annotation:
 
 <Frame caption="Annotate Queued Traces">
-  <video
-    data-video="queues.annotateItems"
-    controls
-    autoPlay
-  />
+  <video data-video="queues.annotateItems" controls autoPlay />
 </Frame>
 
 You'll have the option to:
@@ -154,11 +149,7 @@ By default, the **Queue Annotator** strips away all information that except the 
 Once you're done, go to **Queue Settings** to see an overview of all completed/in progress items.
 
 <Frame>
-  <video
-    data-video="queues.markItems"
-    controls
-    autoPlay
-  />
+  <video data-video="queues.markItems" controls autoPlay />
 </Frame>
 
 </Step>
@@ -172,9 +163,175 @@ Once you're done, go to **Queue Settings** to see an overview of all completed/i
 For items that you've queued for annotation, you can always manage them via the **Queue Settings** page, which includes assigning/unnassigning users, marking items as completed/in progress, and removing items from a queue.
 
 <Frame caption="Manage Queue Settings">
-  <video
-    data-video="queues.manageItems"
-    controls
-    autoPlay
+  <video data-video="queues.manageItems" controls autoPlay />
+</Frame>
+
+<Note>
+  Reassigning an item — individually or in bulk — sends the new assignee an
+  in-app notification and an email.
+</Note>
+
+## Export as CSV
+
+From the **Queue Settings → Queued Items** toolbar, click **Export as CSV** to download the queue's items and their annotations.
+
+<Frame caption="Export queue items as CSV">
+  <img
+    data-image="queues.exportCsv"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   />
 </Frame>
+
+The dropdown offers two options:
+
+- **Download selected** — only the rows you've checked. Selections persist across pages, so you can curate a precise subset before exporting.
+- **Download all filtered** — every row that matches your current filters (status filter, sort, etc.), even rows you haven't paginated to yet.
+
+The CSV emits one row per **(queue item × annotation)**. Items without any annotations still appear, so the export reflects the full state of the queue regardless of completion.
+
+| Column type           | Columns                                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Lookup keys**       | `queueItemId`, `entityType`, `entityId`                                                                                                                            |
+| **Queue lifecycle**   | `completed`, `assignedToEmail`, `addedAt`                                                                                                                          |
+| **Annotation fields** | `annotationId`, `annotationName`, `annotationType`, `annotationRating`, `annotationExplanation`, `expectedOutput`, `expectedOutcome`, `annotatedBy`, `annotatedAt` |
+
+<Note>
+  The export is annotation-focused — it does **not** include the full
+  input/output of each trace, span, or thread. Use the lookup keys (`entityType`
+  + `entityId`) to cross-reference any item back to the platform when you need
+  the underlying payload.
+</Note>
+
+## Auto-Ingestion
+
+For ongoing review work, you can configure **ingestion tasks** that automatically pull matching data into a queue as it's produced — no manual "Add to queue" step required.
+
+<Frame caption="Ingestion tasks on a queue">
+  <img
+    data-image="queues.ingestionTasks"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Open a queue and pick the **Automations** tab to manage its ingestion tasks. Each task targets the queue's data type — a trace queue ingests traces, a thread queue ingests threads, and so on.
+
+### Create an Ingestion Task
+
+<Frame caption="Create or edit an ingestion task">
+  <img
+    data-image="queues.ingestionTaskCreate"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Steps>
+
+<Step title="Open Automations">
+
+In the left side bar, navigate to **Automations** for an annotation queue and click **Add ingestion task**.
+
+</Step>
+
+<Step title="Name and describe">
+
+Pick a clear **Name** (e.g. _Production billing complaints_) and an optional **Description**. The data model is locked to the queue type — a thread queue ingests threads, a trace queue ingests traces.
+
+</Step>
+
+<Step title="Configure filters">
+
+Add **Filters** to narrow which items the task ingests. Filters use the same syntax as the Observatory and Dashboards, so you can match by environment, tag, metadata field, classifier label, score, latency, or any combination.
+
+</Step>
+
+<Step title="Tune sample rate and max items">
+
+Set the **Sample Rate** between `0` and `1` to ingest only a fraction of matches (e.g. `0.2` ingests 20% of matching items). Optionally set **Max Items** to cap how many items the task can add to the queue total — leave blank for no limit.
+
+</Step>
+
+<Step title="Pick an assignment strategy">
+
+Decide who each ingested item gets routed to. Pick one of:
+
+- **Unassigned** — items land in the queue without an owner. Reviewers self-serve from the queue.
+- **Single user** — every ingested item is assigned to the same project member.
+- **Round robin** — rotates ingested items across a set of reviewers, weighted by **fewest assignments first** (with `lastAssignedAt` as a tiebreaker). Even distribution is the goal — reviewers don't end up lopsided just because the task ran more often during their off-hours.
+- **Random** — picks one reviewer at random from a set for each ingested item. Useful when you want statistical coverage rather than even distribution.
+
+<Tip>
+  Round robin tracks per-reviewer counters scoped to **this ingestion task**.
+  Adding or removing reviewers rebalances the rotation on the next tick — the
+  reviewer with the fewest assignments so far is picked first, so newcomers
+  catch up automatically.
+</Tip>
+
+Whichever strategy you pick, every assignee receives an in-app notification and an email summarizing how many items were routed to them. Notifications are batched per ingestion run, so a tick that assigns ten items to one reviewer fires **one** notification, not ten.
+
+</Step>
+
+<Step title="Save">
+
+Save the task. New items start arriving on the next ingestion tick — runs happen every five minutes.
+
+</Step>
+
+</Steps>
+
+### Worked Examples
+
+**Single reviewer** — a queue of low-feedback billing traces from production, with light sampling, that auto-routes to one reviewer:
+
+| Field       | Value                                                          |
+| ----------- | -------------------------------------------------------------- |
+| Name        | `Billing Quality — low feedback`                               |
+| Filters     | `tag = "billing"` AND `feedback.rating < 3` AND `env = "prod"` |
+| Sample Rate | `0.2`                                                          |
+| Max Items   | `200`                                                          |
+| Strategy    | `Single user`                                                  |
+| Assign To   | `reviewer@yourcompany.com`                                     |
+
+Once enabled, the task ingests roughly one in five matching traces every five minutes (capped at 200 total) and assigns them to the named reviewer.
+
+**Round robin across a team** — a queue of all production threads, distributed evenly across three on-call reviewers:
+
+| Field       | Value                               |
+| ----------- | ----------------------------------- |
+| Name        | `Production threads — daily review` |
+| Filters     | `env = "prod"`                      |
+| Sample Rate | `1`                                 |
+| Max Items   | _(unset)_                           |
+| Strategy    | `Round robin`                       |
+| Reviewers   | `alice@…`, `bob@…`, `carol@…`       |
+
+Each ingested thread goes to whichever of the three has the fewest assignments so far on this task. Each reviewer gets a single batched notification per tick listing how many items they picked up.
+
+Disable any task with the inline switch when you're done — the queue and any already-ingested items are untouched.
+
+<Tip>
+  You can run ingestion tasks alongside manually added items, and you can mix
+  strategies across tasks on the same queue (e.g. one round-robin task for bulk
+  volume + one single-user task for a specific filter). The reviewer UI doesn't
+  differentiate between the two — the queue is just a queue.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card
+    title="Eval Alignment"
+    icon="handshake-angle"
+    iconType="light"
+    href="/docs/human-in-the-loop/eval-alignment"
+  >
+    Compare metric evals to human annotations on the same queue items, with a
+    per-metric confusion-matrix breakdown.
+  </Card>
+  <Card
+    title="Error Analysis"
+    icon="bullseye-arrow"
+    iconType="light"
+    href="/docs/human-in-the-loop/error-analysis"
+  >
+    Discover failure patterns from human feedback and accept metric suggestions
+    to detect them automatically.
+  </Card>
+</CardGroup>

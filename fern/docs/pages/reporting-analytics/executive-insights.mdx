@@ -1,0 +1,142 @@
+---
+subtitle: AI-written narrative reports that summarize what happened in your project, generated daily.
+slug: reporting-analytics/executive-insights
+description: Configure executive insights, read the generated reports, and export them as PDFs.
+---
+
+## Overview
+
+**Executive Insights** are AI-generated narrative reports — overview, key findings, supporting tables, an optional chart, and recommendations — written daily over your project's data. Configure an insight by describing the question you want answered in plain English; Confident AI plans the queries, runs them, and produces a report you can read on the platform or export as a PDF.
+
+<Frame caption="A rendered Executive Insight report">
+  <img
+    data-image="reports.fullDocument"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Each report contains:
+
+- **Overview** — a paragraph framing the time window and the answer at a glance.
+- **Key findings** — the three to five most important takeaways with supporting numbers.
+- **Stats cards** — headline metrics that anchor the findings.
+- **Graph** *(optional)* — a chart of the most relevant time-series data the planner selected.
+- **Tables** *(optional)* — supporting rollups, e.g. top failure modes, slowest spans, lowest-scoring metrics.
+- **Recommendations** — concrete next steps the model surfaced from the data.
+- **Caveat** — what the model could not see or measure, so you don't over-interpret.
+
+## How a Report Is Generated
+
+When an insight runs, Confident AI:
+
+1. **Plans queries.** A planner model reads your insight description and proposes a set of queries against your project's tracing, threads, metric, and test-run data.
+2. **Executes queries.** Each planned query runs against the same backing data the rest of the platform uses.
+3. **Summarizes.** A summarizer model writes the narrative report from the query results — overview, findings, recommendations, and the caveat.
+
+The rendered report is what shows up on the **Executive Reports** page. If the planner determines that your description doesn't map to data the project actually has (e.g. you ask about red-team scores in a project with no red-teaming data), the report comes back as **"Irrelevant query"** with an explanation, and you can tighten the description and try again.
+
+## Create an Insight
+
+<Steps>
+
+<Step title="Open the settings">
+
+Navigate to **Project Settings** → **Executive Insights**.
+
+</Step>
+
+<Step title="Add a new insight">
+
+Click **New Insight** and provide:
+
+- **Title** — a short name (e.g. *Daily Error Summary*, *Weekly Test-Run Health*).
+- **Description** — what you want to understand about your data, in plain English.
+
+</Step>
+
+<Step title="Be specific in the description">
+
+The planner uses your description to decide which queries to run, and the summarizer uses it to frame the narrative. Mention the data types, metrics, and time windows you care about.
+
+A vague description like *"How are we doing?"* produces a vague report. A specific description like *"Show me the passing rates of test runs this past week and which metrics had the highest failure rates. What was our thread activity and have any threads been annotated?"* produces a focused, useful one.
+
+</Step>
+
+<Step title="Save and wait for the next run">
+
+Save the insight. Reports generate automatically once a day at the run time displayed on the settings page. Toggle the switch on a row to disable an insight without deleting it.
+
+</Step>
+
+</Steps>
+
+<Frame caption="Configure Executive Insights">
+  <img
+    data-image="settings.project.executiveInsights"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Note>
+  Each project supports up to **five** active insights. Disable or delete an existing insight to free up a slot.
+</Note>
+
+## Read a Report
+
+Open **Reports** from the project sidebar. Each enabled insight has its own tab; the latest generated report is shown by default.
+
+<Frame caption="Executive Reports page">
+  <img
+    data-image="reports.overview"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+If multiple reports exist for an insight, use the *Report N of M* arrows above the document to step through historical generations. Each report carries the date it was generated and the date range it covered.
+
+A condensed version of the latest report also appears in an **Executive Insight side drawer** wherever it shows up across the platform — useful for skimming the takeaway without opening the full document.
+
+## Export a Report
+
+Both the full report document and the side drawer have a **Download as PDF** action — the icon in the top-right toolbar of the document, or in the heading row of the side drawer. The exported PDF mirrors the rendered report, including the chart and tables, so it stays exec-shareable on its own.
+
+The full report document also has an **Expand** button next to the download icon — switch to the full-screen view for a print-quality reading experience before exporting.
+
+## Which Model Generates Reports
+
+Executive Insights uses your project's configured **evaluation model** when the provider is OpenAI-compatible (`OpenAI` or Confident's pooled OpenAI-backed default). For any other provider — Anthropic, Bedrock, Vertex, etc. — the system falls back to Confident AI's standard generation model so report quality stays consistent.
+
+You can change the active model in **Project Settings** → **[Evaluation Models](/docs/settings/project/evaluation-models)**.
+
+<Note>
+  If you select **`gpt-5`** specifically, OpenAI requires the org whose key handles the call to be verified. See the [Evaluation Models](/docs/settings/project/evaluation-models) page for details.
+</Note>
+
+## When a Report Says "Irrelevant Query"
+
+If the planner can't find data that matches your description, the report returns an "irrelevant query" message instead of a fabricated narrative. Common reasons:
+
+- The description names a feature the project doesn't have data for (e.g. red-team results in a project without red-teaming).
+- The description names a time window with no traffic.
+- The description is too abstract to map onto any concrete query.
+
+Tighten the description (data types, metrics, time window, what "good" looks like) and the next generation will produce a real report.
+
+<CardGroup cols={2}>
+  <Card
+    title="Dashboards"
+    icon="chart-line"
+    iconType="light"
+    href="/docs/reporting-analytics/dashboards"
+  >
+    Build live, drillable dashboards over the same data — graphs, tables, and big-number tiles you can refresh on demand.
+  </Card>
+  <Card
+    title="Evaluation Models"
+    icon="brain"
+    iconType="light"
+    href="/docs/settings/project/evaluation-models"
+  >
+    Configure which model and credentials Executive Insights uses, including the `gpt-5` verification note.
+  </Card>
+</CardGroup>
