@@ -1,0 +1,126 @@
+---
+subtitle: Surface patterns, spikes, and label breakdowns across your traces and threads.
+slug: llm-tracing/features/signals
+description: Explore Signals — the runtime view of classifier output across your project.
+---
+
+## Overview
+
+**Signals** are the runtime side of [classifiers](/docs/settings/project/classifiers). Once a classifier is enabled, every matching trace or thread gets a label (or none), and those labels surface here as cards, breakdowns, occurrence rows, and trend findings — your at-a-glance view of "what's happening in production right now?"
+
+<Frame caption="Signals overview">
+  <img
+    data-image="tracing.signals.overview"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+The Signals page has two main areas:
+
+- **What's happening** — automatically detected spikes and trends across your classifier labels (e.g. "`RateLimit` up 3.2x compared to the previous period").
+- **Classifications** — one card per classifier showing the label distribution and counts in the selected time range, with drill-down into individual labels and occurrences.
+
+Use the date picker and environment dropdown at the top to scope everything on the page.
+
+<Note>
+  No classifiers configured yet? Head to [Project Settings → Classifiers](/docs/settings/project/classifiers) to create one. Trace classifiers light up immediately as new traces arrive; thread classifiers populate after the configured idle window.
+</Note>
+
+## Drill Into a Label
+
+Click any classifier card to drop into the per-classifier detail view: the label-level breakdown, a sparkline of occurrences over time, and the individual occurrence rows that contributed to each label.
+
+<Frame caption="Per-classifier label detail with occurrences">
+  <img
+    data-image="tracing.signals.detail"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Each occurrence row links straight to the underlying trace or thread so you can investigate why the LLM picked that label.
+
+## Filter the Observatory by Label
+
+Anywhere classifiers run, you can filter the [Observatory](/docs/llm-tracing/introduction) by classifier label to scope a search to just the data that matched. Pick the classifier and label from the filter dropdown; combine with other filters (environment, tag, metadata, latency, score, etc.) to narrow further.
+
+<Frame caption="Filter traces by classifier label in the Observatory">
+  <img
+    data-image="tracing.signals.observatoryFilter"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## A Worked Example: Failure Mode + User Sentiment
+
+Suppose you want to know **"how often does an upstream model failure correlate with a user being unhappy in the same conversation?"** — a question that touches both a trace-level dimension (the failure) and a thread-level dimension (the sentiment). The cleanest way to answer it is **two cooperating classifiers**: one trace-scoped, one thread-scoped.
+
+### Step 1 — A trace classifier for failure mode
+
+Create a trace classifier called **`Failure Mode`** with this description:
+
+> Inspect each trace for technical errors. Use the error field, status codes in metadata, and any error text in the output. Pick the label that best fits.
+
+Add four labels:
+
+| Label         | Description                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `RateLimit`   | Trace failed because the upstream model returned a 429 or rate-limit error in the response or metadata.                      |
+| `Timeout`     | Trace timed out — status code 504, timeout in error field, or latency above the configured ceiling with no output.           |
+| `BadRequest`  | Trace returned a 4xx error from the model that wasn't a rate limit (e.g. invalid request, missing fields).                   |
+| `Unhandled`   | Trace error message indicates an unexpected exception in your application code.                                              |
+
+A trace that didn't fail simply gets no label — that's the "no match" outcome and is the expected default for happy-path traffic.
+
+### Step 2 — A thread classifier for sentiment
+
+Create a thread classifier called **`User Sentiment`** with this description:
+
+> Read the user-side turns of the conversation. Decide whether the user expresses positive, negative, or neutral sentiment about the assistant's responses across the thread.
+
+Add three labels: `Positive`, `Negative`, `Neutral` (each with one or two sentences describing what triggers it). Set a **Time Limit** of around `600` seconds so the classifier waits for the conversation to settle before grading sentiment.
+
+### Step 3 — Use the labels
+
+Once both classifiers are enabled and have processed some data, you can pivot on the same dimensions across the platform:
+
+- **Signals page** — both classifiers appear as cards. The "What's happening" section flags spikes like *"`RateLimit` up 3.2x"* or *"`Negative` sentiment doubled vs. the previous period."*
+- **Observatory traces** — filter by `Failure Mode = Timeout` to inspect every trace that timed out in a window.
+- **Observatory threads** — filter by `User Sentiment = Negative` to inspect unhappy conversations end-to-end.
+- **Combined investigation** — start in threads filtered to `User Sentiment = Negative`, then drop into one of those threads and look at how many of its traces are labeled `Failure Mode = Timeout`. That's the canonical "did our outages cause user frustration?" workflow.
+- **Dashboards** — graph trace count broken down by `Failure Mode` label, or thread count over time broken down by `User Sentiment`. See [Dashboards](/docs/reporting-analytics/dashboards) for setting up breakdown widgets.
+
+## What Classifiers *Can* Do
+
+A few capabilities worth knowing:
+
+- **Multiple labels per classifier.** A classifier can have any number of labels — each trace or thread is assigned at most one of them.
+- **"No match" is fine.** The classifier doesn't force a label onto every item. Items that don't fit any label are simply not signaled.
+- **Sample rate.** Each classifier respects the trace or thread sample rate set in [Project Settings → Classifiers](/docs/settings/project/classifiers), so you can tune classification overhead.
+- **Time limit (threads).** Thread classifiers wait for a configurable idle window before evaluating, so you grade *settled* conversations instead of mid-flight ones.
+
+<Tip>
+  The LLM sees what you ingest. Error messages, status codes, metadata, tags — anything the trace or thread carries is visible to the classifier. Detection by error code, metadata field, or sentiment all just work, as long as the description tells the LLM how to interpret what it sees.
+</Tip>
+
+## Cost
+
+Each classification logs a usage event for billing. See **Project Settings → [Data Usage](/docs/settings/project/data-usage)** under the **Signals** line for live usage and projected cost. Limits are gated by your org plan — Enterprise has no cap, but the line item is still visible.
+
+<CardGroup cols={2}>
+  <Card
+    title="Configure Classifiers"
+    icon="tags"
+    iconType="light"
+    href="/docs/settings/project/classifiers"
+  >
+    Create or edit the classifiers and labels that produce signals.
+  </Card>
+  <Card
+    title="Dashboards"
+    icon="chart-line"
+    iconType="light"
+    href="/docs/reporting-analytics/dashboards"
+  >
+    Trend a label's volume or break a metric down by classifier label on a dashboard.
+  </Card>
+</CardGroup>

@@ -1,0 +1,28 @@
+---
+tags: ["Observability", "Quality of Life", "Red Teaming"]
+---
+
+## Queue Tip
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+Queues now know who to call, dashboards picked up every chart shape known to humankind, and traces went multimodal. Plus a stack of reliability fixes quietly landed underneath.
+
+<Frame>![Changelog May 22, 2026](/assets/changelog/2026-05-22.png)</Frame>
+
+### Added
+
+- **Queue Assignment & Notifications** - Annotation queues now route work to specific teammates and ping the assignee the second it lands. Take a number, get a name, get notified. Fewer "who's got this?" Slack threads, more "on it" replies. _Queue_ the applause.
+- **Provider & Integrations on Spans** - Spans started naming names. Each one now tells you which provider and integration is actually doing the work, so you can stop pointing fingers and start pointing at the actual culprit—OpenAI, your vector DB, or that one piece of glue code you swore you'd refactor. _Span_-cific accountability, at last.
+- **Multimodal Traces (PDFs & Images)** - Traces are no longer text-only citizens. PDFs and images now ride shotgun through inputs and outputs alongside the words, so your multimodal model finally has a multimodal paper trail to match. _Picture_-perfect fidelity.
+- **Risk Assessment Live Updates** - Risk assessments stopped saving the drama for the season finale. Attack methods land and vulnerabilities surface live, so you can watch threats roll in as they happen instead of waiting for the credits. _Live_, laugh, threat-model.
+- **Time-Series Tables & Every Graph Type** - Dashboard widgets now sort themselves into time-series and categorical camps, joined by a brand-new time-series table and pretty much every chart shape known to humankind. If your data has a shape, we've already graphed it. _Plot_ armor: equipped.
+- **PDF & Image Export for Dashboards & Reports** - Any dashboard widget or report now exports cleanly to PDF or image—deck-ready, doc-ready, leadership-ready. No screenshot diplomacy required. _Export_ control: granted.
+- **Thread Metadata Everywhere** - Thread metadata is now stitched through the whole stack: ingestion picks it up, and the thread displayer, datatables, filters, and dashboards all read it back fluently. Tag once, slice forever, _thread_ lightly.
+
+### Changed
+
+- **Postgres Connection Pooling** - We tracked down and squashed the connection pooling gremlin that occasionally turned Postgres into a waiting room of its own. The database is back to being a database, your requests are back to being responsive, and nobody has to ask "is it the DB?" first thing in the morning. _Pooled_ resources, restored.
+- **2FA Is Back** - Two-factor authentication returned from its brief stint in witness protection. Lock your accounts down properly again—with two factors, instead of two fingers crossed. _Authenticate_ this.
+- **The 95% Online Eval Error** - The single error responsible for roughly 95% of online eval failures has been escorted off the premises, permanently. If your online evals were quietly losing runs to the void, the void is closed for business. _Error_-minated.
+- **More Reliable Signals** - Signals got a serious reliability pass under the hood. Fewer hiccups, less flakiness, exactly zero "is this thing on?" energy. _Signal_ strength: restored, with bars to spare.
