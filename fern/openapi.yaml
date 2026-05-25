@@ -76,14 +76,21 @@ paths:
                     - id: "METRIC-ID-1"
                       name: Correctness
                       criteria: Determine if the `actual output` is correct based on the `input`.
-                      evaluationParams:
+                      evaluationSteps: null
+                      rubric: null
+                      multiTurn: false
+                      requiredParameters:
                         - input
                         - actualOutput
-                      multiTurn: false
                     - id: "METRIC-ID-2"
                       name: Relevancy
                       criteria: Determine if the assistant answers are relevant to what the user is asking.
+                      evaluationSteps: null
+                      rubric: null
                       multiTurn: true
+                      requiredParameters:
+                        - role
+                        - content
                 deprecated: false
     post:
       x-fern-server-name: Confident AI
@@ -212,10 +219,12 @@ paths:
                       id: "METRIC-ID-1"
                       name: Correctness
                       criteria: Determine if the `actual output` is correct based on the `expected output`.
+                      evaluationSteps: null
+                      rubric: null
+                      multiTurn: false
                       requiredParameters:
                         - actualOutput
                         - expectedOutput
-                      multiTurn: false
                     deprecated: false
                 Multi-Turn:
                   value:
@@ -224,10 +233,12 @@ paths:
                       id: "METRIC-ID-2"
                       name: Professionalism
                       criteria: Determine whether the assistant has acted professionally throughout the conversation.
+                      evaluationSteps: null
+                      rubric: null
+                      multiTurn: true
                       requiredParameters:
                         - role
                         - content
-                      multiTurn: true
                     deprecated: false
 
   /v1/batch-metrics:
@@ -2937,15 +2948,19 @@ components:
           description: This is the name of the metric, it's unique to all metrics.
         criteria:
           type: string
+          nullable: true
           description: This is the criteria this metric uses to evaluate test cases.
         evaluationSteps:
-          type: string
-          description: This is the alternative of criteria and is used to evaluate your test cases.
-        evaluationParams:
-          description: It is an array of the params that will be used to evaluate your test cases.
+          type: array
+          nullable: true
+          description: An alternative to criteria — a list of steps used to evaluate test cases.
+          items:
+            type: string
+        requiredParameters:
+          description: The parameters required by this metric for evaluation.
           oneOf:
             - type: array
-              title: llmTestCaseParams
+              title: singleTurnRequiredParameters
               items:
                 type: string
                 enum:
@@ -2954,34 +2969,41 @@ components:
                     actualOutput,
                     expectedOutput,
                     context,
-                    toolsCalled,
                     expectedTools,
+                    toolsCalled,
                     retrievalContext,
+                    metadata,
+                    tags,
                   ]
             - type: array
-              title: conversationalTestCaseParams
+              title: multiTurnRequiredParameters
               items:
                 type: string
                 enum:
                   [
-                    turns,
+                    content,
+                    role,
                     scenario,
                     expectedOutcome,
-                    userDescription,
-                    context,
-                    chatbotRole,
+                    toolsCalled,
+                    retrievalContext,
+                    metadata,
+                    tags,
                   ]
         multiTurn:
           type: boolean
           description: This is true if the metric is used to evaluate multi-turn test cases.
         rubric:
           type: array
+          nullable: true
           description: A list of score ranges (0–10 inclusive). Must be in order and non-overlapping. Click here to [learn more](https://deepeval.com/docs/metrics-llm-evals#rubric)
           items:
             $ref: "#/components/schemas/Rubric"
       required:
+        - id
         - name
         - multiTurn
+        - requiredParameters
 
     CreateBatchMetrics:
       type: object
@@ -3051,7 +3073,7 @@ components:
           description: "This is true if the metric was successfully retrieved."
         data:
           $ref: "#/components/schemas/Metric"
-          description: "This maps to the metric retrieved."
+          description: "The metric retrieved."
         deprecated:
           type: boolean
           description: "This is true if this metric endpoint is deprecated."

@@ -211,7 +211,7 @@ Once you're happy with your `GEval` metric, call the `.upload()` method to creat
 correctness_metric.upload()
 ```
 
-If a metric already exists on Confident AI, you can pull it into a local `GEval` instance by name. The `.pull()` method populates `criteria`, `evaluation_steps`, `evaluation_params`, and `rubric` from the platform, so you only need to provide the metric `name`:
+If a metric already exists on Confident AI, you can pull it into a local `GEval` instance by name. The `.pull()` method populates `criteria`, `evaluation_steps`, `evaluation_params`, and `rubric` from the platform:
 
 ```python
 from deepeval.metrics import GEval
