@@ -43,7 +43,7 @@ G-Eval also provide an optional rubric, which you can use to confine custom metr
   simply guide the LLM judge as a form of CoT to output something more reliable.
 </Note>
 
-If you're creating G-Eval locally via `deepeval`, you can also use the `upload` method to create a metric.
+If you're creating G-Eval locally via `deepeval`, you can use the `upload` method to create a metric on Confident AI, or the `pull` method to fetch an existing one back into your local metric instance.
 
 ## Writing an Effective Criteria
 
@@ -167,7 +167,7 @@ Once you have your criteria set, make sure everything looks right in the final r
 
 ## Create G-Eval in Code
 
-You can create G-Eval metrics locally using `deepeval` and upload them to Confident AI.
+You can create G-Eval metrics locally using `deepeval` and upload them to Confident AI, or pull a metric that already exists on Confident AI into a local instance.
 
 <Tabs>
   <Tab title="Single-turn">
@@ -211,6 +211,15 @@ Once you're happy with your `GEval` metric, call the `.upload()` method to creat
 correctness_metric.upload()
 ```
 
+If a metric already exists on Confident AI, you can pull it into a local `GEval` instance by name. The `.pull()` method populates `criteria`, `evaluation_steps`, `evaluation_params`, and `rubric` from the platform:
+
+```python
+from deepeval.metrics import GEval
+
+correctness_metric = GEval(name="Correctness")
+correctness_metric.pull()
+```
+
   </Tab>
   <Tab title="Multi-turn">
 
@@ -233,6 +242,15 @@ Once you're happy with your `ConversationalGEval` metric, call the `.upload()` m
 professionalism_metric.upload()
 ```
 
+If a multi-turn metric already exists on Confident AI, pull it into a local `ConversationalGEval` instance by name. The `.pull()` method populates `criteria`, `evaluation_steps`, `evaluation_params`, and `rubric` from the platform:
+
+```python
+from deepeval.metrics import ConversationalGEval
+
+professionalism_metric = ConversationalGEval(name="Professionalism")
+professionalism_metric.pull()
+```
+
   </Tab>
 </Tabs>
 
@@ -248,6 +266,21 @@ Under the hood, `.upload()` calls the Evals API to create a custom G-Eval metric
   </Tab>
   <Tab title="Multi-turn">
     <EndpointRequestSnippet endpoint="POST /v1/metrics" example="Multi-Turn" />
+  </Tab>
+</Tabs>
+
+</Tip>
+
+<Tip>
+
+Under the hood, `.pull()` retrieves an existing G-Eval metric by name from your Confident AI project.
+
+<Tabs>
+  <Tab title="Single-turn">
+    <EndpointRequestSnippet endpoint="GET /v1/metric/{name}" example="Single-Turn" />
+  </Tab>
+  <Tab title="Multi-turn">
+    <EndpointRequestSnippet endpoint="GET /v1/metric/{name}" example="Multi-Turn" />
   </Tab>
 </Tabs>
 
