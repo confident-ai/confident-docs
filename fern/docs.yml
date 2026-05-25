@@ -54,6 +54,9 @@ navigation:
           - page: Setup and Installation
             path: docs/pages/setup-and-installation.mdx
             icon: fa-light fa-play
+          - page: Connect Your AI Agent
+            path: docs/pages/connect-your-ai-agent.mdx
+            icon: fa-light fa-robot
       - section: LLM Evaluation
         contents:
           - page: Introduction
