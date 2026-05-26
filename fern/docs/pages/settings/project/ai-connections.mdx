@@ -120,7 +120,6 @@ Available variables:
 | `hyperparameters`                          | A dictionary of hyperparameter key-value pairs     | object     |
 | `testCaseId`                               | Unique identifier for linking traces to test cases | string     |
 | `turnId`                                   | Unique identifier for linking traces to turns      | string     |
-| `threadId`                                 | Unique identifier for grouping traces from multi-turn red-team attacks into a single thread | string     |
 | `state`                                    | An object to keep state for multi-turn simulations | object     |
 
 Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](#hyperparameters) for passing hyperparameters to your endpoint.
@@ -148,7 +147,7 @@ Example payload:
 
   <Tab title="Code">
 
-Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, `turnId`, `threadId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
+Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, `turnId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
 
 Available `golden` attributes when `golden` is a `Golden`:
 
@@ -182,7 +181,6 @@ Additional parameters:
 | `hyperparameters` | A dictionary of hyperparameter key-value pairs                                              | `Optional[Dict[str, str]]` |
 | `testCaseId`      | Unique identifier for linking traces to test cases                                          | `Optional[str]`            |
 | `turnId`          | Unique identifier for linking traces to individual turns in multi-turn evals                | `Optional[str]`            |
-| `threadId`        | Unique identifier for grouping traces from multi-turn red-team attacks into a single thread | `Optional[str]`            |
 | `state`           | An object to keep state for multi-turn simulations                                          | `Optional[Any]`            |
 
 ```python
@@ -194,7 +192,6 @@ def generate_payload(
     hyperparameters: Optional[Dict[str, str]] = None,
     testCaseId: Optional[str] = None,
     turnId: Optional[str] = None,
-    threadId: Optional[str] = None,
     state: Optional[Any] = None,
 ) -> dict:
 
@@ -767,7 +764,14 @@ async function main() {
 
 ## Linking Turns to Traces
 
-For multi-turn evaluations, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation results.
+For multi-turn evaluations and multi-turn red-team attacks, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation or assessment results.
+
+<Note>
+  Per-turn trace linkage only works when your AI Connection's payload
+  includes both `testCaseId` and `turnId`. Both are in the default JSON
+  payload template — only custom payloads need to ensure they reference
+  these variables.
+</Note>
 
 ```mermaid
 sequenceDiagram
@@ -973,225 +977,11 @@ async function main() {
 </Tabs>
 
 <Tip>
-  With `turnId` linked, you can click "Open trace" on any individual turn in the
-  evaluation results to see the full trace for that specific turn.
+  With `turnId` linked, each turn in the conversation gets a "View trace"
+  button — click it from the evaluation results or the risk assessment side
+  drawer to see the full trace for that specific turn.
 </Tip>
 
-## Linking Risk Assessments to Threads
-
-For multi-turn red-team attack methods (e.g. _Linear Jailbreaking_, _Crescendo Jailbreaking_, _Tree Jailbreaking_, _Sequential Jailbreak_, _Bad Likert Judge_), Confident AI calls your endpoint once per turn — every call produces its own trace. To group all of those turn-traces into a single conversation in the assessment view, the platform sends a `threadId` in the payload. Stamp it onto your traces and the assessment side drawer will open them as one thread.
-
-```mermaid
-sequenceDiagram
-    participant C as Confident AI
-    participant E as Your Endpoint
-    participant T as Tracing
-
-    Note over C,E: Turn 1
-    C->>E: { threadId, ...payload }
-    E->>T: Create trace with threadId
-    E-->>C: Return actual_output
-
-    Note over C,E: Turn 2
-    C->>E: { threadId, ...payload }
-    E->>T: Create trace with threadId
-    E-->>C: Return actual_output
-
-    T-->>C: Send traces to Confident AI
-    Note over C: All turn-traces grouped under one thread
-```
-
-<Note>
-  `threadId` is only sent for multi-turn red-team attacks. Single-turn attacks
-  and standard evaluations don't include it, so your endpoint can safely treat
-  it as optional.
-</Note>
-
-Include `threadId` in your payload configuration:
-
-```json
-{
-  "input": golden.input,
-  "threadId": threadId
-}
-```
-
-Then, pass the `threadId` to your tracing implementation:
-
-<Tabs>
-
-  <Tab title="Python">
-
-```python
-from deepeval.tracing import observe, update_current_trace
-
-@observe()
-def llm_app(input: str, thread_id: str):
-    update_current_trace(thread_id=thread_id)
-
-    response = llm.generate(user=input)
-    return response
-
-@app.post("/generate")
-def generate(request: dict):
-    thread_id = request.get("threadId")
-    response = llm_app(request["input"], thread_id)
-    return {"output": response}
-```
-
-  </Tab>
-  <Tab title="TypeScript">
-
-```typescript
-import OpenAI from "openai";
-import { instrumentOpenAI } from "deepeval/openai";
-import { setTracingContext } from "deepeval/tracing";
-
-const client = new OpenAI();
-instrumentOpenAI(client);
-
-const main = async () => {
-  await setTracingContext(
-    { 
-      threadId: "thread_123" 
-    },
-    async () => {
-      const response = await client.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: "What is the weather in France?" },
-        ],
-      });
-      console.log(response);
-    }
-  );
-};
-
-main();
-```
-
-  </Tab>
-  <Tab title="LangChain">
-
-```python
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    thread_id = request.get("threadId")
-
-    result = agent_executor.invoke(
-        {"input": request["input"]},
-        config={"callbacks": [CallbackHandler(thread_id=thread_id)]}
-    )
-    return {"output": result["output"]}
-```
-
-  </Tab>
-  <Tab title="LangGraph">
-
-```python
-from langgraph.prebuilt import create_react_agent
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    thread_id = request.get("threadId")
-
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": request["input"]}]},
-        config={"callbacks": [CallbackHandler(thread_id=thread_id)]}
-    )
-    return {"output": result["messages"][-1].content}
-```
-
-  </Tab>
-  <Tab title="OpenTelemetry">
-
-```python
-@app.post("/generate")
-def generate(request: dict):
-    thread_id = request.get("threadId")
-
-    with tracer.start_as_current_span("llm_app") as span:
-        span.set_attribute("confident.trace.thread_id", thread_id)
-
-        response = llm.generate(user=request["input"])
-        return {"output": response}
-```
-
-  </Tab>
-  <Tab title="Vercel AI SDK">
-
-```typescript
-import { generateText } from "ai";
-
-const { text } = await generateText({
-  model: "openai/gpt-4o",
-  prompt: "How to make the best coffee?",
-  experimental_telemetry: {
-    isEnabled: true,
-    metadata: {
-      threadId: "thread_123",
-    }
-  },
-});
-console.log(text);
-```
-
-  </Tab>
-  <Tab title="OpenInference">
-<CodeBlocks>
-```python
-import os
-from openinference.instrumentation.langchain import LangChainInstrumentor
-from langchain_openai import ChatOpenAI
-from deepeval.integrations.openinference import instrument_openinference
-
-LangChainInstrumentor().instrument()
-
-instrument_openinference(
-  thread_id="thread_123",
-)
-
-llm = ChatOpenAI(model="gpt-4o-mini")
-result = llm.invoke("What are LLMs?")
-```
-
-```typescript
-import { instrumentOpenInference } from "deepeval/integrations/openinference";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
-
-instrumentOpenInference({
-  threadId: "thread_123",
-});
-
-registerInstrumentations({
-  instrumentations: [new OpenAIInstrumentation()],
-});
-
-async function main() {
-  const { default: OpenAI } = await import("openai");
-  const client = new OpenAI();
-  await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: "What is OpenInference?" }],
-  });
-}
-```
-</CodeBlocks>
-
-  </Tab>
-</Tabs>
-
-<Tip>
-  Once linked, the assessment side drawer for a multi-turn test case on risk assessment will show a link to your thread.
-</Tip>
 
 ## Testing Your Connection
 
