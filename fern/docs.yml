@@ -340,6 +340,9 @@ navigation:
           - page: Risk Profiles
             path: docs/pages/red-teaming/risk-profile.mdx
             icon: fa-light fa-triangle-exclamation
+          - page: Trace-Level Detections
+            path: docs/pages/red-teaming/trace-level-detections.mdx
+            icon: fa-light fa-magnifying-glass-chart
           - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code

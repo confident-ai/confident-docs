@@ -80,6 +80,13 @@ Each test case includes:
 
 Each test case has a status of `passed`, `failed`, or `errored`. A `failed` status means your AI application generated an unsafe response to the adversarial input.
 
+<Tip>
+  If your AI application is traced and linked to test cases, Confident AI also
+  scans every span in each trace for vulnerability findings. See [Trace-Level
+  Detections](/docs/red-teaming/trace-level-detections) to learn how to set
+  that up.
+</Tip>
+
 ## Download Assessments
 
 Click **Download Report** to export a PDF overview of your risk assessment. The report includes an executive summary, CVSS scores, vulnerability breakdowns, and remediation recommendations — designed to be shared with non-technical stakeholders such as compliance teams, security reviewers, and leadership.

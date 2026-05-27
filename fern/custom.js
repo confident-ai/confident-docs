@@ -156,6 +156,7 @@ function runOnDomUpdates(callback) {
     "redTeaming.runRiskAssessment": `${S3_BASE}/red-teaming:quick-start:run-risk-assessment.png`,
     "redTeaming.riskAssessmentTestCases": `${S3_BASE}/red-teaming:risk-profile:risk-assessment-test-cases.png`,
     "redTeaming.scheduledRedTeamFramework": `${S3_BASE}/red-teaming:scheduled-red-team-framework.png`,
+    "redTeaming.spanDetections": `${S3_BASE}/red-teaming:tracing.png`,
 
     "data.organization": `${S3_BASE}/data-organization.svg`,
 
