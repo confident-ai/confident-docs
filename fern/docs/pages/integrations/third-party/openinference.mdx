@@ -7,6 +7,10 @@ subtitle: Use Confident AI for LLM observability and evals for OpenInference
 
 [OpenInference](https://openinference.io/) is an open standard for capturing and storing AI model inferences. Confident AI allows you to trace and evaluate any application instrumented with OpenInference in just a few lines of code.
 
+<Note>
+  Google ADK uses OpenInference under the hood. If you are using Google ADK, use the dedicated [`instrument_google_adk`](/docs/integrations/third-party/google-adk) wrapper instead, which calls `instrument_openinference` internally.
+</Note>
+
 ## Tracing Quickstart
 
 <Tip>
@@ -146,9 +150,7 @@ system_prompt = prompt.interpolate()
 
 LangChainInstrumentor().instrument()
 
-instrument_openinference(
-    confident_prompt=prompt, 
-)
+instrument_openinference()
 
 llm = ChatOpenAI(model="gpt-4o-mini")
 result = llm.invoke(system_prompt)
@@ -173,6 +175,10 @@ instrumentOpenInference({
   Logging prompts lets you attribute specific prompts to OpenInference LLM spans.
   Be sure to **pull the prompt** before logging it, otherwise the prompt will
   not be visible on Confident AI.
+</Note>
+
+<Note>
+  The `prompt` option is currently only supported in TypeScript. In Python, use the native [`@observe`](/docs/llm-tracing/integrations/python) decorator with deepeval's tracing API to log prompts on individual spans.
 </Note>
 
 ### Logging threads
@@ -230,6 +236,8 @@ instrument_openinference(
     metadata={"Key": "Value"},
     user_id="user_1",
     thread_id="conversation-abc123",
+    test_case_id="test-case-001",
+    turn_id="turn-1",
     environment="production",
 )
 
@@ -245,6 +253,8 @@ instrumentOpenInference({
   name: "Custom Trace Name",
   threadId: "thread_123",
   userId: "user_456",
+  testCaseId: "test-case-001",
+  turnId: "turn-1",
   tags: ["production", "v1"],
   metadata: { "internal_version": "1.0.2" },
   environment: "production"
@@ -274,6 +284,14 @@ instrumentOpenInference({
   Supply the user ID to enable user analytics. [Learn more](/docs/llm-tracing/features/users).
 </ParamField>
 
+<ParamField path="test_case_id" type="str" required={false}>
+  Associate this trace with a specific test case ID for offline evaluation linkage.
+</ParamField>
+
+<ParamField path="turn_id" type="str" required={false}>
+  Associate this trace with a specific conversation turn.
+</ParamField>
+
 <ParamField path="environment" type="str" required={false}>
   The deployment environment. Accepted values: `"production"`, `"staging"`, `"development"`, `"testing"`. Defaults to `"development"`.
 </ParamField>
@@ -292,7 +310,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
 
 <Steps>
   <Step title="Create metric collection">
-    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your AgentCore agent.
+    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your traces.
     <Frame caption="Create metric collection">
       <video
         autoPlay
@@ -307,9 +325,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
     </Warning>
   </Step>
   <Step title="Run evals">
-    You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
-
-    After instrumenting your AgentCore agent, pass the metric collection name to the respective component:
+    Pass the `metric_collection` name (Python) or `metricCollection` / `traceMetricCollection` name (TypeScript) to `instrument_openinference` to enable online evaluations at the trace level.
 
     <Tabs>
         <Tab title="Trace">
@@ -324,7 +340,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
 
             instrument_openinference(
                 name="openinference_application",
-                trace_metric_collection="TRACE-METRIC-COLLECTION"
+                metric_collection="TRACE-METRIC-COLLECTION"
             )
 
             llm = ChatOpenAI(model="gpt-4o-mini")
@@ -342,24 +358,9 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
         </Tab>
 
         <Tab title="LLM Span">
-            Pass the `llm_metric_collection` parameter to `instrument_openinference`. This evaluates all LLM spans against a specific metric collection.
+            In TypeScript, pass the `llmMetricCollection` parameter to `instrumentOpenInference` to evaluate all LLM spans against a specific metric collection.
 
             <CodeBlocks>
-            ```python main.py
-            import os
-            from openinference.instrumentation.langchain import LangChainInstrumentor
-            from langchain_openai import ChatOpenAI
-            from deepeval.integrations.openinference import instrument_openinference
-
-            LangChainInstrumentor().instrument()
-
-            instrument_openinference(
-                llm_metric_collection="test_collection_1",
-            )
-
-            llm = ChatOpenAI(model="gpt-4o-mini")
-            result = llm.invoke("What are LLMs?")
-            ```
             ```typescript
             import { instrumentOpenInference } from "deepeval/integrations/openinference";
 
@@ -369,50 +370,31 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your OpenInference
             });
             ```
             </CodeBlocks>
+
+            <Note>
+              Span-level metric collection parameters (`llm_metric_collection`, `tool_metric_collection_map`) are not available in the Python integration. In Python, metric collections are assigned at the trace level via `metric_collection`. Use the TypeScript integration for span-level metric routing.
+            </Note>
         </Tab>
 
         <Tab title="Tool Span">
-            Pass the `tool_metric_collection_map` parameter to `instrument_openinference`. This maps each tool name to its metric collection.
+            In TypeScript, pass the `toolMetricCollectionMap` parameter to `instrumentOpenInference` to map each tool name to its own metric collection.
+
             <CodeBlocks>
-            ```python main.py
-            import os
-            from openinference.instrumentation.langchain import LangChainInstrumentor
-            from langchain_openai import ChatOpenAI
-            from langchain_core.tools import tool
-            from langgraph.prebuilt import create_react_agent
-            from deepeval.integrations.openinference import instrument_openinference
-
-            LangChainInstrumentor().instrument()
-
-            instrument_openinference(
-                tool_metric_collection_map={
-                    "get_weather": "test_collection_1",
-                },
-            )
-
-            @tool
-            def get_weather(location: str) -> str:
-                """Get current weather in a city."""
-                return f"The weather in {location} is 72 degrees and sunny."
-
-            llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-            agent_executor = create_react_agent(model=llm, tools=[get_weather])
-
-            result = agent_executor.invoke({
-                "messages": [("user", "What is the weather in Tokyo?")]
-            })
-            ```
             ```typescript
             import { instrumentOpenInference } from "deepeval/integrations/openinference";
 
             instrumentOpenInference({
               name: "Custom Trace Name",
-              tool_metric_collection_map={
-                "get_weather": "test_collection_1",
+              toolMetricCollectionMap: {
+                "get_weather": "TOOL-METRIC-COLLECTION",
               },
             });
             ```
             </CodeBlocks>
+
+            <Note>
+              Span-level metric collection parameters are not available in the Python integration. Use the TypeScript integration for per-tool metric routing.
+            </Note>
         </Tab>
     </Tabs>
 

@@ -430,6 +430,12 @@ navigation:
           - page: Agent Core
             path: docs/pages/integrations/third-party/agentcore.mdx
             icon: fa-brands fa-aws
+          - page: Strands Agents
+            path: docs/pages/integrations/third-party/strands.mdx
+            icon: fa-light fa-dna
+          - page: Google ADK
+            path: docs/pages/integrations/third-party/google-adk.mdx
+            icon: fa-brands fa-google
           - page: Open Inference
             path: docs/pages/integrations/third-party/openinference.mdx
             icon: fa-light fa-telescope

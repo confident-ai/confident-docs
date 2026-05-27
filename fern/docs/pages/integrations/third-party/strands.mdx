@@ -1,0 +1,289 @@
+---
+slug: integrations/third-party/strands
+subtitle: Use Confident AI for LLM observability and evals for Strands Agents
+---
+
+## Overview
+
+[Strands Agents](https://strandsagents.com/) is an open-source SDK from AWS for building and running AI agents. It emits OpenTelemetry spans natively using the OTel GenAI semantic conventions, making it straightforward to integrate with Confident AI for real-time tracing and evaluation.
+
+The integration works via OpenTelemetry: `instrument_strands()` registers a `StrandsSpanInterceptor` and a `ContextAwareSpanProcessor` on the global `TracerProvider`. Strands' built-in tracer picks up the provider automatically — so you only need to call `instrument_strands()` once before creating your `Agent`, and all spans flow to Confident AI in real time.
+
+## Tracing Quickstart
+
+<Tip>
+For users in the EU region, please set the OTEL endpoint to the EU version as shown below:
+
+```bash
+export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
+```
+
+</Tip>
+
+<Steps>
+  <Step title="Install Dependencies">
+    Run the following command to install the required packages:
+    ```bash
+    pip install -U deepeval strands-agents opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
+    ```
+  </Step>
+  <Step title="Instrument Strands">
+    Call `instrument_strands` once at startup, **before** creating your `Agent`. It registers deepeval's processors on the global `TracerProvider` so Strands' built-in tracer picks them up automatically.
+
+    ```python main.py
+    from strands import Agent
+    from deepeval.integrations.strands import instrument_strands
+
+    instrument_strands()
+
+    agent = Agent(model="us.amazon.nova-lite-v1:0")
+    result = agent("Explain OpenTelemetry in one sentence.")
+    print(result.message)
+    ```
+
+    <Note>
+      Strands emits OTel GenAI semantic convention attributes natively (`gen_ai.user.message`, `gen_ai.choice`, `gen_ai.usage.input_tokens`, `gen_ai.operation.name`, etc.), so the integration captures agent, LLM, and tool spans automatically with no extra configuration.
+    </Note>
+  </Step>
+  <Step title="Run your agent">
+    Execute the script to send traces to Confident AI:
+    ```bash
+    python main.py
+    ```
+    You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+  </Step>
+</Steps>
+
+## What Gets Captured
+
+The Strands integration automatically extracts the following data from each span:
+
+| Span Type | Data Captured |
+|-----------|--------------|
+| **Agent** | Agent name, input message, output message, tool calls made |
+| **LLM** | Model name, provider, input/output messages, token counts (input + output) |
+| **Tool** | Tool name, input parameters, output |
+
+Token counts are read from `gen_ai.usage.input_tokens` / `gen_ai.usage.output_tokens` (and the `prompt_tokens` / `completion_tokens` aliases). The LLM provider is inferred from the model name, or read directly from `gen_ai.response.provider` when available.
+
+## Advanced Usage
+
+### Logging threads
+
+Threads group related traces together and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Pass `thread_id` to `instrument_strands`.
+
+```python main.py
+from strands import Agent
+from deepeval.integrations.strands import instrument_strands
+
+instrument_strands(
+    thread_id="conversation-abc123",
+    user_id="user_1",
+)
+
+agent = Agent(model="us.amazon.nova-lite-v1:0")
+result = agent("What's the capital of France?")
+print(result.message)
+```
+
+<Tip>
+  Strands supports passing custom attributes via `trace_attributes={"session.id": "..."}` when creating an agent. The integration automatically promotes `session.id` to `thread_id` when no explicit `thread_id` is provided.
+</Tip>
+
+### Trace attributes
+
+All trace-level attributes are optional and apply to every trace produced while the instrumentation is active.
+
+```python main.py
+from strands import Agent
+from deepeval.integrations.strands import instrument_strands
+
+instrument_strands(
+    name="My Strands Agent",
+    tags=["production", "v2"],
+    metadata={"region": "us-east-1"},
+    user_id="user_1",
+    thread_id="conversation-abc123",
+    environment="production",
+)
+
+agent = Agent(model="us.amazon.nova-lite-v1:0")
+result = agent("Summarize the latest AI news.")
+print(result.message)
+```
+
+<Accordion title='View Trace Attributes'>
+<ParamField path="api_key" type="str" required={false}>
+  Your Confident AI API key. Defaults to the `CONFIDENT_API_KEY` environment variable when omitted.
+</ParamField>
+
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn more](/docs/llm-tracing/features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach any metadata to the trace. [Learn more](/docs/llm-tracing/features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations. [Learn more](/docs/llm-tracing/features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn more](/docs/llm-tracing/features/users).
+</ParamField>
+
+<ParamField path="turn_id" type="str" required={false}>
+  The turn ID for multi-turn conversations.
+</ParamField>
+
+<ParamField path="test_case_id" type="str" required={false}>
+  Associate this trace with a specific test case ID.
+</ParamField>
+
+<ParamField path="metric_collection" type="str" required={false}>
+  The name of the metric collection to use for online evals at the trace level.
+</ParamField>
+
+<ParamField path="environment" type="str" required={false}>
+  The deployment environment. Accepted values: `"production"`, `"staging"`, `"development"`, `"testing"`. Defaults to `"development"`.
+</ParamField>
+
+<Info>
+  Each attribute is **optional**, and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, use `next_llm_span` to associate a `Prompt` with the next LLM span before invoking your agent.
+
+```python main.py
+from strands import Agent
+from deepeval.prompt import Prompt
+from deepeval.tracing import next_llm_span
+from deepeval.integrations.strands import instrument_strands
+
+instrument_strands(environment="production")
+
+agent = Agent(model="us.amazon.nova-lite-v1:0")
+
+prompt = Prompt(alias="<prompt-alias>")
+prompt.pull(version="00.00.01")
+
+with next_llm_span(prompt=prompt):
+    result = agent(prompt.interpolate())
+print(result.message)
+```
+
+<Note>
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will
+  not be visible on Confident AI.
+</Note>
+
+### Using with tools
+
+The integration captures tool spans automatically. Define tools with the `@tool` decorator and pass them to your `Agent` as usual.
+
+```python main.py
+from strands import Agent
+from strands.tools import tool
+from deepeval.integrations.strands import instrument_strands
+
+instrument_strands(environment="production")
+
+@tool
+def get_weather(city: str) -> str:
+    """Get the current weather for a city."""
+    return f"The weather in {city} is sunny and 22°C."
+
+agent = Agent(
+    model="us.amazon.nova-lite-v1:0",
+    tools=[get_weather],
+)
+
+result = agent("What's the weather like in Paris?")
+print(result.message)
+```
+
+Each tool invocation produces a tool span with the tool name and input parameters captured automatically.
+
+### Using with observe
+
+When `instrument_strands` is called inside an active deepeval `@observe` / `with trace(...)` context, Strands' OTel spans are stitched into the enclosing deepeval trace. `update_current_span(...)` and `update_current_trace(...)` work anywhere in the call stack.
+
+```python main.py
+from strands import Agent
+from deepeval import observe
+from deepeval.integrations.strands import instrument_strands
+
+instrument_strands()
+
+agent = Agent(model="us.amazon.nova-lite-v1:0")
+
+@observe(name="my-app")
+def run_pipeline(prompt: str) -> str:
+    # Strands spans are stitched into this @observe trace automatically
+    result = agent(prompt)
+    return result.message
+```
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-tracing/online-evals) on your Strands agent, which will run evaluations on all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+  <Step title="Create metric collection">
+    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your Strands agent.
+    <Frame caption="Create metric collection">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="metrics.createCollection"
+        type="video/mp4"
+      />
+    </Frame>
+    <Warning>
+      Your metric collection must only contain metrics that evaluate the input and actual output of the component it is assigned to.
+    </Warning>
+  </Step>
+  <Step title="Run evals">
+    Pass the `metric_collection` parameter to `instrument_strands` to run online evals at the trace level. For span-level evals, use `update_current_span(metric_collection=...)` inside your agent code.
+
+    ```python main.py
+    from strands import Agent
+    from deepeval.integrations.strands import instrument_strands
+
+    instrument_strands(
+        metric_collection="my-trace-collection",
+        environment="production",
+    )
+
+    agent = Agent(model="us.amazon.nova-lite-v1:0")
+    result = agent("Summarize the latest AI news.")
+    print(result.message)
+    ```
+
+    <Note>
+      We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component (trace, agent span, LLM span, tool span), since each requires its own evaluation criteria and metrics.
+    </Note>
+  </Step>
+  <Success>
+    All incoming traces will now be evaluated using metrics from your metric
+    collection.
+  </Success>
+</Steps>
+
+You can view evals on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+
+<Frame>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
+</Frame>

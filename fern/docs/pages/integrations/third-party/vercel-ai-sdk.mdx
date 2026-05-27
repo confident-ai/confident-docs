@@ -3,7 +3,7 @@ slug: integrations/third-party/vercel-ai-sdk
 subtitle: Use Confident AI for LLM observability and evals for Vercel AI SDK on typescript
 ---
 
-The [AI SDK](https://ai-sdk.dev) by vercel is a powerful typescript framework that allows you to use various LLM providers and models for AI based applications. Confident AI allows you to trace and evaluate AI SDK based LLM applications in just a few lines of code.
+The [AI SDK](https://ai-sdk.dev) by Vercel is a powerful TypeScript framework that allows you to use various LLM providers and models for AI-based applications. Confident AI allows you to trace and evaluate AI SDK based LLM applications in just a few lines of code.
 
 ## Choose Your Integration Mode
 
@@ -11,7 +11,7 @@ DeepEval supports two ways to integrate tracing with the Vercel AI SDK.
 
 <Tabs>
 
-<Tab title="Standard Setup (No Existing Otel)" language="standard">
+<Tab title="Standard Setup (No Existing OTel)" language="standard">
 
 If you are **not already using OpenTelemetry**, simply use `configureAiSdkTracing` and pass the tracer to the AI SDK telemetry:
 
@@ -103,7 +103,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 
   </Step>
   <Step title="Configure AI SDK">
-    Use DeepEval's `configureAiSdkTracing` to trace the LLM operations. 
+    Use DeepEval's `configureAiSdkTracing` to trace LLM operations. 
     <Tabs>
       <Tab title="Standard Setup" language="standard">
         <Tabs>
@@ -143,7 +143,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            // example: use textStream as an async iterable
             for await (const textPart of result.textStream) {
                 console.log(textPart);
             }
@@ -151,8 +150,9 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
           </Tab>
           <Tab title="Tool Calling">
             ```typescript
-            import { generateText } from "ai";
+            import { generateText, tool } from "ai";
             import { configureAiSdkTracing } from "deepeval";
+            import { z } from "zod";
 
             const tracer = configureAiSdkTracing();
 
@@ -160,17 +160,16 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 model: "openai/gpt-4o",
                 tools: {
                     weather: tool({
-                    description: 'Get the weather in a location',
-                    inputSchema: z.object({
-                        location: z.string().describe('The location to get the weather for'),
-                    }),
-                    execute: async ({ location }) => ({
-                        location,
-                        temperature: 72 + Math.floor(Math.random() * 21) - 10,
-                    }),
+                        description: 'Get the weather in a location',
+                        parameters: z.object({
+                            location: z.string().describe('The location to get the weather for'),
+                        }),
+                        execute: async ({ location }) => ({
+                            location,
+                            temperature: 72 + Math.floor(Math.random() * 21) - 10,
+                        }),
                     }),
                 },
-                stopWhen: stepCountIs(5),
                 prompt: 'What is the weather in San Francisco?',
                 experimental_telemetry: {
                     isEnabled: true,
@@ -178,27 +177,26 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            conosle.log(result);
+            console.log(result);
             ```
           </Tab>
           <Tab title="Generate Structured Data">
             ```typescript
-            import { generateText } from "ai";
+            import { generateObject } from "ai";
             import { configureAiSdkTracing } from "deepeval";
+            import { z } from "zod";
 
             const tracer = configureAiSdkTracing();
 
-            const { output } = await generateText({
+            const { object } = await generateObject({
                 model: "openai/gpt-4o",
-                output: Output.object({
-                    schema: z.object({
+                schema: z.object({
                     recipe: z.object({
                         name: z.string(),
                         ingredients: z.array(
-                        z.object({ name: z.string(), amount: z.string() }),
+                            z.object({ name: z.string(), amount: z.string() }),
                         ),
                         steps: z.array(z.string()),
-                    }),
                     }),
                 }),
                 prompt: 'Generate a lasagna recipe.',
@@ -208,7 +206,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            conosle.log(output);
+            console.log(object);
             ```
           </Tab>
           <Tab title="Embedding Text">
@@ -227,12 +225,12 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            conosle.log(embedding);
+            console.log(embedding);
             ```
           </Tab>
         </Tabs>
       </Tab>
-      <Tab title="Existing Otel" language="existing">
+      <Tab title="Existing OTel" language="existing">
         <Tabs>
           <Tab title="Generate Text">
 
@@ -262,7 +260,6 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            // example: use textStream as an async iterable
             for await (const textPart of result.textStream) {
                 console.log(textPart);
             }
@@ -270,47 +267,46 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
           </Tab>
           <Tab title="Tool Calling">
             ```typescript
-            import { generateText } from "ai";
+            import { generateText, tool } from "ai";
+            import { z } from "zod";
 
             const result = await generateText({
                 model: "openai/gpt-4o",
                 tools: {
                     weather: tool({
-                    description: 'Get the weather in a location',
-                    inputSchema: z.object({
-                        location: z.string().describe('The location to get the weather for'),
-                    }),
-                    execute: async ({ location }) => ({
-                        location,
-                        temperature: 72 + Math.floor(Math.random() * 21) - 10,
-                    }),
+                        description: 'Get the weather in a location',
+                        parameters: z.object({
+                            location: z.string().describe('The location to get the weather for'),
+                        }),
+                        execute: async ({ location }) => ({
+                            location,
+                            temperature: 72 + Math.floor(Math.random() * 21) - 10,
+                        }),
                     }),
                 },
-                stopWhen: stepCountIs(5),
                 prompt: 'What is the weather in San Francisco?',
                 experimental_telemetry: {
                     isEnabled: true,
                 },
             });
 
-            conosle.log(result);
+            console.log(result);
             ```
           </Tab>
           <Tab title="Generate Structured Data">
             ```typescript
-            import { generateText } from "ai";
+            import { generateObject } from "ai";
+            import { z } from "zod";
 
-            const { output } = await generateText({
+            const { object } = await generateObject({
                 model: "openai/gpt-4o",
-                output: Output.object({
-                    schema: z.object({
+                schema: z.object({
                     recipe: z.object({
                         name: z.string(),
                         ingredients: z.array(
-                        z.object({ name: z.string(), amount: z.string() }),
+                            z.object({ name: z.string(), amount: z.string() }),
                         ),
                         steps: z.array(z.string()),
-                    }),
                     }),
                 }),
                 prompt: 'Generate a lasagna recipe.',
@@ -319,7 +315,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            conosle.log(output);
+            console.log(object);
             ```
           </Tab>
           <Tab title="Embedding Text">
@@ -334,7 +330,7 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
                 },
             });
 
-            conosle.log(embedding);
+            console.log(embedding);
             ```
           </Tab>
         </Tabs>
@@ -343,17 +339,53 @@ export CONFIDENT_OTEL_URL="https://eu.otel.confident-ai.com"
 
   </Step>
   <Step title="Run AI SDK Generation">
-    Run your LLM application by executing the following script:
-
-    ```bash
-    npx ts-node
-    ```
-    You can directly view the traces on [Confident AI](https://app.confident.ai)'s traces page inside the observatory.
-
+    Run your LLM application. You can directly view the traces on [Confident AI](https://app.confident.ai)'s traces page inside the observatory.
   </Step>
 </Steps>
 
 ## Advanced Usage
+
+### Configuration options
+
+`configureAiSdkTracing` accepts an optional options object to control tracing behavior:
+
+```typescript
+import { configureAiSdkTracing } from "deepeval";
+
+const tracer = configureAiSdkTracing({
+  apiKey: "your-confident-api-key",     // defaults to CONFIDENT_API_KEY env var
+  environment: "production",             // defaults to "development"
+  name: "my-ai-app",                    // optional default trace name
+  traceMetricCollection: "my-metrics",  // optional default metric collection for all traces
+  debug: false,                          // set true to enable verbose logging
+});
+```
+
+<Accordion title="View configureAiSdkTracing Options">
+<ParamField path="apiKey" type="string" required={false}>
+  Your Confident AI API key. Defaults to the `CONFIDENT_API_KEY` environment variable.
+</ParamField>
+
+<ParamField path="environment" type="string" required={false}>
+  The deployment environment label attached to all traces (e.g. `"production"`, `"staging"`). Defaults to `"development"`. Can also be set via the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
+</ParamField>
+
+<ParamField path="name" type="string" required={false}>
+  A default name applied to every trace created by this tracer. Can be overridden per-trace using `setTracingContext` or via `ai.telemetry.metadata.traceName`.
+</ParamField>
+
+<ParamField path="traceMetricCollection" type="string" required={false}>
+  A default [metric collection](/docs/metrics/metric-collections) applied to every trace for online evaluation. Can be overridden per-trace using `setTracingContext` or via `ai.telemetry.metadata.traceMetricCollection`.
+</ParamField>
+
+<ParamField path="otelEndpoint" type="string" required={false}>
+  Custom OTLP endpoint URL. Defaults to `https://otel.confident-ai.com`. Use `https://eu.otel.confident-ai.com` for the EU region.
+</ParamField>
+
+<ParamField path="debug" type="boolean" required={false}>
+  When `true`, logs tracing configuration details and flush events to the console. Defaults to `false`.
+</ParamField>
+</Accordion>
 
 ### Logging prompts
 
@@ -392,7 +424,7 @@ await setTracingContext(
 );
 ```
 </Tab>
-<Tab title="Existing Otel" language="existing">
+<Tab title="Existing OTel" language="existing">
 ```typescript
 import { generateText } from "ai";
 import { Prompt } from "deepeval";
@@ -427,9 +459,9 @@ console.log(text);
 
 Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your AI SDK applications.
 
-For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
+For example, `threadId` and `userId` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
 
-You can set these attributes using the `setTracingContext` function from `deepeval`:
+You can set these attributes using the `setTracingContext` function from `deepeval/tracing`:
 
 <Tabs>
 
@@ -443,8 +475,10 @@ const tracer = configureAiSdkTracing();
 
 await setTracingContext(
   {
-    threadId: "123",
-    userId: "456"
+    threadId: "thread-123",
+    userId: "user-456",
+    testCaseId: "tc-789",   // optional: link trace to a test case
+    turnId: "turn-1",        // optional: identify a specific turn in a conversation
   }, 
   async () => {
     const { text } = await generateText({
@@ -460,7 +494,7 @@ await setTracingContext(
 );
 ```
 </Tab>
-<Tab title="Existing Otel" language="existing">
+<Tab title="Existing OTel" language="existing">
 ```typescript
 import { generateText } from "ai";
 
@@ -470,42 +504,50 @@ const { text } = await generateText({
   experimental_telemetry: {
     isEnabled: true,
     metadata: {
-      threadId: "123",
-      userId: "456",
+      threadId: "thread-123",
+      userId: "user-456",
       traceName: "Trace name here",
-      // You can set trace name here if you didn't set it in the createDeepEvalProcessors options!
+      testCaseId: "tc-789",   // optional: link trace to a test case
+      turnId: "turn-1",        // optional: identify a specific turn in a conversation
     }
   },
 });
 console.log(text);
-
 ```
 </Tab>
 </Tabs>
 
 <Accordion title='View Trace Attributes'>
-<ParamField path="name" type="str" required={false}>
+<ParamField path="name" type="string" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
-<ParamField path="tags" type="List[str]" required={false}>
+<ParamField path="tags" type="string[]" required={false}>
   Tags are string labels that help you group related traces. [Learn
   more](/docs/llm-tracing/features/tags).
 </ParamField>
 
-<ParamField path="metadata" type="Dict" required={false}>
+<ParamField path="metadata" type="Record<string, any>" required={false}>
   Attach any metadata to the trace. [Learn
   more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
-<ParamField path="threadId" type="str" required={false}>
+<ParamField path="threadId" type="string" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
   [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
-<ParamField path="userId" type="str" required={false}>
+<ParamField path="userId" type="string" required={false}>
   Supply the user ID to enable user analytics. [Learn
   more](/docs/llm-tracing/features/users).
+</ParamField>
+
+<ParamField path="testCaseId" type="string" required={false}>
+  Link this trace to an existing test case on Confident AI for offline evaluation workflows.
+</ParamField>
+
+<ParamField path="turnId" type="string" required={false}>
+  Identifies a specific turn within a multi-turn conversation thread. Used together with `threadId` to track individual turns.
 </ParamField>
 
 <Info>
@@ -537,7 +579,8 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK applic
   </Step>
   <Step title="Run evals">
     You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
-    You can pass different metric collections like `metricCollection` (for entire trace), `llmMetricCollection`, `toolMetricCollection` in the `configureAiSdkTracing` as shown below:
+
+    Pass different metric collections as trace attributes: `metricCollection` applies to the entire trace, while `llmSpanContext.metricCollection` applies to individual LLM spans, and `llmSpanContext.toolsMetricCollection` applies to tool call spans.
 
     <Tabs>
 
@@ -554,7 +597,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK applic
         metricCollection: "trace-metric-collection-name",
         llmSpanContext: {
           metricCollection: "llm-metric-collection-name",
-          toolMetricCollection: "tool-metric-collection-name"
+          toolsMetricCollection: "tool-metric-collection-name"
         }
       }, 
       async () => {
@@ -571,7 +614,7 @@ You can run [online evals](/docs/llm-tracing/online-evals) on your AI SDK applic
     );
     ```
     </Tab>
-    <Tab title="Existing Otel" language="existing">
+    <Tab title="Existing OTel" language="existing">
     ```typescript
     import { generateText } from "ai";
 
@@ -603,4 +646,3 @@ You can view evals on [Confident AI](https://app.confident.ai) by visiting the t
 <Frame>
   <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
 </Frame>
-````
