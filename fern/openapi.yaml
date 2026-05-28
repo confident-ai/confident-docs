@@ -450,6 +450,7 @@ paths:
                   success: true
                   data:
                     id: "DATASET-ID"
+                    version: "00.00.01"
                     goldens:
                       - input: "How's the weather like in NYC?"
                         expectedOutput: "No idea"
@@ -457,6 +458,7 @@ paths:
                   success: true
                   data:
                     id: "DATASET-ID"
+                    version: "00.00.01"
                     conversationalGoldens:
                       - scenario: "Booking a hotel"
                         expectedOutcome: "Successfully booked"
@@ -529,6 +531,57 @@ paths:
                 success: true
                 data:
                   id: "dataset-id"
+
+  /v1/datasets/{alias}/versions:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: List Dataset Versions
+      operationId: getDatasetVersions
+      description: Returns all versions of the dataset, newest first.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDatasetVersionsResponse"
+              example:
+                success: true
+                data:
+                  versions:
+                    - id: "abc-123"
+                      version: "00.00.02"
+                      createdAt: "2026-05-28T13:35:16.268Z"
+                    - id: "def-456"
+                      version: "00.00.01"
+                      createdAt: "2026-05-28T13:05:24.777Z"
+                deprecated: false
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Create Dataset Version
+      operationId: createDatasetVersion
+      description: |
+        Snapshots the current state of the dataset as a new immutable version. If this
+        is the first version, all existing unversioned goldens are backfilled onto it.
+        Subsequent versions snapshot all goldens from the previous version (with new
+        IDs).
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateDatasetVersionResponse"
+              example:
+                success: true
+                data:
+                  id: "abc-123"
+                  version: "00.00.02"
+                deprecated: false
 
   /v1/evaluate:
     post:
@@ -3756,6 +3809,12 @@ components:
                 id:
                   type: string
                   description: A unique identifier for a dataset
+                version:
+                  type: string
+                  nullable: true
+                  description: |
+                    The resolved version of the dataset returned. `null` if the dataset
+                    has no versions yet.
                 goldens:
                   type: array
                   items:
@@ -3770,6 +3829,12 @@ components:
                 id:
                   type: string
                   description: A unique identifier for a dataset
+                version:
+                  type: string
+                  nullable: true
+                  description: |
+                    The resolved version of the dataset returned. `null` if the dataset
+                    has no versions yet.
                 conversationalGoldens:
                   type: array
                   items:
@@ -3787,6 +3852,13 @@ components:
         finalized:
           type: boolean
           description: "Determines whether goldens are finalized when pushed to the dataset."
+        version:
+          type: string
+          description: |
+            Optional dataset version (e.g. `"00.00.01"`) to push goldens onto. When the
+            dataset already has versions, omitting this pushes to the latest version.
+            When the dataset has no versions yet, omitting this leaves the goldens
+            unversioned. Specifying a `version` on a brand-new dataset alias returns 400.
         goldens:
           type: array
           items:
@@ -3812,6 +3884,60 @@ components:
             id:
               type: string
               description: "This is the ID of the deleted dataset."
+      required:
+        - success
+        - data
+
+    DatasetVersion:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique identifier for the dataset version.
+        version:
+          type: string
+          description: "The version label (e.g. `\"00.00.01\"`)."
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO timestamp of when the version was created.
+      required:
+        - id
+        - version
+
+    GetDatasetVersionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            versions:
+              type: array
+              items:
+                $ref: "#/components/schemas/DatasetVersion"
+          required:
+            - versions
+      required:
+        - success
+        - data
+
+    CreateDatasetVersionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            version:
+              type: string
+          required:
+            - id
+            - version
       required:
         - success
         - data
