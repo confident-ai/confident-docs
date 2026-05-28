@@ -5,7 +5,14 @@ subtitle: Use Confident AI for LLM observability and evals for LangChain
 
 ## Overview
 
-[LangChain](https://www.langchain.com/) is a framework for building LLM applications. Confident AI provides a `CallbackHandler` to trace and evaluate LangChain applications.
+[LangChain](https://www.langchain.com/) is a framework for building LLM applications. Confident AI provides a callback handlers in both python and typescript SDKs to trace and evaluate your LangChain applications automatically.
+
+The callback handler captures the following spans from your LangChain application:
+
+- **LLM spans** — model name, provider, input messages, output content, tool calls made by the model, and token usage
+- **Tool spans** — tool name, input parameters, and output; also aggregated at the trace level as `tools_called`
+- **Retriever spans** — query input and retrieved document output
+- **Chain spans** — inputs and outputs for top-level chains (used to set trace-level input/output)
 
 ## Tracing Quickstart
 
@@ -21,7 +28,7 @@ pip install -U deepeval langchain langchain-openai
 ```
 
 ```typescript title="TypeScript"
-npm install langchain @langchain/core
+npm install deepeval langchain @langchain/core
 ```
 
 </CodeBlocks>
@@ -196,7 +203,7 @@ python main.py
 <CodeBlock language="typescript">
 
 ```typescript
-npx ts-node
+npx ts-node main.ts
 ```
 
 </CodeBlock>
@@ -246,33 +253,51 @@ const handler = new DeepEvalCallbackHandler({
 </CodeBlocks>
 
 <Accordion title='View Trace Attributes'>
-<ParamField path="name" type="str" required={false}>
+<ParamField path="name / name" type="str / string" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
-<ParamField path="tags" type="List[str]" required={false}>
+<ParamField path="tags / tags" type="List[str] / string[]" required={false}>
   Tags are string labels that help you group related traces. [Learn
   more](/docs/llm-tracing/features/tags).
 </ParamField>
 
-<ParamField path="metadata" type="Dict" required={false}>
+<ParamField path="metadata / metadata" type="Dict / Record<string, any>" required={false}>
   Attach any metadata to the trace. [Learn
   more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
-<ParamField path="thread_id" type="str" required={false}>
+<ParamField path="thread_id / threadId" type="str / string" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
   [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
-<ParamField path="user_id" type="str" required={false}>
+<ParamField path="user_id / userId" type="str / string" required={false}>
   Supply the user ID to enable user analytics. [Learn
   more](/docs/llm-tracing/features/users).
 </ParamField>
 
+<ParamField path="test_case_id / testCaseId" type="str / string" required={false}>
+  Attach a test case ID to associate this trace with a specific test case.
+</ParamField>
+
+<ParamField path="turn_id / turnId" type="str / string" required={false}>
+  Supply a turn ID to identify individual turns in a multi-turn conversation.
+</ParamField>
+
+<ParamField path="metrics / metrics" type="List[BaseMetric] / BaseMetric[]" required={false}>
+  A list of metrics to run against the root span of this trace. Used for offline (development) evaluations.
+</ParamField>
+
+<ParamField path="metric_collection / metricCollection" type="str / string" required={false}>
+  The name of a metric collection on Confident AI to use for online (production) evaluations.
+</ParamField>
+
 <Info>
   Each attribute is **optional**, and works the same way as the [native tracing
-  features](/docs/llm-tracing/introduction) on Confident AI.
+  features](/docs/llm-tracing/introduction) on Confident AI. Python uses
+  `snake_case` (e.g. `thread_id`) and TypeScript uses `camelCase` (e.g.
+  `threadId`).
 </Info>
 </Accordion>
 
@@ -321,7 +346,7 @@ const llm = new ChatOpenAI({
 </CodeBlocks>
 
 <Note>
-  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Logging prompts lets you attribute specific prompts to LangChain LLM spans.
   Be sure to **pull the prompt** before logging it, otherwise the prompt will
   not be visible on Confident AI.
 </Note>
@@ -336,7 +361,7 @@ If your LangChain application is in production, and you still want to run evalua
 
 <Step title="Create metric collection">
 
-Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangGraph agent. Copy the name of the metric collection.
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LangChain application. Copy the name of the metric collection.
 
 <Frame caption="Create metric collection">
   <video data-video="metrics.createCollection" controls autoPlay />
@@ -357,7 +382,7 @@ Set the `metric_collection` name to evaluate various components of your LangChai
 
 <Tab title="Agent Span">
 
-This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
+This is the top level component of your LangChain application. Also a very ideal component to evaluate with the **Task Completion** metric.
 
 <CodeBlocks >
 

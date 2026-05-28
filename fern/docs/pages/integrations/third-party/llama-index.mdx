@@ -27,7 +27,7 @@ Login to Confident AI using your Confident API key.
 
 <CodeBlocks>
 
-<CodeBlock language="bash">
+<CodeBlock language="bash" title="Bash">
 
 ```bash
 deepeval login
@@ -41,7 +41,6 @@ deepeval login
 import deepeval
 
 deepeval.login("<your-confident-api-key>")
-
 ```
 
 </CodeBlock>
@@ -50,9 +49,9 @@ deepeval.login("<your-confident-api-key>")
 
 </Step>
 
-<Step title="Configure LlamaIndex">
+<Step title="Instrument LlamaIndex">
 
-Instrument LlamaIndex using `instrument_llama_index` to enable Confident AI's `LlamaIndexHandler`.
+Call `instrument_llama_index` once at startup, passing LlamaIndex's root dispatcher. Every subsequent LlamaIndex call in your application will automatically be traced and sent to Confident AI.
 
 ```python main.py maxLines=100 {6,7}
 import asyncio
@@ -73,51 +72,162 @@ agent = FunctionAgent(
     system_prompt="You are a helpful assistant that can perform calculations.",
 )
 
-async def llm_app(input: str):
-    return await agent.run(input)
+async def main():
+    return await agent.run("What is 3 * 12?")
 
-asyncio.run(llm_app("What is 3 * 12?"))
+asyncio.run(main())
 ```
 
 <Note>
-  Now whenever you use LlamaIndex, DeepEval will collect LlamaIndex traces and
-  publish them to Confident AI.
+  `instrument_llama_index` registers DeepEval's handler with LlamaIndex's
+  instrumentation dispatcher. From that point on, all LlamaIndex spans and
+  events are captured automatically — no other code changes are required.
 </Note>
 
-You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
+You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link printed in the console output.
 
 </Step>
 
 </Steps>
 
+## What Gets Traced
+
+The integration captures the following span types automatically:
+
+| Span type | When it is created |
+| --------- | ------------------ |
+| **Agent** | Any `Workflow.run()` or `FunctionAgent.run()` call |
+| **LLM** | Each `LLMChatStartEvent` / `LLMChatEndEvent` pair — includes input messages, model name, and the inferred provider (e.g. `OpenAI`, `Anthropic`) |
+| **Tool** | Any `call_tool` / `acall_tool` / `acall` invocation — captures tool name, inputs, and outputs |
+| **Generic** | All other instrumented LlamaIndex methods |
+
+Retrieval context from `RetrievalEndEvent` is automatically attached to the enclosing span, making it available for retrieval-based metrics.
+
+Each span is tagged with `integration: "LlamaIndex"` so you can filter by framework on Confident AI.
+
+## Advanced Features
+
+### Set trace attributes
+
+You can attach metadata, user identifiers, and other attributes to a trace by wrapping your LlamaIndex call inside the `trace` context manager.
+
+```python main.py maxLines=100 {5,6,10,11,12,13,14}
+import asyncio
+from llama_index.core.agent import FunctionAgent
+from llama_index.llms.openai import OpenAI
+import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrument_llama_index
+from deepeval.tracing import trace
+
+instrument_llama_index(instrument.get_dispatcher())
+
+agent = FunctionAgent(
+    tools=[],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant.",
+)
+
+async def handle_request(user_input: str, user_id: str, thread_id: str):
+    with trace(
+        user_id=user_id,
+        thread_id=thread_id,
+        tags=["production", "v2"],
+        metadata={"environment": "prod"},
+    ):
+        return await agent.run(user_input)
+
+asyncio.run(handle_request("Hello!", user_id="user-42", thread_id="conv-99"))
+```
+
+<Accordion title="View Trace Attributes">
+<ParamField path="name" type="str" required={false}>
+  The name of the trace. [Learn more](/docs/llm-tracing/features/name).
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required={false}>
+  Tags are string labels that help you group related traces. [Learn
+  more](/docs/llm-tracing/features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Dict" required={false}>
+  Attach arbitrary metadata to the trace. [Learn
+  more](/docs/llm-tracing/features/metadata).
+</ParamField>
+
+<ParamField path="thread_id" type="str" required={false}>
+  Supply the thread or conversation ID to view and evaluate conversations.
+  [Learn more](/docs/llm-tracing/features/threads).
+</ParamField>
+
+<ParamField path="user_id" type="str" required={false}>
+  Supply the user ID to enable user analytics. [Learn
+  more](/docs/llm-tracing/features/users).
+</ParamField>
+
+<ParamField path="input" type="Any" required={false}>
+  Override the top-level input recorded for this trace.
+</ParamField>
+
+<ParamField path="output" type="Any" required={false}>
+  Override the top-level output recorded for this trace.
+</ParamField>
+
+<ParamField path="retrieval_context" type="List[str]" required={false}>
+  Explicitly set the retrieval context for this trace.
+</ParamField>
+
+<ParamField path="context" type="List[str]" required={false}>
+  Contextual information available to the model at inference time.
+</ParamField>
+
+<ParamField path="expected_output" type="str" required={false}>
+  The expected or ground-truth output for this trace.
+</ParamField>
+
+<ParamField path="tools_called" type="List[ToolCall]" required={false}>
+  Manually specify the tools called during this trace.
+</ParamField>
+
+<ParamField path="expected_tools" type="List[ToolCall]" required={false}>
+  The expected tools that should have been called.
+</ParamField>
+
+<Info>
+  Each attribute is **optional** and works the same way as the [native tracing
+  features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+</Accordion>
+
 ## Evals Usage
 
 ### Online evals
 
-You can run [online evals](/docs/llm-tracing/online-evals) on your LlamaIndex agent, which will run evaluations on all incoming traces on Confident AI’s servers. This approach is recommended if your agent is in production.
+You can run [online evals](/docs/llm-tracing/online-evals) on your LlamaIndex application to evaluate all incoming traces on Confident AI's servers. This approach is recommended when your application is in production.
 
 <Steps>
 
 <Step title="Create metric collection">
 
-Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LlamaIndex agent.
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your LlamaIndex application.
 
 <Frame caption="Create metric collection">
   <video data-video="metrics.createCollection" autoPlay controls />
 </Frame>
 
 <Warning>
-  Your metric collection should only contain metrics that don't require
-  `retrieval_context`, `context`, `expected_output`, or `expected_tools` for
-  evaluation.
+  The LlamaIndex integration automatically captures `input` and `actual_output`
+  for Agent and LLM spans. Use metrics that only require those fields (e.g.
+  **Answer Relevancy**, **Task Completion**) unless you also supply
+  `retrieval_context`, `context`, `expected_output`, or `expected_tools`
+  explicitly via the `trace` context manager or span context objects.
 </Warning>
 </Step>
 
 <Step title="Run evals">
 
-Confident AI supports [online evals](/docs/llm-tracing/online-evals) for LlamaIndex applications. Evaluations are configured using `metric_collection` as an argument on the trace context which applies to all spans emitted during the trace.
+Pass `metric_collection` to the `trace` context manager to evaluate the entire trace with your chosen metric collection.
 
-```python main.py maxLines=100 focus={5,21}
+```python main.py maxLines=100 {6,20-22}
 import asyncio
 from llama_index.llms.openai import OpenAI
 from llama_index.core.agent import FunctionAgent
@@ -137,11 +247,11 @@ agent = FunctionAgent(
     system_prompt="You are a helpful assistant.",
 )
 
-async def llm_app():
+async def llm_app(user_input: str):
     with trace(metric_collection="my_metric_collection"):
-        await agent.run("What is 3 * 12?")
+        return await agent.run(user_input)
 
-asyncio.run(llm_app())
+asyncio.run(llm_app("What is 3 * 12?"))
 ```
 
 <Success>
@@ -151,6 +261,107 @@ asyncio.run(llm_app())
 
 </Step>
 </Steps>
+
+### Span-level evals
+
+For finer-grained control, you can attach metrics or a metric collection directly to individual **Agent** or **LLM** spans using `AgentSpanContext` or `LlmSpanContext`. This lets you evaluate specific spans independently.
+
+```python main.py maxLines=100 {6-8,16-20}
+import asyncio
+from llama_index.llms.openai import OpenAI
+from llama_index.core.agent import FunctionAgent
+import llama_index.core.instrumentation as instrument
+from deepeval.integrations.llama_index import instrument_llama_index
+from deepeval.tracing import trace
+from deepeval.tracing.trace_context import AgentSpanContext
+from deepeval.metrics import AnswerRelevancyMetric
+
+instrument_llama_index(instrument.get_dispatcher())
+
+def multiply(a: float, b: float) -> float:
+    """Useful for multiplying two numbers."""
+    return a * b
+
+agent = FunctionAgent(
+    tools=[multiply],
+    llm=OpenAI(model="gpt-4o-mini"),
+    system_prompt="You are a helpful assistant that can perform calculations.",
+)
+
+answer_relevancy = AnswerRelevancyMetric()
+
+async def llm_app(user_input: str):
+    agent_span_context = AgentSpanContext(
+        metrics=[answer_relevancy],
+    )
+    with trace(agent_span_context=agent_span_context):
+        return await agent.run(user_input)
+
+asyncio.run(llm_app("What is 3 * 12?"))
+```
+
+<Accordion title="View Span Context Parameters">
+
+**`AgentSpanContext`** — applied to Agent spans (i.e. workflow / agent `.run()` calls):
+
+<ParamField path="metrics" type="List[BaseMetric]" required={false}>
+  A list of DeepEval metric instances to evaluate this agent span with.
+</ParamField>
+
+<ParamField path="metric_collection" type="str" required={false}>
+  Name of a metric collection on Confident AI to use for evaluation.
+</ParamField>
+
+<ParamField path="expected_output" type="str" required={false}>
+  The expected output for the agent span.
+</ParamField>
+
+<ParamField path="expected_tools" type="List[ToolCall]" required={false}>
+  The expected tools that should have been called.
+</ParamField>
+
+<ParamField path="context" type="List[str]" required={false}>
+  Contextual information for the span.
+</ParamField>
+
+<ParamField path="retrieval_context" type="List[str]" required={false}>
+  Retrieved documents or chunks for the span.
+</ParamField>
+
+---
+
+**`LlmSpanContext`** — applied to LLM spans (i.e. individual LLM calls):
+
+<ParamField path="metrics" type="List[BaseMetric]" required={false}>
+  A list of DeepEval metric instances to evaluate this LLM span with.
+</ParamField>
+
+<ParamField path="metric_collection" type="str" required={false}>
+  Name of a metric collection on Confident AI to use for evaluation.
+</ParamField>
+
+<ParamField path="prompt" type="Prompt" required={false}>
+  A `Prompt` object from `deepeval.prompt` to associate a managed prompt with
+  this LLM span.
+</ParamField>
+
+<ParamField path="expected_output" type="str" required={false}>
+  The expected output for the LLM span.
+</ParamField>
+
+<ParamField path="expected_tools" type="List[ToolCall]" required={false}>
+  The expected tools that should have been called.
+</ParamField>
+
+<ParamField path="context" type="List[str]" required={false}>
+  Contextual information for the span.
+</ParamField>
+
+<ParamField path="retrieval_context" type="List[str]" required={false}>
+  Retrieved documents or chunks for the span.
+</ParamField>
+
+</Accordion>
 
 ### View on Confident AI
 

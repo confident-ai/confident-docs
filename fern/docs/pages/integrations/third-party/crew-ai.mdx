@@ -33,9 +33,45 @@ pip install -U deepeval crewai
 
 </Step>
 
+<Step title="Setup Confident AI Key">
+
+Login to Confident AI using your Confident API key.
+
+<CodeBlocks>
+
+<CodeBlock title="Env" language="bash">
+
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
+
+</CodeBlock>
+
+<CodeBlock language="bash" title="Bash">
+
+```bash
+deepeval login
+```
+
+</CodeBlock>
+
+<CodeBlock language="python">
+
+```python
+import deepeval
+
+deepeval.login("<your-confident-api-key>")
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
 <Step title="Configure CrewAI">
 
-Instrument CrewAI with your Confident AI API key using `instrument_crewai`.
+Instrument CrewAI with `instrument_crewai` before running any crew. You only need to call this once at startup.
 
 ```python main.py maxLines=100 {3,4}
 from crewai import Task, Crew, Agent
@@ -60,6 +96,14 @@ crew = Crew(agents=[agent], tasks=[task])
 result = crew.kickoff({"input": "What are the LLMs?"})
 ```
 
+<Note>
+  `instrument_crewai()` monkey-patches `Crew.kickoff`, `Crew.kickoff_for_each`,
+  their async variants (`kickoff_async`, `kickoff_for_each_async`, `akickoff`,
+  `akickoff_for_each`), and `Agent.execute_task` / `Agent.aexecute_task`. It
+  also registers an event listener that captures LLM calls, tool usage, and
+  knowledge retrieval automatically.
+</Note>
+
 </Step>
 
 <Step title="Run CrewAI">
@@ -76,6 +120,19 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
+### What gets traced
+
+After calling `instrument_crewai()`, every crew run produces a nested trace with the following span types:
+
+
+| **Span type**             | **What it captures**                                                                                                |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------|
+| **Crew**                  | The top-level `Crew.kickoff` (or async variant) call — input, output, and timing for the whole crew run             |
+| **Agent**                 | Each `Agent.execute_task` call — the task prompt sent to the agent and the agent's final answer                     |
+| **LLM**                   | Every LLM call made by an agent — messages sent, model name, provider, and the model response                       |
+| **Tool**                  | Every tool invocation — tool name, input arguments, output, and timing                                              |
+| **Knowledge Retrieval**   | Knowledge retrieval operations — the query and the retrieved documents                                              |
+
 ## Advanced Usage
 
 ### Logging threads
@@ -83,6 +140,8 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 Threads are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here. Set the `thread_id` in the `trace` context and call `crew.kickoff` within the context.
 
 ```python main.py {7}
+from deepeval.tracing import trace
+
 ...
 with trace(thread_id="crewai_run_1"):
     crew.kickoff({"city": "London"})
@@ -93,6 +152,8 @@ with trace(thread_id="crewai_run_1"):
 You can also set the `metadata` in the `trace` context.
 
 ```python main.py {7}
+from deepeval.tracing import trace
+
 ...
 with trace(metadata={"test_metadata_1": "test_metadata_1"}):
     crew.kickoff({"city": "London"})
@@ -103,6 +164,8 @@ with trace(metadata={"test_metadata_1": "test_metadata_1"}):
 Additionally, you can set the `name`, `tags` and `user_id` in the `trace` context.
 
 ```python main.py {7}
+from deepeval.tracing import trace
+
 ...
 with trace(name="crewai_run_1", tags=["crewai"], user_id="crewai_user_1"):
     crew.kickoff({"city": "London"})
@@ -142,17 +205,17 @@ with trace(name="crewai_run_1", tags=["crewai"], user_id="crewai_user_1"):
 
 ### Online evals
 
-You can run [online evals](/docs/llm-evaluation/online-evals) on your OpenAI Agent, which will run evaluations on all incoming traces on Confident AI’s servers. This is the recommended approach, especially if your agent is in production.
+You can run [online evals](/docs/llm-evaluation/online-evals) on your CrewAI application, which will run evaluations on all incoming traces on Confident AI's servers. This is the recommended approach, especially if your agent is in production.
 
 <Steps>
 
 <Step title="Create metric collection">
 
-Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your OpenAI Agent.
+Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your CrewAI application.
 
-<Accordion title='Click to see supported metrics for OpenAI Agents'>
+<Accordion title='Click to see supported metrics for CrewAI'>
 
-Confident AI supports evaluating the input-output pairs of OpenAI Agent spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
+Confident AI supports evaluating the input-output pairs of CrewAI spans and traces, which means your metric collections must only contain metrics that only require the input and output for evaluation. These metrics include:
 
 - [Answer Relevancy](https://www.confident-ai.com/docs/metrics/single-turn/answer-relevancy-metric)
 - [Task Completion](https://www.confident-ai.com/docs/metrics/single-turn/task-completion-metric)
@@ -178,7 +241,7 @@ Confident AI supports evaluating the input-output pairs of OpenAI Agent spans an
 
 <Step title="Run evals">
 
-Run evaluations on the various components of your CrewAI application by setting the `metric_collection` to the DeepEval's wrapper for CrewAI.
+Run evaluations on the various components of your CrewAI application by setting the `metric_collection` on DeepEval's wrappers for `Crew`, `Agent`, `LLM`, or `tool`.
 
 <Warning>
   The current CrewAI integration supports metrics with parameters that evaluate
@@ -188,7 +251,7 @@ Run evaluations on the various components of your CrewAI application by setting 
 <Tabs>
 
 <Tab title="Trace">
-To evaluate the trace level, set the `trace_metric_collection` to the DeepEval's `trace` context.
+To evaluate at the trace level, pass `metric_collection` to the `trace` context.
 
 ```python main.py
 from crewai import Task, Crew, Agent
@@ -211,7 +274,7 @@ task = Task(
 
 crew = Crew(agents=[agent], tasks=[task])
 
-with trace(trace_metric_collection="test_collection_1"):
+with trace(metric_collection="test_collection_1"):
     result = crew.kickoff({"input": "What are the LLMs?"})
 ```
 
@@ -219,13 +282,12 @@ with trace(trace_metric_collection="test_collection_1"):
 
 <Tab title="Crew Span">
 
-To evaluate the crew span level, set the `metric_collection` to the DeepEval's `Crew` wrapper.
+To evaluate at the crew span level, replace `Crew` with DeepEval's wrapper and set `metric_collection`.
 
 ```python main.py
 from crewai import Task, Agent
 
-from deepeval.integrations.crewai import Crew
-from deepeval.integrations.crewai import instrument_crewai
+from deepeval.integrations.crewai import Crew, instrument_crewai
 
 instrument_crewai()
 
@@ -250,13 +312,12 @@ result = crew.kickoff({"input": "What are the LLMs?"})
 
 <Tab title="Agent Span">
 
-To evaluate the agent span level, set the `metric_collection` to the DeepEval's `Agent` wrapper.
+To evaluate at the agent span level, replace `Agent` with DeepEval's wrapper and set `metric_collection`.
 
 ```python main.py
 from crewai import Task, Crew
 
-from deepeval.integrations.crewai import Agent
-from deepeval.integrations.crewai import instrument_crewai
+from deepeval.integrations.crewai import Agent, instrument_crewai
 
 instrument_crewai()
 
@@ -282,13 +343,12 @@ result = crew.kickoff({"input": "What are the LLMs?"})
 
 <Tab title="LLM Span">
 
-To evaluate the llm span level, set the `metric_collection` to the DeepEval's `LLM` wrapper.
+To evaluate at the LLM span level, replace `LLM` with DeepEval's wrapper and set `metric_collection`.
 
 ```python main.py
 from crewai import Task, Crew, Agent
 
-from deepeval.integrations.crewai import LLM
-from deepeval.integrations.crewai import instrument_crewai
+from deepeval.integrations.crewai import LLM, instrument_crewai
 
 instrument_crewai()
 
@@ -302,6 +362,42 @@ agent = Agent(
     goal="Write clear, concise explanation.",
     backstory="An expert consultant with a keen eye for software trends.",
     llm=llm,
+)
+
+task = Task(
+    description="Explain the given topic",
+    expected_output="A clear and concise explanation.",
+    agent=agent,
+)
+
+crew = Crew(agents=[agent], tasks=[task])
+
+result = crew.kickoff({"input": "What are the LLMs?"})
+```
+
+</Tab>
+
+<Tab title="Tool Span">
+
+To evaluate at the tool span level, replace the `@tool` decorator with DeepEval's wrapper and set `metric_collection`.
+
+```python main.py
+from crewai import Task, Crew, Agent
+
+from deepeval.integrations.crewai import tool, instrument_crewai
+
+instrument_crewai()
+
+@tool(metric_collection="test_collection_1")
+def search_database(query: str) -> str:
+    """Search the internal database for relevant information."""
+    return f"Results for: {query}"
+
+agent = Agent(
+    role="Consultant",
+    goal="Write clear, concise explanation.",
+    backstory="An expert consultant with a keen eye for software trends.",
+    tools=[search_database],
 )
 
 task = Task(
