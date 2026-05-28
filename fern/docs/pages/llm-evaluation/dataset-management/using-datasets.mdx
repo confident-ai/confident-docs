@@ -77,6 +77,16 @@ Datasets are either single or multi-turn, and you should know that pulling a sin
 
 Pulling goldens via the Evals API will only pull **finalized** goldens by default. Below is a single-turn dataset example ([click here](/docs/llm-evaluation/code-driven/multi-turn) for multi-turn usage of datasets):
 
+<Tip>
+  For reproducible evaluation runs, pin to a specific dataset version by passing
+  `version="00.00.01"` (Python) or `{ version: "00.00.01" }` (TypeScript) to
+  `pull(...)`. Omitting `version` pulls the latest version, or unversioned goldens
+  if the dataset has no versions yet. See [Versioning
+  Datasets](/docs/llm-evaluation/dataset-management/automate-dataset-management#versioning-datasets)
+  for details.
+</Tip>
+
+
 <Tabs>
 
 <Tab title="Python" language="python">

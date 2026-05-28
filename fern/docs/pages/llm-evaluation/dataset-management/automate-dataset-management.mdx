@@ -207,6 +207,137 @@ const multiturnGolden = new ConversationalGolden({
 
 </Tabs>
 
+## Versioning Datasets
+
+Datasets support immutable, named versions so you can pin evaluation runs to a specific snapshot of goldens.
+
+- **Create a version** to snapshot the current state of the dataset.
+- **Push** without specifying `version` to add goldens to the latest version (or unversioned, if the dataset has no versions yet).
+- **Push** with `version=...` to add goldens to a specific version.
+- **Pull** without `version` to read the latest version. **Pull** with `version=...` to read a specific version.
+- **Get versions** to list all snapshots, newest first.
+
+### Create a version
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+version = dataset.create_version(alias="YOUR-DATASET-ALIAS")
+# version -> "00.00.01"
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval";
+
+const dataset = new EvaluationDataset();
+const { version } = await dataset.createVersion({ alias: "YOUR-DATASET-ALIAS" });
+// version -> "00.00.01"
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet endpoint="POST /v1/datasets/{alias}/versions" />
+
+</Tab>
+
+</Tabs>
+
+The first call to `create_version` backfills every existing unversioned golden onto the new version. Subsequent calls snapshot all goldens from the previous version (with new IDs) and auto-increment the version number.
+
+### List versions
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+versions = dataset.get_versions(alias="YOUR-DATASET-ALIAS")
+for v in versions:
+    print(v.version, v.id)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval";
+
+const dataset = new EvaluationDataset();
+const versions = await dataset.getVersions({ alias: "YOUR-DATASET-ALIAS" });
+for (const v of versions) {
+  console.log(v.version, v.id);
+}
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet endpoint="GET /v1/datasets/{alias}/versions" />
+
+</Tab>
+
+</Tabs>
+
+### Push and pull a specific version
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset, Golden
+
+dataset = EvaluationDataset(goldens=[Golden(input="...", expected_output="...")])
+
+# Push goldens onto version 00.00.01
+dataset.push(alias="YOUR-DATASET-ALIAS", version="00.00.01")
+
+# Pull a specific version
+dataset.pull(alias="YOUR-DATASET-ALIAS", version="00.00.01")
+print(dataset._version)  # -> "00.00.01"
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset, Golden } from "deepeval";
+
+const dataset = new EvaluationDataset();
+dataset.addGolden(new Golden({ input: "...", expectedOutput: "..." }));
+
+// Push goldens onto version 00.00.01
+await dataset.push({ alias: "YOUR-DATASET-ALIAS", version: "00.00.01" });
+
+// Pull a specific version
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS", version: "00.00.01" });
+```
+
+</Tab>
+
+</Tabs>
+
+<Note>
+When `version` is omitted, push and pull operate on the latest version. If the dataset has no versions yet, push leaves goldens unversioned and pull returns those unversioned goldens with `version: null`.
+</Note>
+
 ## Delete Dataset
 
 Delete a dataset programmatically via the Evals API.
