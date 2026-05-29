@@ -1,0 +1,19 @@
+---
+tags: ["Integrations", "Observability", "Red Teaming"]
+---
+
+## We've Got an Issue
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+This week closes the loop from trace to ticket. GitHub and Linear integrations push problem traces straight into your issue tracker, the Integrations page got a card-based makeover with per-integration notification controls, and every alert that fires now leaves a full paper trail.
+
+<Frame>![Changelog May 29, 2026](/assets/changelog/2026-05-29.png)</Frame>
+
+### Added
+
+- **GitHub & Linear Integrations** - Spot a bad trace, ship a ticket. New GitHub and Linear integrations turn problem traces straight into issues in the tool your team already lives in—no copy-paste pilgrimage, no screenshot diplomacy, no "remind me which trace this was?" Trace, triage, ticket. _Issue_ resolved.
+- **Revamped Integrations Page** - The Integrations page got a full card-based glow-up, with each integration getting its own card and its own fine-grained notification controls. Mute the chatty ones, crank up the critical ones, and stop drowning in pings that weren't yours to begin with. _Card_-carrying integrations, finally.
+- **Alert History & Logs** - Every alert that fires now leaves a paper trail. Browse a full history of triggered alerts—who got pinged, when, and why—so you can answer "wait, did that fire last Tuesday?" without spelunking through Slack scrollback. _Alert_ and accounted for.
+- **Traces on Red Teaming Test Cases** - Red teaming test cases now come with full traces attached. When an attack lands a hit, you see exactly how the model got there—step by step, span by span—instead of squinting at the final output and reverse-engineering the path. _Trace_ the threat, expose the route.
+- **Dataset Version API Support** - Dataset versioning is now fully scriptable via the API. Pin runs to specific dataset versions, automate version promotion, and keep your CI honest about which goldens it actually ran against. _Version_ control: now actually under your control.
