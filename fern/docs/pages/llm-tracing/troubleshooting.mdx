@@ -11,6 +11,31 @@ This page covers common tracing issues caused by Python's concurrency model and 
 - **Traces not showing up** on the Confident AI dashboard after execution.
 - **Trace attributes not set correctly** — output, name, or metadata reflecting the wrong values.
 - **Missing output on streamed responses** — trace appears but with no output.
+- **Stacking `@observe` with another tracing decorator** and unsure if it's safe or what order to use.
+
+## Stacking `@observe` with Other Tracing Decorators
+
+If your code already uses another tracing decorator from a different observability system, you can leave it in place. `deepeval`'s `@observe` is a standard Python decorator (it uses `functools.wraps`) and stacks on top of any other tracing decorator without conflict. This applies to any decorator-based tracer — common examples include MLflow's `@mlflow.trace`, Langfuse's `@observe`, and OpenTelemetry's `@trace`.
+
+Order does not change correctness, but it controls which backend's span wraps which. Default to putting `@observe` closest to the function (innermost) so your existing tracing dashboard keeps showing the outer call as the root:
+
+```python
+from deepeval.tracing import observe
+
+@tracer.trace      # your existing tracing decorator stays on top
+@observe()
+def run_my_ai_app(query: str) -> str:
+    ...
+```
+
+Each decorator emits to its own backend — your existing tracer to its own destination, `@observe` to Confident AI. They do **not** share span IDs or trace IDs. Seeing the same function logged on both platforms is expected, not a duplicate bug.
+
+<Note>
+  If your project also uses an autoinstrumentation feature (such as MLflow
+  `autolog()` or OpenTelemetry auto-instrumentation) for an LLM provider, the
+  LLM call will appear as an extra autologged span on that platform. This is
+  harmless and does not affect the Confident AI trace.
+</Note>
 
 ## Using `@observe` with `ThreadPoolExecutor`
 

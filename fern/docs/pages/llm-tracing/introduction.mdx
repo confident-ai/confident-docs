@@ -84,6 +84,45 @@ Instrument your LLM application using the `@observe` decorator, one-line integra
   </Card>
 </CardGroup>
 
+## Vibe Coding Traces
+
+If you use **Claude Code**, install Confident AI's plugin and Claude will instrument your app for you — picking the right path (DeepEval `@observe`, a framework integration, or OpenTelemetry) based on what your project uses and what you ask.
+
+<Steps>
+
+<Step title="Install the plugin">
+
+Run these four commands in Claude Code:
+
+```bash
+/plugin marketplace add confident-ai/deepeval
+/plugin install deepeval@confident-ai-plugins
+/reload-plugins
+/plugins
+```
+
+</Step>
+
+<Step title="Verify the install">
+
+The `/plugins` command should list `DeepEval Plugin` under your installed plugins.
+
+</Step>
+
+<Step title="Ask Claude to instrument your app">
+
+Open the project you want to trace and tell Claude what you need. Example prompts:
+
+- *"Instrument this app with DeepEval tracing and send traces to Confident AI."*
+- *"Add the OpenAI integration so my LLM calls show up on Confident AI."*
+- *"I'm using LangGraph — wire up DeepEval tracing for it."*
+
+Claude will read the codebase, choose between a native integration and manual `@observe`, and confirm traces land in the Observatory.
+
+</Step>
+
+</Steps>
+
 ## Key capabilities
 
 <CardGroup cols={2}>
