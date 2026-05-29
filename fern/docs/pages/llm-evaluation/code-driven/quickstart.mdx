@@ -42,6 +42,50 @@ You can either run evals via code locally or remotely on Confident AI, both of w
   </Card>
 </CardGroup>
 
+## Vibe Coding Evals
+
+If you use **Claude Code**, install Confident AI's plugin and Claude will build the eval suite for you — datasets, metrics, pytest files, and shareable Confident AI reports.
+
+<Steps>
+
+<Step title="Install the plugin">
+
+Run these four commands in Claude Code:
+
+```bash
+/plugin marketplace add confident-ai/deepeval
+/plugin install deepeval@confident-ai-plugins
+/reload-plugins
+/plugins
+```
+
+</Step>
+
+<Step title="Verify the install">
+
+The `/plugins` command should list `DeepEval Plugin` under your installed plugins.
+
+</Step>
+
+<Step title="Ask Claude to build the eval suite">
+
+Open the project you want to evaluate and tell Claude what you need. Example prompts:
+
+- *"Create a DeepEval pytest eval suite for this app, generate ~30 goldens, and push results to Confident AI."*
+- *"My app is a RAG pipeline — set up DeepEval evals with retrieval-focused metrics."*
+- *"Generate a dataset from the docs in `./knowledge` and run them through DeepEval."*
+
+Claude will run the intake questions, pick metrics, generate goldens with `deepeval generate`, and produce a committed pytest suite you can rerun in CI.
+
+</Step>
+
+</Steps>
+
+<Note>
+  The plugin is Python-first today. TypeScript support via Claude Code is
+  coming soon — for now, follow the TypeScript steps below directly.
+</Note>
+
 ## Run Your First Eval
 
 This examples goes through a **single-turn**, **end-to-end** evaluation example in code.
