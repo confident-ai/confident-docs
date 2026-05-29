@@ -84,53 +84,6 @@ Instrument your LLM application using the `@observe` decorator, one-line integra
   </Card>
 </CardGroup>
 
-## Vibe Code Your Tracing
-
-Let your coding agent instrument your app for you — it picks the right path (DeepEval `@observe`, a framework integration, or OpenTelemetry) based on what your project uses and what you ask. Choose the install method for your agent below.
-
-<Tabs>
-
-<Tab title="Claude Code (plugin)">
-
-Run these four commands in Claude Code:
-
-```bash
-/plugin marketplace add confident-ai/deepeval
-/plugin install deepeval@confident-ai-plugins
-/reload-plugins
-/plugins
-```
-
-The `/plugins` command should list `DeepEval Plugin` under your installed plugins.
-
-</Tab>
-
-<Tab title="Cursor, Codex, Windsurf & others (Skills CLI)">
-
-Install the [`deepeval-tracing` Agent Skill](https://github.com/confident-ai/deepeval/tree/main/skills/deepeval-tracing) with any [Skills](https://github.com/anthropics/skills)-compatible installer. This works with Cursor, Claude Code, Codex, Windsurf, OpenCode, and any other assistant that supports the Skills standard:
-
-```bash
-npx skills add confident-ai/deepeval --skill deepeval-tracing
-```
-
-The skill teaches your agent how to choose between a native integration and manual `@observe`, set span types/tags/metadata, and send traces to Confident AI's Observatory. It triggers automatically on prompts like the ones below.
-
-</Tab>
-
-</Tabs>
-
-Once installed, open the project you want to trace and tell your agent what you need. Example prompts:
-
-- *"Instrument this app with DeepEval tracing and send traces to Confident AI."*
-- *"Add the OpenAI integration so my LLM calls show up on Confident AI."*
-- *"I'm using LangGraph — wire up DeepEval tracing for it."*
-
-Your agent will read the codebase, choose between a native integration and manual `@observe`, and confirm traces land in the Observatory.
-
-<Tip>
-  Point your agent at our LLM-friendly docs for accurate, up-to-date instrumentation: [llms.txt](https://www.confident-ai.com/docs/llms.txt) indexes every page (append `.md` to any docs URL for that page's raw Markdown). You can also connect your agent directly to our [docs MCP server](https://confident-ai.docs.buildwithfern.com/docs/_mcp/server).
-</Tip>
-
 ## Key capabilities
 
 <CardGroup cols={2}>
