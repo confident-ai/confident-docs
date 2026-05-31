@@ -383,6 +383,214 @@ navigation:
         flattened: true
         skip-slug: true
         paginated: true
+        layout:
+          - section: Metrics
+            skip-slug: true
+            contents:
+              - section: Metrics
+                contents:
+                  - GET /v1/metrics
+                  - POST /v1/metrics
+                  - PUT /v1/metrics/{id}
+                  - GET /v1/metric/{name}
+              - section: Batch Metrics
+                contents:
+                  - POST /v1/metrics/batch
+          - section: Metric Collections
+            skip-slug: true
+            contents:
+              - metricCollections
+          - section: Metric Data
+            skip-slug: true
+            contents:
+              - metricData
+          - section: Datasets
+            skip-slug: true
+            contents:
+              - section: Datasets
+                contents:
+                  - GET /v1/datasets
+                  - GET /v1/datasets/{alias}
+                  - POST /v1/datasets/{alias}
+                  - DELETE /v1/datasets/{alias}
+              - section: Dataset Versions
+                contents:
+                  - GET /v1/datasets/{alias}/versions
+                  - POST /v1/datasets/{alias}/versions
+          - section: Evaluate
+            skip-slug: true
+            contents:
+              - section: Evaluate
+                contents:
+                  - POST /v1/evaluate
+                  - POST /v1/evaluate/spans/{spanUuid}
+                  - POST /v1/evaluate/traces/{traceUuid}
+                  - POST /v1/evaluate/threads/{threadId}
+          - section: Simulate
+            skip-slug: true
+            contents:
+              - section: Simulate
+                contents:
+                  - POST /v1/simulate
+          - section: Test Runs
+            skip-slug: true
+            contents:
+              - section: Test Runs
+                contents:
+                  - GET /v1/test-runs
+                  - GET /v1/test-runs/{testRunId}
+          - section: Traces
+            skip-slug: true
+            contents:
+              - section: Traces
+                contents:
+                  - GET /v1/traces
+                  - POST /v1/traces
+                  - GET /v1/traces/{traceUuid}
+          - section: Spans
+            skip-slug: true
+            contents:
+              - section: Spans
+                contents:
+                  - GET /v1/spans
+                  - GET /v1/spans/{spanUuid}
+          - section: Threads
+            skip-slug: true
+            contents:
+              - threads
+          - section: Prompts
+            skip-slug: true
+            contents:
+              - section: Prompts
+                contents:
+                  - GET /v1/prompts
+                  - POST /v1/prompts
+              - section: Labels
+                contents:
+                  - GET /v1/prompts/{alias}/labels/{label}
+              - section: Versions
+                contents:
+                  - GET /v1/prompts/{alias}/versions
+                  - POST /v1/prompts/{alias}/versions
+                  - GET /v1/prompts/{alias}/versions/{version}
+              - section: Commits
+                contents:
+                  - GET /v1/prompts/{alias}/commits
+                  - GET /v1/prompts/{alias}/commits/{hash}
+              - section: Branches
+                contents:
+                  - GET /v1/prompts/{alias}/branches
+                  - POST /v1/prompts/{alias}/branches
+                  - PUT /v1/prompts/{alias}/branches/{name}
+                  - DELETE /v1/prompts/{alias}/branches/{name}
+          - section: Annotations
+            skip-slug: true
+            contents:
+              - annotations
+          - section: Annotation Queues
+            skip-slug: true
+            contents:
+              - section: Annotation Queues
+                contents:
+                  - GET /v1/annotation-queues
+                  - POST /v1/annotation-queues
+                  - GET /v1/annotation-queues/{queueId}
+                  - DELETE /v1/annotation-queues/{queueId}
+              - section: Annotation Queue Items
+                contents:
+                  - GET /v1/annotation-queues/{queueId}/items
+                  - POST /v1/annotation-queues/{itemId}/annotate
+          - section: Projects
+            skip-slug: true
+            contents:
+              - section: Projects
+                contents:
+                  - GET /v1/projects
+                  - POST /v1/projects
+                  - GET /v1/projects/{projectId}
+                  - PUT /v1/projects/{projectId}
+                  - DELETE /v1/projects/{projectId}
+              - section: API Keys
+                contents:
+                  - GET /v1/projects/{projectId}/api-keys
+                  - GET /v1/projects/{projectId}/api-keys/{apiKeyId}
+                  - POST /v1/projects/{projectId}/api-keys
+                  - PUT /v1/projects/{projectId}/api-keys/{apiKeyId}
+                  - DELETE /v1/projects/{projectId}/api-keys/{apiKeyId}
+              - section: Members
+                contents:
+                  - GET /v1/projects/{projectId}/members
+                  - PUT /v1/projects/{projectId}/members/{userId}
+                  - DELETE /v1/projects/{projectId}/members/{userId}
+              - section: Invitations
+                contents:
+                  - GET /v1/projects/{projectId}/invitations
+                  - POST /v1/projects/{projectId}/invitations
+                  - PUT /v1/projects/{projectId}/invitations/{invitationId}
+                  - DELETE /v1/projects/{projectId}/invitations/{invitationId}
+              - section: Roles
+                contents:
+                  - GET /v1/projects/{projectId}/roles
+                  - POST /v1/projects/{projectId}/roles
+                  - PUT /v1/projects/{projectId}/roles/{roleId}
+                  - DELETE /v1/projects/{projectId}/roles/{roleId}
+              - section: Policies
+                contents:
+                  - GET /v1/projects/{projectId}/policies
+                  - POST /v1/projects/{projectId}/policies
+                  - PUT /v1/projects/{projectId}/policies/{policyId}
+                  - DELETE /v1/projects/{projectId}/policies/{policyId}
+              - section: Permissions
+                contents:
+                  - GET /v1/projects/{projectId}/permissions
+          - section: Organization
+            skip-slug: true
+            contents:
+              - section: Organization
+                contents:
+                  - GET /v1/organization
+                  - PUT /v1/organization
+              - section: API Keys
+                contents:
+                  - GET /v1/organization/api-keys
+                  - GET /v1/organization/api-keys/{apiKeyId}
+                  - POST /v1/organization/api-keys
+                  - PUT /v1/organization/api-keys/{apiKeyId}
+                  - DELETE /v1/organization/api-keys/{apiKeyId}
+              - section: Members
+                contents:
+                  - GET /v1/organization/members
+                  - PUT /v1/organization/members/{userId}
+                  - DELETE /v1/organization/members/{userId}
+              - section: Invitations
+                contents:
+                  - GET /v1/organization/invitations
+                  - POST /v1/organization/invitations
+                  - PUT /v1/organization/invitations/{invitationId}
+                  - DELETE /v1/organization/invitations/{invitationId}
+              - section: Roles
+                contents:
+                  - GET /v1/organization/roles
+                  - POST /v1/organization/roles
+                  - PUT /v1/organization/roles/{roleId}
+                  - DELETE /v1/organization/roles/{roleId}
+              - section: Policies
+                contents:
+                  - GET /v1/organization/policies
+                  - POST /v1/organization/policies
+                  - PUT /v1/organization/policies/{policyId}
+                  - DELETE /v1/organization/policies/{policyId}
+              - section: Permissions
+                contents:
+                  - GET /v1/organization/permissions
+          - section: Legacy
+            skip-slug: true
+            contents:
+              - section: Metrics
+                contents:
+                  - section: Batch Metrics
+                    contents:
+                      - POST /v1/batch-metrics
   - tab: integrations
     layout:
       - page: Integrations
