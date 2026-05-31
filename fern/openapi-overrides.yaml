@@ -868,6 +868,21 @@ paths:
           example: "<ORGANIZATION-API-KEY>"
 
   /v1/projects/{projectId}:
+    get:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to retrieve.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
     put:
       parameters:
         - in: path
@@ -876,6 +891,364 @@ paths:
           schema:
             type: string
           description: The unique identifier of the project to update.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to delete.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/api-keys:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/api-keys/{apiKeyId}:
+    put:
+      parameters:
+        - in: path
+          name: apiKeyId
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: apiKeyId
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/projects/{projectId}/api-keys:
+    get:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/projects/{projectId}/api-keys/{apiKeyId}:
+    put:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - in: path
+          name: apiKeyId
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - in: path
+          name: apiKeyId
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    put:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/members:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/members/{userId}:
+    put:
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/invitations:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/invitations/{invitationId}:
+    delete:
+      parameters:
+        - in: path
+          name: invitationId
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the invitation.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/roles:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/roles/{roleId}:
+    put:
+      parameters:
+        - in: path
+          name: roleId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: roleId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/policies:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/policies/{policyId}:
+    put:
+      parameters:
+        - in: path
+          name: policyId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+    delete:
+      parameters:
+        - in: path
+          name: policyId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/permissions:
+    get:
+      parameters:
         - in: header
           name: CONFIDENT_API_KEY
           required: true
