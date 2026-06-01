@@ -7,9 +7,9 @@ description: Manage organizations, projects, members, roles, policies, and API k
 
 ## Overview
 
-The `ConfidentClient` lets you administer your Confident AI account in code — the same projects, teams, roles, and API keys you'd otherwise manage in the platform UI. It's ideal for automating onboarding, provisioning projects in CI/CD, syncing roles with your identity provider, and rotating API keys.
+`ConfidentClient` is a programmatic admin client for your Confident AI account. It lets you manage your organization, projects, team members, roles, and API keys directly in code — the same actions you'd otherwise perform by clicking through the platform UI.
 
-The client wraps the [management endpoints of the Evals API](/docs/api-reference/organization/get-organization) and exposes them as typed methods across eight resource areas:
+Use it whenever you want to script account management instead of doing it by hand — for example, onboarding new teammates, provisioning projects in CI/CD, keeping roles in sync with your identity provider, or rotating API keys.
 
 <CardGroup cols={2}>
   <Card title="Projects" icon="folder" href="/docs/management/projects">
@@ -33,6 +33,8 @@ Management operations require an **Organization API Key**. Learn how to retrieve
 </Note>
 
 ## Setup
+
+Install the SDK and configure your `ConfidentClient` with an Organization API Key.
 
 <Steps>
 
@@ -137,7 +139,7 @@ Both require an Organization API Key.
 
 ## Manage Your Organization
 
-Retrieve the organization tied to your API key, or rename it.
+You can retrieve the organization tied to your API key, or rename it.
 
 <Tabs>
 

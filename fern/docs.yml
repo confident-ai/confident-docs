@@ -420,7 +420,7 @@ navigation:
                   - PUT /v1/metric-collections/{id}
               - section: Metric Data
                 contents:
-                  - GET /v1/metrics-data
+                  - GET /v1/metric-data
               - section: Datasets
                 contents:
                   - GET /v1/datasets

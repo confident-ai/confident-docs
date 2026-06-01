@@ -6,7 +6,19 @@ description: Manage organization and project members and invitations programmati
 
 ## Overview
 
-Members are users who belong to your organization or a specific project. New members join by accepting an invitation. The `ConfidentClient` exposes both **organization-scoped** and **project-scoped** methods so you can automate team onboarding and offboarding.
+Members are the people with access to your account, and they exist at two levels:
+
+- **Organization members** belong to your entire organization. Anyone you invite to the org becomes an organization member, and can be given an organization-level role.
+- **Project members** belong to a single project. You add organization members to individual projects to grant them access there, with a project-level role.
+
+A user is always an organization member first — project membership is layered on top to grant access to specific projects. New members join by accepting an invitation, and each level has its own `ConfidentClient` methods: organization methods manage org-wide membership, while project methods take a leading `project_id`.
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 90}}}%%
+flowchart LR
+    OM["Organization Members"] -->|added to| PMA["Project A Members"]
+    OM -->|added to| PMB["Project B Members"]
+```
 
 <Note>
 
@@ -16,9 +28,11 @@ All methods on this page require an **Organization API Key**. See [Setup](/docs/
 
 ## Members
 
+You can manage the people in your organization and its individual projects.
+
 ### List Members
 
-Member listing is paginated (defaults: `page=1`, `page_size=25`).
+You can list members page by page; the listing defaults to `page=1` and `page_size=25`.
 
 <Tabs>
 
@@ -58,7 +72,7 @@ const projectMembers = await client.listProjectMembers("proj_123", { page: 1 });
 
 ### Update a Member's Role
 
-Assign a role to a member by their `user_id`. Roles are managed in [Roles, Policies & Permissions](/docs/management/roles-policies-permissions).
+You can assign a role to a member by their `user_id`. Roles are managed in the [Roles, Policies & Permissions](/docs/management/roles-policies-permissions) section.
 
 <Tabs>
 
@@ -104,6 +118,8 @@ const projectMember = await client.updateProjectMemberRole(
 
 ### Remove a Member
 
+You can remove a member from your organization or a specific project by their `user_id`.
+
 <Tabs>
 
 <Tab title="Python" language="python">
@@ -128,7 +144,11 @@ await client.removeProjectMember("proj_123", "user_123");
 
 ## Invitations
 
+You can invite new people to your organization or projects, and manage invitations that are still pending.
+
 ### List Invitations
+
+You can list the pending invitations at the organization or project level.
 
 <Tabs>
 
@@ -154,7 +174,7 @@ const projectInvitations = await client.listProjectInvitations("proj_123");
 
 ### Create Invitations
 
-Invite one or more emails. The optional `role_id` assigns a role to invitees on join.
+You can invite one or more emails at once, and the optional `role_id` assigns a role to invitees when they join.
 
 <Tabs>
 
@@ -199,6 +219,8 @@ const projectInvitations = await client.createProjectInvitations(
 </Tabs>
 
 ### Resend & Delete Invitations
+
+You can resend a pending invitation by its `invitation_id`, or delete it to revoke access before it's accepted.
 
 <Tabs>
 

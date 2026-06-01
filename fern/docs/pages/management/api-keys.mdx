@@ -6,7 +6,19 @@ description: Manage organization and project API keys programmatically with the 
 
 ## Overview
 
-API keys authenticate requests to Confident AI. The `ConfidentClient` lets you list, create, enable/disable, and delete both **organization-scoped** and **project-scoped** keys — ideal for automating key rotation.
+API keys authenticate requests to Confident AI, and come in two scopes:
+
+- **Organization API keys** authenticate at the organization level. They're used for account-wide administration — including every management method in this SDK.
+- **Project API keys** are scoped to a single project. They're the keys your application uses to send traces and run evaluations against that project.
+
+Each scope has its own `ConfidentClient` methods: organization methods manage org-wide keys, while project methods take a leading `project_id`. Use them to list, create, enable/disable, and rotate keys in code.
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 90}}}%%
+flowchart LR
+    OK["Organization API Key"] -->|authenticates| Admin["Account-wide management<br/>(this SDK)"]
+    PK["Project API Key"] -->|authenticates| Ingest["Traces & evaluations<br/>in one project"]
+```
 
 <Warning>
 
@@ -21,6 +33,8 @@ All methods on this page require an **Organization API Key**. See [Setup](/docs/
 </Note>
 
 ## List API Keys
+
+You can list every API key at the organization or project level, with secret values masked.
 
 <Tabs>
 
@@ -54,6 +68,8 @@ const projectApiKeys = await client.listProjectApiKeys("proj_123");
 
 ## Get an API Key
 
+You can retrieve a single API key by its `api_key_id`, with its secret value masked.
+
 <Tabs>
 
 <Tab title="Python" language="python">
@@ -78,7 +94,7 @@ const projectApiKey = await client.getProjectApiKey("proj_123", 7);
 
 ## Create an API Key
 
-The returned object's `value` is the full secret — capture it now.
+You can create a new key at the organization or project level, and the returned object's `value` is the full secret — capture it right away.
 
 <Tabs>
 
@@ -114,7 +130,7 @@ const projectApiKey = await client.createProjectApiKey(
 
 ## Enable or Disable an API Key
 
-Set `valid` to `false` to revoke a key without deleting it, or `true` to re-enable it.
+You can set `valid` to `false` to revoke a key without deleting it, or back to `true` to re-enable it.
 
 <Tabs>
 
@@ -143,6 +159,8 @@ const projectApiKey = await client.updateProjectApiKey("proj_123", 7, false);
 </Tabs>
 
 ## Delete an API Key
+
+You can permanently delete an API key by its `api_key_id`, which immediately revokes it.
 
 <Tabs>
 
