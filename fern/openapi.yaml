@@ -2613,7 +2613,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: List Annotation Queues
+      summary: List Queues
       operationId: listAnnotationQueues
       description: |
         Retrieves all annotation queues in your project with statistics and pagination support. Each queue includes completion metrics, item counts, and assignment breakdowns.
@@ -2712,7 +2712,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Create Annotation Queue
+      summary: Create Queue
       operationId: createAnnotationQueue
       description: |
         Creates a new annotation queue for organizing traces, spans, threads, golden datasets, or test runs for systematic review and annotation.
@@ -2756,7 +2756,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Get Annotation Queue
+      summary: Get Queue
       operationId: getAnnotationQueue
       description: |
         Retrieves detailed information about a specific annotation queue including comprehensive statistics.
@@ -2810,7 +2810,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Delete Annotation Queue
+      summary: Delete Queue
       operationId: deleteAnnotationQueue
       description: |
         Permanently deletes an annotation queue and all its associated queue items.
@@ -5161,7 +5161,7 @@ components:
           description: "This is true if the list of metric collections was retrieved successfully."
         data:
           type: object
-          description: "This maps to a list of metric collections, which can be used to [run evals](/api-reference/evaluation/evaluate-llm) remotely."
+          description: "This maps to a list of metric collections, which can be used to [run evals](/docs/api-reference/evaluate/evaluate-llm) remotely."
           properties:
             metricCollections:
               type: array
@@ -5174,7 +5174,7 @@ components:
                     description: "This is the id of the metric collection."
                   name:
                     type: string
-                    description: "This is the name of the metric collection, which should be supplied to the [evals API](/api-reference/evaluation/evaluate-llm) to run evaluations remotely."
+                    description: "This is the name of the metric collection, which should be supplied to the [evals API](/docs/api-reference/evaluate/evaluate-llm) to run evaluations remotely."
                   multiTurn:
                     type: boolean
                     description: "This is true if the metric collection is a multi-turn collection, which only contains multi-turn metrics for multi-turn evaluations."
