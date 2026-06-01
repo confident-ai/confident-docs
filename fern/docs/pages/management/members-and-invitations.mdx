@@ -1,0 +1,246 @@
+---
+subtitle: Invite teammates, manage memberships, and assign roles.
+slug: management/members-and-invitations
+description: Manage organization and project members and invitations programmatically with the ConfidentClient in the DeepEval Python and TypeScript SDKs.
+---
+
+## Overview
+
+Members are users who belong to your organization or a specific project. New members join by accepting an invitation. The `ConfidentClient` exposes both **organization-scoped** and **project-scoped** methods so you can automate team onboarding and offboarding.
+
+<Note>
+
+All methods on this page require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+
+</Note>
+
+## Members
+
+### List Members
+
+Member listing is paginated (defaults: `page=1`, `page_size=25`).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.confident import ConfidentClient
+
+client = ConfidentClient()
+
+# Organization members
+members = client.list_organization_members(page=1, page_size=25)
+
+# Project members
+members = client.list_project_members(project_id="proj_123", page=1)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentClient } from "deepeval";
+
+const client = new ConfidentClient();
+
+// Organization members
+const members = await client.listOrganizationMembers({ page: 1, pageSize: 25 });
+
+// Project members
+const projectMembers = await client.listProjectMembers("proj_123", { page: 1 });
+```
+
+</Tab>
+
+</Tabs>
+
+### Update a Member's Role
+
+Assign a role to a member by their `user_id`. Roles are managed in [Roles, Policies & Permissions](/docs/management/roles-policies-permissions).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+# Organization-level role
+member = client.update_organization_member_role(
+    user_id="user_123",
+    role_id="role_abc",
+)
+
+# Project-level role
+member = client.update_project_member_role(
+    project_id="proj_123",
+    user_id="user_123",
+    role_id="role_abc",
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+// Organization-level role
+const member = await client.updateOrganizationMemberRole(
+  "user_123",
+  "role_abc",
+);
+
+// Project-level role
+const projectMember = await client.updateProjectMemberRole(
+  "proj_123",
+  "user_123",
+  "role_abc",
+);
+```
+
+</Tab>
+
+</Tabs>
+
+### Remove a Member
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+client.remove_organization_member(user_id="user_123")
+client.remove_project_member(project_id="proj_123", user_id="user_123")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+await client.removeOrganizationMember("user_123");
+await client.removeProjectMember("proj_123", "user_123");
+```
+
+</Tab>
+
+</Tabs>
+
+## Invitations
+
+### List Invitations
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+invitations = client.list_organization_invitations()
+invitations = client.list_project_invitations(project_id="proj_123")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const invitations = await client.listOrganizationInvitations();
+const projectInvitations = await client.listProjectInvitations("proj_123");
+```
+
+</Tab>
+
+</Tabs>
+
+### Create Invitations
+
+Invite one or more emails. The optional `role_id` assigns a role to invitees on join.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+# Organization invitations
+invitations = client.create_organization_invitations(
+    emails=["alice@acme.com", "bob@acme.com"],
+    role_id="role_abc",
+)
+
+# Project invitations
+invitations = client.create_project_invitations(
+    project_id="proj_123",
+    emails=["alice@acme.com"],
+    role_id="role_abc",
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+// Organization invitations
+const invitations = await client.createOrganizationInvitations(
+  ["alice@acme.com", "bob@acme.com"],
+  "role_abc",
+);
+
+// Project invitations
+const projectInvitations = await client.createProjectInvitations(
+  "proj_123",
+  ["alice@acme.com"],
+  "role_abc",
+);
+```
+
+</Tab>
+
+</Tabs>
+
+### Resend & Delete Invitations
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+# Resend
+client.resend_organization_invitation(invitation_id=42)
+client.resend_project_invitation(project_id="proj_123", invitation_id=42)
+
+# Delete
+client.delete_organization_invitation(invitation_id=42)
+client.delete_project_invitation(project_id="proj_123", invitation_id=42)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+// Resend
+await client.resendOrganizationInvitation(42);
+await client.resendProjectInvitation("proj_123", 42);
+
+// Delete
+await client.deleteOrganizationInvitation(42);
+await client.deleteProjectInvitation("proj_123", 42);
+```
+
+</Tab>
+
+</Tabs>
+
+## Next Steps
+
+To control what your members can do, define the roles you assign them:
+
+<CardGroup cols={2}>
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/management/roles-policies-permissions">
+    Create the roles you assign to members.
+  </Card>
+  <Card title="Projects" icon="folder" href="/docs/management/projects">
+    Manage the projects members belong to.
+  </Card>
+</CardGroup>

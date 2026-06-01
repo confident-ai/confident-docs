@@ -1,0 +1,195 @@
+---
+title: Introduction to Management
+subtitle: Programmatically manage your organization, projects, teams, and access control.
+slug: management/introduction
+description: Manage organizations, projects, members, roles, policies, and API keys using the ConfidentClient in the DeepEval Python and TypeScript SDKs.
+---
+
+## Overview
+
+The `ConfidentClient` lets you administer your Confident AI account in code — the same projects, teams, roles, and API keys you'd otherwise manage in the platform UI. It's ideal for automating onboarding, provisioning projects in CI/CD, syncing roles with your identity provider, and rotating API keys.
+
+The client wraps the [management endpoints of the Evals API](/docs/api-reference/organization/get-organization) and exposes them as typed methods across eight resource areas:
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/docs/management/projects">
+    Create, read, update, and delete projects in your organization.
+  </Card>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/management/members-and-invitations">
+    Invite teammates, manage memberships, and assign roles.
+  </Card>
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/management/roles-policies-permissions">
+    Define RBAC with roles, policies, and permissions.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/management/api-keys">
+    Provision and rotate organization- and project-scoped API keys.
+  </Card>
+</CardGroup>
+
+<Note>
+
+Management operations require an **Organization API Key**. Learn how to retrieve it in [Authentication](/docs/api-reference/authentication#organization-level-auth).
+
+</Note>
+
+## Setup
+
+<Steps>
+
+<Step title="Install the SDK">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+pip install -U deepeval
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+npm install deepeval
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Set your Organization API Key">
+
+The client reads the `CONFIDENT_API_KEY` environment variable by default:
+
+```bash
+export CONFIDENT_API_KEY="confident_us..."
+```
+
+</Step>
+
+<Step title="Create a client">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.confident import ConfidentClient
+
+client = ConfidentClient()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentClient } from "deepeval";
+
+const client = new ConfidentClient();
+```
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+You can also pass the key explicitly instead of relying on the environment variable. This is useful when managing multiple organizations from the same process.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+client = ConfidentClient(api_key="confident_us...")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const client = new ConfidentClient("confident_us...");
+```
+
+</Tab>
+
+</Tabs>
+
+</Tip>
+
+</Step>
+
+</Steps>
+
+## Organization- vs Project-Scoped Operations
+
+Most resources exist at two levels:
+
+- **Organization-scoped** methods (e.g. `list_organization_members`) operate across your entire organization.
+- **Project-scoped** methods (e.g. `list_project_members`) operate within a single project, identified by its `project_id`.
+
+Both require an Organization API Key.
+
+## Manage Your Organization
+
+Retrieve the organization tied to your API key, or rename it.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.confident import ConfidentClient
+
+client = ConfidentClient()
+
+organization = client.get_organization()
+print(organization.id, organization.name)
+
+# Rename the organization
+organization = client.update_organization(name="Acme Inc.")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentClient } from "deepeval";
+
+const client = new ConfidentClient();
+
+const organization = await client.getOrganization();
+console.log(organization.id, organization.name);
+
+// Rename the organization
+const renamed = await client.updateOrganization("Acme Inc.");
+```
+
+</Tab>
+
+</Tabs>
+
+## Next Steps
+
+Now that your client is set up, dive into the resource you want to manage:
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/docs/management/projects">
+    Provision and tear down projects in code.
+  </Card>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/management/members-and-invitations">
+    Onboard and offboard teammates programmatically.
+  </Card>
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/management/roles-policies-permissions">
+    Build and assign RBAC in code.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/management/api-keys">
+    Automate key provisioning and rotation.
+  </Card>
+</CardGroup>

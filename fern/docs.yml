@@ -346,6 +346,23 @@ navigation:
           - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code
+      - section: Management
+        contents:
+          - page: Introduction
+            path: docs/pages/management/introduction.mdx
+            icon: fa-light fa-circle-info
+          - page: Projects
+            path: docs/pages/management/projects.mdx
+            icon: fa-light fa-folder
+          - page: Members & Invitations
+            path: docs/pages/management/members-and-invitations.mdx
+            icon: fa-light fa-user-group
+          - page: Roles, Policies & Permissions
+            path: docs/pages/management/roles-policies-permissions.mdx
+            icon: fa-light fa-user-shield
+          - page: API Keys
+            path: docs/pages/management/api-keys.mdx
+            icon: fa-light fa-key
       - section: Resources
         contents:
           - page: Why Confident AI

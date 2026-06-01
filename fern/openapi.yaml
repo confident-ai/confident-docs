@@ -2441,6 +2441,8 @@ paths:
       operationId: createAnnotation
       x-fern-examples:
         - name: Thumbs Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             traceUuid: "<TRACE-UUID>"
             rating: 1
@@ -2454,6 +2456,8 @@ paths:
                 id: "ANNOTATION-ID"
               deprecated: false
         - name: Five Star Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             spanUuid: "<SPAN-UUID>"
             rating: 5
@@ -3024,7 +3028,13 @@ paths:
         - Projects
       summary: Create Project
       operationId: createProject
-      description: Creates a new project within your organization.
+      description: |
+        Creates a new project within your organization.
+
+        The project is provisioned the same way as one created from the dashboard:
+        a default project-scoped API key is created (its full `value` is returned **once** in this response) and a set of default classifiers is seeded so the project is ready to use immediately.
+
+        Optionally pass `ownerId` to assign an existing organization member as the project's Owner so they can manage it from the dashboard.
       requestBody:
         required: true
         description: ""
@@ -3051,6 +3061,13 @@ paths:
                     description: "This is a new project for testing"
                     organizationId: "ORGANIZATION-ID"
                     created_at: "2024-12-04T23:00:00.000Z"
+                  apiKey:
+                    id: 12
+                    name: "Default Key"
+                    valid: true
+                    value: "confident_proj_9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: null
 
   /v1/projects/{projectId}:
     get:
@@ -3566,7 +3583,7 @@ paths:
       summary: Update Project Member Role
       operationId: updateProjectMemberRole
       description: |
-        Changes a member's project role. The `Owner` role cannot be assigned through the API, and the project's current Owner cannot be reassigned.
+        Changes a member's project role. Assigning the `Owner` role to another member transfers ownership: the current Owner is automatically demoted to `Manager`. The current Owner's role cannot be changed directly — transfer ownership instead.
       parameters:
         - name: projectId
           in: path
@@ -4216,7 +4233,7 @@ paths:
       summary: Update Organization Member Role
       operationId: updateMemberRole
       description: |
-        Changes a member's organization role. The `Owner` role cannot be assigned through the API, and the organization's current Owner cannot be reassigned.
+        Changes a member's organization role. Assigning the `Owner` role to another member transfers ownership: the current Owner is automatically demoted to `Admin`. The current Owner's role cannot be changed directly — transfer ownership instead.
       parameters:
         - name: userId
           in: path
@@ -8656,6 +8673,10 @@ components:
         description:
           type: string
           description: Optional description of the project
+        ownerId:
+          type: string
+          description: |
+            Optional id of an existing organization member to assign as the project's Owner. The Owner is granted full project access. Ownership can later be transferred by assigning the `Owner` role to another member via the Update Project Member Role endpoint. Omit this to create a project with no member (accessible via its API key and to organization admins).
       required:
         - name
 
@@ -8670,6 +8691,11 @@ components:
           properties:
             project:
               $ref: "#/components/schemas/Project"
+            apiKey:
+              allOf:
+                - $ref: "#/components/schemas/ApiKey"
+              description: |
+                A default project-scoped API key that is provisioned automatically with the project so it is immediately usable for ingestion. Its full `value` is returned **only once**, in this response, and cannot be retrieved again afterwards.
       required:
         - success
         - data
@@ -8915,7 +8941,7 @@ components:
       properties:
         roleId:
           type: string
-          description: The id of the organization role to assign to the member
+          description: The id of the role to assign to the member. Assigning the `Owner` role transfers ownership, automatically demoting the current Owner.
       required:
         - roleId
 

@@ -1,0 +1,176 @@
+---
+subtitle: Create, read, update, and delete projects in your organization.
+slug: management/projects
+description: Manage Confident AI projects programmatically with the ConfidentClient in the DeepEval Python and TypeScript SDKs.
+---
+
+## Overview
+
+Projects are isolated workspaces for your datasets, prompts, traces, and evaluations. With the `ConfidentClient` you can provision and tear down projects in code — useful for spinning up a project per customer, environment, or CI run.
+
+<Note>
+
+All project methods require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+
+</Note>
+
+## List Projects
+
+Returns every project in your organization.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval.confident import ConfidentClient
+
+client = ConfidentClient()
+
+projects = client.list_projects()
+for project in projects:
+    print(project.id, project.name)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentClient } from "deepeval";
+
+const client = new ConfidentClient();
+
+const projects = await client.listProjects();
+projects.forEach((project) => console.log(project.id, project.name));
+```
+
+</Tab>
+
+</Tabs>
+
+## Create a Project
+
+`description` is optional.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.create_project(
+    name="Customer Support Bot",
+    description="Production support assistant",
+)
+print(project.id)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = await client.createProject({
+  name: "Customer Support Bot",
+  description: "Production support assistant",
+});
+console.log(project.id);
+```
+
+</Tab>
+
+</Tabs>
+
+## Get a Project
+
+Retrieve a single project by its `project_id`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.get_project(project_id="proj_123")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = await client.getProject("proj_123");
+```
+
+</Tab>
+
+</Tabs>
+
+## Update a Project
+
+Both `name` and `description` are optional — only the fields you pass are changed.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.update_project(
+    project_id="proj_123",
+    name="Support Bot (v2)",
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = await client.updateProject("proj_123", {
+  name: "Support Bot (v2)",
+});
+```
+
+</Tab>
+
+</Tabs>
+
+## Delete a Project
+
+<Warning>
+
+Deleting a project permanently removes all of its datasets, prompts, traces, and evaluations. This cannot be undone.
+
+</Warning>
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+client.delete_project(project_id="proj_123")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+await client.deleteProject("proj_123");
+```
+
+</Tab>
+
+</Tabs>
+
+## Next Steps
+
+With projects in place, manage who can access them and how:
+
+<CardGroup cols={2}>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/management/members-and-invitations">
+    Add teammates to your new projects.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/management/api-keys">
+    Provision project-scoped API keys.
+  </Card>
+</CardGroup>
