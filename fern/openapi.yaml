@@ -2010,13 +2010,13 @@ paths:
                               verboseLogs: "..."
                     deprecated: false
 
-  /v1/metric-data:
+  /v1/metrics-data:
     get:
       x-fern-server-name: Confident AI
       tags:
         - Metric Data
       summary: List Metric Data
-      operationId: listMetricData
+      operationId: listMetricsData
       description: |
         Retrieves a paginated list of metric data (evaluation results) from your Confident AI project.
       parameters:
@@ -2125,6 +2125,90 @@ paths:
                       evaluationCost: 0.003
                       verboseLogs: null
                       updatedAt: "2025-11-12T09:15:03.000Z"
+                  totalMetricsData: 150
+                  page: 1
+                  pageSize: 25
+
+  /v1/metric-data:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Legacy
+      summary: List Metric Data
+      operationId: listMetricData
+      description: >-
+        Deprecated. Use `GET /v1/metrics-data` instead. Retrieves a paginated
+        list of metric data (evaluation results) from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the metrics data to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: This specifies the maximum number of metrics data per page. Defaulted to 25, capped at 100.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created after the specified start datetime. Defaulted to 60 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created before the specified end datetime. Defaulted to the current time.
+      responses:
+        "200":
+          description: Successfully retrieved list of metrics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMetricsDataResponse"
+              example:
+                success: true
+                data:
+                  metricsData:
+                    - id: "metric-data-uuid-1"
+                      projectId: "PROJECT-ID"
+                      traceUuid: null
+                      spanUuid: null
+                      testCaseId: "test-case-uuid-1"
+                      testRunId: null
+                      threadId: null
+                      name: "answer_relevancy"
+                      multiTurn: false
+                      score: 0.85
+                      reason: "The answer is relevant to the question"
+                      success: true
+                      createdAt: "2025-11-12T10:30:00.000Z"
+                      evaluatedAt: "2025-11-12T10:30:02.000Z"
+                      threshold: 0.7
+                      strictMode: false
+                      skipped: false
+                      evaluationModel: "gpt-4o"
+                      error: null
+                      evaluationCost: 0.002
+                      verboseLogs: null
+                      updatedAt: "2025-11-12T10:30:02.000Z"
                   totalMetricsData: 150
                   page: 1
                   pageSize: 25
