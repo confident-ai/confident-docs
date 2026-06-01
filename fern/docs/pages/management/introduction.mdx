@@ -62,19 +62,13 @@ npm install deepeval
 
 </Step>
 
-<Step title="Set your API Key">
+<Step title="Set your Organization API Key">
 
-The client reads the `CONFIDENT_API_KEY` environment variable by default — the same key you already use for tracing and evaluations:
+The client reads the `CONFIDENT_ORG_API_KEY` environment variable by default. This is separate from the `CONFIDENT_API_KEY` used for tracing and evaluations, so you can configure both at once.
 
 ```bash
-export CONFIDENT_API_KEY="confident_us..."
+export CONFIDENT_ORG_API_KEY="confident_us..."
 ```
-
-<Note>
-
-You can also keep a dedicated key for management in `CONFIDENT_ORG_API_KEY`. The client prefers `CONFIDENT_API_KEY` and falls back to `CONFIDENT_ORG_API_KEY`, so both can be configured at once. Whichever key you use must have organization-level permissions.
-
-</Note>
 
 </Step>
 
@@ -113,7 +107,7 @@ You can also pass the key explicitly instead of relying on the environment varia
 <Tab title="Python" language="python">
 
 ```python
-client = ConfidentClient(api_key="confident_us...")
+client = ConfidentClient(org_api_key="confident_us...")
 ```
 
 </Tab>
