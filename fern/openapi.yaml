@@ -48,8 +48,8 @@ tags:
     description: Projects API
     externalDocs:
       description: Learn about projects
-  - name: Metric Data
-    description: Metric Data API
+  - name: Metrics Data
+    description: Metrics Data API
     externalDocs:
       description: Learn about metric data
   - name: Project API Keys
@@ -2014,8 +2014,8 @@ paths:
     get:
       x-fern-server-name: Confident AI
       tags:
-        - Metric Data
-      summary: List Metric Data
+        - Metrics Data
+      summary: List Metrics Data
       operationId: listMetricsData
       description: |
         Retrieves a paginated list of metric data (evaluation results) from your Confident AI project.
@@ -8594,7 +8594,7 @@ components:
         - success
         - data
 
-    # Metric Data Schemas
+    # Metrics Data Schemas
     MetricDataItem:
       type: object
       required:

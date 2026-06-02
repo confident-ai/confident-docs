@@ -1,7 +1,7 @@
 ---
 subtitle: Define role-based access control in code.
 slug: management/roles-policies-permissions
-description: Manage roles, policies, and permissions programmatically with the ConfidentClient in the DeepEval Python and TypeScript SDKs.
+description: Manage roles, policies, and permissions programmatically with the ConfidentAI client in the confidentai Python and TypeScript SDKs.
 ---
 
 ## Overview
@@ -20,7 +20,7 @@ flowchart LR
     Role -->|assigned to| Member["Members"]
 ```
 
-Each building block exists independently at both the **organization** and **project** level: organization-level roles govern org-wide access, while project-level roles govern access within a single project. The two sets mirror each other — every method has an `*_organization_*` variant and a `*_project_*` variant (the latter takes a leading `project_id`). To learn more about RBAC concepts, see [RBAC](/docs/settings/rbac).
+Each building block exists independently at both the **organization** and **project** level: organization-level roles govern org-wide access, while project-level roles govern access within a single project. The two sets mirror each other — access the organization set through `client.organization()` and the project set through `client.project(project_id)`. To learn more about RBAC concepts, see [RBAC](/docs/settings/rbac).
 
 <Note>
 
@@ -37,12 +37,15 @@ Permissions are read-only. List them to discover the `id`s you'll attach to poli
 <Tab title="Python" language="python">
 
 ```python
-from deepeval.confident import ConfidentClient
+from confidentai import ConfidentAI
 
-client = ConfidentClient()
+client = ConfidentAI()
 
-permissions = client.list_organization_permissions()
-permissions = client.list_project_permissions(project_id="proj_123")
+org = client.organization()
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+
+permissions = org.permissions.list()
+project_permissions = project.permissions.list()
 ```
 
 </Tab>
@@ -50,12 +53,15 @@ permissions = client.list_project_permissions(project_id="proj_123")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
-import { ConfidentClient } from "deepeval";
+import { ConfidentAI } from "confidentai";
 
-const client = new ConfidentClient();
+const client = new ConfidentAI();
 
-const permissions = await client.listOrganizationPermissions();
-const projectPermissions = await client.listProjectPermissions("proj_123");
+const org = client.organization();
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+
+const permissions = await org.permissions.list();
+const projectPermissions = await project.permissions.list();
 ```
 
 </Tab>
@@ -75,26 +81,29 @@ Each policy takes a `name`, a list of `permission_ids`, and an optional `descrip
 <Tab title="Python" language="python">
 
 ```python
+org = client.organization()
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+
 # List
-policies = client.list_organization_policies()
-policies = client.list_project_policies(project_id="proj_123")
+policies = org.policies.list()
+project_policies = project.policies.list()
 
 # Create
-policy = client.create_organization_policy(
-    name="Dataset Editor",
-    permission_ids=["perm_1", "perm_2"],
+policy = org.policies.create(
+    "Dataset Editor",
+    permission_ids=["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e"],
     description="Can edit datasets",
 )
 
 # Update
-policy = client.update_organization_policy(
-    policy_id="policy_123",
+policy = org.policies.update(
+    "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
     name="Dataset Editor",
-    permission_ids=["perm_1", "perm_2", "perm_3"],
+    permission_ids=["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e", "2a7e9c1d-4b6f-4a8c-1d3e-7f5a9b2c0e4d"],
 )
 
 # Delete
-client.delete_organization_policy(policy_id="policy_123")
+org.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d")
 ```
 
 </Tab>
@@ -102,25 +111,28 @@ client.delete_organization_policy(policy_id="policy_123")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
+const org = client.organization();
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+
 // List
-const policies = await client.listOrganizationPolicies();
-const projectPolicies = await client.listProjectPolicies("proj_123");
+const policies = await org.policies.list();
+const projectPolicies = await project.policies.list();
 
 // Create
-const policy = await client.createOrganizationPolicy({
+const policy = await org.policies.create({
   name: "Dataset Editor",
-  permissionIds: ["perm_1", "perm_2"],
+  permissionIds: ["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e"],
   description: "Can edit datasets",
 });
 
 // Update
-const updated = await client.updateOrganizationPolicy("policy_123", {
+const updated = await org.policies.update("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", {
   name: "Dataset Editor",
-  permissionIds: ["perm_1", "perm_2", "perm_3"],
+  permissionIds: ["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e", "2a7e9c1d-4b6f-4a8c-1d3e-7f5a9b2c0e4d"],
 });
 
 // Delete
-await client.deleteOrganizationPolicy("policy_123");
+await org.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d");
 ```
 
 </Tab>
@@ -129,7 +141,7 @@ await client.deleteOrganizationPolicy("policy_123");
 
 <Tip>
 
-Project-scoped policies use the equivalent `*_project_policy` / `*ProjectPolicy` methods, which take a leading `project_id` argument.
+Project-scoped policies use the same methods under `client.project(project_id).policies`.
 
 </Tip>
 
@@ -146,26 +158,29 @@ Each role takes a `name`, a list of `policy_ids`, and an optional `description`.
 <Tab title="Python" language="python">
 
 ```python
+org = client.organization()
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+
 # List
-roles = client.list_organization_roles()
-roles = client.list_project_roles(project_id="proj_123")
+roles = org.roles.list()
+project_roles = project.roles.list()
 
 # Create
-role = client.create_organization_role(
-    name="Data Scientist",
-    policy_ids=["policy_123"],
+role = org.roles.create(
+    "Data Scientist",
+    policy_ids=["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d"],
     description="Read/write datasets and prompts",
 )
 
 # Update
-role = client.update_organization_role(
-    role_id="role_abc",
+role = org.roles.update(
+    "b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
     name="Data Scientist",
-    policy_ids=["policy_123", "policy_456"],
+    policy_ids=["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", "c4f8a2e6-1d3b-4e9a-8c7d-5b2f1a0e6d3c"],
 )
 
 # Delete
-client.delete_organization_role(role_id="role_abc")
+org.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e")
 ```
 
 </Tab>
@@ -173,25 +188,28 @@ client.delete_organization_role(role_id="role_abc")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
+const org = client.organization();
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+
 // List
-const roles = await client.listOrganizationRoles();
-const projectRoles = await client.listProjectRoles("proj_123");
+const roles = await org.roles.list();
+const projectRoles = await project.roles.list();
 
 // Create
-const role = await client.createOrganizationRole({
+const role = await org.roles.create({
   name: "Data Scientist",
-  policyIds: ["policy_123"],
+  policyIds: ["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d"],
   description: "Read/write datasets and prompts",
 });
 
 // Update
-const updated = await client.updateOrganizationRole("role_abc", {
+const updated = await org.roles.update("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e", {
   name: "Data Scientist",
-  policyIds: ["policy_123", "policy_456"],
+  policyIds: ["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", "c4f8a2e6-1d3b-4e9a-8c7d-5b2f1a0e6d3c"],
 });
 
 // Delete
-await client.deleteOrganizationRole("role_abc");
+await org.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e");
 ```
 
 </Tab>
@@ -200,7 +218,7 @@ await client.deleteOrganizationRole("role_abc");
 
 <Tip>
 
-Project-scoped roles use the equivalent `*_project_role` / `*ProjectRole` methods, which take a leading `project_id` argument.
+Project-scoped roles use the same methods under `client.project(project_id).roles`.
 
 </Tip>
 

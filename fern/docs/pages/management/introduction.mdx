@@ -2,12 +2,12 @@
 title: Introduction to Management
 subtitle: Programmatically manage your organization, projects, teams, and access control.
 slug: management/introduction
-description: Manage organizations, projects, members, roles, policies, and API keys using the ConfidentClient in the DeepEval Python and TypeScript SDKs.
+description: Manage organizations, projects, members, roles, policies, and API keys using the ConfidentAI client in the confidentai Python and TypeScript SDKs.
 ---
 
 ## Overview
 
-`ConfidentClient` is a programmatic admin client for your Confident AI account. It lets you manage your organization, projects, team members, roles, and API keys directly in code — the same actions you'd otherwise perform by clicking through the platform UI.
+`ConfidentAI` is a programmatic admin client for your Confident AI account. It lets you manage your organization, projects, team members, roles, and API keys directly in code — the same actions you'd otherwise perform by clicking through the platform UI.
 
 Use it whenever you want to script account management instead of doing it by hand — for example, onboarding new teammates, provisioning projects in CI/CD, keeping roles in sync with your identity provider, or rotating API keys.
 
@@ -34,7 +34,7 @@ Management operations require an **Organization API Key**. Learn how to retrieve
 
 ## Setup
 
-Install the SDK and configure your `ConfidentClient` with an Organization API Key.
+Install the SDK and configure your `ConfidentAI` client with an Organization API Key.
 
 <Steps>
 
@@ -45,7 +45,7 @@ Install the SDK and configure your `ConfidentClient` with an Organization API Ke
 <Tab title="Python" language="python">
 
 ```bash
-pip install -U deepeval
+pip install confidentai
 ```
 
 </Tab>
@@ -53,7 +53,7 @@ pip install -U deepeval
 <Tab title="TypeScript" language="typescript">
 
 ```bash
-npm install deepeval
+npm install confidentai
 ```
 
 </Tab>
@@ -67,7 +67,7 @@ npm install deepeval
 The client reads the `CONFIDENT_ORG_API_KEY` environment variable by default. This is separate from the `CONFIDENT_API_KEY` used for tracing and evaluations, so you can configure both at once.
 
 ```bash
-export CONFIDENT_ORG_API_KEY="confident_us..."
+export CONFIDENT_ORG_API_KEY="confident_us_org_8Kj2mNpQ4rVz..."
 ```
 
 </Step>
@@ -79,9 +79,9 @@ export CONFIDENT_ORG_API_KEY="confident_us..."
 <Tab title="Python" language="python">
 
 ```python
-from deepeval.confident import ConfidentClient
+from confidentai import ConfidentAI
 
-client = ConfidentClient()
+client = ConfidentAI()
 ```
 
 </Tab>
@@ -89,9 +89,9 @@ client = ConfidentClient()
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
-import { ConfidentClient } from "deepeval";
+import { ConfidentAI } from "confidentai";
 
-const client = new ConfidentClient();
+const client = new ConfidentAI();
 ```
 
 </Tab>
@@ -107,7 +107,7 @@ You can also pass the key explicitly instead of relying on the environment varia
 <Tab title="Python" language="python">
 
 ```python
-client = ConfidentClient(org_api_key="confident_us...")
+client = ConfidentAI(api_key="confident_us_org_8Kj2mNpQ4rVz...")
 ```
 
 </Tab>
@@ -115,7 +115,7 @@ client = ConfidentClient(org_api_key="confident_us...")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
-const client = new ConfidentClient("confident_us...");
+const client = new ConfidentAI({ apiKey: "confident_us_org_8Kj2mNpQ4rVz..." });
 ```
 
 </Tab>
@@ -130,12 +130,42 @@ const client = new ConfidentClient("confident_us...");
 
 ## Organization- vs Project-Scoped Operations
 
-Most resources exist at two levels:
+Most resources exist at two levels, and the client gives you a separate entry point for each:
 
-- **Organization-scoped** methods (e.g. `list_organization_members`) operate across your entire organization.
-- **Project-scoped** methods (e.g. `list_project_members`) operate within a single project, identified by its `project_id`.
+- **Organization-scoped** resources operate across your entire organization. Access them from `client.organization()`.
+- **Project-scoped** resources operate within a single project. Access them from `client.project(project_id)`.
 
-Both require an Organization API Key.
+From either entry point, you chain the resource and the action — for example, listing members:
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+# Across the whole organization
+client.organization().members.list()
+
+# Within a single project
+client.project(project_id).members.list()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+// Across the whole organization
+client.organization().members.list();
+
+// Within a single project
+client.project(projectId).members.list();
+```
+
+</Tab>
+
+</Tabs>
+
+Both entry points require an Organization API Key.
 
 ## Manage Your Organization
 
@@ -146,15 +176,17 @@ You can retrieve the organization tied to your API key, or rename it.
 <Tab title="Python" language="python">
 
 ```python
-from deepeval.confident import ConfidentClient
+from confidentai import ConfidentAI
 
-client = ConfidentClient()
+client = ConfidentAI()
 
-organization = client.get_organization()
+org = client.organization()
+
+organization = org.get()
 print(organization.id, organization.name)
 
 # Rename the organization
-organization = client.update_organization(name="Acme Inc.")
+organization = org.update(name="Acme Inc.")
 ```
 
 </Tab>
@@ -162,20 +194,28 @@ organization = client.update_organization(name="Acme Inc.")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
-import { ConfidentClient } from "deepeval";
+import { ConfidentAI } from "confidentai";
 
-const client = new ConfidentClient();
+const client = new ConfidentAI();
 
-const organization = await client.getOrganization();
+const org = client.organization();
+
+const organization = await org.get();
 console.log(organization.id, organization.name);
 
 // Rename the organization
-const renamed = await client.updateOrganization("Acme Inc.");
+const renamed = await org.update({ name: "Acme Inc." });
 ```
 
 </Tab>
 
 </Tabs>
+
+<Tip>
+
+`client.whoami()` is a shortcut that returns the organization your API key is scoped to — handy for confirming which account a key belongs to.
+
+</Tip>
 
 ## Next Steps
 

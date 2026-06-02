@@ -418,7 +418,7 @@ navigation:
                   - POST /v1/metric-collections
                   - GET /v1/metric-collections
                   - PUT /v1/metric-collections/{id}
-              - section: Metric Data
+              - section: Metrics Data
                 contents:
                   - GET /v1/metrics-data
               - section: Datasets
@@ -583,7 +583,7 @@ navigation:
                   - section: Batch Metrics
                     contents:
                       - POST /v1/batch-metrics
-              - section: Metric Data
+              - section: Metrics Data
                 contents:
                   - GET /v1/metric-data
   - tab: integrations
