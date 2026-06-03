@@ -201,13 +201,13 @@ project = client.project("clq9z3x1k0001la08f7t3g5p2")
 
 # Organization invitations
 invitations = org.invitations.create(
-    ["alice@acme.com", "bob@acme.com"],
+    ["alice@example.com", "bob@example.com"],
     role_id="b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
 )
 
 # Project invitations
 project_invitations = project.invitations.create(
-    ["alice@acme.com"],
+    ["alice@example.com"],
     role_id="b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
 )
 ```
@@ -222,13 +222,13 @@ const project = client.project("clq9z3x1k0001la08f7t3g5p2");
 
 // Organization invitations
 const invitations = await org.invitations.create({
-  emails: ["alice@acme.com", "bob@acme.com"],
+  emails: ["alice@example.com", "bob@example.com"],
   roleId: "b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
 });
 
 // Project invitations
 const projectInvitations = await project.invitations.create({
-  emails: ["alice@acme.com"],
+  emails: ["alice@example.com"],
   roleId: "b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
 });
 ```

@@ -117,10 +117,10 @@ org = client.organization()
 project = client.project("clq9z3x1k0001la08f7t3g5p2")
 
 api_key = org.api_keys.create("ci-pipeline")
-print(api_key.value)  # e.g. "confident_us_org_8Kj2mNpQ4rVz...", shown only once
+print(api_key.value)  # e.g. "confident_us_org_...", shown only once
 
 project_api_key = project.api_keys.create("ci-pipeline")
-print(project_api_key.value)  # e.g. "confident_us_proj_WQDt3T2mLpu7..."
+print(project_api_key.value)  # e.g. "confident_us_proj_..."
 ```
 
 </Tab>
@@ -132,10 +132,10 @@ const org = client.organization();
 const project = client.project("clq9z3x1k0001la08f7t3g5p2");
 
 const apiKey = await org.apiKeys.create({ name: "ci-pipeline" });
-console.log(apiKey.value); // e.g. "confident_us_org_8Kj2mNpQ4rVz...", shown only once
+console.log(apiKey.value); // e.g. "confident_us_org_...", shown only once
 
 const projectApiKey = await project.apiKeys.create({ name: "ci-pipeline" });
-console.log(projectApiKey.value); // e.g. "confident_us_proj_WQDt3T2mLpu7..."
+console.log(projectApiKey.value); // e.g. "confident_us_proj_..."
 ```
 
 </Tab>

@@ -63,7 +63,7 @@ created = client.projects.create(
     description="Production support assistant",
 )
 print(created.project.id)  # e.g. "clq9z3x1k0001la08f7t3g5p2"
-print(created.api_key.value)  # e.g. "confident_us_proj_WQDt3T2mLpu7...", shown only once
+print(created.api_key.value)  # e.g. "confident_us_proj_...", shown only once
 ```
 
 </Tab>
@@ -76,7 +76,7 @@ const created = await client.projects.create({
   description: "Production support assistant",
 });
 console.log(created.project.id); // e.g. "clq9z3x1k0001la08f7t3g5p2"
-console.log(created.apiKey?.value); // e.g. "confident_us_proj_WQDt3T2mLpu7..."
+console.log(created.apiKey?.value); // e.g. "confident_us_proj_..."
 ```
 
 </Tab>
