@@ -1,7 +1,7 @@
 ---
 subtitle: Provision and rotate organization- and project-scoped API keys.
-slug: management/api-keys
-description: Manage organization and project API keys programmatically with the ConfidentAI client in the confidentai Python and TypeScript SDKs.
+slug: settings/project/management/api-keys
+description: Manage organization and project API keys programmatically with the Admin SDK for Python and TypeScript.
 ---
 
 ## Overview
@@ -11,7 +11,7 @@ API keys authenticate requests to Confident AI, and come in two scopes:
 - **Organization API keys** authenticate at the organization level. They're used for account-wide administration — including every management method in this SDK.
 - **Project API keys** are scoped to a single project. They're the keys your application uses to send traces and run evaluations against that project.
 
-Each scope is accessed through its own client: `client.organization().api_keys` manages org-wide keys, while `client.project(project_id).api_keys` manages a single project's keys. Use them to list, create, enable/disable, and rotate keys in code.
+Use the Admin SDK to list, create, enable, disable, and delete keys at either scope.
 
 ```mermaid
 %%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 90}}}%%
@@ -28,7 +28,7 @@ The full secret `value` of an API key is **only returned when it is created**. S
 
 <Note>
 
-All methods on this page require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
 
 </Note>
 
@@ -106,7 +106,7 @@ const projectApiKey = await project.apiKeys.get(7);
 
 ## Create an API Key
 
-You can create a new key at the organization or project level, and the returned object's `value` is the full secret — capture it right away.
+You can create a new key at the organization or project level. The returned object's `value` is the full secret, so store it securely when the key is created.
 
 <Tabs>
 
@@ -214,7 +214,7 @@ Use your keys to authenticate the rest of the platform and SDKs:
   <Card title="Authentication" icon="lock-keyhole" href="/docs/api-reference/authentication">
     Learn how organization- and project-level auth works.
   </Card>
-  <Card title="Projects" icon="folder" href="/docs/management/projects">
+  <Card title="Projects" icon="folder" href="/docs/settings/project/management/projects">
     Manage the projects your keys are scoped to.
   </Card>
 </CardGroup>

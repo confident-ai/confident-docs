@@ -29,6 +29,10 @@ tabs:
     slug: integrations
     icon: fa-light fa-plug
     display-name: Integrations & OTEL
+  guides:
+    slug: guides
+    icon: fa-light fa-compass
+    display-name: Guides
   settings:
     slug: settings
     icon: fa-light fa-gear
@@ -346,23 +350,6 @@ navigation:
           - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code
-      - section: Management
-        contents:
-          - page: Introduction
-            path: docs/pages/management/introduction.mdx
-            icon: fa-light fa-circle-info
-          - page: Projects
-            path: docs/pages/management/projects.mdx
-            icon: fa-light fa-folder
-          - page: Members & Invitations
-            path: docs/pages/management/members-and-invitations.mdx
-            icon: fa-light fa-user-group
-          - page: Roles, Policies & Permissions
-            path: docs/pages/management/roles-policies-permissions.mdx
-            icon: fa-light fa-user-shield
-          - page: API Keys
-            path: docs/pages/management/api-keys.mdx
-            icon: fa-light fa-key
       - section: Resources
         contents:
           - page: Why Confident AI
@@ -743,6 +730,29 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+      - section: Admin SDK
+        contents:
+          - page: Introduction
+            path: docs/pages/settings/project/management/introduction.mdx
+            icon: fa-light fa-circle-info
+          - page: Quickstart
+            path: docs/pages/settings/project/management/quickstart.mdx
+            icon: fa-light fa-bolt
+          - page: Organization
+            path: docs/pages/settings/project/management/organization.mdx
+            icon: fa-light fa-building
+          - page: Projects
+            path: docs/pages/settings/project/management/projects.mdx
+            icon: fa-light fa-folder
+          - page: Members & Invitations
+            path: docs/pages/settings/project/management/members-and-invitations.mdx
+            icon: fa-light fa-user-group
+          - page: Roles, Policies & Permissions
+            path: docs/pages/settings/project/management/roles-policies-permissions.mdx
+            icon: fa-light fa-user-shield
+          - page: API Keys
+            path: docs/pages/settings/project/management/api-keys.mdx
+            icon: fa-light fa-key
   - tab: self-hosting
     layout:
       - page: Self-Hosting
@@ -838,6 +848,16 @@ navigation:
                 path: docs/pages/self-hosting/gcp/kubernetes-deployment.mdx
               - page: Verification
                 path: docs/pages/self-hosting/gcp/verification.mdx
+  - tab: guides
+    layout:
+      - page: Guides
+        path: docs/pages/guides/introduction.mdx
+        icon: fa-light fa-compass
+      - section: End-to-End
+        contents:
+          - page: Multi-Tenant Project Isolation
+            path: docs/pages/guides/provision-projects-in-code.mdx
+            icon: fa-light fa-layer-group
   - tab: changelog
 
 redirects:

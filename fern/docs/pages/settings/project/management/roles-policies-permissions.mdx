@@ -1,7 +1,7 @@
 ---
 subtitle: Define role-based access control in code.
-slug: management/roles-policies-permissions
-description: Manage roles, policies, and permissions programmatically with the ConfidentAI client in the confidentai Python and TypeScript SDKs.
+slug: settings/project/management/roles-policies-permissions
+description: Manage roles, policies, and permissions programmatically with the Admin SDK for Python and TypeScript.
 ---
 
 ## Overview
@@ -10,7 +10,7 @@ Confident AI uses role-based access control (RBAC). Access is granted by composi
 
 - **Permissions** are the atomic actions you can grant (e.g. `traces:read`). They are predefined by the platform, so you can only list them.
 - **Policies** are named bundles of permissions.
-- **Roles** are named bundles of policies that you assign to [members](/docs/management/members-and-invitations).
+- **Roles** are named bundles of policies that you assign to [members](/docs/settings/project/management/members-and-invitations).
 
 ```mermaid
 %%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 90}}}%%
@@ -20,17 +20,17 @@ flowchart LR
     Role -->|assigned to| Member["Members"]
 ```
 
-Each building block exists independently at both the **organization** and **project** level: organization-level roles govern org-wide access, while project-level roles govern access within a single project. The two sets mirror each other — access the organization set through `client.organization()` and the project set through `client.project(project_id)`. To learn more about RBAC concepts, see [RBAC](/docs/settings/rbac).
+Each building block exists independently at both the **organization** and **project** level. Organization-level roles govern access across the organization, while project-level roles govern access within a single project. To learn more about RBAC concepts, see [RBAC](/docs/settings/rbac).
 
 <Note>
 
-All methods on this page require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
 
 </Note>
 
 ## Permissions
 
-Permissions are read-only. List them to discover the `id`s you'll attach to policies.
+Permissions are read-only. List them to discover the `id`s to attach to policies.
 
 <Tabs>
 
@@ -141,7 +141,7 @@ await org.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d");
 
 <Tip>
 
-Project-scoped policies use the same methods under `client.project(project_id).policies`.
+Project-scoped policies use the same list, create, update, and delete operations as organization-scoped policies.
 
 </Tip>
 
@@ -218,7 +218,7 @@ await org.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e");
 
 <Tip>
 
-Project-scoped roles use the same methods under `client.project(project_id).roles`.
+Project-scoped roles use the same list, create, update, and delete operations as organization-scoped roles.
 
 </Tip>
 
@@ -227,7 +227,7 @@ Project-scoped roles use the same methods under `client.project(project_id).role
 With your roles defined, assign them to your team:
 
 <CardGroup cols={2}>
-  <Card title="Members & Invitations" icon="user-group" href="/docs/management/members-and-invitations">
+  <Card title="Members & Invitations" icon="user-group" href="/docs/settings/project/management/members-and-invitations">
     Assign roles to members and invitees.
   </Card>
   <Card title="RBAC" icon="user-shield" href="/docs/settings/rbac">

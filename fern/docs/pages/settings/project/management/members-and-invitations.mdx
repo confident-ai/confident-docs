@@ -1,28 +1,29 @@
 ---
-subtitle: Invite teammates, manage memberships, and assign roles.
-slug: management/members-and-invitations
-description: Manage organization and project members and invitations programmatically with the ConfidentAI client in the confidentai Python and TypeScript SDKs.
+subtitle: Invite members, manage memberships, and assign roles.
+slug: settings/project/management/members-and-invitations
+description: Manage organization and project members and invitations programmatically with the Admin SDK for Python and TypeScript.
 ---
 
 ## Overview
 
 Members are the people with access to your account, and they exist at two levels:
 
-- **Organization members** belong to your entire organization. Anyone you invite to the org becomes an organization member, and can be given an organization-level role.
-- **Project members** belong to a single project. You add organization members to individual projects to grant them access there, with a project-level role.
+- **Organization members** belong to your entire organization. Invited users become organization members and can receive an organization-level role.
+- **Project members** belong to a single project. Add organization members to projects to grant project access with a project-level role.
 
-A user is always an organization member first — project membership is layered on top to grant access to specific projects. New members join by accepting an invitation, and each level is accessed through its own client: `client.organization()` manages org-wide membership, while `client.project(project_id)` manages the members of a single project.
+A user must be an organization member before they can be added to a project. New members join by accepting an invitation, and project membership grants access to specific projects.
 
 ```mermaid
 %%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 90}}}%%
 flowchart LR
-    OM["Organization Members"] -->|added to| PMA["Project A Members"]
-    OM -->|added to| PMB["Project B Members"]
+    Invite["Invitation<br/>email + optional role"] --> Member["Organization Member<br/>organization-level role"]
+    Member --> ProjectA["Project A Member<br/>project-level role"]
+    Member --> ProjectB["Project B Member<br/>project-level role"]
 ```
 
 <Note>
 
-All methods on this page require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
 
 </Note>
 
@@ -78,7 +79,7 @@ const projectMembers = await project.members.list({ page: 1 });
 
 ### Update a Member's Role
 
-You can assign a role to a member by their `user_id`. Roles are managed in the [Roles, Policies & Permissions](/docs/management/roles-policies-permissions) section.
+You can assign a role to a member by their `user_id`. Roles are managed in the [Roles, Policies & Permissions](/docs/settings/project/management/roles-policies-permissions) section.
 
 <Tabs>
 
@@ -280,13 +281,13 @@ await project.invitations.revoke(42);
 
 ## Next Steps
 
-To control what your members can do, define the roles you assign them:
+Define roles before assigning access to members:
 
 <CardGroup cols={2}>
-  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/management/roles-policies-permissions">
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/settings/project/management/roles-policies-permissions">
     Create the roles you assign to members.
   </Card>
-  <Card title="Projects" icon="folder" href="/docs/management/projects">
+  <Card title="Projects" icon="folder" href="/docs/settings/project/management/projects">
     Manage the projects members belong to.
   </Card>
 </CardGroup>

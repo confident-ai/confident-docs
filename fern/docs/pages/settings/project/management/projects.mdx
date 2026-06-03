@@ -1,16 +1,16 @@
 ---
 subtitle: Create, read, update, and delete projects in your organization.
-slug: management/projects
-description: Manage Confident AI projects programmatically with the ConfidentAI client in the confidentai Python and TypeScript SDKs.
+slug: settings/project/management/projects
+description: Manage Confident AI projects programmatically with the Admin SDK for Python and TypeScript.
 ---
 
 ## Overview
 
-Projects are isolated workspaces for your datasets, prompts, traces, and evaluations. With the `ConfidentAI` client you can provision and tear down projects in code. This is especially useful for spinning up a project per AI agent, environment, or customer.
+Projects are isolated workspaces for your datasets, prompts, traces, and evaluations. With the Admin SDK you can create, update, and delete projects programmatically. This supports project-per-agent, project-per-environment, and project-per-customer organization models.
 
 <Note>
 
-All project methods require an **Organization API Key**. See [Setup](/docs/management/introduction#setup) to create a client.
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
 
 </Note>
 
@@ -51,7 +51,7 @@ projects.forEach((project) => console.log(project.id, project.name));
 
 ## Create a Project
 
-You can create a new project with just a `name`, while the `description` is optional. Creating a project also mints its first project API key, so the call returns both the `project` and that `api_key` (whose full secret is only available here).
+You can create a new project with just a `name`, while the `description` is optional. Creating a project also generates its first project API key, so the call returns both the `project` and that `api_key` (whose full secret is only available here).
 
 <Tabs>
 
@@ -169,17 +169,17 @@ await project.delete();
 
 ## Next Steps
 
-With projects in place, manage who can access them and how:
+After projects are configured, manage access and keys:
 
 <CardGroup cols={2}>
   <Card
     title="Members & Invitations"
     icon="user-group"
-    href="/docs/management/members-and-invitations"
+    href="/docs/settings/project/management/members-and-invitations"
   >
-    Add teammates to your new projects.
+    Add users to projects and assign roles.
   </Card>
-  <Card title="API Keys" icon="key" href="/docs/management/api-keys">
+  <Card title="API Keys" icon="key" href="/docs/settings/project/management/api-keys">
     Provision project-scoped API keys.
   </Card>
 </CardGroup>
