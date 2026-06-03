@@ -1,22 +1,24 @@
 ---
-title: Multi-Tenant Project Isolation
-subtitle: Isolate each application in its own project while managing all projects from one organization.
+title: Provision Projects for Agents on the Fly
+subtitle: Spin up a dedicated Confident AI project for each agent your users build, then trace and evaluate every agent in isolation.
 slug: guides/multi-tenant-project-isolation
-description: Create Confident AI projects programmatically with the Admin SDK, store each returned Project API Key, and route tenant or application traces to the correct project.
+description: Programmatically create a Confident AI project per agent with the Admin SDK, store each returned Project API Key, and route every agent's traces to the right project.
 ---
 
 ## Overview
 
-This guide is for teams that want to create Confident AI projects programmatically instead of creating them manually in the platform UI. It is especially useful for multi-tenant products, proofs of concept, and internal platforms where each tenant, customer, or application should have its own isolated Confident AI project.
+This guide is for teams that want to create Confident AI projects programmatically instead of creating them manually in the platform UI. It is especially useful for internal agent-building platforms, multi-tenant products, and proofs of concept where each agent (or tenant or customer) should have its own isolated Confident AI project.
+
+For example, imagine an enterprise platform where every user builds their own agents. Each agent should get its own Confident AI project so its traces and evaluations stay isolated from every other agent on the platform.
 
 In this guide, you will:
 
 - **Configure the Admin SDK** with one Organization API Key.
-- **Create projects in code** for each tenant, customer, or application.
+- **Create a project in code** for each agent the moment it is built.
 - **Store the returned Project API Key** with the project ID for later trace routing.
 - **Route traces to the correct project** by setting the Project API Key on each trace.
 
-By the end, your application will be able to provision isolated Confident AI projects on demand and send each tenant's traces, datasets, and evaluations to the right workspace.
+By the end, your platform will be able to provision an isolated Confident AI project per agent on demand and send each agent's traces, datasets, and evaluations to the right workspace.
 
 ```mermaid
 flowchart TB
@@ -89,7 +91,7 @@ export CONFIDENT_ORG_API_KEY="confident_us_org_..."
 ```python title="app/confident.py"
 from confidentai import ConfidentAI
 
-admin = ConfidentAI()
+confident_ai = ConfidentAI()
 ```
 
 </Tab>
@@ -99,7 +101,7 @@ admin = ConfidentAI()
 ```typescript title="app/confident.ts"
 import { ConfidentAI } from "confidentai";
 
-export const admin = new ConfidentAI();
+export const confidentAI = new ConfidentAI();
 ```
 
 </Tab>
@@ -110,7 +112,7 @@ export const admin = new ConfidentAI();
 
 <Step title="Provision Project">
 
-Create a project for each application. Creating a project also generates its first **Project API Key**. Store the project ID and key with that application so traces can be routed to the same project later.
+Create a project for each application. The `projects.create(...)` call returns the new project and its first **Project API Key**. Store both values with that application so traces can be routed to the same project later.
 
 The storage helpers in this example represent your own database or persistence layer.
 
@@ -118,37 +120,37 @@ The storage helpers in this example represent your own database or persistence l
 
 <Tab title="Python" language="python">
 
-```python title="app/onboarding.py" {5,11}
-from app.confident import admin
+```python title="app/onboarding.py" {5,7-12}
+from app.confident import confident_ai
 from app.storage import save_application_project
 
 def onboard_application(application_slug: str):
-    created = admin.projects.create(name=application_slug)
+    new_project = confident_ai.projects.create(name=application_slug)
 
     save_application_project(
         application_slug,
-        project_id=created.project.id,
-        project_api_key=created.api_key.value,
+        project_id=new_project.project.id,
+        project_api_key=new_project.api_key.value,
     )
-    return created.project.id
+    return new_project.project.id
 ```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="app/onboarding.ts" {5,9}
-import { admin } from "./confident";
+```typescript title="app/onboarding.ts" {5,7-10}
+import { confidentAI } from "./confident";
 import { saveApplicationProject } from "./storage";
 
 export async function onboardApplication(applicationSlug: string) {
-  const created = await admin.projects.create({ name: applicationSlug });
+  const newProject = await confidentAI.projects.create({ name: applicationSlug });
 
   await saveApplicationProject(applicationSlug, {
-    projectId: created.project.id,
-    projectApiKey: created.apiKey?.value,
+    projectId: newProject.project.id,
+    projectApiKey: newProject.apiKey?.value,
   });
-  return created.project.id;
+  return newProject.project.id;
 }
 ```
 

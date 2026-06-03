@@ -855,7 +855,7 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
-          - page: Multi-Tenant Project Isolation
+          - page: Provision Projects for Agents on the Fly
             path: docs/pages/guides/provision-projects-in-code.mdx
             icon: fa-light fa-layer-group
   - tab: changelog
