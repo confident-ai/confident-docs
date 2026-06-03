@@ -48,8 +48,8 @@ tags:
     description: Projects API
     externalDocs:
       description: Learn about projects
-  - name: Metric Data
-    description: Metric Data API
+  - name: Metrics Data
+    description: Metrics Data API
     externalDocs:
       description: Learn about metric data
   - name: Project API Keys
@@ -2014,7 +2014,7 @@ paths:
     get:
       x-fern-server-name: Confident AI
       tags:
-        - Metric Data
+        - Metrics Data
       summary: List Metrics Data
       operationId: listMetricsData
       description: |
@@ -2083,9 +2083,9 @@ paths:
                   metricsData:
                     - id: "metric-data-uuid-1"
                       projectId: "PROJECT-ID"
-                      traceUuid: "trace-uuid-1"
+                      traceUuid: null
                       spanUuid: null
-                      testCaseId: null
+                      testCaseId: "test-case-uuid-1"
                       testRunId: null
                       threadId: null
                       name: "answer_relevancy"
@@ -2106,8 +2106,8 @@ paths:
                     - id: "metric-data-uuid-2"
                       projectId: "PROJECT-ID"
                       traceUuid: null
-                      spanUuid: "span-uuid-1"
-                      testCaseId: null
+                      spanUuid: null
+                      testCaseId: "test-case-uuid-2"
                       testRunId: null
                       threadId: null
                       name: "faithfulness"
@@ -2125,6 +2125,90 @@ paths:
                       evaluationCost: 0.003
                       verboseLogs: null
                       updatedAt: "2025-11-12T09:15:03.000Z"
+                  totalMetricsData: 150
+                  page: 1
+                  pageSize: 25
+
+  /v1/metric-data:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Legacy
+      summary: List Metric Data
+      operationId: listMetricData
+      description: >-
+        Deprecated. Use `GET /v1/metrics-data` instead. Retrieves a paginated
+        list of metric data (evaluation results) from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the metrics data to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: This specifies the maximum number of metrics data per page. Defaulted to 25, capped at 100.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created after the specified start datetime. Defaulted to 60 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created before the specified end datetime. Defaulted to the current time.
+      responses:
+        "200":
+          description: Successfully retrieved list of metrics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMetricsDataResponse"
+              example:
+                success: true
+                data:
+                  metricsData:
+                    - id: "metric-data-uuid-1"
+                      projectId: "PROJECT-ID"
+                      traceUuid: null
+                      spanUuid: null
+                      testCaseId: "test-case-uuid-1"
+                      testRunId: null
+                      threadId: null
+                      name: "answer_relevancy"
+                      multiTurn: false
+                      score: 0.85
+                      reason: "The answer is relevant to the question"
+                      success: true
+                      createdAt: "2025-11-12T10:30:00.000Z"
+                      evaluatedAt: "2025-11-12T10:30:02.000Z"
+                      threshold: 0.7
+                      strictMode: false
+                      skipped: false
+                      evaluationModel: "gpt-4o"
+                      error: null
+                      evaluationCost: 0.002
+                      verboseLogs: null
+                      updatedAt: "2025-11-12T10:30:02.000Z"
                   totalMetricsData: 150
                   page: 1
                   pageSize: 25
@@ -2441,6 +2525,8 @@ paths:
       operationId: createAnnotation
       x-fern-examples:
         - name: Thumbs Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             traceUuid: "<TRACE-UUID>"
             rating: 1
@@ -2454,6 +2540,8 @@ paths:
                 id: "ANNOTATION-ID"
               deprecated: false
         - name: Five Star Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             spanUuid: "<SPAN-UUID>"
             rating: 5
@@ -3024,7 +3112,8 @@ paths:
         - Projects
       summary: Create Project
       operationId: createProject
-      description: Creates a new project within your organization.
+      description: |
+        Creates a new project within your organization. A default project-scoped API key is provisioned with the project — its full `value` is returned **once** in this response. Optionally pass `email` to assign an existing organization member (by email) as the project's Owner.
       requestBody:
         required: true
         description: ""
@@ -3051,6 +3140,13 @@ paths:
                     description: "This is a new project for testing"
                     organizationId: "ORGANIZATION-ID"
                     created_at: "2024-12-04T23:00:00.000Z"
+                  apiKey:
+                    id: 12
+                    name: "Default Key"
+                    valid: true
+                    value: "confident_proj_9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: null
 
   /v1/projects/{projectId}:
     get:
@@ -3566,7 +3662,7 @@ paths:
       summary: Update Project Member Role
       operationId: updateProjectMemberRole
       description: |
-        Changes a member's project role. The `Owner` role cannot be assigned through the API, and the project's current Owner cannot be reassigned.
+        Changes a member's project role. Assigning the `Owner` role to another member transfers ownership, demoting the current Owner to `Manager`.
       parameters:
         - name: projectId
           in: path
@@ -4216,7 +4312,7 @@ paths:
       summary: Update Organization Member Role
       operationId: updateMemberRole
       description: |
-        Changes a member's organization role. The `Owner` role cannot be assigned through the API, and the organization's current Owner cannot be reassigned.
+        Changes a member's organization role. Assigning the `Owner` role to another member transfers ownership, demoting the current Owner to `Admin`.
       parameters:
         - name: userId
           in: path
@@ -8498,7 +8594,7 @@ components:
         - success
         - data
 
-    # Metric Data Schemas
+    # Metrics Data Schemas
     MetricDataItem:
       type: object
       required:
@@ -8656,6 +8752,10 @@ components:
         description:
           type: string
           description: Optional description of the project
+        email:
+          type: string
+          format: email
+          description: Optional email of an existing organization member to assign as the project's Owner. If omitted, the project has no member and is accessible via its API key and to organization admins.
       required:
         - name
 
@@ -8670,6 +8770,10 @@ components:
           properties:
             project:
               $ref: "#/components/schemas/Project"
+            apiKey:
+              allOf:
+                - $ref: "#/components/schemas/ApiKey"
+              description: A default project-scoped API key provisioned with the project. Its full `value` is returned only once, in this response.
       required:
         - success
         - data
@@ -8915,7 +9019,7 @@ components:
       properties:
         roleId:
           type: string
-          description: The id of the organization role to assign to the member
+          description: The id of the role to assign to the member.
       required:
         - roleId
 

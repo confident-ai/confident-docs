@@ -1,0 +1,45 @@
+---
+title: Introduction to the Admin SDK
+subtitle: Programmatically manage your organization, projects, teams, and access control.
+slug: settings/project/management/introduction
+description: Manage organizations, projects, members, roles, policies, and API keys using the Admin SDK for Python and TypeScript.
+---
+
+## Overview
+
+The Admin SDK lets you manage organizations, projects, team members, roles, and API keys programmatically. It is available for Python and TypeScript through the `confidentai` SDK.
+
+Use the Admin SDK when administrative workflows need to run programmatically instead of through the platform UI. Common use cases include project provisioning, member onboarding, role synchronization, and API key rotation.
+
+<Note>
+
+Management operations require an **Organization API Key**. Learn how to retrieve it in [Authentication](/docs/api-reference/authentication#organization-level-auth).
+
+</Note>
+
+## Organization vs Project Scope
+
+Admin SDK operations are scoped to either the organization or a project. The scope determines whether an operation affects account-wide resources or resources inside a single project.
+
+- **Organization-scoped** resources operate across your entire organization.
+- **Project-scoped** resources operate within a single project.
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Organization" icon="building" href="/docs/settings/project/management/organization">
+    Read and rename the organization tied to your API key.
+  </Card>
+  <Card title="Projects" icon="folder" href="/docs/settings/project/management/projects">
+    Create, read, update, and delete projects in your organization.
+  </Card>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/settings/project/management/members-and-invitations">
+    Invite members, manage memberships, and assign roles.
+  </Card>
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/settings/project/management/roles-policies-permissions">
+    Define RBAC with roles, policies, and permissions.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/settings/project/management/api-keys">
+    Provision and rotate organization- and project-scoped API keys.
+  </Card>
+</CardGroup>
