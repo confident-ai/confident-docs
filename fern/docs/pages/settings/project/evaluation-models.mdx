@@ -7,7 +7,10 @@ description: Learn about evaluation models configuration
 By default, Confident AI provides evaluation models for you to use for all evals run on the platform. You can however customize the evaluation model used to your liking.
 
 <Frame caption="Select Evaluation Model">
-  <img data-image="settings.project.evaluationModel" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+  <img
+    data-image="settings.project.evaluationModel"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 ## Select An Evaluation Model
@@ -29,10 +32,11 @@ Alternatively, toggle **Inherit from Organization** to use the model credentials
 <Note>
   **OpenAI `gpt-5` model family.** OpenAI requires the org whose key handles the call to be **verified** before it will serve `gpt-5` (and certain other gated SKUs). If you select `gpt-5` and the call returns a verification error:
 
-  - **BYO key** — verify your own org at [platform.openai.com](https://platform.openai.com) under **Organization → General**.
-  - **Pooled (Confident-managed) key** — pick a non-gated SKU like `gpt-5.4` or `gpt-4.1` instead, or contact support.
+- **BYO key** — verify your own org at [platform.openai.com](https://platform.openai.com) under **Organization → General**.
+- **Pooled (Confident-managed) key** — pick a non-gated SKU like `gpt-5.4` or `gpt-4.1` instead, or contact support.
 
-  Other Confident features (Classifiers, Error Analysis, Test Run summarizers, Auto-Annotation, [Executive Insights](/docs/reporting-analytics/executive-insights)) all use `gpt-5.4` / `gpt-4.1` by default and aren't affected unless you explicitly pick `gpt-5`.
+Other Confident features (Classifiers, Error Analysis, Test Run summarizers, Auto-Annotation, [Executive Insights](/docs/reporting-analytics/executive-insights)) all use `gpt-5.4` / `gpt-4.1` by default and aren't affected unless you explicitly pick `gpt-5`.
+
 </Note>
 
 ## Available Providers
@@ -53,6 +57,13 @@ There are three categories of providers you can configure. To set up any provide
 
 - Amazon Bedrock
 - Vertex AI
+
+<Tip>
+  **Amazon Bedrock inference profiles.** The **Model ID** field accepts either a model ID (e.g., `anthropic.claude-3-sonnet-20240229-v1:0`) or an [inference profile ARN](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-use.html) (e.g., `arn:aws:bedrock:us-east-1:123456789012:application-inference-profile/abc123`). Use an application inference profile ARN to attribute your Bedrock spend in AWS Cost Explorer via cost-allocation tags.
+
+- Your AWS credentials need invoke permissions on both the inference profile ARN and the underlying foundation model.
+- Cost attribution appears in AWS, not in Confident AI. To show per-token costs for ARN-named models in your traces, map the ARN to a rate in [Model Costs settings](/docs/settings/project/model-costs).
+  </Tip>
 
 **LLM Gateways** — Connect a gateway to manage tag-based routing credentials:
 
