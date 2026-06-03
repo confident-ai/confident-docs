@@ -2,21 +2,21 @@
 title: Multi-Tenant Project Isolation
 subtitle: Isolate each application in its own project while managing all projects from one organization.
 slug: guides/multi-tenant-project-isolation
-description: Isolate tenant traces, datasets, and evaluations by provisioning one Confident AI project per application and routing traces to the right project.
+description: Create Confident AI projects programmatically with the Admin SDK, store each returned Project API Key, and route tenant or application traces to the correct project.
 ---
 
 ## Overview
 
-This guide is for teams that want to create Confident AI projects programmatically instead of creating them manually in the platform UI. Use it for multi-tenant products, proofs of concept, or internal platforms where each tenant, customer, or application should have its own isolated Confident AI project.
-
-This guide walks through the full workflow: configure the [Admin SDK](/docs/settings/project/management/introduction) with one **Organization API Key**, create projects in code, store each returned Project API Key, and use that key to route traces into the correct project.
+This guide is for teams that want to create Confident AI projects programmatically instead of creating them manually in the platform UI. It is especially useful for multi-tenant products, proofs of concept, and internal platforms where each tenant, customer, or application should have its own isolated Confident AI project.
 
 In this guide, you will:
 
-- Configure the Admin SDK with an Organization API Key
-- Create a Confident AI project for each tenant or application
-- Store the project ID and returned Project API Key
-- Route traces for each tenant or application into its own project
+- **Configure the Admin SDK** with one Organization API Key.
+- **Create projects in code** for each tenant, customer, or application.
+- **Store the returned Project API Key** with the project ID for later trace routing.
+- **Route traces to the correct project** by setting the Project API Key on each trace.
+
+By the end, your application will be able to provision isolated Confident AI projects on demand and send each tenant's traces, datasets, and evaluations to the right workspace.
 
 ```mermaid
 flowchart TB
@@ -267,7 +267,7 @@ Done ✅. The workflow now creates a dedicated project per application and route
 
 ## Next Steps
 
-Continue with the related Admin SDK and tracing sections:
+Now that each tenant or application can route traces to its own project, use these sections to extend the workflow:
 
 <CardGroup cols={2}>
   <Card
@@ -275,23 +275,23 @@ Continue with the related Admin SDK and tracing sections:
     icon="folder"
     href="/docs/settings/project/management/projects"
   >
-    Update, list, and delete projects.
+    Manage the projects your application creates, including updates and cleanup.
   </Card>
   <Card
     title="Members & Invitations"
     icon="user-group"
     href="/docs/settings/project/management/members-and-invitations"
   >
-    Invite members to projects.
+    Add users to the projects you create and assign the right project-level roles.
   </Card>
   <Card title="LLM Tracing" icon="route" href="/docs/llm-tracing/quickstart">
-    Learn about spans, span types, and trace enrichment.
+    Customize the traces you route by setting span types, metadata, tags, and other trace attributes.
   </Card>
   <Card
     title="Online Evals"
     icon="toggle-on"
     href="/docs/llm-tracing/features/online-evals"
   >
-    Automatically evaluate traces as they land in each project's workspace.
+    Run evaluations automatically as traces arrive in each isolated project.
   </Card>
 </CardGroup>

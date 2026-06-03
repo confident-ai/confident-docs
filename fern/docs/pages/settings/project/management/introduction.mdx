@@ -7,9 +7,9 @@ description: Manage organizations, projects, members, roles, policies, and API k
 
 ## Overview
 
-The Admin SDK lets you manage organizations, projects, team members, roles, and API keys programmatically. It is available for both Python and TypeScript through the `confidentai` SDK.
+The Admin SDK lets you manage organizations, projects, team members, roles, and API keys programmatically. It is available for Python and TypeScript through the `confidentai` SDK.
 
-Use the Admin SDK for workflows such as project provisioning, member onboarding, role synchronization, and API key rotation.
+Use the Admin SDK when administrative workflows need to run programmatically instead of through the platform UI. Common use cases include project provisioning, member onboarding, role synchronization, and API key rotation.
 
 <Note>
 
@@ -19,12 +19,10 @@ Management operations require an **Organization API Key**. Learn how to retrieve
 
 ## Organization vs Project Scope
 
-Most resources exist at two levels:
+Admin SDK operations are scoped to either the organization or a project. The scope determines whether an operation affects account-wide resources or resources inside a single project.
 
 - **Organization-scoped** resources operate across your entire organization.
 - **Project-scoped** resources operate within a single project.
-
-Organization-scoped operations affect resources across the account, while project-scoped operations affect resources within a single project.
 
 ## Key Capabilities
 
