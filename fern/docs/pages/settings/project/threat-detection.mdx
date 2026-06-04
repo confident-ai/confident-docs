@@ -1,0 +1,64 @@
+---
+subtitle: Automatically scan incoming traces and threads for security vulnerabilities.
+slug: settings/project/threat-detection
+description: Learn how to configure threat detection to scan traces and threads for security vulnerabilities.
+---
+
+Threat Detection continuously scans incoming traces and threads against your project's configured vulnerabilities. When a threat is found, a **detection** is attached to the trace or thread and surfaces in the **Detections** tab of the relevant detail view, so you can pinpoint exactly where a security compromise occurred.
+
+<Frame caption="Threat Detection settings">
+  <img data-image="settings.project.threatDetection" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+The Threat Detection page has two tabs — **Trace** and **Threads** — each configured independently.
+
+## Enable threat detection
+
+To enable threat detection for traces:
+
+1. Navigate to **Project Settings** → **Threat Detection**
+2. Select the **Trace** tab
+3. Toggle **Enable trace detection** on
+4. Set a **Sample rate** between `0.0` and `1.0` — this is the probability that any given incoming trace is scanned
+5. Click **Save**
+
+To enable threat detection for threads:
+
+1. Navigate to **Project Settings** → **Threat Detection**
+2. Select the **Threads** tab
+3. Toggle **Enable thread detection** on
+4. Set a **Sample rate** between `0.0` and `1.0`
+5. Set an **Idle time limit** — the number of seconds of inactivity before a thread is scanned; the scan runs once no new trace has arrived for this period
+6. Click **Save**
+
+<Note>
+  Threat detection runs on data your project has already ingested. No data leaves Confident AI to an external scanner — the underlying LLM evaluates your traces and threads directly.
+</Note>
+
+## Configuration reference
+
+| Setting          | Scope          | Description                                                                                   |
+| ---------------- | -------------- | --------------------------------------------------------------------------------------------- |
+| Enable detection | Trace, Threads | Turns scanning on or off for the selected data model.                                         |
+| Sample rate      | Trace, Threads | Fraction of incoming traces or threads that are scanned. `1.0` scans everything; `0.1` scans one in ten. |
+| Idle time limit  | Threads only   | Seconds of inactivity before a thread is eligible for scanning. Use this to avoid scanning mid-conversation threads. |
+
+## Viewing detections
+
+When a threat is detected, it appears under the **Detections** tab on the trace or thread detail view. Each detection shows:
+
+- **Vulnerability** — the vulnerability name and type (e.g. `Prompt Injection › Direct Attack`)
+- **Outcome** — how the threat resolved
+
+| Outcome       | Meaning                                                                 |
+| ------------- | ----------------------------------------------------------------------- |
+| Materialized  | The attack succeeded — the vulnerability was exploited.                 |
+| Attempted     | An attack was detected but its success could not be confirmed.          |
+| Mitigated     | The attack was detected and blocked before it could cause harm.         |
+
+- **Attack vector** — the path or mechanism used in the attack, if identified
+- **Reason** — a short explanation of why this was flagged as a threat
+
+<Frame caption="Detections on a trace">
+  <img data-image="tracing.detectionsOnTrace" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>

@@ -1,80 +1,130 @@
 ---
-subtitle: Connect external data sources to automatically generate evaluation datasets from your documents and messages.
+subtitle: Connect external data sources to build a knowledge base for evaluation dataset generation.
 slug: settings/project/data-sources
-description: Learn about data sources for dataset generation
+description: Learn how to connect data sources and upload documents to build a knowledge base for generating evaluation datasets.
 ---
 
-Data sources let you connect external platforms to Confident AI so you can automatically generate evaluation datasets from your existing documents and messages, rather than creating test cases manually.
+The Knowledge Base lets you connect external platforms or upload documents directly so Confident AI can automatically generate evaluation datasets from your existing content, rather than creating test cases manually.
 
-<Frame caption="Manage Data Sources">
+<Frame caption="Knowledge Base">
   <img data-image="settings.project.dataSources" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
-## Supported Data Sources
+## Supported sources
 
-| Source | Description |
-| -------------- | --------------------------------------------- |
-| Google Drive | Retrieves documents from a specific folder |
-| SharePoint | Accesses documents from Microsoft SharePoint |
-| Slack | Syncs messages from Slack channels |
-| Notion | Fetches content from Notion pages and databases |
+| Source       | Connection method | Description                                              |
+| ------------ | ----------------- | -------------------------------------------------------- |
+| Google Drive | Credentials       | Sync documents from a specific Google Drive folder       |
+| SharePoint   | Credentials       | Sync documents from Microsoft SharePoint                 |
+| Slack        | Credentials       | Sync messages from Slack channels                        |
+| Notion       | Credentials       | Sync content from Notion pages and databases             |
+| Snowflake    | Credentials       | Query data from a Snowflake database                     |
+| Salesforce   | OAuth             | Sync data from your Salesforce org                       |
+| Documents    | File upload       | Upload files directly as a knowledge base                |
 
-## Create a Data Source
+## Create a data source
 
-1. Navigate to **Project Settings** > **Data Sources**
+1. Navigate to **Project Settings** → **Knowledge Base**
 2. Click **New Data Source**
 3. Enter a unique **Name** for the data source
-4. Select a **Type** from the dropdown (Google Drive, SharePoint, Slack, or Notion)
-5. Click **Save**
+4. Select a **Type** from the dropdown
+5. Click **Create** — you are taken to the data source detail page to configure credentials
 
-## Configure Credentials
+## Configure credentials
 
-After creating a data source, you need to provide credentials so Confident AI can access the external platform. Click into the data source to open its detail page and fill in the required fields.
+Each source type requires different credentials. Open the data source detail page to fill them in.
 
-**Google Drive** requires:
-- **Service Account JSON** - Credentials from a Google Cloud service account
-- **Folder URL** - URL of the Google Drive folder to sync
+### Google Drive
 
-**SharePoint** requires:
-- **Tenant ID** - Azure tenant identifier
-- **Client ID** - Azure app registration client ID
-- **Client Secret** - Azure app registration secret
+| Field                | Description                                                  |
+| -------------------- | ------------------------------------------------------------ |
+| Service Account JSON | Paste the full JSON from a Google Cloud service account with read access to the folder |
+| Folder URL           | URL of the Google Drive folder to sync (e.g. `https://drive.google.com/drive/folders/...`) |
 
-**Slack** requires:
-- **Bot Token** - Slack bot token (starts with `xoxb-`)
+### SharePoint
 
-**Notion** requires:
-- **Integration Token** - Notion integration secret token
+| Field         | Description                            |
+| ------------- | -------------------------------------- |
+| Tenant ID     | Your Azure tenant identifier (UUID)    |
+| Client ID     | Your Azure app registration client ID  |
+| Client Secret | Your Azure app registration secret     |
 
-## Connect and Sync
+### Slack
 
-Once credentials are saved, click **Connect** to establish the connection. After connecting:
+| Field     | Description                                  |
+| --------- | -------------------------------------------- |
+| Bot Token | A Slack bot token starting with `xoxb-`      |
 
-- **Manual sync** - Click **Sync** to pull the latest data at any time
-- **Automatic sync** - Configure a sync schedule to keep data up to date automatically
+### Notion
 
-### Sync Schedule
+| Field             | Description                          |
+| ----------------- | ------------------------------------ |
+| Integration Token | Your Notion integration secret (starts with `secret_`) |
 
-You can set the sync frequency to one of the following intervals:
+### Snowflake
 
-- Every hour
-- Every 2 hours
-- Every 6 hours (default)
-- Every 12 hours
-- Every 24 hours
+| Field     | Description                                                         |
+| --------- | ------------------------------------------------------------------- |
+| Host      | Your Snowflake account hostname (e.g. `xy12345.us-east-1.snowflakecomputing.com`) |
+| Role      | The Snowflake role to use (e.g. `ACCOUNTADMIN`)                    |
+| Warehouse | The virtual warehouse to use (e.g. `COMPUTE_WH`)                   |
+| Database  | The database name (e.g. `ANALYTICS`)                               |
+| Schema    | The schema name (e.g. `PUBLIC`)                                    |
+| Username  | Your Snowflake username                                             |
+| Password  | Your Snowflake password                                             |
 
-Toggle **Sync Enabled** on or off to control whether automatic syncing is active.
+After filling in all fields, click **Save** — Confident AI will attempt to connect immediately.
 
-## Use Data Sources for Dataset Generation
+### Salesforce
 
-Once a data source is connected and synced, you can use it to auto-generate evaluation datasets. When creating a dataset, link a generation configuration to a data source and Confident AI will process the synced content to produce test cases (goldens) automatically.
+Salesforce uses OAuth rather than static credentials.
 
-## Manage Data Sources
+1. Open the Salesforce data source detail page
+2. Click **Connect Salesforce**
+3. Choose **Production** (`login.salesforce.com`) or **Sandbox** (`test.salesforce.com`)
+4. Click **Continue to Salesforce** — you will be redirected to authorize Confident AI
+5. After authorization, you are returned to the detail page and the connection is established automatically
 
-From the data sources list, use the action buttons on any row to **Sync**, **Edit**, or **Delete** a data source.
+To switch orgs or refresh access, click **Reconnect Salesforce** at any time.
 
-To disconnect a data source without deleting it, open the detail page and click **Disconnect**. This removes the connection but preserves the data source configuration.
+### Documents
+
+The Documents source lets you upload files directly rather than pulling from an external platform.
+
+**Supported file types:** `.txt`, `.pdf`, `.docx`, `.md`, `.markdown`, `.mdx`
+
+**Maximum file size:** 25 MB per file
+
+To upload documents:
+
+1. Open the Documents data source detail page
+2. Drag and drop files onto the upload area, or click to browse
+3. Uploaded files appear in the documents list immediately
+
+To remove a document, click the delete icon on its row. Multiple files can be uploaded in a single operation.
+
+## Sync (connector sources)
+
+For all sources except Documents, data is pulled from the external platform via sync. Two sync modes are available from the data source detail page:
+
+- **Manual sync** — click **Sync** to pull the latest data on demand
+- **Automatic sync** — select a sync frequency from the schedule dropdown to keep data current automatically
+
+| Frequency        | Interval          |
+| ---------------- | ----------------- |
+| Manual sync only | No automatic sync |
+| Every hour       | Hourly            |
+| Every 2 hours    | Every 2 hours     |
+| Every 6 hours    | Every 6 hours     |
+| Every 12 hours   | Every 12 hours    |
+| Every 24 hours   | Daily             |
+
+The **Last synced** timestamp on the detail page shows when data was last pulled successfully. Sync and the schedule dropdown are disabled until the data source is connected.
+
+## Manage data sources
+
+From the Knowledge Base list, each row has action buttons to **Sync**, **Edit**, or **Delete** a data source. Deleting a data source is permanent and cannot be undone.
 
 <Note>
-  Data Sources is a premium feature currently in beta. You must be on the Premium plan or above to configure data sources.
+  Knowledge Base is a premium feature. You must be on the Premium plan or above to create data sources.
 </Note>
