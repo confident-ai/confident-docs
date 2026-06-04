@@ -194,6 +194,7 @@ function runOnDomUpdates(callback) {
     "tracing.workflows.evaluationRule": `${S3_BASE}/confident-docs:evaluation-rule.png`,
     "tracing.workflows.classifier": `${S3_BASE}/confident-docs:classifier.png`,
 
+    "settings.project.knowledgeBase": `${S3_BASE}/knowledge-base.png`,
     "settings.project.threatDetection": `${S3_BASE}/threat-detections.png`,
 
     "tracing.signals.overview": `${S3_BASE}/tracing:signals:overview.png`,
