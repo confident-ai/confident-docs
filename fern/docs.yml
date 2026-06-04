@@ -291,7 +291,7 @@ navigation:
               - page: Dropping Traces
                 path: docs/pages/llm-tracing/features/dropping-traces.mdx
                 icon: fa-light fa-trash-can
-          - page: Signals
+          - page: Features
             path: docs/pages/llm-tracing/features/signals.mdx
             icon: fa-light fa-signal-stream
           - page: Troubleshooting
