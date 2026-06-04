@@ -172,7 +172,7 @@ function runOnDomUpdates(callback) {
     "settings.project.rolesPermissions": `${S3_BASE}/settings:project:roles-n-permissions.png`,
     "settings.project.apiKeys": `${S3_BASE}/settings:project:api-keys.png`,
     "settings.project.evaluationModel": `${S3_BASE}/settings:project:evaluation-model.png`,
-    "settings.project.integrations": `${S3_BASE}/settings:project:integrations.png`,
+    "settings.project.integrations": `${S3_BASE}/integrations.png`,
     "settings.project.team": `${S3_BASE}/settings:project:team.png`,
     "settings.project.aiConnection": `${S3_BASE}/settings:project:ai-connection.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
@@ -185,6 +185,16 @@ function runOnDomUpdates(callback) {
     "settings.project.classifiers": `${S3_BASE}/settings:project:classifiers.png`,
     "settings.project.classifierDetail": `${S3_BASE}/settings:project:classifier-detail.png`,
     "settings.project.executiveInsights": `${S3_BASE}/settings:project:executive-insights.png`,
+
+    "tracing.triage": `${S3_BASE}/confident-docs:trace-triage.png`,
+    "tracing.detectionsOnTrace": `${S3_BASE}/confident-docs:detections-on-trace.png`,
+    "tracing.workflows": `${S3_BASE}/workflows.png`,
+    "tracing.workflows.datasetIngestion": `${S3_BASE}/confident-docs:dataset-ingestion.png`,
+    "tracing.workflows.queueIngestion": `${S3_BASE}/confident-docs:queue-ingestion.png`,
+    "tracing.workflows.evaluationRule": `${S3_BASE}/confident-docs:evaluation-rule.png`,
+    "tracing.workflows.classifier": `${S3_BASE}/confident-docs:classifier.png`,
+
+    "settings.project.threatDetection": `${S3_BASE}/threat-detections.png`,
 
     "tracing.signals.overview": `${S3_BASE}/tracing:signals:overview.png`,
     "tracing.signals.detail": `${S3_BASE}/tracing:signals:detail.png`,
