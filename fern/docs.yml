@@ -296,8 +296,11 @@ navigation:
                 path: docs/pages/llm-tracing/features/dropping-traces.mdx
                 icon: fa-light fa-trash-can
           - page: Features
-            path: docs/pages/llm-tracing/features/signals.mdx
+            path: docs/pages/llm-tracing/features/features.mdx
             icon: fa-light fa-signal-stream
+          - page: Workflows
+            path: docs/pages/llm-tracing/workflows.mdx
+            icon: fa-light fa-diagram-project
           - page: Troubleshooting
             path: docs/pages/llm-tracing/troubleshooting.mdx
             icon: fa-light fa-wrench
@@ -686,16 +689,13 @@ navigation:
           - page: Evaluation Models
             path: docs/pages/settings/project/evaluation-models.mdx
             icon: fa-light fa-brain
-          - page: Evaluation Rules
-            path: docs/pages/settings/project/evaluation-rules.mdx
-            icon: fa-light fa-toggle-on
           - page: Annotation Options
             path: docs/pages/settings/project/annotation-options.mdx
             icon: fa-light fa-star
-          - page: Classifiers
-            path: docs/pages/settings/project/classifiers.mdx
-            icon: fa-light fa-tags
-          - page: Data Sources
+          - page: Threat Detection
+            path: docs/pages/settings/project/threat-detection.mdx
+            icon: fa-light fa-shield-halved
+          - page: Knowledge Base
             path: docs/pages/settings/project/data-sources.mdx
             icon: fa-light fa-database
           - page: Data Retention
