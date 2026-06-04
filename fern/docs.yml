@@ -421,6 +421,9 @@ navigation:
                     contents:
                       - GET /v1/datasets/{alias}/versions
                       - POST /v1/datasets/{alias}/versions
+                  - section: Dataset Queue
+                    contents:
+                      - POST /v1/datasets/{alias}/queue
               - section: Test Runs
                 contents:
                   - GET /v1/test-runs
