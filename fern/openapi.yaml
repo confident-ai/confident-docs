@@ -48,10 +48,78 @@ tags:
     description: Projects API
     externalDocs:
       description: Learn about projects
-  - name: Metric Data
-    description: Metric Data API
+  - name: Metrics Data
+    description: Metrics Data API
     externalDocs:
       description: Learn about metric data
+  - name: Project API Keys
+    x-displayName: API Keys
+    description: Create and manage project-scoped API keys
+    externalDocs:
+      description: Learn about API keys
+  - name: Project Members
+    x-displayName: Members
+    description: Manage the members of a project
+    externalDocs:
+      description: Learn about members
+  - name: Project Invitations
+    x-displayName: Invitations
+    description: Invite users to a project
+    externalDocs:
+      description: Learn about invitations
+  - name: Project Roles
+    x-displayName: Roles
+    description: Manage project roles
+    externalDocs:
+      description: Learn about roles
+  - name: Project Policies
+    x-displayName: Policies
+    description: Manage project policies
+    externalDocs:
+      description: Learn about policies
+  - name: Project Permissions
+    x-displayName: Permissions
+    description: List assignable project permissions
+    externalDocs:
+      description: Learn about permissions
+  - name: Organization API Keys
+    x-displayName: API Keys
+    description: Create and manage organization-scoped API keys
+    externalDocs:
+      description: Learn about API keys
+  - name: Organization
+    description: Manage your organization's settings
+    externalDocs:
+      description: Learn about organizations
+  - name: Organization Members
+    x-displayName: Members
+    description: Manage the members of your organization
+    externalDocs:
+      description: Learn about members
+  - name: Organization Invitations
+    x-displayName: Invitations
+    description: Invite users to your organization
+    externalDocs:
+      description: Learn about invitations
+  - name: Organization Roles
+    x-displayName: Roles
+    description: Manage organization roles
+    externalDocs:
+      description: Learn about roles
+  - name: Organization Policies
+    x-displayName: Policies
+    description: Manage organization policies
+    externalDocs:
+      description: Learn about policies
+  - name: Organization Permissions
+    x-displayName: Permissions
+    description: List assignable organization permissions
+    externalDocs:
+      description: Learn about permissions
+  - name: Legacy
+    description: Deprecated endpoints kept for backward compatibility. Avoid using these in new integrations.
+    externalDocs:
+      description: Learn about legacy endpoints
 
 paths:
   /v1/metrics:
@@ -241,13 +309,13 @@ paths:
                         - content
                     deprecated: false
 
-  /v1/batch-metrics:
+  /v1/metrics/batch:
     post:
       x-fern-server-name: Confident AI
       tags:
         - Metrics
       summary: Batch Create
-      operationId: createBatchMetrics
+      operationId: createMetricsBatch
       description: Creates a batch of new metrics on your Confident AI project.
       requestBody:
         required: true
@@ -278,12 +346,50 @@ paths:
                     - METRIC-ID
                 deprecated: false
 
+  /v1/batch-metrics:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Legacy
+      summary: Batch Create
+      operationId: createBatchMetrics
+      description: >-
+        Deprecated. Use `POST /v1/metrics/batch` instead. Creates a batch of new
+        metrics on your Confident AI project.
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBatchMetrics"
+            example:
+              metrics:
+                - name: Correctness
+                  criteria: Determine if the `actual output` is correct based on the `expected output`.
+                  evaluationParams:
+                    - actualOutput
+                    - expectedOutput
+                  multiTurn: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateBatchMetricsResponse"
+              example:
+                success: true
+                data:
+                  ids:
+                    - METRIC-ID
+
   /v1/metric-collections:
     post:
       x-fern-server-name: Confident AI
       tags:
         - Metric Collections
-      summary: Add Collection
+      summary: Create Collection
       operationId: createMetricCollection
       description: Creates a metric collection with the `name` and the `metricSettings` you specified.
       requestBody:
@@ -1908,7 +2014,7 @@ paths:
     get:
       x-fern-server-name: Confident AI
       tags:
-        - Metric Data
+        - Metrics Data
       summary: List Metrics Data
       operationId: listMetricsData
       description: |
@@ -1977,9 +2083,9 @@ paths:
                   metricsData:
                     - id: "metric-data-uuid-1"
                       projectId: "PROJECT-ID"
-                      traceUuid: "trace-uuid-1"
+                      traceUuid: null
                       spanUuid: null
-                      testCaseId: null
+                      testCaseId: "test-case-uuid-1"
                       testRunId: null
                       threadId: null
                       name: "answer_relevancy"
@@ -2000,8 +2106,8 @@ paths:
                     - id: "metric-data-uuid-2"
                       projectId: "PROJECT-ID"
                       traceUuid: null
-                      spanUuid: "span-uuid-1"
-                      testCaseId: null
+                      spanUuid: null
+                      testCaseId: "test-case-uuid-2"
                       testRunId: null
                       threadId: null
                       name: "faithfulness"
@@ -2019,6 +2125,90 @@ paths:
                       evaluationCost: 0.003
                       verboseLogs: null
                       updatedAt: "2025-11-12T09:15:03.000Z"
+                  totalMetricsData: 150
+                  page: 1
+                  pageSize: 25
+
+  /v1/metric-data:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Legacy
+      summary: List Metric Data
+      operationId: listMetricData
+      description: >-
+        Deprecated. Use `GET /v1/metrics-data` instead. Retrieves a paginated
+        list of metric data (evaluation results) from your Confident AI project.
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: This specifies the page number of the metrics data to return. Defaulted to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: This specifies the maximum number of metrics data per page. Defaulted to 25, capped at 100.
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created after the specified start datetime. Defaulted to 60 days ago.
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: This filters for metrics data created before the specified end datetime. Defaulted to the current time.
+      responses:
+        "200":
+          description: Successfully retrieved list of metrics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMetricsDataResponse"
+              example:
+                success: true
+                data:
+                  metricsData:
+                    - id: "metric-data-uuid-1"
+                      projectId: "PROJECT-ID"
+                      traceUuid: null
+                      spanUuid: null
+                      testCaseId: "test-case-uuid-1"
+                      testRunId: null
+                      threadId: null
+                      name: "answer_relevancy"
+                      multiTurn: false
+                      score: 0.85
+                      reason: "The answer is relevant to the question"
+                      success: true
+                      createdAt: "2025-11-12T10:30:00.000Z"
+                      evaluatedAt: "2025-11-12T10:30:02.000Z"
+                      threshold: 0.7
+                      strictMode: false
+                      skipped: false
+                      evaluationModel: "gpt-4o"
+                      error: null
+                      evaluationCost: 0.002
+                      verboseLogs: null
+                      updatedAt: "2025-11-12T10:30:02.000Z"
                   totalMetricsData: 150
                   page: 1
                   pageSize: 25
@@ -2335,6 +2525,8 @@ paths:
       operationId: createAnnotation
       x-fern-examples:
         - name: Thumbs Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             traceUuid: "<TRACE-UUID>"
             rating: 1
@@ -2348,6 +2540,8 @@ paths:
                 id: "ANNOTATION-ID"
               deprecated: false
         - name: Five Star Rating
+          headers:
+            CONFIDENT_API_KEY: "<PROJECT-API-KEY>"
           request:
             spanUuid: "<SPAN-UUID>"
             rating: 5
@@ -2507,7 +2701,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: List Annotation Queues
+      summary: List Queues
       operationId: listAnnotationQueues
       description: |
         Retrieves all annotation queues in your project with statistics and pagination support. Each queue includes completion metrics, item counts, and assignment breakdowns.
@@ -2606,7 +2800,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Create Annotation Queue
+      summary: Create Queue
       operationId: createAnnotationQueue
       description: |
         Creates a new annotation queue for organizing traces, spans, threads, golden datasets, or test runs for systematic review and annotation.
@@ -2650,7 +2844,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Get Annotation Queue
+      summary: Get Queue
       operationId: getAnnotationQueue
       description: |
         Retrieves detailed information about a specific annotation queue including comprehensive statistics.
@@ -2704,7 +2898,7 @@ paths:
       x-fern-server-name: Confident AI
       tags:
         - Annotation Queues
-      summary: Delete Annotation Queue
+      summary: Delete Queue
       operationId: deleteAnnotationQueue
       description: |
         Permanently deletes an annotation queue and all its associated queue items.
@@ -2902,23 +3096,24 @@ paths:
                 success: true
                 data:
                   projects:
-                    - id: "clxxxxx"
+                    - id: "PROJECT-ID-1"
                       name: "Production App"
                       description: "Main production application"
-                      organizationId: "clxxxxx"
-                      startTime: "2024-12-04T23:00:00.000Z"
-                    - id: "clxxxxx"
+                      organizationId: "ORGANIZATION-ID"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                    - id: "PROJECT-ID-2"
                       name: "Staging Environment"
                       description: null
-                      organizationId: "clxxxxx"
-                      startTime: "2024-12-03T15:30:00.000Z"
+                      organizationId: "ORGANIZATION-ID"
+                      created_at: "2024-12-03T15:30:00.000Z"
     post:
       x-fern-server-name: Confident AI
       tags:
         - Projects
       summary: Create Project
       operationId: createProject
-      description: Creates a new project within your organization.
+      description: |
+        Creates a new project within your organization. A default project-scoped API key is provisioned with the project — its full `value` is returned **once** in this response. Optionally pass `email` to assign an existing organization member (by email) as the project's Owner.
       requestBody:
         required: true
         description: ""
@@ -2940,13 +3135,50 @@ paths:
                 success: true
                 data:
                   project:
-                    id: "clxxxxx"
+                    id: "PROJECT-ID"
                     name: "New Project"
                     description: "This is a new project for testing"
-                    organizationId: "clxxxxx"
-                    startTime: "2024-12-04T23:00:00.000Z"
+                    organizationId: "ORGANIZATION-ID"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                  apiKey:
+                    id: 12
+                    name: "Default Key"
+                    valid: true
+                    value: "confident_proj_9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: null
 
   /v1/projects/{projectId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Retrieve Project
+      operationId: getProject
+      description: Retrieves a single project by id. The project must belong to the organization the API key is scoped to.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to retrieve
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProjectResponse"
+              example:
+                success: true
+                data:
+                  project:
+                    id: "PROJECT-ID"
+                    name: "Production App"
+                    description: "Main production application"
+                    organizationId: "ORGANIZATION-ID"
+                    created_at: "2024-12-04T23:00:00.000Z"
     put:
       x-fern-server-name: Confident AI
       tags:
@@ -2982,11 +3214,1618 @@ paths:
                 success: true
                 data:
                   project:
-                    id: "clxxxxx"
+                    id: "PROJECT-ID"
                     name: "Updated Project Name"
                     description: "Updated description"
-                    organizationId: "clxxxxx"
-                    startTime: "2024-12-04T23:00:00.000Z"
+                    organizationId: "ORGANIZATION-ID"
+                    created_at: "2024-12-04T23:00:00.000Z"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Projects
+      summary: Delete Project
+      operationId: deleteProject
+      description: |
+        Permanently deletes a project and all of its associated data (traces, datasets, metrics, API keys, etc.). This action cannot be undone.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project to delete
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProjectResponse"
+              example:
+                success: true
+                data:
+                  id: "PROJECT-ID"
+                  deleted: true
+
+  /v1/organization/api-keys:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization API Keys
+      summary: List Organization API Keys
+      operationId: listOrganizationApiKeys
+      description: |
+        Lists all organization-scoped API keys. Each key's `value` is redacted (only the last 6 characters are shown) — the full value is only ever returned once, at creation.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyListResponse"
+              example:
+                success: true
+                data:
+                  apiKeys:
+                    - id: 12
+                      name: "CI/CD key"
+                      valid: true
+                      value: "***************a1b2c3"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      lastUsed: "2024-12-05T10:15:00.000Z"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization API Keys
+      summary: Create Organization API Key
+      operationId: createOrganizationApiKey
+      description: |
+        Mints a new organization-scoped API key. The raw `value` is returned **exactly once** in this response and can never be retrieved again — store it securely.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApiKey"
+            example:
+              name: "CI/CD key"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 12
+                    name: "CI/CD key"
+                    valid: true
+                    value: "confident_org_a3f1c9e2b7d84f06a1c2e3d4f5a6b7c8"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: null
+
+  /v1/organization/api-keys/{apiKeyId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization API Keys
+      summary: Get Organization API Key
+      operationId: getOrganizationApiKey
+      description: Retrieves a single organization-scoped API key by id. The `value` is redacted — the full value is only ever returned once, at creation.
+      parameters:
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 12
+                    name: "CI/CD key"
+                    valid: true
+                    value: "***************a1b2c3"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: "2024-12-05T10:15:00.000Z"
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization API Keys
+      summary: Update Organization API Key
+      operationId: updateOrganizationApiKey
+      description: Activates or deactivates an organization-scoped API key. A deactivated key is rejected on authentication.
+      parameters:
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateApiKey"
+            example:
+              valid: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 12
+                    name: "CI/CD key"
+                    valid: false
+                    value: "***************a1b2c3"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: "2024-12-05T10:15:00.000Z"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization API Keys
+      summary: Revoke Organization API Key
+      operationId: deleteOrganizationApiKey
+      description: Permanently revokes an organization-scoped API key. This action cannot be undone.
+      parameters:
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteApiKeyResponse"
+              example:
+                success: true
+                data:
+                  id: 12
+                  deleted: true
+
+  /v1/projects/{projectId}/api-keys:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project API Keys
+      summary: List Project API Keys
+      operationId: listProjectApiKeys
+      description: |
+        Lists all API keys scoped to the project. Each key's `value` is redacted (only the last 6 characters are shown) — the full value is only ever returned once, at creation.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyListResponse"
+              example:
+                success: true
+                data:
+                  apiKeys:
+                    - id: 34
+                      name: "Production agent key"
+                      valid: true
+                      value: "***************d4e5f6"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      lastUsed: "2024-12-05T10:15:00.000Z"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project API Keys
+      summary: Create Project API Key
+      operationId: createProjectApiKey
+      description: |
+        Mints a new project-scoped API key. The raw `value` is returned **exactly once** in this response and can never be retrieved again — store it securely. This is the key your application uses to send traces and run evaluations against the project.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApiKey"
+            example:
+              name: "Production agent key"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 34
+                    name: "Production agent key"
+                    valid: true
+                    value: "confident_proj_9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: null
+
+  /v1/projects/{projectId}/api-keys/{apiKeyId}:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project API Keys
+      summary: Get Project API Key
+      operationId: getProjectApiKey
+      description: Retrieves a single project-scoped API key by id. The `value` is redacted — the full value is only ever returned once, at creation.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 34
+                    name: "Production agent key"
+                    valid: true
+                    value: "***************d4e5f6"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: "2024-12-05T10:15:00.000Z"
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project API Keys
+      summary: Update Project API Key
+      operationId: updateProjectApiKey
+      description: Activates or deactivates a project-scoped API key. A deactivated key is rejected on authentication.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateApiKey"
+            example:
+              valid: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponse"
+              example:
+                success: true
+                data:
+                  apiKey:
+                    id: 34
+                    name: "Production agent key"
+                    valid: false
+                    value: "***************d4e5f6"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    lastUsed: "2024-12-05T10:15:00.000Z"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project API Keys
+      summary: Revoke Project API Key
+      operationId: deleteProjectApiKey
+      description: Permanently revokes a project-scoped API key. This action cannot be undone.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: apiKeyId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the API key
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteApiKeyResponse"
+              example:
+                success: true
+                data:
+                  id: 34
+                  deleted: true
+
+  /v1/projects/{projectId}/members:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Members
+      summary: List Project Members
+      operationId: listProjectMembers
+      description: Lists the members of a project, along with each member's project role.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number to return. Defaults to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: The maximum number of members per page (max 100). Defaults to 25.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectMembersResponse"
+              example:
+                success: true
+                data:
+                  members:
+                    - id: "user-uuid-1"
+                      email: "alice@example.com"
+                      name: "Alice"
+                      image: null
+                      projectRole:
+                        id: "project-role-uuid-1"
+                        name: "Owner"
+                    - id: "user-uuid-2"
+                      email: "bob@example.com"
+                      name: "Bob"
+                      image: null
+                      projectRole:
+                        id: "project-role-uuid-2"
+                        name: "Member"
+                  total: 2
+
+  /v1/projects/{projectId}/members/{userId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Members
+      summary: Update Project Member Role
+      operationId: updateProjectMemberRole
+      description: |
+        Changes a member's project role. Assigning the `Owner` role to another member transfers ownership, demoting the current Owner to `Manager`.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemberRole"
+            example:
+              roleId: "project-role-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectMemberResponse"
+              example:
+                success: true
+                data:
+                  member:
+                    id: "user-uuid-2"
+                    email: "bob@example.com"
+                    name: "Bob"
+                    image: null
+                    projectRole:
+                      id: "project-role-uuid-2"
+                      name: "Member"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Members
+      summary: Remove Project Member
+      operationId: removeProjectMember
+      description: |
+        Removes a member from the project. The member is detached from the project and their pending project invitations are cleared. The project Owner cannot be removed.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemoveMemberResponse"
+              example:
+                success: true
+                data:
+                  id: "user-uuid-2"
+                  removed: true
+
+  /v1/projects/{projectId}/invitations:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Invitations
+      summary: List Project Invitations
+      operationId: listProjectInvitations
+      description: Lists the project's pending and declined invitations.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectInvitationsResponse"
+              example:
+                success: true
+                data:
+                  invitations:
+                    - id: 201
+                      email: "carol@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      projectRoleId: "project-role-uuid-2"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Invitations
+      summary: Create Project Invitations
+      operationId: createProjectInvitations
+      description: |
+        Invites one or more users to a project by email. Emails that are already members or already invited are skipped. Optionally assign a project role to the invitees — the `Owner` role cannot be assigned. Inviting members is not available on the Free plan outside of the trial period.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectInvitations"
+            example:
+              emails:
+                - "carol@example.com"
+                - "dave@example.com"
+              projectRoleId: "project-role-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectInvitationsResponse"
+              example:
+                success: true
+                data:
+                  invitations:
+                    - id: 201
+                      email: "carol@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      projectRoleId: "project-role-uuid-2"
+                    - id: 202
+                      email: "dave@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      projectRoleId: "project-role-uuid-2"
+
+  /v1/projects/{projectId}/invitations/{invitationId}:
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Invitations
+      summary: Revoke Project Invitation
+      operationId: deleteProjectInvitation
+      description: Revokes a pending project invitation.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the invitation
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteInvitationResponse"
+              example:
+                success: true
+                data:
+                  id: 201
+                  deleted: true
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Invitations
+      summary: Resend Project Invitation
+      operationId: resendProjectInvitation
+      description: Resends a pending project invitation email to the invitee.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInvitationResponse"
+              example:
+                success: true
+                data:
+                  invitation:
+                    id: 201
+                    email: "carol@example.com"
+                    status: "PENDING"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    projectRoleId: "project-role-uuid-2"
+
+  /v1/projects/{projectId}/roles:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Roles
+      summary: List Project Roles
+      operationId: listProjectRoles
+      description: |
+        Lists the roles available to a project. This includes both global, system-defined roles (where `projectId` is `null`) and custom roles defined for the project.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectRolesResponse"
+              example:
+                success: true
+                data:
+                  roles:
+                    - id: "project-role-uuid-1"
+                      name: "Owner"
+                      description: "Owner of the project with full access to all resources."
+                      projectId: null
+                      policies: []
+                    - id: "project-role-uuid-3"
+                      name: "Analyst"
+                      description: "Read-only project access"
+                      projectId: "PROJECT-ID"
+                      policies:
+                        - id: "policy-uuid-1"
+                          name: "View traces"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Roles
+      summary: Create Project Role
+      operationId: createProjectRole
+      description: |
+        Creates a custom project role from a set of policies. The role name must be unique within the project and cannot collide with a system-defined role name.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateRole"
+            example:
+              name: "Analyst"
+              description: "Read-only project access"
+              policyIds:
+                - "policy-uuid-1"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRoleResponse"
+              example:
+                success: true
+                data:
+                  role:
+                    id: "project-role-uuid-3"
+                    name: "Analyst"
+                    description: "Read-only project access"
+                    projectId: "PROJECT-ID"
+                    policies:
+                      - id: "policy-uuid-1"
+                        name: "View traces"
+
+  /v1/projects/{projectId}/roles/{roleId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Roles
+      summary: Update Project Role
+      operationId: updateProjectRole
+      description: Updates a custom project role's name, description, or policies. Global roles cannot be modified.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateRole"
+            example:
+              name: "Analyst"
+              description: "Read and comment on project traces"
+              policyIds:
+                - "policy-uuid-1"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRoleResponse"
+              example:
+                success: true
+                data:
+                  role:
+                    id: "project-role-uuid-3"
+                    name: "Analyst"
+                    description: "Read and comment on project traces"
+                    projectId: "PROJECT-ID"
+                    policies:
+                      - id: "policy-uuid-1"
+                        name: "View traces"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Roles
+      summary: Delete Project Role
+      operationId: deleteProjectRole
+      description: |
+        Deletes a custom project role. A role that is still assigned to one or more members cannot be deleted.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteRoleResponse"
+              example:
+                success: true
+                data:
+                  id: "project-role-uuid-3"
+                  deleted: true
+
+  /v1/projects/{projectId}/policies:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Policies
+      summary: List Project Policies
+      operationId: listProjectPolicies
+      description: Lists the custom policies defined for a project. Each policy is a named collection of permissions.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectPoliciesResponse"
+              example:
+                success: true
+                data:
+                  policies:
+                    - id: "policy-uuid-1"
+                      name: "View traces"
+                      description: "Grants read access to traces"
+                      permissions:
+                        - id: "perm-uuid-1"
+                          name: "trace:read"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Policies
+      summary: Create Project Policy
+      operationId: createProjectPolicy
+      description: Creates a custom project policy from a set of permissions. Use `GET /v1/organization/permissions` to discover assignable permission ids.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdatePolicy"
+            example:
+              name: "View traces"
+              description: "Grants read access to traces"
+              permissionIds:
+                - "perm-uuid-1"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyResponse"
+              example:
+                success: true
+                data:
+                  policy:
+                    id: "policy-uuid-1"
+                    name: "View traces"
+                    description: "Grants read access to traces"
+                    permissions:
+                      - id: "perm-uuid-1"
+                        name: "trace:read"
+
+  /v1/projects/{projectId}/policies/{policyId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Policies
+      summary: Update Project Policy
+      operationId: updateProjectPolicy
+      description: Updates a custom project policy's name, description, or permissions.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdatePolicy"
+            example:
+              name: "View traces"
+              description: "Grants read and export access to traces"
+              permissionIds:
+                - "perm-uuid-1"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyResponse"
+              example:
+                success: true
+                data:
+                  policy:
+                    id: "policy-uuid-1"
+                    name: "View traces"
+                    description: "Grants read and export access to traces"
+                    permissions:
+                      - id: "perm-uuid-1"
+                        name: "trace:read"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Policies
+      summary: Delete Project Policy
+      operationId: deleteProjectPolicy
+      description: Deletes a custom project policy.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePolicyResponse"
+              example:
+                success: true
+                data:
+                  id: "policy-uuid-1"
+                  deleted: true
+
+  /v1/organization:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization
+      summary: Retrieve Organization
+      operationId: getOrganization
+      description: Retrieves the organization that the API key is scoped to.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationResponse"
+              example:
+                success: true
+                data:
+                  organization:
+                    id: "ORGANIZATION-ID"
+                    name: "Acme Inc."
+                    plan: "PREMIUM"
+                    created_at: "2024-12-04T23:00:00.000Z"
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization
+      summary: Update Organization
+      operationId: updateOrganization
+      description: Updates the organization's name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrganization"
+            example:
+              name: "Acme Inc."
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationResponse"
+              example:
+                success: true
+                data:
+                  organization:
+                    id: "ORGANIZATION-ID"
+                    name: "Acme Inc."
+                    plan: "PREMIUM"
+                    created_at: "2024-12-04T23:00:00.000Z"
+
+  /v1/organization/members:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Members
+      summary: List Organization Members
+      operationId: listMembers
+      description: Lists the members of your organization, along with each member's organization role.
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number to return. Defaults to 1.
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: The maximum number of members per page (max 100). Defaults to 25.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMembersResponse"
+              example:
+                success: true
+                data:
+                  members:
+                    - id: "user-uuid-1"
+                      email: "alice@example.com"
+                      name: "Alice"
+                      image: null
+                      organizationRole:
+                        id: "role-uuid-1"
+                        name: "Admin"
+                    - id: "user-uuid-2"
+                      email: "bob@example.com"
+                      name: "Bob"
+                      image: null
+                      organizationRole:
+                        id: "role-uuid-2"
+                        name: "Member"
+                  total: 2
+
+  /v1/organization/members/{userId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Members
+      summary: Update Organization Member Role
+      operationId: updateMemberRole
+      description: |
+        Changes a member's organization role. Assigning the `Owner` role to another member transfers ownership, demoting the current Owner to `Admin`.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemberRole"
+            example:
+              roleId: "role-uuid-1"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemberResponse"
+              example:
+                success: true
+                data:
+                  member:
+                    id: "user-uuid-2"
+                    email: "bob@example.com"
+                    name: "Bob"
+                    image: null
+                    organizationRole:
+                      id: "role-uuid-1"
+                      name: "Admin"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Members
+      summary: Remove Organization Member
+      operationId: removeMember
+      description: |
+        Removes a member from the organization. The member is detached from all projects and their pending invitations are cleared. The organization Owner cannot be removed.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the member
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemoveMemberResponse"
+              example:
+                success: true
+                data:
+                  id: "user-uuid-2"
+                  removed: true
+
+  /v1/organization/invitations:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Invitations
+      summary: List Organization Invitations
+      operationId: listInvitations
+      description: Lists the organization's pending and declined invitations.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListInvitationsResponse"
+              example:
+                success: true
+                data:
+                  invitations:
+                    - id: 101
+                      email: "carol@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      organizationRoleId: "role-uuid-2"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Invitations
+      summary: Create Organization Invitations
+      operationId: createInvitations
+      description: |
+        Invites one or more users to your organization by email. Emails that are already members or already invited are skipped. Optionally assign an organization role to the invitees — the `Owner` role cannot be assigned. Inviting members is not available on the Free plan outside of the trial period.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvitations"
+            example:
+              emails:
+                - "carol@example.com"
+                - "dave@example.com"
+              organizationRoleId: "role-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListInvitationsResponse"
+              example:
+                success: true
+                data:
+                  invitations:
+                    - id: 101
+                      email: "carol@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      organizationRoleId: "role-uuid-2"
+                    - id: 102
+                      email: "dave@example.com"
+                      status: "PENDING"
+                      created_at: "2024-12-04T23:00:00.000Z"
+                      organizationRoleId: "role-uuid-2"
+
+  /v1/organization/invitations/{invitationId}:
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Invitations
+      summary: Revoke Organization Invitation
+      operationId: deleteInvitation
+      description: Revokes a pending organization invitation.
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the invitation
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteInvitationResponse"
+              example:
+                success: true
+                data:
+                  id: 101
+                  deleted: true
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Invitations
+      summary: Resend Organization Invitation
+      operationId: resendInvitation
+      description: Resends a pending organization invitation email to the invitee.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvitationResponse"
+              example:
+                success: true
+                data:
+                  invitation:
+                    id: 101
+                    email: "carol@example.com"
+                    status: "PENDING"
+                    created_at: "2024-12-04T23:00:00.000Z"
+                    organizationRoleId: "role-uuid-2"
+
+  /v1/organization/roles:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Roles
+      summary: List Organization Roles
+      operationId: listRoles
+      description: |
+        Lists the roles available to your organization. This includes both global, system-defined roles (where `organizationId` is `null`) and custom roles defined by your organization.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListRolesResponse"
+              example:
+                success: true
+                data:
+                  roles:
+                    - id: "role-uuid-1"
+                      name: "Admin"
+                      description: "Full administrative access"
+                      organizationId: null
+                      policies:
+                        - id: "policy-uuid-1"
+                          name: "Manage projects"
+                    - id: "role-uuid-3"
+                      name: "Billing Manager"
+                      description: "Can manage billing only"
+                      organizationId: "ORGANIZATION-ID"
+                      policies:
+                        - id: "policy-uuid-2"
+                          name: "Manage billing"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Roles
+      summary: Create Organization Role
+      operationId: createRole
+      description: |
+        Creates a custom organization role from a set of policies. The role name must be unique within your organization and cannot collide with a system-defined role name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateRole"
+            example:
+              name: "Billing Manager"
+              description: "Can manage billing only"
+              policyIds:
+                - "policy-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+              example:
+                success: true
+                data:
+                  role:
+                    id: "role-uuid-3"
+                    name: "Billing Manager"
+                    description: "Can manage billing only"
+                    organizationId: "ORGANIZATION-ID"
+                    policies:
+                      - id: "policy-uuid-2"
+                        name: "Manage billing"
+
+  /v1/organization/roles/{roleId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Roles
+      summary: Update Organization Role
+      operationId: updateRole
+      description: Updates a custom organization role's name, description, or policies. Global roles cannot be modified.
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateRole"
+            example:
+              name: "Billing Manager"
+              description: "Can manage billing and view usage"
+              policyIds:
+                - "policy-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+              example:
+                success: true
+                data:
+                  role:
+                    id: "role-uuid-3"
+                    name: "Billing Manager"
+                    description: "Can manage billing and view usage"
+                    organizationId: "ORGANIZATION-ID"
+                    policies:
+                      - id: "policy-uuid-2"
+                        name: "Manage billing"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Roles
+      summary: Delete Organization Role
+      operationId: deleteRole
+      description: |
+        Deletes a custom organization role. A role that is still assigned to one or more members cannot be deleted.
+      parameters:
+        - name: roleId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the role
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteRoleResponse"
+              example:
+                success: true
+                data:
+                  id: "role-uuid-3"
+                  deleted: true
+
+  /v1/organization/policies:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Policies
+      summary: List Organization Policies
+      operationId: listPolicies
+      description: Lists the custom policies defined by your organization. Each policy is a named collection of permissions.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPoliciesResponse"
+              example:
+                success: true
+                data:
+                  policies:
+                    - id: "policy-uuid-2"
+                      name: "Manage billing"
+                      description: "Grants access to billing settings"
+                      permissions:
+                        - id: "perm-uuid-1"
+                          name: "billing:read"
+                        - id: "perm-uuid-2"
+                          name: "billing:write"
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Policies
+      summary: Create Organization Policy
+      operationId: createPolicy
+      description: Creates a custom organization policy from a set of permissions. Use `GET /v1/organization/permissions` to discover assignable permission ids.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdatePolicy"
+            example:
+              name: "Manage billing"
+              description: "Grants access to billing settings"
+              permissionIds:
+                - "perm-uuid-1"
+                - "perm-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyResponse"
+              example:
+                success: true
+                data:
+                  policy:
+                    id: "policy-uuid-2"
+                    name: "Manage billing"
+                    description: "Grants access to billing settings"
+                    permissions:
+                      - id: "perm-uuid-1"
+                        name: "billing:read"
+                      - id: "perm-uuid-2"
+                        name: "billing:write"
+
+  /v1/organization/policies/{policyId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Policies
+      summary: Update Organization Policy
+      operationId: updatePolicy
+      description: Updates a custom organization policy's name, description, or permissions.
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdatePolicy"
+            example:
+              name: "Manage billing"
+              description: "Grants full access to billing settings"
+              permissionIds:
+                - "perm-uuid-1"
+                - "perm-uuid-2"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyResponse"
+              example:
+                success: true
+                data:
+                  policy:
+                    id: "policy-uuid-2"
+                    name: "Manage billing"
+                    description: "Grants full access to billing settings"
+                    permissions:
+                      - id: "perm-uuid-1"
+                        name: "billing:read"
+                      - id: "perm-uuid-2"
+                        name: "billing:write"
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Policies
+      summary: Delete Organization Policy
+      operationId: deletePolicy
+      description: Deletes a custom organization policy.
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the policy
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePolicyResponse"
+              example:
+                success: true
+                data:
+                  id: "policy-uuid-2"
+                  deleted: true
+
+  /v1/organization/permissions:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Organization Permissions
+      summary: List Organization Permissions
+      operationId: listPermissions
+      description: |
+        Lists every assignable organization permission. Permissions are named `resource:action` (e.g. `billing:read`) and are the building blocks of policies.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPermissionsResponse"
+              example:
+                success: true
+                data:
+                  permissions:
+                    - id: "perm-uuid-1"
+                      name: "billing:read"
+                      description: null
+                    - id: "perm-uuid-2"
+                      name: "billing:write"
+                      description: null
+
+  /v1/projects/{projectId}/permissions:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Project Permissions
+      summary: List Project Permissions
+      operationId: listProjectPermissions
+      description: |
+        Lists every assignable project permission. Permissions are named `resource:action` (e.g. `traces:read`) and are the building blocks of project policies.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPermissionsResponse"
+              example:
+                success: true
+                data:
+                  permissions:
+                    - id: "perm-uuid-1"
+                      name: "traces:read"
+                      description: null
+                    - id: "perm-uuid-2"
+                      name: "traces:write"
+                      description: null
 
 components:
   schemas:
@@ -3418,7 +5257,7 @@ components:
           description: "This is true if the list of metric collections was retrieved successfully."
         data:
           type: object
-          description: "This maps to a list of metric collections, which can be used to [run evals](/api-reference/evaluation/evaluate-llm) remotely."
+          description: "This maps to a list of metric collections, which can be used to [run evals](/docs/api-reference/evaluate/evaluate-llm) remotely."
           properties:
             metricCollections:
               type: array
@@ -3431,7 +5270,7 @@ components:
                     description: "This is the id of the metric collection."
                   name:
                     type: string
-                    description: "This is the name of the metric collection, which should be supplied to the [evals API](/api-reference/evaluation/evaluate-llm) to run evaluations remotely."
+                    description: "This is the name of the metric collection, which should be supplied to the [evals API](/docs/api-reference/evaluate/evaluate-llm) to run evaluations remotely."
                   multiTurn:
                     type: boolean
                     description: "This is true if the metric collection is a multi-turn collection, which only contains multi-turn metrics for multi-turn evaluations."
@@ -3910,6 +5749,7 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates if the request was successful
         data:
           type: object
           properties:
@@ -3928,6 +5768,7 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates if the request was successful
         data:
           type: object
           properties:
@@ -6753,7 +8594,7 @@ components:
         - success
         - data
 
-    # Metric Data Schemas
+    # Metrics Data Schemas
     MetricDataItem:
       type: object
       required:
@@ -6879,7 +8720,7 @@ components:
         organizationId:
           type: string
           description: ID of the organization this project belongs to
-        startTime:
+        created_at:
           type: string
           format: date-time
           description: ISO 8601 timestamp of when the project was created
@@ -6911,6 +8752,10 @@ components:
         description:
           type: string
           description: Optional description of the project
+        email:
+          type: string
+          format: email
+          description: Optional email of an existing organization member to assign as the project's Owner. If omitted, the project has no member and is accessible via its API key and to organization admins.
       required:
         - name
 
@@ -6925,6 +8770,10 @@ components:
           properties:
             project:
               $ref: "#/components/schemas/Project"
+            apiKey:
+              allOf:
+                - $ref: "#/components/schemas/ApiKey"
+              description: A default project-scoped API key provisioned with the project. Its full `value` is returned only once, in this response.
       required:
         - success
         - data
@@ -6950,6 +8799,841 @@ components:
           properties:
             project:
               $ref: "#/components/schemas/Project"
+      required:
+        - success
+        - data
+
+    GetProjectResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            project:
+              $ref: "#/components/schemas/Project"
+      required:
+        - success
+        - data
+
+    DeleteProjectResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: ID of the deleted project
+            deleted:
+              type: boolean
+              description: Always `true` when the project was deleted
+      required:
+        - success
+        - data
+
+    # API Key Schemas
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the API key
+        name:
+          type: string
+          nullable: true
+          description: Human-readable label for the API key
+        valid:
+          type: boolean
+          description: Whether the key is active. A deactivated key is rejected on authentication.
+        value:
+          type: string
+          description: |
+            The API key value. This is redacted (only the last 6 characters are shown, prefixed with asterisks) on every response **except** the create response, where the full value is returned exactly once.
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the key was created
+        lastUsed:
+          type: string
+          format: date-time
+          nullable: true
+          description: ISO 8601 timestamp of when the key was last used to authenticate, or `null` if never used
+      required:
+        - id
+        - valid
+        - value
+        - created_at
+
+    CreateApiKey:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Human-readable label for the API key
+      required:
+        - name
+
+    UpdateApiKey:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Set to `false` to deactivate the key, or `true` to reactivate it
+      required:
+        - valid
+
+    ApiKeyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            apiKey:
+              $ref: "#/components/schemas/ApiKey"
+      required:
+        - success
+        - data
+
+    ApiKeyListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            apiKeys:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiKey"
+      required:
+        - success
+        - data
+
+    DeleteApiKeyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: ID of the revoked API key
+            deleted:
+              type: boolean
+              description: Always `true` when the key was revoked
+      required:
+        - success
+        - data
+
+    # Organization Schemas
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the organization
+        name:
+          type: string
+          description: Name of the organization
+        plan:
+          type: string
+          enum: [TRIAL, FREE, STARTER, ENTERPRISE, TEAM, PREMIUM]
+          description: The organization's current billing plan
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the organization was created
+      required:
+        - id
+        - name
+        - plan
+        - created_at
+
+    UpdateOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+          description: New name for the organization
+      required:
+        - name
+
+    OrganizationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            organization:
+              $ref: "#/components/schemas/Organization"
+      required:
+        - success
+        - data
+
+    # Member Schemas
+    Member:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the member
+        email:
+          type: string
+          description: The member's email address
+        name:
+          type: string
+          nullable: true
+          description: The member's display name
+        image:
+          type: string
+          nullable: true
+          description: URL of the member's avatar image
+        organizationRole:
+          allOf:
+            - $ref: "#/components/schemas/NamedRef"
+          nullable: true
+          description: The member's organization role, or `null` if they have no role
+      required:
+        - id
+        - email
+
+    UpdateMemberRole:
+      type: object
+      properties:
+        roleId:
+          type: string
+          description: The id of the role to assign to the member.
+      required:
+        - roleId
+
+    ListMembersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            members:
+              type: array
+              description: List of members in the organization
+              items:
+                $ref: "#/components/schemas/Member"
+            total:
+              type: integer
+              description: Total number of members in the organization
+      required:
+        - success
+        - data
+
+    MemberResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            member:
+              $ref: "#/components/schemas/Member"
+      required:
+        - success
+        - data
+
+    RemoveMemberResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: ID of the removed member
+            removed:
+              type: boolean
+              description: Always `true` when the member was removed
+      required:
+        - success
+        - data
+
+    # Invitation Schemas
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the invitation
+        email:
+          type: string
+          description: The invited email address
+        status:
+          type: string
+          enum: [PENDING, ACCEPTED, DECLINED]
+          description: The current status of the invitation
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the invitation was created
+        organizationRoleId:
+          type: string
+          nullable: true
+          description: The id of the organization role the invitee will receive, or `null` for the default
+      required:
+        - id
+        - email
+        - status
+        - created_at
+
+    CreateInvitations:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: One or more email addresses to invite
+          items:
+            type: string
+            format: email
+        organizationRoleId:
+          type: string
+          format: uuid
+          description: Optional organization role id to assign to all invitees. The `Owner` role cannot be assigned.
+      required:
+        - emails
+
+    ListInvitationsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            invitations:
+              type: array
+              description: List of organization invitations
+              items:
+                $ref: "#/components/schemas/Invitation"
+      required:
+        - success
+        - data
+
+    DeleteInvitationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: ID of the revoked invitation
+            deleted:
+              type: boolean
+              description: Always `true` when the invitation was revoked
+      required:
+        - success
+        - data
+
+    # Role & Policy Schemas
+    NamedRef:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier
+        name:
+          type: string
+          description: Name
+      required:
+        - id
+        - name
+
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the role
+        name:
+          type: string
+          description: Name of the role
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the role
+        organizationId:
+          type: string
+          nullable: true
+          description: |
+            The owning organization id, or `null` for global, system-defined roles that are available to every organization.
+        policies:
+          type: array
+          description: The policies attached to this role
+          items:
+            $ref: "#/components/schemas/NamedRef"
+      required:
+        - id
+        - name
+
+    CreateOrUpdateRole:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the role (must be unique within the organization and cannot be a system role name)
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the role
+        policyIds:
+          type: array
+          description: The ids of the policies to attach to this role
+          items:
+            type: string
+      required:
+        - name
+        - policyIds
+
+    RoleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            role:
+              $ref: "#/components/schemas/Role"
+      required:
+        - success
+        - data
+
+    ListRolesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            roles:
+              type: array
+              description: List of roles available to the organization, including global system roles
+              items:
+                $ref: "#/components/schemas/Role"
+      required:
+        - success
+        - data
+
+    DeleteRoleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: ID of the deleted role
+            deleted:
+              type: boolean
+              description: Always `true` when the role was deleted
+      required:
+        - success
+        - data
+
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the policy
+        name:
+          type: string
+          description: Name of the policy
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the policy
+        permissions:
+          type: array
+          description: The permissions granted by this policy
+          items:
+            $ref: "#/components/schemas/NamedRef"
+      required:
+        - id
+        - name
+
+    CreateOrUpdatePolicy:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the policy
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the policy
+        permissionIds:
+          type: array
+          description: The ids of the permissions granted by this policy
+          items:
+            type: string
+      required:
+        - name
+        - permissionIds
+
+    PolicyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            policy:
+              $ref: "#/components/schemas/Policy"
+      required:
+        - success
+        - data
+
+    ListPoliciesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            policies:
+              type: array
+              description: List of the organization's custom policies
+              items:
+                $ref: "#/components/schemas/Policy"
+      required:
+        - success
+        - data
+
+    DeletePolicyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: ID of the deleted policy
+            deleted:
+              type: boolean
+              description: Always `true` when the policy was deleted
+      required:
+        - success
+        - data
+
+    # Permission Schemas
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the permission
+        name:
+          type: string
+          description: "The permission name, formatted as `resource:action` (e.g. `billing:read`)"
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable description of the permission
+      required:
+        - id
+        - name
+
+    ListPermissionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            permissions:
+              type: array
+              description: List of all available permissions
+              items:
+                $ref: "#/components/schemas/Permission"
+      required:
+        - success
+        - data
+
+    # Project Member Schemas
+    ProjectMember:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the member
+        email:
+          type: string
+          description: The member's email address
+        name:
+          type: string
+          nullable: true
+          description: The member's display name
+        image:
+          type: string
+          nullable: true
+          description: URL of the member's avatar image
+        projectRole:
+          allOf:
+            - $ref: "#/components/schemas/NamedRef"
+          nullable: true
+          description: The member's project role, or `null` if they have no role
+      required:
+        - id
+        - email
+
+    ListProjectMembersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            members:
+              type: array
+              description: List of members in the project
+              items:
+                $ref: "#/components/schemas/ProjectMember"
+            total:
+              type: integer
+              description: Total number of members in the project
+      required:
+        - success
+        - data
+
+    ProjectMemberResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            member:
+              $ref: "#/components/schemas/ProjectMember"
+      required:
+        - success
+        - data
+
+    # Project Invitation Schemas
+    ProjectInvitation:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the invitation
+        email:
+          type: string
+          description: The invited email address
+        status:
+          type: string
+          enum: [PENDING, ACCEPTED, DECLINED]
+          description: The current status of the invitation
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the invitation was created
+        projectRoleId:
+          type: string
+          nullable: true
+          description: The id of the project role the invitee will receive, or `null` for the default
+      required:
+        - id
+        - email
+        - status
+        - created_at
+
+    CreateProjectInvitations:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: One or more email addresses to invite
+          items:
+            type: string
+            format: email
+        projectRoleId:
+          type: string
+          format: uuid
+          description: Optional project role id to assign to all invitees. The `Owner` role cannot be assigned.
+      required:
+        - emails
+
+    ListProjectInvitationsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            invitations:
+              type: array
+              description: List of project invitations
+              items:
+                $ref: "#/components/schemas/ProjectInvitation"
+      required:
+        - success
+        - data
+
+    # Project Role & Policy Schemas
+    ProjectRole:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the role
+        name:
+          type: string
+          description: Name of the role
+        description:
+          type: string
+          nullable: true
+          description: Optional description of the role
+        projectId:
+          type: string
+          nullable: true
+          description: |
+            The owning project id, or `null` for global, system-defined roles that are available to every project.
+        policies:
+          type: array
+          description: The policies attached to this role
+          items:
+            $ref: "#/components/schemas/NamedRef"
+      required:
+        - id
+        - name
+
+    ProjectRoleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            role:
+              $ref: "#/components/schemas/ProjectRole"
+      required:
+        - success
+        - data
+
+    ListProjectRolesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            roles:
+              type: array
+              description: List of roles available to the project, including global system roles
+              items:
+                $ref: "#/components/schemas/ProjectRole"
+      required:
+        - success
+        - data
+
+    ListProjectPoliciesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            policies:
+              type: array
+              description: List of the project's custom policies
+              items:
+                $ref: "#/components/schemas/Policy"
+      required:
+        - success
+        - data
+
+    InvitationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          type: object
+          properties:
+            invitation:
+              $ref: "#/components/schemas/Invitation"
+          required:
+            - invitation
+      required:
+        - success
+        - data
+
+    ProjectInvitationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          type: object
+          properties:
+            invitation:
+              $ref: "#/components/schemas/ProjectInvitation"
+          required:
+            - invitation
       required:
         - success
         - data

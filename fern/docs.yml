@@ -29,6 +29,10 @@ tabs:
     slug: integrations
     icon: fa-light fa-plug
     display-name: Integrations & OTEL
+  guides:
+    slug: guides
+    icon: fa-light fa-compass
+    display-name: Guides
   settings:
     slug: settings
     icon: fa-light fa-gear
@@ -383,6 +387,192 @@ navigation:
         flattened: true
         skip-slug: true
         paginated: true
+        layout:
+          - section: Data Models
+            skip-slug: true
+            contents:
+              - section: Metrics
+                contents:
+                  - GET /v1/metrics
+                  - POST /v1/metrics
+                  - PUT /v1/metrics/{id}
+                  - GET /v1/metric/{name}
+                  - section: Batch Metrics
+                    contents:
+                      - POST /v1/metrics/batch
+              - section: Metric Collections
+                contents:
+                  - POST /v1/metric-collections
+                  - GET /v1/metric-collections
+                  - PUT /v1/metric-collections/{id}
+              - section: Metrics Data
+                contents:
+                  - GET /v1/metrics-data
+              - section: Datasets
+                contents:
+                  - GET /v1/datasets
+                  - GET /v1/datasets/{alias}
+                  - POST /v1/datasets/{alias}
+                  - DELETE /v1/datasets/{alias}
+                  - section: Dataset Versions
+                    contents:
+                      - GET /v1/datasets/{alias}/versions
+                      - POST /v1/datasets/{alias}/versions
+              - section: Test Runs
+                contents:
+                  - GET /v1/test-runs
+                  - GET /v1/test-runs/{testRunId}
+              - section: Traces
+                contents:
+                  - GET /v1/traces
+                  - POST /v1/traces
+                  - GET /v1/traces/{traceUuid}
+              - section: Spans
+                contents:
+                  - GET /v1/spans
+                  - GET /v1/spans/{spanUuid}
+              - section: Threads
+                contents:
+                  - GET /v1/threads
+                  - GET /v1/threads/{threadId}
+              - section: Prompts
+                contents:
+                  - GET /v1/prompts
+                  - POST /v1/prompts
+                  - section: Labels
+                    contents:
+                      - GET /v1/prompts/{alias}/labels/{label}
+                  - section: Versions
+                    contents:
+                      - GET /v1/prompts/{alias}/versions
+                      - POST /v1/prompts/{alias}/versions
+                      - GET /v1/prompts/{alias}/versions/{version}
+                  - section: Commits
+                    contents:
+                      - GET /v1/prompts/{alias}/commits
+                      - GET /v1/prompts/{alias}/commits/{hash}
+                  - section: Branches
+                    contents:
+                      - GET /v1/prompts/{alias}/branches
+                      - POST /v1/prompts/{alias}/branches
+                      - PUT /v1/prompts/{alias}/branches/{name}
+                      - DELETE /v1/prompts/{alias}/branches/{name}
+              - section: Annotations
+                contents:
+                  - GET /v1/annotations
+                  - POST /v1/annotations
+                  - GET /v1/annotations/{annotationId}
+                  - PUT /v1/annotations/{annotationId}
+              - section: Annotation Queues
+                contents:
+                  - GET /v1/annotation-queues
+                  - POST /v1/annotation-queues
+                  - GET /v1/annotation-queues/{queueId}
+                  - DELETE /v1/annotation-queues/{queueId}
+                  - section: Queue Items
+                    contents:
+                      - GET /v1/annotation-queues/{queueId}/items
+                      - POST /v1/annotation-queues/{itemId}/annotate
+              - section: Projects
+                contents:
+                  - GET /v1/projects
+                  - POST /v1/projects
+                  - GET /v1/projects/{projectId}
+                  - PUT /v1/projects/{projectId}
+                  - DELETE /v1/projects/{projectId}
+                  - section: API Keys
+                    contents:
+                      - GET /v1/projects/{projectId}/api-keys
+                      - GET /v1/projects/{projectId}/api-keys/{apiKeyId}
+                      - POST /v1/projects/{projectId}/api-keys
+                      - PUT /v1/projects/{projectId}/api-keys/{apiKeyId}
+                      - DELETE /v1/projects/{projectId}/api-keys/{apiKeyId}
+                  - section: Members
+                    contents:
+                      - GET /v1/projects/{projectId}/members
+                      - PUT /v1/projects/{projectId}/members/{userId}
+                      - DELETE /v1/projects/{projectId}/members/{userId}
+                  - section: Invitations
+                    contents:
+                      - GET /v1/projects/{projectId}/invitations
+                      - POST /v1/projects/{projectId}/invitations
+                      - PUT /v1/projects/{projectId}/invitations/{invitationId}
+                      - DELETE /v1/projects/{projectId}/invitations/{invitationId}
+                  - section: Roles
+                    contents:
+                      - GET /v1/projects/{projectId}/roles
+                      - POST /v1/projects/{projectId}/roles
+                      - PUT /v1/projects/{projectId}/roles/{roleId}
+                      - DELETE /v1/projects/{projectId}/roles/{roleId}
+                  - section: Policies
+                    contents:
+                      - GET /v1/projects/{projectId}/policies
+                      - POST /v1/projects/{projectId}/policies
+                      - PUT /v1/projects/{projectId}/policies/{policyId}
+                      - DELETE /v1/projects/{projectId}/policies/{policyId}
+                  - section: Permissions
+                    contents:
+                      - GET /v1/projects/{projectId}/permissions
+              - section: Organization
+                contents:
+                  - GET /v1/organization
+                  - PUT /v1/organization
+                  - section: API Keys
+                    contents:
+                      - GET /v1/organization/api-keys
+                      - GET /v1/organization/api-keys/{apiKeyId}
+                      - POST /v1/organization/api-keys
+                      - PUT /v1/organization/api-keys/{apiKeyId}
+                      - DELETE /v1/organization/api-keys/{apiKeyId}
+                  - section: Members
+                    contents:
+                      - GET /v1/organization/members
+                      - PUT /v1/organization/members/{userId}
+                      - DELETE /v1/organization/members/{userId}
+                  - section: Invitations
+                    contents:
+                      - GET /v1/organization/invitations
+                      - POST /v1/organization/invitations
+                      - PUT /v1/organization/invitations/{invitationId}
+                      - DELETE /v1/organization/invitations/{invitationId}
+                  - section: Roles
+                    contents:
+                      - GET /v1/organization/roles
+                      - POST /v1/organization/roles
+                      - PUT /v1/organization/roles/{roleId}
+                      - DELETE /v1/organization/roles/{roleId}
+                  - section: Policies
+                    contents:
+                      - GET /v1/organization/policies
+                      - POST /v1/organization/policies
+                      - PUT /v1/organization/policies/{policyId}
+                      - DELETE /v1/organization/policies/{policyId}
+                  - section: Permissions
+                    contents:
+                      - GET /v1/organization/permissions
+          - section: Evals
+            skip-slug: true
+            contents:
+              - section: Evaluate
+                contents:
+                  - POST /v1/evaluate
+                  - POST /v1/evaluate/spans/{spanUuid}
+                  - POST /v1/evaluate/traces/{traceUuid}
+                  - POST /v1/evaluate/threads/{threadId}
+              - section: Simulate
+                contents:
+                  - POST /v1/simulate
+          - section: Legacy
+            skip-slug: true
+            contents:
+              - section: Metrics
+                contents:
+                  - section: Batch Metrics
+                    contents:
+                      - POST /v1/batch-metrics
+              - section: Metrics Data
+                contents:
+                  - GET /v1/metric-data
   - tab: integrations
     layout:
       - page: Integrations
@@ -540,6 +730,29 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+      - section: Admin SDK
+        contents:
+          - page: Introduction
+            path: docs/pages/settings/project/management/introduction.mdx
+            icon: fa-light fa-circle-info
+          - page: Quickstart
+            path: docs/pages/settings/project/management/quickstart.mdx
+            icon: fa-light fa-bolt
+          - page: Organization
+            path: docs/pages/settings/project/management/organization.mdx
+            icon: fa-light fa-building
+          - page: Projects
+            path: docs/pages/settings/project/management/projects.mdx
+            icon: fa-light fa-folder
+          - page: Members & Invitations
+            path: docs/pages/settings/project/management/members-and-invitations.mdx
+            icon: fa-light fa-user-group
+          - page: Roles, Policies & Permissions
+            path: docs/pages/settings/project/management/roles-policies-permissions.mdx
+            icon: fa-light fa-user-shield
+          - page: API Keys
+            path: docs/pages/settings/project/management/api-keys.mdx
+            icon: fa-light fa-key
   - tab: self-hosting
     layout:
       - page: Self-Hosting
@@ -635,6 +848,16 @@ navigation:
                 path: docs/pages/self-hosting/gcp/kubernetes-deployment.mdx
               - page: Verification
                 path: docs/pages/self-hosting/gcp/verification.mdx
+  - tab: guides
+    layout:
+      - page: Guides
+        path: docs/pages/guides/introduction.mdx
+        icon: fa-light fa-compass
+      - section: End-to-End
+        contents:
+          - page: Provision Projects for Agents on the Fly
+            path: docs/pages/guides/provision-projects-in-code.mdx
+            icon: fa-light fa-layer-group
   - tab: changelog
 
 redirects:
@@ -643,6 +866,160 @@ redirects:
     permanent: true
   - source: /docs/settings/project/categories
     destination: /docs/settings/project/classifiers
+    permanent: true
+  # API Reference: sub-resources moved under their parent domain (single-parent wildcards)
+  - source: /docs/api-reference/dataset-versions/:slug*
+    destination: /docs/api-reference/datasets/dataset-versions/:slug*
+    permanent: true
+  - source: /docs/api-reference/batch-metrics/:slug*
+    destination: /docs/api-reference/metrics/batch-metrics/:slug*
+    permanent: true
+  - source: /docs/api-reference/labels/:slug*
+    destination: /docs/api-reference/prompts/labels/:slug*
+    permanent: true
+  - source: /docs/api-reference/versions/:slug*
+    destination: /docs/api-reference/prompts/versions/:slug*
+    permanent: true
+  - source: /docs/api-reference/commits/:slug*
+    destination: /docs/api-reference/prompts/commits/:slug*
+    permanent: true
+  - source: /docs/api-reference/branches/:slug*
+    destination: /docs/api-reference/prompts/branches/:slug*
+    permanent: true
+  - source: /docs/api-reference/annotation-queue-items/:slug*
+    destination: /docs/api-reference/annotation-queues/queue-items/:slug*
+    permanent: true
+  # API Reference: api-keys split between Projects and Organization
+  - source: /docs/api-reference/api-keys/list-project-api-keys
+    destination: /docs/api-reference/projects/api-keys/list-project-api-keys
+    permanent: true
+  - source: /docs/api-reference/api-keys/get-project-api-key
+    destination: /docs/api-reference/projects/api-keys/get-project-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/create-project-api-key
+    destination: /docs/api-reference/projects/api-keys/create-project-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/update-project-api-key
+    destination: /docs/api-reference/projects/api-keys/update-project-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/delete-project-api-key
+    destination: /docs/api-reference/projects/api-keys/delete-project-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/list-organization-api-keys
+    destination: /docs/api-reference/organization/api-keys/list-organization-api-keys
+    permanent: true
+  - source: /docs/api-reference/api-keys/get-organization-api-key
+    destination: /docs/api-reference/organization/api-keys/get-organization-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/create-organization-api-key
+    destination: /docs/api-reference/organization/api-keys/create-organization-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/update-organization-api-key
+    destination: /docs/api-reference/organization/api-keys/update-organization-api-key
+    permanent: true
+  - source: /docs/api-reference/api-keys/delete-organization-api-key
+    destination: /docs/api-reference/organization/api-keys/delete-organization-api-key
+    permanent: true
+  # API Reference: members split between Projects and Organization
+  - source: /docs/api-reference/members/list-project-members
+    destination: /docs/api-reference/projects/members/list-project-members
+    permanent: true
+  - source: /docs/api-reference/members/update-project-member-role
+    destination: /docs/api-reference/projects/members/update-project-member-role
+    permanent: true
+  - source: /docs/api-reference/members/remove-project-member
+    destination: /docs/api-reference/projects/members/remove-project-member
+    permanent: true
+  - source: /docs/api-reference/members/list-members
+    destination: /docs/api-reference/organization/members/list-members
+    permanent: true
+  - source: /docs/api-reference/members/update-member-role
+    destination: /docs/api-reference/organization/members/update-member-role
+    permanent: true
+  - source: /docs/api-reference/members/remove-member
+    destination: /docs/api-reference/organization/members/remove-member
+    permanent: true
+  # API Reference: invitations split between Projects and Organization
+  - source: /docs/api-reference/invitations/list-project-invitations
+    destination: /docs/api-reference/projects/invitations/list-project-invitations
+    permanent: true
+  - source: /docs/api-reference/invitations/create-project-invitations
+    destination: /docs/api-reference/projects/invitations/create-project-invitations
+    permanent: true
+  - source: /docs/api-reference/invitations/resend-project-invitation
+    destination: /docs/api-reference/projects/invitations/resend-project-invitation
+    permanent: true
+  - source: /docs/api-reference/invitations/delete-project-invitation
+    destination: /docs/api-reference/projects/invitations/delete-project-invitation
+    permanent: true
+  - source: /docs/api-reference/invitations/list-invitations
+    destination: /docs/api-reference/organization/invitations/list-invitations
+    permanent: true
+  - source: /docs/api-reference/invitations/create-invitations
+    destination: /docs/api-reference/organization/invitations/create-invitations
+    permanent: true
+  - source: /docs/api-reference/invitations/resend-invitation
+    destination: /docs/api-reference/organization/invitations/resend-invitation
+    permanent: true
+  - source: /docs/api-reference/invitations/delete-invitation
+    destination: /docs/api-reference/organization/invitations/delete-invitation
+    permanent: true
+  # API Reference: roles split between Projects and Organization
+  - source: /docs/api-reference/roles/list-project-roles
+    destination: /docs/api-reference/projects/roles/list-project-roles
+    permanent: true
+  - source: /docs/api-reference/roles/create-project-role
+    destination: /docs/api-reference/projects/roles/create-project-role
+    permanent: true
+  - source: /docs/api-reference/roles/update-project-role
+    destination: /docs/api-reference/projects/roles/update-project-role
+    permanent: true
+  - source: /docs/api-reference/roles/delete-project-role
+    destination: /docs/api-reference/projects/roles/delete-project-role
+    permanent: true
+  - source: /docs/api-reference/roles/list-roles
+    destination: /docs/api-reference/organization/roles/list-roles
+    permanent: true
+  - source: /docs/api-reference/roles/create-role
+    destination: /docs/api-reference/organization/roles/create-role
+    permanent: true
+  - source: /docs/api-reference/roles/update-role
+    destination: /docs/api-reference/organization/roles/update-role
+    permanent: true
+  - source: /docs/api-reference/roles/delete-role
+    destination: /docs/api-reference/organization/roles/delete-role
+    permanent: true
+  # API Reference: policies split between Projects and Organization
+  - source: /docs/api-reference/policies/list-project-policies
+    destination: /docs/api-reference/projects/policies/list-project-policies
+    permanent: true
+  - source: /docs/api-reference/policies/create-project-policy
+    destination: /docs/api-reference/projects/policies/create-project-policy
+    permanent: true
+  - source: /docs/api-reference/policies/update-project-policy
+    destination: /docs/api-reference/projects/policies/update-project-policy
+    permanent: true
+  - source: /docs/api-reference/policies/delete-project-policy
+    destination: /docs/api-reference/projects/policies/delete-project-policy
+    permanent: true
+  - source: /docs/api-reference/policies/list-policies
+    destination: /docs/api-reference/organization/policies/list-policies
+    permanent: true
+  - source: /docs/api-reference/policies/create-policy
+    destination: /docs/api-reference/organization/policies/create-policy
+    permanent: true
+  - source: /docs/api-reference/policies/update-policy
+    destination: /docs/api-reference/organization/policies/update-policy
+    permanent: true
+  - source: /docs/api-reference/policies/delete-policy
+    destination: /docs/api-reference/organization/policies/delete-policy
+    permanent: true
+  # API Reference: permissions split between Projects and Organization
+  - source: /docs/api-reference/permissions/list-project-permissions
+    destination: /docs/api-reference/projects/permissions/list-project-permissions
+    permanent: true
+  - source: /docs/api-reference/permissions/list-permissions
+    destination: /docs/api-reference/organization/permissions/list-permissions
     permanent: true
 
 navbar-links:

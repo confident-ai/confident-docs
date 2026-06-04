@@ -3,20 +3,21 @@ slug: settings
 description: Configure and manage your project and organization settings on Confident AI
 ---
 
-Confident AI provides comprehensive settings to help you configure your workspace exactly how you need it. Settings are organized into two categories based on their scope and impact.
+Confident AI provides platform settings for configuring projects, managing organization-wide resources, and automating administrative workflows through the Admin SDK.
 
 ## Overview
 
-Settings in Confident AI are divided into two levels:
+Settings in Confident AI are organized into three areas:
 
-1. **Project Settings** — Configure settings that apply to a specific project
-2. **Organization Settings** — Manage settings that apply across all projects in your organization
+1. **Project Settings** configure settings that apply to a specific project.
+2. **Organization Settings** manage settings that apply across all projects in your organization.
+3. **Admin SDK** manages organization and project resources programmatically.
 
 <Note>
   Teams focused on org-wide AI adoption—such as Centers of Excellence,
   innovation teams, or platform teams in large enterprises—will find
   **Organization Settings** particularly relevant. These settings help manage
-  resources and governance for multiple AI teams across the company.
+  resources and access for multiple AI teams across the company.
 </Note>
 
 ## Project vs Organization
@@ -166,6 +167,34 @@ Organization settings control resources and configurations that apply to all pro
     href="/settings/organization/feature-access"
   >
     Control which features are enabled for projects.
+  </Card>
+</CardGroup>
+
+## Admin SDK
+
+The Admin SDK lets you manage organization and project resources programmatically. Use it to create projects, invite members, manage roles, and provision API keys without configuring each resource manually in the platform UI.
+
+<CardGroup cols={3}>
+  <Card
+    title="Admin SDK Introduction"
+    icon="toolbox"
+    href="/settings/project/management/introduction"
+  >
+    Learn what the Admin SDK manages and when to use it.
+  </Card>
+  <Card
+    title="Admin SDK Quickstart"
+    icon="bolt"
+    href="/settings/project/management/quickstart"
+  >
+    Install the SDK, configure an Organization API Key, and make your first request.
+  </Card>
+  <Card
+    title="Projects"
+    icon="folder"
+    href="/settings/project/management/projects"
+  >
+    Create, update, and delete projects programmatically.
   </Card>
 </CardGroup>
 

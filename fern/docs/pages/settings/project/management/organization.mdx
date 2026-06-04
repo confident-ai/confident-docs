@@ -1,0 +1,90 @@
+---
+subtitle: Read and rename the organization tied to your API key.
+slug: settings/project/management/organization
+description: Manage your organization programmatically with the Admin SDK for Python and TypeScript.
+---
+
+## Overview
+
+Your organization is the top-level account that owns every project, member, role, and API key. With the Admin SDK you can read and rename the organization tied to your API key.
+
+<Note>
+
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
+
+</Note>
+
+## Get Your Organization
+
+You can retrieve the organization tied to your API key, including its `id` and `name`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from confidentai import ConfidentAI
+
+client = ConfidentAI()
+
+org = client.organization()
+organization = org.get()
+print(organization.id, organization.name)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentAI } from "confidentai";
+
+const client = new ConfidentAI();
+
+const org = client.organization();
+const organization = await org.get();
+console.log(organization.id, organization.name);
+```
+
+</Tab>
+
+</Tabs>
+
+## Rename Your Organization
+
+You can update your organization's `name`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+org = client.organization()
+organization = org.update(name="Example Org")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const org = client.organization();
+const organization = await org.update({ name: "Example Org" });
+```
+
+</Tab>
+
+</Tabs>
+
+## Next Steps
+
+Manage the resources in your organization:
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/docs/settings/project/management/projects">
+    Create, update, and delete projects.
+  </Card>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/settings/project/management/members-and-invitations">
+    Invite members and assign roles.
+  </Card>
+</CardGroup>

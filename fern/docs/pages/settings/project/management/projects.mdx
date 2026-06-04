@@ -1,0 +1,185 @@
+---
+subtitle: Create, read, update, and delete projects in your organization.
+slug: settings/project/management/projects
+description: Manage Confident AI projects programmatically with the Admin SDK for Python and TypeScript.
+---
+
+## Overview
+
+Projects are isolated workspaces for your datasets, prompts, traces, and evaluations. With the Admin SDK you can create, update, and delete projects programmatically. This supports project-per-agent, project-per-environment, and project-per-customer organization models.
+
+<Note>
+
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
+
+</Note>
+
+## List Projects
+
+You can list every project in your organization.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from confidentai import ConfidentAI
+
+client = ConfidentAI()
+
+projects = client.projects.list()
+for project in projects:
+    print(project.id, project.name)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentAI } from "confidentai";
+
+const client = new ConfidentAI();
+
+const projects = await client.projects.list();
+projects.forEach((project) => console.log(project.id, project.name));
+```
+
+</Tab>
+
+</Tabs>
+
+## Create a Project
+
+You can create a new project with just a `name`, while the `description` is optional. Creating a project also generates its first project API key, so the call returns both the `project` and that `api_key` (whose full secret is only available here).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+created = client.projects.create(
+    name="Customer Support Bot",
+    description="Production support assistant",
+)
+print(created.project.id)  # e.g. "clq9z3x1k0001la08f7t3g5p2"
+print(created.api_key.value)  # e.g. "confident_us_proj_...", shown only once
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const created = await client.projects.create({
+  name: "Customer Support Bot",
+  description: "Production support assistant",
+});
+console.log(created.project.id); // e.g. "clq9z3x1k0001la08f7t3g5p2"
+console.log(created.apiKey?.value); // e.g. "confident_us_proj_..."
+```
+
+</Tab>
+
+</Tabs>
+
+## Get a Project
+
+You can retrieve a single project by its `project_id`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+project.get()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+await project.get();
+```
+
+</Tab>
+
+</Tabs>
+
+## Update a Project
+
+You can update a project's `name`, `description`, or both, and only the fields you pass are changed.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+project.update(name="Support Bot (v2)")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+await project.update({ name: "Support Bot (v2)" });
+```
+
+</Tab>
+
+</Tabs>
+
+## Delete a Project
+
+You can permanently delete a project from your organization.
+
+<Warning>
+
+Deleting a project permanently removes all of its datasets, prompts, traces, and evaluations. This cannot be undone.
+
+</Warning>
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+project = client.project("clq9z3x1k0001la08f7t3g5p2")
+project.delete()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const project = client.project("clq9z3x1k0001la08f7t3g5p2");
+await project.delete();
+```
+
+</Tab>
+
+</Tabs>
+
+## Next Steps
+
+After projects are configured, manage access and keys:
+
+<CardGroup cols={2}>
+  <Card
+    title="Members & Invitations"
+    icon="user-group"
+    href="/docs/settings/project/management/members-and-invitations"
+  >
+    Add users to projects and assign roles.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/settings/project/management/api-keys">
+    Provision project-scoped API keys.
+  </Card>
+</CardGroup>

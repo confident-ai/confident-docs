@@ -1,0 +1,163 @@
+---
+title: Admin SDK Quickstart
+subtitle: Install the Admin SDK and make your first management call.
+slug: settings/project/management/quickstart
+description: Install the Admin SDK for Python or TypeScript, configure it with an Organization API Key, and make your first programmatic management call.
+---
+
+## Overview
+
+The Admin SDK lets you manage organizations, projects, members, roles, and API keys programmatically. It is available for both Python and TypeScript through the `confidentai` SDK.
+
+This quickstart shows how to install the SDK, configure an Organization API Key, create a client, and list projects in your organization.
+
+## Get Started
+
+<Steps>
+
+<Step title="Install the SDK">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+pip install confidentai
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+npm install confidentai
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Set your Organization API Key">
+
+<Warning>
+
+The `ConfidentAI` client requires an **Organization API Key**, which is separate from the project keys used for tracing and evaluations. [Retrieve yours](/docs/api-reference/authentication#organization-level-auth) before configuring the client.
+
+</Warning>
+
+The client reads the `CONFIDENT_ORG_API_KEY` environment variable by default. This is separate from the `CONFIDENT_API_KEY` used for tracing and evaluations, so you can configure both at once.
+
+```bash
+export CONFIDENT_ORG_API_KEY="confident_us_org_..."
+```
+
+</Step>
+
+<Step title="Create a client">
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from confidentai import ConfidentAI
+
+client = ConfidentAI()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentAI } from "confidentai";
+
+const client = new ConfidentAI();
+```
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+You can also pass the key explicitly instead of relying on the environment variable. This is useful when managing multiple organizations from the same process.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+client = ConfidentAI(api_key="confident_us_org_...")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const client = new ConfidentAI({ apiKey: "confident_us_org_..." });
+```
+
+</Tab>
+
+</Tabs>
+
+</Tip>
+
+</Step>
+
+<Step title="Make your first call">
+
+List the projects in your organization to verify that the client is configured correctly.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+# List the projects in your organization
+for project in client.projects.list():
+    print(project.id, project.name)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+// List the projects in your organization
+const projects = await client.projects.list();
+projects.forEach((project) => console.log(project.id, project.name));
+```
+
+</Tab>
+
+</Tabs>
+
+Done ✅. The Admin SDK client is configured and can make management requests.
+
+</Step>
+
+</Steps>
+
+## Next Steps
+
+Review the resource references for common management operations:
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/docs/settings/project/management/projects">
+    Create, update, and delete projects.
+  </Card>
+  <Card title="Members & Invitations" icon="user-group" href="/docs/settings/project/management/members-and-invitations">
+    Manage organization and project membership.
+  </Card>
+  <Card title="Roles, Policies & Permissions" icon="user-shield" href="/docs/settings/project/management/roles-policies-permissions">
+    Manage roles, policies, and permissions.
+  </Card>
+  <Card title="API Keys" icon="key" href="/docs/settings/project/management/api-keys">
+    Automate key provisioning and rotation.
+  </Card>
+</CardGroup>

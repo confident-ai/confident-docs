@@ -15,7 +15,7 @@ This page covers common tracing issues caused by Python's concurrency model and 
 
 ## Stacking `@observe` with Other Tracing Decorators
 
-If your code already uses another tracing decorator from a different observability system, you can leave it in place. `deepeval`'s `@observe` is a standard Python decorator (it uses `functools.wraps`) and stacks on top of any other tracing decorator without conflict. This applies to any decorator-based tracer — common examples include MLflow's `@mlflow.trace`, Langfuse's `@observe`, and OpenTelemetry's `@trace`.
+If your code already uses another tracing decorator from a different observability system, you can leave it in place. `deepeval`'s `@observe` is a standard Python decorator (it uses `functools.wraps`) and stacks on top of any other tracing decorator without conflict. This applies to any decorator-based tracer — e.g., MLflow's `@mlflow.trace` and OpenTelemetry's `@trace`.
 
 Order does not change correctness, but it controls which backend's span wraps which. Default to putting `@observe` closest to the function (innermost) so your existing tracing dashboard keeps showing the outer call as the root:
 

@@ -42,13 +42,13 @@ You can either run evals via code locally or remotely on Confident AI, both of w
   </Card>
 </CardGroup>
 
-## Vibe Coding Evals
+## Vibe Code Your Evals
 
-If you use **Claude Code**, install Confident AI's plugin and Claude will build the eval suite for you — datasets, metrics, pytest files, and shareable Confident AI reports.
+Let your coding agent build the eval suite for you — datasets, metrics, pytest files, and shareable Confident AI reports. Better yet, use DeepEval as your build-loop ground truth: your agent runs the evals, reads the failures and `reason` strings, makes the smallest app change, and re-runs to confirm. Choose the install method for your agent below.
 
-<Steps>
+<Tabs>
 
-<Step title="Install the plugin">
+<Tab title="Claude Code (plugin)">
 
 Run these four commands in Claude Code:
 
@@ -59,31 +59,39 @@ Run these four commands in Claude Code:
 /plugins
 ```
 
-</Step>
-
-<Step title="Verify the install">
-
 The `/plugins` command should list `DeepEval Plugin` under your installed plugins.
 
-</Step>
+</Tab>
 
-<Step title="Ask Claude to build the eval suite">
+<Tab title="Cursor, Codex, Windsurf & others (Skills CLI)">
 
-Open the project you want to evaluate and tell Claude what you need. Example prompts:
+Install the [`deepeval` Agent Skill](https://github.com/confident-ai/deepeval/tree/main/skills/deepeval) with any [Skills](https://github.com/anthropics/skills)-compatible installer. This works with Cursor, Claude Code, Codex, Windsurf, OpenCode, and any other assistant that supports the Skills standard:
+
+```bash
+npx skills add confident-ai/deepeval --skill deepeval
+```
+
+The skill teaches your agent how to pick the right test shape (single-turn / multi-turn / component-level), reuse or generate goldens, write a committed `tests/evals/` suite, run `deepeval test run`, read failures, and iterate. It triggers automatically on prompts like the ones below.
+
+</Tab>
+
+</Tabs>
+
+Once installed, open the project you want to evaluate and tell your agent what you need. Example prompts:
 
 - *"Create a DeepEval pytest eval suite for this app, generate ~30 goldens, and push results to Confident AI."*
 - *"My app is a RAG pipeline — set up DeepEval evals with retrieval-focused metrics."*
 - *"Generate a dataset from the docs in `./knowledge` and run them through DeepEval."*
 
-Claude will run the intake questions, pick metrics, generate goldens with `deepeval generate`, and produce a committed pytest suite you can rerun in CI.
+Your agent will run the intake questions, pick metrics, generate goldens with `deepeval generate`, and produce a committed pytest suite you can rerun in CI.
 
-</Step>
-
-</Steps>
+<Tip>
+  Point your agent at our LLM-friendly docs so it picks the right metrics and APIs: [llms.txt](https://www.confident-ai.com/docs/llms.txt) indexes every page (append `.md` to any docs URL for that page's raw Markdown). You can also connect your agent directly to our [docs MCP server](https://confident-ai.docs.buildwithfern.com/docs/_mcp/server).
+</Tip>
 
 <Note>
-  The plugin is Python-first today. TypeScript support via Claude Code is
-  coming soon — for now, follow the TypeScript steps below directly.
+  The Claude Code plugin is Python-first today. TypeScript support via Claude
+  Code is coming soon — for now, follow the TypeScript steps below directly.
 </Note>
 
 ## Run Your First Eval
