@@ -689,6 +689,43 @@ paths:
                   version: "00.00.02"
                 deprecated: false
 
+  /v1/datasets/{alias}/queue:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Queue Goldens
+      operationId: queueDatasetGoldens
+      description: |
+        Queues `Golden`s or `ConversationalGolden`s to a dataset as unfinalized goldens for later review. If the dataset alias does not exist yet, a new dataset is created automatically.
+
+        Provide either `goldens` (single-turn) or `conversationalGoldens` (multi-turn), but not both.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueueDatasetGoldensRequestData"
+            examples:
+              Single-Turn:
+                goldens:
+                  - input: "How is the weather like in NYC?"
+                    expectedOutput: "No idea"
+              Multi-Turn:
+                conversationalGoldens:
+                  - scenario: "Booking a hotel"
+                    expectedOutcome: "Successfully booked"
+                    userDescription: "Finds hotels in NYC"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueDatasetGoldensResponse"
+              example:
+                link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+
   /v1/evaluate:
     post:
       x-fern-server-name: Confident AI
@@ -5710,6 +5747,29 @@ components:
           description: "This is a list of conversational goldens to push. If you are pushing a single-turn dataset, this should be `null`."
       required:
         - finalized
+
+    QueueDatasetGoldensRequestData:
+      type: object
+      properties:
+        goldens:
+          type: array
+          items:
+            $ref: "#/components/schemas/Golden"
+          description: "This is a list of single-turn goldens to queue. If you are queueing conversational goldens, this should be `null`."
+        conversationalGoldens:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationalGolden"
+          description: "This is a list of conversational goldens to queue. If you are queueing single-turn goldens, this should be `null`."
+
+    QueueDatasetGoldensResponse:
+      type: object
+      properties:
+        link:
+          type: string
+          description: "A link to the dataset the goldens were queued to."
+      required:
+        - link
 
     DeleteDatasetResponse:
       type: object

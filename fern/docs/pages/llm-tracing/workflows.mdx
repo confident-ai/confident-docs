@@ -1,0 +1,204 @@
+---
+subtitle: See and manage everything that happens to your traces, spans, and threads after they hit the platform.
+slug: llm-tracing/workflows
+description: Manage dataset ingestion, queue ingestion, evaluation rules, and classifiers for traces, spans, and threads in one place.
+---
+
+Workflows gives you a single view of the entire post-ingestion pipeline for your traces, spans, and threads — dataset ingestion tasks, queue ingestion tasks, evaluation rules, and classifiers — visualised as a graph and managed through a set of tabs below it.
+
+<Frame caption="Workflows — the full post-ingestion pipeline as a graph">
+  <img data-image="tracing.workflows" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+Use the **Traces**, **Spans**, and **Threads** buttons at the top to scope the graph and all tabs to a specific entity type. Everything on the page updates to show only the workflows relevant to that type.
+
+## Dataset Ingestion
+
+Dataset ingestion tasks continuously ingest matching traces, spans, or threads into a dataset as goldens. Each task runs automatically against incoming data and adds qualifying items to the target dataset without manual intervention.
+
+<Frame caption="Dataset Ingestion">
+  <img data-image="tracing.workflows.datasetIngestion" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+To create a dataset ingestion task:
+
+1. Navigate to **Workflows** and select **Traces**, **Spans**, or **Threads**
+2. Click the **Dataset Ingestion** tab
+3. Click **New ingestion task**
+4. Configure the task in the side drawer — select the target dataset, set filters, and name the task
+5. Save the task
+
+Each task row shows its name, target dataset, data model, and golden count. Use the toggle to enable or disable a task without deleting it. Click the edit icon to update its configuration, or the delete icon to remove it permanently.
+
+## Queue Ingestion
+
+Queue ingestion tasks continuously route matching traces, spans, or threads into an annotation queue for human review. Use these to automatically populate queues with data that meets specific criteria.
+
+<Frame caption="Queue Ingestion">
+  <img data-image="tracing.workflows.queueIngestion" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+To create a queue ingestion task:
+
+1. Navigate to **Workflows** and select **Traces**, **Spans**, or **Threads**
+2. Click the **Queue Ingestion** tab
+3. Click **New ingestion task**
+4. Select the target annotation queue and configure the task in the side drawer
+5. Save the task
+
+Each task row shows its name, target queue, data model, and how many items have been ingested so far. Toggle, edit, and delete work the same way as for dataset ingestion tasks.
+
+## Evaluation Rules
+
+Evaluation rules automatically run a metric collection on incoming traces, spans, or threads at ingest time — without any code changes. They fire only when the SDK call that produced the data did not already supply a metric collection, making them a no-code complement to inline evaluation.
+
+<Frame caption="Evaluation Rules">
+  <img data-image="tracing.workflows.evaluationRule" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+<Note>
+  If your SDK call already passes `metric_collection`, that value wins — the rule is skipped for that item. Rules only attach evaluations when the SDK does not supply a metric collection.
+</Note>
+
+To create an evaluation rule:
+
+1. Navigate to **Workflows** and select **Traces**, **Spans**, or **Threads**
+2. Click the **Evaluation Rules** tab
+3. Click **New rule**
+4. Configure the rule in the side drawer (see fields below)
+5. Click **Create Rule**
+
+### Fields
+
+| Field | Required | Description |
+| ----- | -------- | ----------- |
+| Name | Yes | A unique name for the rule |
+| Description | No | Optional context about the rule's purpose |
+| Enabled | Yes | Toggle on to activate; disabled rules are saved but skipped at ingest time |
+| Data Model | Yes | `Trace`, `Span`, or `Thread` — determines what the rule runs on and when |
+| Span Type | Span rules only | Restrict to a specific span type: **LLM**, **Agent**, **Tool**, **Retriever**, or **Custom**. Leave as **Any** to match all spans. |
+| Metric Collection | Yes | The metric collection to run. Trace and span rules require a single-turn collection; thread rules require a multi-turn collection. |
+| Filters | No | Scope the rule to a subset of data (e.g. specific environments, tags, or metadata values). Leave empty to match every entity. |
+| Sample Rate | No | Fraction of matching entities the rule fires on (`0.0`–`1.0`). Sampling is deterministic — the same item always makes the same decision for a given rule. Defaults to `1.0`. |
+| Time Limit | Thread rules only | Seconds of inactivity before a thread is eligible for evaluation. The thread evaluates once no new traces have arrived for this period. Defaults to `300`. |
+| Overwrite Evaluations | Thread rules only | When **on**, each idle cycle replaces the thread's prior evaluations. When **off** (default), each cycle appends a new set of metric rows, preserving the full history. |
+
+### Data models
+
+| Data Model | When it runs | Metric collection type |
+| ---------- | ------------ | ---------------------- |
+| Trace | At ingest, on each incoming trace | Single-turn |
+| Span | At ingest, on each incoming span | Single-turn |
+| Thread | After the thread has been idle for the configured time limit | Multi-turn |
+
+### Filters
+
+Filters narrow which traces, spans, or threads a rule applies to. Filters can target environment, tags, metadata fields, latency, and other dimensions. Filter tabs for eval metrics, annotations, and signals are not available in rules — those dimensions don't exist at ingest time.
+
+<Tip>
+  Leave **Filters** empty to match every entity for the chosen data model.
+</Tip>
+
+### Thread rules and API metric collections
+
+For threads, evaluation rules are the primary way to run evaluations automatically — there is no equivalent inline SDK parameter that triggers a thread-level evaluation. Threads can still be evaluated explicitly via the [Evaluate Threads](/docs/llm-tracing/features/evaluate-threads) function if needed.
+
+<Note>
+  Only one enabled thread rule can target a given metric collection at a time. Enabling a rule that would conflict with another active thread rule targeting the same collection is blocked until the conflicting rule is disabled.
+</Note>
+
+## Classifiers
+
+Classifiers assign labels to traces and threads as they are ingested, based on a description and a set of labels you define. The labels they produce surface as [Signals](/docs/llm-tracing/features/signals) and as filterable dimensions across the Observatory and Dashboards.
+
+<Frame caption="Classifiers">
+  <img data-image="tracing.workflows.classifier" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+<Note>
+  Classifiers are not available for Spans. Switch to the **Traces** or **Threads** tab to see and manage classifiers.
+</Note>
+
+### How a classifier thinks
+
+When a classifier runs, the underlying LLM receives:
+
+1. The classifier's **description** — what is this classifier looking for?
+2. The list of **labels** with each label's **description** — when should this label be assigned?
+3. The trace or thread payload — input, output, metadata, error, tags, and (for threads) the conversation turns
+
+The model picks one label or returns "no match." There is no rule engine, no metadata-based pre-filtering, and no regex — everything depends on how the descriptions read against the data.
+
+<Tip>
+  Specificity matters. Vague label descriptions yield vague labels. Concrete examples in each description (e.g. "label as `Negative` if the user expresses frustration, gives up, or restates the same question because of a wrong answer") drive accuracy more than any other lever.
+</Tip>
+
+### Create a classifier
+
+To create a classifier:
+
+1. Navigate to **Workflows** and select **Traces** or **Threads**
+2. Click the **Classifiers** tab
+3. Click **New classifier**
+4. In the dialog, give the classifier a name and description
+5. Save the classifier
+
+After creating, click the edit icon on the row to open the classifier editor in a side drawer. This is where you manage labels and configure generation settings.
+
+### Labels
+
+Each classifier has one or more labels. Add labels manually with **New Label** (Name + Description) or auto-suggest them in bulk via **Generate Labels**. Each label has its own enable toggle — disabled labels are not assigned to new items but remain in the classifier's history.
+
+#### Generate Labels
+
+If you don't yet know what labels you need, **Generate Labels** proposes a set from your recent traces or threads. Click **Configure Generation** first to set the prompt and clustering parameters, then **Generate Labels** to run the three-stage pipeline:
+
+1. **Summarizing** — the model summarizes a sample of your recent traces or threads using the configured summary prompt
+2. **Clustering** — summaries are grouped into the configured number of clusters using K-means
+3. **Labeling** — each cluster is turned into a candidate label (name + description) and shown on the row as **Recommended**
+
+Recommended labels show **Accept** (✓) and **Decline** (✕) actions instead of the regular edit menu. Accepted labels become regular labels and start running on the next ingestion tick. Declined labels are deleted. Re-running generation while recommendations are still pending discards the old ones first.
+
+<Note>
+  Generation configuration (summary prompt and number of clusters) must be saved before the **Generate Labels** button becomes active.
+</Note>
+
+### Auto Classify
+
+The **Auto Classify** toggle in the classifier editor is separate from the top-level **Enabled** toggle:
+
+- **Enabled** — turns the classifier on or off entirely
+- **Auto Classify** — when **on**, the classifier may propose new labels (saved as Recommended on the labels list) when none of your existing labels fit a trace or thread; when **off**, it can only pick from the labels you've already defined or return _no match_
+
+Leave Auto Classify on if you want to keep discovering edge cases, and off if you want a fixed taxonomy.
+
+### Sample rate
+
+The **Sample Rate** below the classifier list controls what fraction of incoming traces (or threads) are sent for classification — `1.0` classifies everything, `0.1` classifies roughly one in ten. This is a project-wide setting shared across all enabled classifiers for that data model.
+
+### Time limit (threads only)
+
+For thread classifiers, **Time Limit** defines how many seconds of inactivity must pass before a thread is eligible for classification. The classification runs once no new trace has arrived for that period. Set this long enough that follow-up turns have stopped arriving, but not so long that you miss the conversation window.
+
+### Cost
+
+Each classification logs a usage event for billing. See **Project Settings → [Data Usage](/docs/settings/project/data-usage)** under the **Signals** line for live usage and projected cost.
+
+<CardGroup cols={2}>
+  <Card
+    title="Signals"
+    icon="signal-stream"
+    iconType="light"
+    href="/docs/llm-tracing/features/signals"
+  >
+    See how classifier labels surface as Signals — cards, breakdowns, trend findings, and Observatory filters.
+  </Card>
+  <Card
+    title="Dashboards"
+    icon="chart-line"
+    iconType="light"
+    href="/docs/reporting-analytics/dashboards"
+  >
+    Break a metric down by classifier label, or trend a label's volume over time on a dashboard widget.
+  </Card>
+</CardGroup>

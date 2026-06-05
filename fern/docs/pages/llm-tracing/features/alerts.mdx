@@ -1,0 +1,60 @@
+---
+subtitle: Monitor traces, spans, and threads with threshold-based alert rules.
+slug: llm-tracing/features/alerts
+description: Set up alert rules that notify your team when a metric on traces, spans, or threads crosses a threshold.
+---
+
+Alerts let you define threshold-based rules that run on a recurring schedule and notify your team when a metric on your traces, spans, or threads crosses a configured value. Every rule appears on the **Alerts** page in the Observatory, with a live status strip showing how often it has triggered over the last 30 runs.
+
+<Frame caption="Alerts in the Observatory">
+  <img data-image="tracing.alerts" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+<Note>
+  Alerts deliver notifications via your connected channels. Set up at least one notification integration under **Project Settings** → **[Integrations](/docs/settings/project/integrations)** before enabling alerts.
+</Note>
+
+## Create an Alert
+
+1. Navigate to **Observatory** → **Alerts**
+2. Click **New Alert**
+3. Enter a **Name** and an optional **Description**
+4. Click **Create** — the alert is saved in a disabled state and you land on the alert detail page to finish configuring it
+
+## Configure an Alert
+
+Alert configuration is split into three steps.
+
+### Configure Alert Event
+
+Choose what to measure:
+
+- **Data Model** — **Trace**, **Span**, or **Thread**
+- **Aggregation** — the metric to evaluate; options depend on the data model (e.g. trace count, error rate, average latency, token cost)
+
+### Customize Advanced Filters
+
+Optionally narrow the data the alert evaluates using the same filter controls available in the Observatory — environment, tags, metadata, and more. Leave empty to monitor all data for the selected model.
+
+### Set Alert Conditions
+
+- **Threshold** — a direction (**Above** or **Below**) and a numeric value; the alert fires when the aggregated metric crosses this boundary during a scheduled run
+- **Frequency** — how often the rule evaluates
+
+| Frequency        | Interval covered    |
+| ---------------- | ------------------- |
+| Every 30 minutes | Previous 30 minutes |
+| Hourly           | Previous hour       |
+| Daily            | Previous day        |
+| Weekly           | Previous week       |
+| Monthly          | Previous month      |
+
+## Alert Status
+
+Each alert row shows a **status strip** — a series of bars representing the last 30 evaluation runs, colored to show whether each run triggered. The row header shows the overall triggered percentage and the timestamps of the first and last run in the strip. Click the strip to open the full alert log with per-run details.
+
+## Test, Pause, and Delete
+
+- **Try alert** — immediately evaluates the rule against current data without waiting for the next scheduled run. Useful for verifying your configuration before enabling.
+- **Pause / Resume** — toggle an alert between active and paused. Paused alerts skip notifications but retain their configuration.
+- **Delete** — permanently removes the alert rule and its history.
