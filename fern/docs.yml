@@ -295,15 +295,31 @@ navigation:
               - page: Dropping Traces
                 path: docs/pages/llm-tracing/features/dropping-traces.mdx
                 icon: fa-light fa-trash-can
-          - page: Features
-            path: docs/pages/llm-tracing/features/features.mdx
-            icon: fa-light fa-signal-stream
+          - page: Signals
+            path: docs/pages/llm-tracing/features/signals.mdx
+            icon: fa-light fa-signal-bars
           - page: Workflows
             path: docs/pages/llm-tracing/workflows.mdx
             icon: fa-light fa-diagram-project
           - page: Troubleshooting
             path: docs/pages/llm-tracing/troubleshooting.mdx
             icon: fa-light fa-wrench
+          - section: Others
+            icon: fa-light fa-signal-stream
+            collapsed: false
+            contents:
+              - page: Triage
+                path: docs/pages/llm-tracing/features/triage.mdx
+                icon: fa-light fa-ticket
+              - page: Exports
+                path: docs/pages/llm-tracing/features/exports.mdx
+                icon: fa-light fa-file-export
+              - page: Alerts
+                path: docs/pages/llm-tracing/features/alerts.mdx
+                icon: fa-light fa-bell
+              - page: Threat Detection
+                path: docs/pages/llm-tracing/features/threat-detection.mdx
+                icon: fa-light fa-shield-halved
       - section: Human-in-the-Loop
         contents:
           - page: Introduction
@@ -672,9 +688,7 @@ navigation:
           - page: Integrations
             path: docs/pages/settings/project/integrations.mdx
             icon: fa-light fa-puzzle-piece
-          - page: Alerts
-            path: docs/pages/settings/project/alerts.mdx
-            icon: fa-light fa-bell
+
           - section: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
             icon: fa-light fa-globe

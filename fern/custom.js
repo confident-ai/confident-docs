@@ -188,6 +188,8 @@ function runOnDomUpdates(callback) {
 
     "tracing.triage": `${S3_BASE}/confident-docs:trace-triage.png`,
     "tracing.detectionsOnTrace": `${S3_BASE}/confident-docs:detections-on-trace.png`,
+    "tracing.exports": `${S3_BASE}/trace-exports.png`,
+    "tracing.alerts": `${S3_BASE}/trace-alerts.png`,
     "tracing.workflows": `${S3_BASE}/workflows.png`,
     "tracing.workflows.datasetIngestion": `${S3_BASE}/confident-docs:dataset-ingestion.png`,
     "tracing.workflows.queueIngestion": `${S3_BASE}/confident-docs:queue-ingestion.png`,

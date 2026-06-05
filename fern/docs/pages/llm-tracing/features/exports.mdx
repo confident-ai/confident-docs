@@ -1,0 +1,67 @@
+---
+subtitle: Export trace data as CSV on demand or on a recurring schedule to an S3 bucket.
+slug: llm-tracing/features/exports
+description: Export traces from the Observatory as CSV, either as a one-off download or as a recurring scheduled export to your data store.
+---
+
+Traces can be exported as CSV in two ways: a one-off export triggered directly from the Observatory, or a recurring scheduled export that uploads to your preferred data store on a set frequency.
+
+<Frame caption="Exports in the Observatory">
+  <img data-image="tracing.exports" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+## One-Off Export
+
+Export traces on demand from the traces list in the Observatory. You can export based on a time range and filters, or export a specific selection of traces you've checked in the table.
+
+To export traces:
+
+1. Navigate to **Observatory** → **Traces**
+2. Apply any filters or select specific rows you want to export
+3. Click **Export** in the toolbar
+4. If exporting by time range: set the **Time range** and optionally refine with filters
+5. Click **Start export**
+
+For exports with 100 or fewer traces, the CSV downloads immediately to your browser. For larger exports, the file is generated in the background and you'll receive an email with a download link when it's ready.
+
+## Scheduled Exports
+
+Schedule recurring exports that automatically upload a CSV to a data store at a chosen frequency. This is configured under **Project Settings** → **Exports**, which has two tabs: **Export Destinations** and **Schedule**.
+
+<Note>
+  You must configure at least one export destination before you can create a schedule.
+</Note>
+
+### Export Destinations
+
+An export destination defines the data store where scheduled export files are uploaded.
+
+To add an export destination:
+
+1. Navigate to **Project Settings** → **Exports** → **Export Destinations**
+2. Create and Save a **New destination**
+
+### Schedules
+
+A schedule defines what to export, how often, and to which destination. Each run exports a CSV to your data store.
+
+To create a schedule:
+
+1. Navigate to **Project Settings** → **Exports** → **Schedule**
+2. Click **New schedule**
+3. Configure the schedule:
+   - **Destination** — select a configured export destination
+   - **Name** — a concise identifier for this schedule
+   - **Frequency** — how often the export runs; each run covers data from the previous interval
+
+   | Frequency        | Interval covered          |
+   | ---------------- | ------------------------- |
+   | Every 30 minutes | Previous 30 minutes       |
+   | Hourly           | Previous hour             |
+   | Daily            | Previous day              |
+   | Weekly           | Previous week             |
+   | Monthly          | Previous month            |
+
+   - **Filters** — optionally limit the export to traces matching specific conditions; leave empty to export all traces in each window
+   - **Description** *(optional)* — internal context about the schedule's purpose or owner
+4. Click **Create schedule**

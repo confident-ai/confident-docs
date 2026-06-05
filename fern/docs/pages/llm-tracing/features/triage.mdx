@@ -1,0 +1,30 @@
+---
+subtitle: File Linear tickets or GitHub issues directly from a trace in the Observatory.
+slug: llm-tracing/features/triage
+description: Triage lets you file a Linear ticket or GitHub issue from any trace in the Observatory without leaving the platform.
+---
+
+Triage lets you file a Linear ticket or GitHub issue directly from any trace in the Observatory, so your team can act on problematic traces without switching tools.
+
+<Frame caption="File a Linear or GitHub issue from the trace detail view">
+  <img data-image="tracing.triage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+## Prerequisites
+
+The **Triage** button appears in the trace detail header only once at least one project management integration is connected. Set one up under **Project Settings** → **[Integrations](/docs/settings/project/integrations#project-management)** before filing your first ticket.
+
+## File a Ticket
+
+1. Open any trace in **Observatory** → **Traces**
+2. Click **Triage** in the trace header — if only one provider is connected and no ticket has been filed yet, this opens the dialog directly; otherwise a dropdown appears
+3. Select **Create Linear issue** or **Create GitHub issue**
+4. Fill in the issue details:
+   - **Title** — pre-filled with the trace name and a short trace ID; edit as needed
+   - **Additional context** — optional description for whoever picks up the ticket
+   - **Assignee** — optional; choose from your Linear team members or GitHub repository collaborators
+5. Click **File issue** — the ticket is created and opens in a new tab
+
+## Track Filed Tickets
+
+Once a ticket has been filed, the **Triage** button shows a badge. Clicking it surfaces a **Latest tickets** section with links to every ticket previously filed for that trace, alongside the option to file another. You can file multiple tickets against a single trace — for example, one in Linear for the engineering owner and one in GitHub for the on-call rotation.

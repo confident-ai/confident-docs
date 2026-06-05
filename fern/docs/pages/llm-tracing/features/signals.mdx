@@ -1,19 +1,10 @@
 ---
-subtitle: Signals, triage, exports, threat detection, and other Observatory features.
+subtitle: Surface patterns, spikes, and label breakdowns across your traces and threads.
 slug: llm-tracing/features/signals
-description: Observatory features including Signals, Triage, Exports, and Threat Detection for traces and threads.
+description: Explore Signals — the runtime view of classifier output across your project.
 ---
 
 ## Overview
-
-This page covers Confident AI's Observatory features:
-
-- [**Signals**](#signals): Surfaces classifier-driven patterns, spikes, and label breakdowns across your traces and threads.
-- [**Triage**](#triage): File Linear tickets or GitHub issues directly from a trace without leaving the Observatory.
-- [**Exports**](#exports): Get trace data out of the platform as CSV — either on demand or on a recurring schedule to an S3 bucket.
-- [**Threat Detection**](#threat-detection): Automatically scan incoming traces and threads for security vulnerabilities and surface detections per span, trace, and thread.
-
-## Signals
 
 **Signals** are the runtime side of [classifiers](/docs/settings/project/classifiers). Once a classifier is enabled, every matching trace or thread gets a label (or none), and those labels surface here as cards, breakdowns, occurrence rows, and trend findings — your at-a-glance view of "what's happening in production right now?"
 
@@ -35,7 +26,7 @@ Use the date picker and environment dropdown at the top to scope everything on t
   No classifiers configured yet? Head to [Project Settings → Classifiers](/docs/settings/project/classifiers) to create one. Trace classifiers light up immediately as new traces arrive; thread classifiers populate after the configured idle window.
 </Note>
 
-### Drill into a label
+## Drill Into a Label
 
 Click any classifier card to drop into the per-classifier detail view: the label-level breakdown, a sparkline of occurrences over time, and the individual occurrence rows that contributed to each label.
 
@@ -48,7 +39,7 @@ Click any classifier card to drop into the per-classifier detail view: the label
 
 Each occurrence row links straight to the underlying trace or thread so you can investigate why the LLM picked that label.
 
-### Filter the Observatory by label
+## Filter the Observatory by Label
 
 Anywhere classifiers run, you can filter the [Observatory](/docs/llm-tracing/introduction) by classifier label to scope a search to just the data that matched. Pick the classifier and label from the filter dropdown; combine with other filters (environment, tag, metadata, latency, score, etc.) to narrow further.
 
@@ -59,11 +50,11 @@ Anywhere classifiers run, you can filter the [Observatory](/docs/llm-tracing/int
   />
 </Frame>
 
-### A worked example: failure mode + user sentiment
+## A Worked Example: Failure Mode + User Sentiment
 
 Suppose you want to know **"how often does an upstream model failure correlate with a user being unhappy in the same conversation?"** — a question that touches both a trace-level dimension (the failure) and a thread-level dimension (the sentiment). The cleanest way to answer it is **two cooperating classifiers**: one trace-scoped, one thread-scoped.
 
-#### Step 1 — A trace classifier for failure mode
+### Step 1 — A trace classifier for failure mode
 
 Create a trace classifier called **`Failure Mode`** with this description:
 
@@ -80,7 +71,7 @@ Add four labels:
 
 A trace that didn't fail simply gets no label — that's the "no match" outcome and is the expected default for happy-path traffic.
 
-#### Step 2 — A thread classifier for sentiment
+### Step 2 — A thread classifier for sentiment
 
 Create a thread classifier called **`User Sentiment`** with this description:
 
@@ -88,7 +79,7 @@ Create a thread classifier called **`User Sentiment`** with this description:
 
 Add three labels: `Positive`, `Negative`, `Neutral` (each with one or two sentences describing what triggers it). Set a **Time Limit** of around `600` seconds so the classifier waits for the conversation to settle before grading sentiment.
 
-#### Step 3 — Use the labels
+### Step 3 — Use the labels
 
 Once both classifiers are enabled and have processed some data, you can pivot on the same dimensions across the platform:
 
@@ -98,7 +89,7 @@ Once both classifiers are enabled and have processed some data, you can pivot on
 - **Combined investigation** — start in threads filtered to `User Sentiment = Negative`, then drop into one of those threads and look at how many of its traces are labeled `Failure Mode = Timeout`. That's the canonical "did our outages cause user frustration?" workflow.
 - **Dashboards** — graph trace count broken down by `Failure Mode` label, or thread count over time broken down by `User Sentiment`. See [Dashboards](/docs/reporting-analytics/dashboards) for setting up breakdown widgets.
 
-### What classifiers can do
+## What Classifiers *Can* Do
 
 A few capabilities worth knowing:
 
@@ -111,7 +102,7 @@ A few capabilities worth knowing:
   The LLM sees what you ingest. Error messages, status codes, metadata, tags — anything the trace or thread carries is visible to the classifier. Detection by error code, metadata field, or sentiment all just work, as long as the description tells the LLM how to interpret what it sees.
 </Tip>
 
-### Cost
+## Cost
 
 Each classification logs a usage event for billing. See **Project Settings → [Data Usage](/docs/settings/project/data-usage)** under the **Signals** line for live usage and projected cost. Limits are gated by your org plan — Enterprise has no cap, but the line item is still visible.
 
@@ -133,106 +124,3 @@ Each classification logs a usage event for billing. See **Project Settings → [
     Trend a label's volume or break a metric down by classifier label on a dashboard.
   </Card>
 </CardGroup>
-
-## Exports
-
-Traces can be exported as CSV in two ways: a one-off export triggered directly from the Observatory, or a recurring scheduled export that uploads to your preferred data store on a set frequency.
-
-### One-off export
-
-Export traces on demand from the traces list in the Observatory. You can export based on a time range and filters, or export a specific selection of traces you've checked in the table.
-
-To export traces:
-
-1. Navigate to **Observatory** → **Traces**
-2. Apply any filters or select specific rows you want to export
-3. Click **Export** in the toolbar
-4. If exporting by time range: set the **Time range** and optionally refine with filters
-5. Click **Start export**
-
-For exports with 100 or fewer traces, the CSV downloads immediately to your browser. For larger exports, the file is generated in the background and you'll receive an email with a download link when it's ready.
-
-### Scheduled exports
-
-Schedule recurring exports that automatically upload a CSV to an data store at a chosen frequency. This is configured under **Project Settings** → **Exports**, which has two tabs: **Export Destinations** and **Schedule**.
-
-<Note>
-  You must configure at least one export destination before you can create a schedule.
-</Note>
-
-#### Export destinations
-
-An export destination defines the data store where scheduled export files are uploaded.
-
-To add an export destination:
-
-1. Navigate to **Project Settings** → **Exports** → **Export Destinations**
-2. Create and Save a **New destination**
-
-#### Schedules
-
-A schedule defines what to export, how often, and to which destination. Each run exports a CSV to your data store.
-
-To create a schedule:
-
-1. Navigate to **Project Settings** → **Exports** → **Schedule**
-2. Click **New schedule**
-3. Configure the schedule:
-   - **Destination** — select a configured export destination
-   - **Name** — a concise identifier for this schedule
-   - **Frequency** — how often the export runs; each run covers data from the previous interval
-
-   | Frequency        | Interval covered          |
-   | ---------------- | ------------------------- |
-   | Every 30 minutes | Previous 30 minutes       |
-   | Hourly           | Previous hour             |
-   | Daily            | Previous day              |
-   | Weekly           | Previous week             |
-   | Monthly          | Previous month            |
-
-   - **Filters** — optionally limit the export to traces matching specific conditions; leave empty to export all traces in each window
-   - **Description** *(optional)* — internal context about the schedule's purpose or owner
-4. Click **Create schedule**
-
-## Triage
-
-Triage lets you file a Linear ticket or GitHub issue directly from any trace in the Observatory, so your team can act on problematic traces without switching tools. The **Triage** button appears in the trace detail header once at least one [project management integration](docs/settings/project/integrations#project-management) is connected.
-
-<Frame caption="File a Linear or GitHub issue from the trace detail view">
-  <img data-image="tracing.triage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-</Frame>
-
-To triage a trace:
-
-1. Open any trace in **Observatory** → **Traces**
-2. Click **Triage** in the trace header — if only one provider is connected and no ticket has been filed yet, this opens the dialog directly; otherwise a dropdown appears
-3. Select **Create Linear issue** or **Create GitHub issue** from the dropdown
-4. Fill in the issue details:
-   - **Title** — pre-filled with the trace name and a short trace ID; edit as needed
-   - **Additional context** — optional description for whoever picks up the ticket
-   - **Assignee** — optional; choose from your Linear team members or GitHub repository collaborators
-5. Click **File issue** — the ticket is created and opens in a new tab
-
-Once a ticket has been filed for a trace, the **Triage** button shows a badge. Clicking it surfaces a **Latest tickets** section with links to all previously filed tickets for that trace, alongside the option to file another.
-
-<Note>
-  The **Triage** button is disabled if no project management integration is connected. Set one up under **Project Settings** → **[Integrations](/docs/settings/project/integrations)**.
-</Note>
-
-## Threat Detection
-
-Threat Detection automatically scans incoming traces and threads against your project's vulnerabilities. When a threat is found, a detection is attached to the trace or thread and surfaces in the **Detections** tab of the detail view — letting you see the vulnerability name, outcome, attack vector, and reason, all the way down to the individual span where the issue originated.
-
-<Frame caption="Detections on a trace">
-  <img data-image="tracing.detectionsOnTrace" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-</Frame>
-
-Each detection has one of three outcomes:
-
-| Outcome      | Meaning                                                        |
-| ------------ | -------------------------------------------------------------- |
-| Materialized | The attack succeeded — the vulnerability was exploited.        |
-| Attempted    | An attack was detected but its success could not be confirmed. |
-| Mitigated    | The attack was detected and blocked before causing harm.       |
-
-Threat detection is configured per data model (traces and threads independently) under **Project Settings** → **[Threat Detection](/docs/settings/project/threat-detection)**, where you can enable scanning, set a sample rate, and for threads configure an idle time limit before a conversation is evaluated.
