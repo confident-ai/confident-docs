@@ -86,7 +86,7 @@ def test_llm_app(test_case: ConversationalTestCase):
 
 </Tabs>
 
-In the test file we've created, we need at least one test function (function that starts with `test_` that calls `assert_test()`). Do **NOT** call `evalaute()` like how you've learnt in previous sections, as this is not part of the `pytest` integration suite.
+In the test file we've created, we need at least one test function (function that starts with `test_` that calls `assert_test()`). Do **NOT** call `evaluate()` like how you've learnt in previous sections, as this is not part of the `pytest` integration suite.
 
 To make sure everything works, run `deepeval test run` in your terminal to trigger the test file:
 
@@ -142,12 +142,11 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction --only main
 
-      - name: Run tests
+      - name: Run DeepEval Unit Tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CONFIDENT_API_KEY: ${{ secrets.CONFIDENT_API_KEY }}
-        run: |
-          poetry run pytest tests/test_core/ --ignore=tests/test_core/test_synthesizer/
+        run: poetry run deepeval test run test_llm_app.py
 ```
 
 <Warning>
@@ -177,7 +176,7 @@ automatically execute your tests based on the specified triggers
 
 ## Log Prompts and Models
 
-Similar to how you can log prompts, models, and other parameters using `evalaute()`, you can also do so with a test file:
+Similar to how you can log prompts, models, and other parameters using `evaluate()`, you can also do so with a test file:
 
 ```python test_llm_app.py focus={20-28} maxLines=30
 import pytest
@@ -212,6 +211,56 @@ def hyperparameters() -> dict[str, Union[str, int, float]]:
 ```
 
 When you run `deepeval test run`, Confident AI will automatically associate your hyperparameters with the test run you've created.
+
+## Official Test Runs
+
+An **official test run** is a test run you've marked as the baseline on Confident AI. Future runs can be compared against it to detect performance regressions automatically in CI/CD.
+
+### Marking a Run as Official
+
+There are three ways to mark a test run as official:
+
+**CLI** — add `--official` (or `-o`) to your `deepeval test run` command:
+
+```bash
+deepeval test run test_llm_app.py --official
+```
+
+**SDK** — call `mark_official()` with a test run ID:
+
+```python
+from deepeval.test_run import TestRun
+
+test_run = TestRun(...)
+test_run.mark_official(run_id="<test-run-id>")
+```
+
+**Platform** — mark any test run as official from the **Test Runs** page on Confident AI.
+
+<Note>
+  `--official` and the SDK method both require a `CONFIDENT_API_KEY`.
+</Note>
+
+### Regression Mode
+
+Once you have an official run, use `--mode regression` flag on `deepeval test run` command on pull requests to compare the current run against it:
+
+```bash
+deepeval test run test_llm_app.py --mode regression
+```
+
+`deepeval` prints a comparison table of official vs. new scores and exits non-zero if any metric drops by more than `0.1`. Test cases are matched by input — official test cases missing from the new run fail the comparison; new test cases not in the official run are ignored.
+
+When running inside GitHub Actions, `deepeval test run` automatically posts a comment on the pull request with the comparison results. Add `GITHUB_TOKEN` to your workflow step to enable this:
+
+```yaml
+      - name: Run Regression Tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CONFIDENT_API_KEY: ${{ secrets.CONFIDENT_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: poetry run deepeval test run test_llm_app.py --mode regression
+```
 
 ## Flag Configs
 
@@ -292,4 +341,20 @@ Repeat each test case by providing a number to the `-r` flag to specify how many
 
 ```
 deepeval test run test_example.py -r 2
+```
+
+### Mark Official
+
+Mark the completed test run as the official baseline on Confident AI with `--official` (or `-o`). Requires a `CONFIDENT_API_KEY`.
+
+```
+deepeval test run test_example.py --official
+```
+
+### Mode
+
+Set the run mode with `--mode`. Use `regression` to compare against the latest official baseline and exit non-zero on any regression. Defaults to `default`.
+
+```
+deepeval test run test_example.py --mode regression
 ```
