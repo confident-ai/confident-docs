@@ -176,6 +176,8 @@ function runOnDomUpdates(callback) {
     "settings.project.team": `${S3_BASE}/settings:project:team.png`,
     "settings.project.aiConnection": `${S3_BASE}/settings:project:ai-connection.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
+    "settings.project.annotationForms": `${S3_BASE}/settings:project:annotation-forms.png`,
+    "settings.project.annotationFormEditor": `${S3_BASE}/settings:project:annotation-form-editor.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
     "settings.project.auditLogs": `${S3_BASE}/settings:project:audit-logs.png`,
     "settings.project.alerts": `${S3_BASE}/settings:project:alerts.png`,
@@ -211,6 +213,7 @@ function runOnDomUpdates(callback) {
     "reports.overview": `${S3_BASE}/reports:overview.png`,
     "reports.fullDocument": `${S3_BASE}/reports:full-document.png`,
 
+    "queues.attachForm": `${S3_BASE}/queues:attach-form.png`,
     "queues.exportCsv": `${S3_BASE}/queues:export-csv.png`,
     "queues.ingestionTasks": `${S3_BASE}/queues:ingestion-tasks.png`,
     "queues.ingestionTaskCreate": `${S3_BASE}/queues:ingestion-task-create.png`,

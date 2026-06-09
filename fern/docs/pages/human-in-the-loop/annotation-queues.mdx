@@ -99,6 +99,15 @@ First create an annotation queue. In this entire example, we'll be showing an an
   <video data-video="queues.createQueue" autoPlay />
 </Frame>
 
+When creating a queue, you can optionally attach an **annotation form** from the **Form (optional)** dropdown. Attaching a form swaps this queue's default star/thumbs fields for the form's questions — leave it on **Default** to keep your project's standard annotation settings. Forms are created in [project settings](/docs/settings/project/annotation#annotation-forms).
+
+<Frame caption="Attach a form when creating a queue">
+  <img
+    data-image="queues.attachForm"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
 </Step>
 
 <Step title="Add items to queue">
@@ -141,6 +150,15 @@ You'll have the option to:
 - View full details of traces/spans/threads
 
 By default, the **Queue Annotator** strips away all information that except the input, output, metadata, and turns (for threads).
+
+<Note>
+  If the queue has an [annotation
+  form](/docs/settings/project/annotation#annotation-forms) attached, the
+  annotator shows that form's fields instead of the default options. Criteria
+  answers are saved as normal annotations, while the form's custom-field answers
+  are saved with the item — visible on the trace/span/thread and included in the
+  CSV export.
+</Note>
 
 </Step>
 
@@ -187,7 +205,7 @@ The dropdown offers two options:
 - **Download selected** — only the rows you've checked. Selections persist across pages, so you can curate a precise subset before exporting.
 - **Download all filtered** — every row that matches your current filters (status filter, sort, etc.), even rows you haven't paginated to yet.
 
-The CSV emits one row per **(queue item × annotation)**. Items without any annotations still appear, so the export reflects the full state of the queue regardless of completion.
+The CSV emits one row per **(queue item × annotation)**. Items without any annotations still appear, so the export reflects the full state of the queue regardless of completion. If the queue has an [annotation form](/docs/settings/project/annotation#annotation-forms) attached, each of the form's custom fields is appended as its own column.
 
 | Column type           | Columns                                                                                                                                                            |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
