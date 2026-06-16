@@ -221,6 +221,7 @@ function runOnDomUpdates(callback) {
 
     "selfHosting.aws.architecture": `${S3_BASE}/self-hosting:aws-architecture.png`,
     "selfHosting.azure.architecture": `${S3_BASE}/self-hosting:azure-architecture.png`,
+    "selfHosting.gcp.architecture": `${S3_BASE}/self-hosting:gcp-architecture.png`,
 
     "logos.openai": "https://www.svgrepo.com/show/306500/openai.svg",
     "logos.langchain": "https://logo.svgcdn.com/s/langchain-dark-8x.png",
