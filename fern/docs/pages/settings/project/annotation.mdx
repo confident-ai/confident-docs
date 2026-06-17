@@ -1,0 +1,110 @@
+---
+subtitle: Define and manage annotation criteria and reusable forms for human-in-the-loop evaluation workflows in your project.
+slug: settings/project/annotation
+description: Learn about annotation option configuration
+---
+
+Enable or disable different human annotation options for your project. These criteria are used **for all annotations** within your project on Confident AI.
+
+<Frame caption="Manage Annotation Options">
+  <img
+    data-image="settings.project.annotationOptions"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Tip>
+  Disabling criteria helps reduce confusion for users or team members by
+  limiting the annotation options shown in the UI.
+</Tip>
+
+## Configure Annotation Option
+
+By default, both annotation systems are enabled:
+
+- **Five Star Rating** — Rate responses on a 1-5 star scale
+- **Thumbs Up/Down** — Simple binary feedback
+
+You can disable either system (but not both) if you only want to use one. To configure annotation criteria:
+
+1. Navigate to **Project Settings** → **Annotation Criteria**
+2. Enable or disable the scoring system (5 star or thumbs up/down) you want to use
+3. Click **Save** to apply your changes
+
+<Note>
+  Disabling a criteria only hides it from the UI—it does not delete existing
+  annotations for that system. It also does not block API calls or cause
+  existing integrations to error.
+</Note>
+
+## Custom Criteria
+
+You can create custom annotation criteria tailored to your specific evaluation needs. By default, no custom criteria are configured.
+
+To add a custom criteria:
+
+1. Click **Add Custom Criteria**
+2. Enter a unique name for the criteria
+3. Select a criteria type (Five Star Rating or Thumbs Up/Down)
+4. Click **Save**
+
+To delete a custom criteria, click the trash icon next to the criteria you want to remove.
+
+## Annotation Forms
+
+Annotation criteria apply to **every** annotation in your project. Forms let you go a step further — bundle a reusable set of custom questions (text, ratings, choices, and more) into a form that you attach to specific annotation queues, replacing the default fields for just that queue.
+
+<Note>
+  Annotation forms are rolling out gradually. If you don't see the **Forms**
+  section, it isn't enabled for your organization yet.
+</Note>
+
+<Frame caption="Annotation forms in project settings">
+  <img
+    data-image="settings.project.annotationForms"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Think of a form as a questionnaire your annotators fill in alongside — or instead of — the default star and thumbs ratings. Each form is reusable across as many queues as you like, and the list shows how many **fields** it has and how many **queues** it's attached to.
+
+### Create a Form
+
+1. In the **Forms** section, click **Create form**
+2. Give it a name (you can change this later) and click **Create**
+3. You'll land in the form editor, where you build out the form's fields
+
+<Frame caption="Building a form in the editor">
+  <img
+    data-image="settings.project.annotationFormEditor"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Click **Add field** to add a question, then configure each one. Drag fields by their handle to reorder them, toggle **Required** to force an answer before an item can be marked complete, and add an optional description to guide your annotators. Forms support the following field types:
+
+- **Text** — Free-form text answer
+- **Number** — Whole number answer
+- **Decimal** — Decimal number answer
+- **Yes / No** — A simple yes/no toggle
+- **Single choice** — Pick one option from a fixed list
+- **Multiple choice** — Pick one or more options from a fixed list
+- **Criteria** — Score a single annotation criterion, with the same optional explanation, expected output, and expected outcome boxes as a standard annotation
+
+<Tip>
+  A **Criteria** field reuses the rating criteria you've defined above, so
+  scores given through a form land in the same place as your standard
+  annotations. The other field types are saved as form responses you can review
+  on each trace/span/thread and include in the queue's CSV export.
+</Tip>
+
+To edit a form later, select the options **⋮** menu → **Edit**.
+
+### Attach a Form to a Queue
+
+A form only starts collecting answers once it's attached to an annotation queue — you pick a form when creating the queue. See the [Using Annotation Queues](/docs/human-in-the-loop/annotation-queues#using-annotation-queues) section for the full walkthrough.
+
+<Warning>
+  Deleting a form that's attached to one or more queues reverts those queues to
+  your project's default annotation settings.
+</Warning>

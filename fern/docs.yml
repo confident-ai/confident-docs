@@ -706,8 +706,8 @@ navigation:
           - page: Evaluation Models
             path: docs/pages/settings/project/evaluation-models.mdx
             icon: fa-light fa-brain
-          - page: Annotation Options
-            path: docs/pages/settings/project/annotation-options.mdx
+          - page: Annotation
+            path: docs/pages/settings/project/annotation.mdx
             icon: fa-light fa-star
           - page: Threat Detection
             path: docs/pages/settings/project/threat-detection.mdx
@@ -883,6 +883,9 @@ redirects:
     permanent: true
   - source: /docs/settings/project/categories
     destination: /docs/settings/project/classifiers
+    permanent: true
+  - source: /docs/settings/project/annotation-options
+    destination: /docs/settings/project/annotation
     permanent: true
   # API Reference: sub-resources moved under their parent domain (single-parent wildcards)
   - source: /docs/api-reference/dataset-versions/:slug*
