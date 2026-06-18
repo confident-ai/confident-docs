@@ -73,7 +73,7 @@ deepeval.login("<your-confident-api-key>")
 
 <Step title="Configure LangGraph">
 
-Build your agent with `create_agent` and provide DeepEval's `CallbackHandler` to its invoke method.
+Provide DeepEval's `CallbackHandler` to your LangGraph agent's invoke method.
 
 <CodeBlocks >
 
@@ -141,10 +141,7 @@ const result = await agent.invoke(
 </CodeBlocks>
 
 <Note>
-  DeepEval's `CallbackHandler` extends LangChain's
-  [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html)
-  or LangChain.js'
-  [`BaseCallbackHandler`](https://v03.api.js.langchain.com/classes/_langchain_core.callbacks_base.BaseCallbackHandler.html).
+  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html)
 </Note>
 
 </Step>
