@@ -1,5 +1,5 @@
 ---
-title: Policies
+title: Governance Policies
 subtitle: Group controls into a policy and enforce it across your projects.
 slug: ai-governance/policies
 description: Learn how governance policies group controls, govern projects, and gate deployments on Confident AI.
@@ -48,13 +48,31 @@ Each assessment produces a historical record, so you can track how a project's c
 
 A policy can act as a **deployment gate**. The gate assesses every control in the project's policy and only passes if all of them pass.
 
+Run the gate from CI/CD using the `deepeval` CLI (available in both Python and TypeScript), or call the public API directly:
+
+<Tabs>
+<Tab title="Python">
+
 ```bash
 deepeval gate
 ```
 
-The command exits with code `0` only when the policy is fully met, and a non-zero code otherwise — so a failing policy stops your pipeline.
+</Tab>
+<Tab title="TypeScript">
 
-Under the hood this calls the [`POST /v1/governance/assess`](/api-reference) endpoint with your project's API key. The response tells you whether the policy passed and which policy was evaluated:
+```bash
+npx deepeval gate
+```
+
+</Tab>
+<Tab title="cURL">
+
+<EndpointRequestSnippet endpoint="POST /v1/governance/assess" />
+
+</Tab>
+</Tabs>
+
+The CLI exits with code `0` only when the policy is fully met, and a non-zero code otherwise — so a failing policy stops your pipeline. All three call the [`POST /v1/governance/assess`](/api-reference) endpoint with your project's API key. The response tells you whether the policy passed and which policy was evaluated:
 
 ```json
 {

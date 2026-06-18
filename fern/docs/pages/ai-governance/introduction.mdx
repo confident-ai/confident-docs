@@ -46,11 +46,11 @@ This gives compliance and engineering teams a single source of truth for answeri
 ## Core concepts
 
 <CardGroup cols={2}>
-  <Card title="Policies" icon="file-shield" href="/docs/ai-governance/policies">
+  <Card title="Governance Policies" icon="file-shield" href="/docs/ai-governance/policies">
     A group of controls that maps to a compliance requirement. Each project
     belongs to one policy, and the policy is met only when every control passes.
   </Card>
-  <Card title="Controls" icon="list-check" href="/docs/ai-governance/controls">
+  <Card title="Governance Controls" icon="list-check" href="/docs/ai-governance/controls">
     The individual requirements that get assessed. Spanning operational,
     runtime, and pre-deployment checks across evals and red teaming.
   </Card>
@@ -84,13 +84,31 @@ A policy is only considered **met** when _every_ control resolves to `PASS`. Any
 
 ## Gating deployments
 
-Use the `deepeval` CLI to enforce a policy in your CI/CD pipeline. The gate assesses every control in the project's policy and exits with code `0` only if all of them pass:
+Enforce a policy in your CI/CD pipeline using the `deepeval` CLI (available in both Python and TypeScript), or call the public API directly. The gate assesses every control in the project's policy and only passes if all of them pass:
+
+<Tabs>
+<Tab title="Python">
 
 ```bash
 deepeval gate
 ```
 
-This calls the [`POST /v1/governance/assess`](/api-reference) endpoint under the hood using your project's API key. A non-zero exit code stops your pipeline, preventing a non-compliant deployment from shipping.
+</Tab>
+<Tab title="TypeScript">
+
+```bash
+npx deepeval gate
+```
+
+</Tab>
+<Tab title="cURL">
+
+<EndpointRequestSnippet endpoint="POST /v1/governance/assess" />
+
+</Tab>
+</Tabs>
+
+The CLI exits with code `0` only when the policy is fully met, and a non-zero code otherwise. All three call the [`POST /v1/governance/assess`](/api-reference) endpoint under the hood using your project's API key. A non-zero exit code stops your pipeline, preventing a non-compliant deployment from shipping.
 
 ## Learn more
 
