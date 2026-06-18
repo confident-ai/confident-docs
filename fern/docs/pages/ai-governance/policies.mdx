@@ -1,0 +1,80 @@
+---
+title: Policies
+subtitle: Group controls into a policy and enforce it across your projects.
+slug: ai-governance/policies
+description: Learn how governance policies group controls, govern projects, and gate deployments on Confident AI.
+---
+
+A **policy** is a named group of [controls](/docs/ai-governance/controls) that represents a single compliance requirement — for example, your internal AI standard or an external framework like the EU AI Act or NIST AI RMF. A policy is **met** only when every control it contains passes.
+
+## How policies work
+
+- A policy contains one or more controls.
+- Each **project belongs to at most one policy**. A single policy can govern many projects.
+- Every project assigned to a policy is assessed against **all** of that policy's controls.
+- The policy is met for a project only when *every* control resolves to `PASS`. Any `FAIL`, `ERROR`, or `NO_DATA` means the policy is not met.
+
+<Note>
+  Because a project can only belong to one policy, the policy you assign should represent the *complete* set of requirements that project must satisfy.
+</Note>
+
+## Create a policy
+
+1. Navigate to your organization's **Governance** page
+2. Click **New Policy**
+3. Enter a **Name** and an optional **Description**
+4. Add the [controls](/docs/ai-governance/controls) this policy should enforce
+5. Save the policy
+
+## Assign projects
+
+A policy has no effect until projects are assigned to it. From the policy, assign the projects it should govern. Each assigned project is then continuously assessed against the policy's controls.
+
+To move a project to a different policy, simply reassign it — a project always belongs to exactly one policy (or none).
+
+## When assessments run
+
+A project's controls are assessed against its policy:
+
+| Trigger | Description |
+| --- | --- |
+| **Daily schedule** | All governed projects are automatically reassessed once per day. |
+| **Reassess controls** | Manually re-run assessments for a policy on demand from the Governance page. |
+| **Deploy gate** | Triggered from CI/CD via the `deepeval` CLI or the public API (see below). |
+
+Each assessment produces a historical record, so you can track how a project's compliance posture changes over time.
+
+## Gate deployments on a policy
+
+A policy can act as a **deployment gate**. The gate assesses every control in the project's policy and only passes if all of them pass.
+
+```bash
+deepeval gate
+```
+
+The command exits with code `0` only when the policy is fully met, and a non-zero code otherwise — so a failing policy stops your pipeline.
+
+Under the hood this calls the [`POST /v1/governance/assess`](/api-reference) endpoint with your project's API key. The response tells you whether the policy passed and which policy was evaluated:
+
+```json
+{
+  "success": true,
+  "data": {
+    "passed": false,
+    "governancePolicy": {
+      "id": "GOVERNANCE-POLICY-ID",
+      "name": "EU AI Act"
+    }
+  },
+  "deprecated": false
+}
+```
+
+<Warning>
+  If a project does not belong to any policy, the assess endpoint returns an error. Assign the project to a policy before gating on it.
+</Warning>
+
+## Next steps
+
+- [Controls](/docs/ai-governance/controls) — configure the requirements inside your policy
+- [Introduction to AI Governance](/docs/ai-governance/introduction) — how policies, controls, and gating fit together

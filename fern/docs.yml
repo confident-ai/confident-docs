@@ -369,6 +369,17 @@ navigation:
           - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code
+      - section: AI Governance
+        contents:
+          - page: Introduction
+            path: docs/pages/ai-governance/introduction.mdx
+            icon: fa-light fa-scale-balanced
+          - page: Policies
+            path: docs/pages/ai-governance/policies.mdx
+            icon: fa-light fa-file-shield
+          - page: Controls
+            path: docs/pages/ai-governance/controls.mdx
+            icon: fa-light fa-list-check
       - section: Resources
         contents:
           - page: Why Confident AI
