@@ -374,10 +374,10 @@ navigation:
           - page: Introduction
             path: docs/pages/ai-governance/introduction.mdx
             icon: fa-light fa-scale-balanced
-          - page: Policies
+          - page: Governance Policies
             path: docs/pages/ai-governance/policies.mdx
             icon: fa-light fa-file-shield
-          - page: Controls
+          - page: Governance Controls
             path: docs/pages/ai-governance/controls.mdx
             icon: fa-light fa-list-check
       - section: Resources
