@@ -5,7 +5,14 @@ subtitle: Use Confident AI for LLM observability and evals for LangGraph
 
 ## Overview
 
-[LangGraph](https://www.langchain.com/langgraph) is a framework for building reactive, multi-agent systems. Confident AI provides a `CallbackHandler` to trace and evaluate LangGraph agents.
+[LangGraph](https://www.langchain.com/langgraph) is a framework for building reactive, multi-agent systems. Confident AI provides a `CallbackHandler` in both the python and typescript SDKs to trace and evaluate your LangGraph agents automatically.
+
+The callback handler captures the following spans from your LangGraph agent:
+
+- **LLM spans** — model name, provider, input messages, output content, tool calls made by the model, and token usage
+- **Tool spans** — tool name, input parameters, and output; also aggregated at the trace level as `tools_called`
+- **Retriever spans** — query input and retrieved document output
+- **Agent spans** — inputs and outputs for the top-level graph (used to set trace-level input/output)
 
 ## Tracing Quickstart
 
@@ -15,9 +22,16 @@ subtitle: Use Confident AI for LLM observability and evals for LangGraph
 
 Run the following command to install the required packages:
 
-```bash
+<CodeBlocks>
+```python title="Python"
 pip install -U deepeval langgraph langchain langchain-openai
 ```
+
+```typescript title="TypeScript"
+npm install deepeval langchain @langchain/langgraph @langchain/openai @langchain/core
+```
+
+</CodeBlocks>
 
 </Step>
 
@@ -27,7 +41,15 @@ Login to Confident AI using your Confident API key.
 
 <CodeBlocks>
 
-<CodeBlock language="bash">
+<CodeBlock title="Env" language="bash">
+
+```bash
+export CONFIDENT_API_KEY="<your-confident-api-key>"
+```
+
+</CodeBlock>
+
+<CodeBlock language="bash" title="Bash">
 
 ```bash
 deepeval login
@@ -41,15 +63,8 @@ deepeval login
 import deepeval
 
 deepeval.login("<your-confident-api-key>")
-
 ```
 
-</CodeBlock>
-
-<CodeBlock title="Env" language="bash">
-```bash
-export CONFIDENT_API_KEY="<your-confident-api-key>"
-```
 </CodeBlock>
 
 </CodeBlocks>
@@ -58,10 +73,14 @@ export CONFIDENT_API_KEY="<your-confident-api-key>"
 
 <Step title="Configure LangGraph">
 
-Provide DeepEval's `CallbackHandler` to your LangGraph agent's invoke method.
+Build your agent with `create_agent` and provide DeepEval's `CallbackHandler` to its invoke method.
 
-```python main.py {4,20} maxLines=25
-from langgraph.prebuilt import create_react_agent
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python Python {4,20} maxLines=32
+from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
 from deepeval.integrations.langchain import CallbackHandler
@@ -72,30 +91,87 @@ def get_weather(city: str) -> str:
 
 llm = ChatOpenAI(model="gpt-4o-mini")
 
-agent = create_react_agent(
+agent = create_agent(
     model=llm,
     tools=[get_weather],
-    prompt="You are a helpful assistant",
+    system_prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
     input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={"callbacks": [CallbackHandler()]}
+    config={"callbacks": [CallbackHandler()]},
 )
 ```
 
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript TypeScript {6,25} maxLines=32
+import { createAgent } from "langchain";
+import { ChatOpenAI } from "@langchain/openai";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+
+import { DeepEvalCallbackHandler } from "deepeval/integrations/langchain";
+
+const getWeather = tool(
+  async ({ city }: { city: string }) => `It's always sunny in ${city}!`,
+  {
+    name: "get_weather",
+    description: "Returns the weather in a city",
+    schema: z.object({ city: z.string() }),
+  },
+);
+
+const agent = createAgent({
+  model: new ChatOpenAI({ model: "gpt-4o-mini" }),
+  tools: [getWeather],
+  systemPrompt: "You are a helpful assistant",
+});
+
+const result = await agent.invoke(
+  { messages: [{ role: "user", content: "what is the weather in sf" }] },
+  { callbacks: [new DeepEvalCallbackHandler({})] },
+);
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
 <Note>
-  DeepEval's `CallbackHandler` extends LangChain's [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html).
+  DeepEval's `CallbackHandler` extends LangChain's
+  [`BaseCallbackHandler`](https://python.langchain.com/api_reference/core/callbacks/langchain_core.callbacks.base.BaseCallbackHandler.html)
+  or LangChain.js'
+  [`BaseCallbackHandler`](https://v03.api.js.langchain.com/classes/_langchain_core.callbacks_base.BaseCallbackHandler.html).
 </Note>
+
 </Step>
 
 <Step title="Run LangGraph">
 
 Invoke your agent by executing the script:
 
-```bash
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python
 python main.py
 ```
+
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript
+npx ts-node main.ts
+```
+
+</CodeBlock>
+
+</CodeBlocks>
 
 You can directly view the traces on [Confident AI](https://app.confident.ai) by clicking on the link in the output printed in the console.
 
@@ -103,53 +179,208 @@ You can directly view the traces on [Confident AI](https://app.confident.ai) by 
 
 </Steps>
 
+## Trace a LangGraph server deployment
+
+Confident AI allows you to trace your LangGraph applications deployed in a server by passing the `CallbackHandler` in the exported graph's config and using it in `langgraph.json` files.
+
+<Steps>
+
+<Step title="Attach DeepEval to your graph">
+
+Attach the `CallbackHandler` to the graph with `with_config` and export it. The handler is then applied to every run the server executes.
+
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python agent.py {16} maxLines=32
+from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+
+from deepeval.integrations.langchain import CallbackHandler
+
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+
+graph = create_agent(
+    model=llm,
+    tools=[get_weather],
+    system_prompt="You are a helpful assistant",
+).with_config(callbacks=[CallbackHandler()])
+```
+
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript agent.ts {21} maxLines=32
+import { createAgent } from "langchain";
+import { ChatOpenAI } from "@langchain/openai";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+
+import { DeepEvalCallbackHandler } from "deepeval/integrations/langchain";
+
+const getWeather = tool(
+  async ({ city }: { city: string }) => `It's always sunny in ${city}!`,
+  {
+    name: "get_weather",
+    description: "Returns the weather in a city",
+    schema: z.object({ city: z.string() }),
+  },
+);
+
+export const graph = createAgent({
+  model: new ChatOpenAI({ model: "gpt-4o-mini" }),
+  tools: [getWeather],
+  systemPrompt: "You are a helpful assistant",
+}).withConfig({ callbacks: [new DeepEvalCallbackHandler({})] });
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Register the graph in langgraph.json">
+
+Point the `graphs` entry at the exported graph variable.
+
+<CodeBlocks>
+
+```json title="Python"
+{
+  "dependencies": ["."],
+  "graphs": { "agent": "./agent.py:graph" },
+  "env": ".env"
+}
+```
+
+```json title="TypeScript"
+{
+  "node_version": "20",
+  "dependencies": ["."],
+  "graphs": { "agent": "./agent.ts:graph" },
+  "env": ".env"
+}
+```
+
+</CodeBlocks>
+
+</Step>
+
+<Step title="Start the LangGraph server">
+
+Run the server. Every request it runs against the graph is traced to Confident AI.
+
+<CodeBlocks>
+
+```python title="Python"
+pip install -U "langgraph-cli[inmem]"
+langgraph dev
+```
+
+```typescript title="TypeScript"
+npx @langchain/langgraph-cli dev
+```
+
+</CodeBlocks>
+
+<Note>
+  Trace attributes such as `thread_id`, `user_id`, and `metric_collection` are
+  set on the `CallbackHandler` itself (see below), so they apply to the graph
+  baked into your `langgraph.json`.
+</Note>
+
+</Step>
+
+</Steps>
+
 ## Advanced Features
 
-### Setting Trace Attributes
+### Set trace attributes
 
-Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangChain application.
+Confident AI's LLM tracing advanced features provide teams with the ability to set certain attributes for each trace when invoking your LangGraph agent.
 
 For example, `thread_id` and `user_id` are used to group related traces together, and are useful for chat apps, agents, or any multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
 
-You can set these attributes in the `CallbackHandler` when invoking your LangChain application.
+You can set these attributes in the `CallbackHandler`.
 
-```python main.py maxLines=100
-result = agent_executor.invoke(
-    {"input": "What is 8 multiplied by 6?"},
-    config={
-        "callbacks": [CallbackHandler(thread_id="123")]
-    },
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python Python {3}
+result = agent.invoke(
+    input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    config={"callbacks": [CallbackHandler(thread_id="123")]},
 )
 ```
 
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript TypeScript {2}
+const handler = new DeepEvalCallbackHandler({
+  threadId: "123",
+});
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
 <Accordion title='View Trace Attributes'>
-<ParamField path="name" type="str" required={false}>
+<ParamField path="name / name" type="str / string" required={false}>
   The name of the trace. [Learn more](/docs/llm-tracing/features/name).
 </ParamField>
 
-<ParamField path="tags" type="List[str]" required={false}>
+<ParamField path="tags / tags" type="List[str] / string[]" required={false}>
   Tags are string labels that help you group related traces. [Learn
   more](/docs/llm-tracing/features/tags).
 </ParamField>
 
-<ParamField path="metadata" type="Dict" required={false}>
+<ParamField path="metadata / metadata" type="Dict / Record<string, any>" required={false}>
   Attach any metadata to the trace. [Learn
   more](/docs/llm-tracing/features/metadata).
 </ParamField>
 
-<ParamField path="thread_id" type="str" required={false}>
+<ParamField path="thread_id / threadId" type="str / string" required={false}>
   Supply the thread or conversation ID to view and evaluate conversations.
   [Learn more](/docs/llm-tracing/features/threads).
 </ParamField>
 
-<ParamField path="user_id" type="str" required={false}>
+<ParamField path="user_id / userId" type="str / string" required={false}>
   Supply the user ID to enable user analytics. [Learn
   more](/docs/llm-tracing/features/users).
 </ParamField>
 
+<ParamField path="test_case_id / testCaseId" type="str / string" required={false}>
+  Attach a test case ID to associate this trace with a specific test case.
+</ParamField>
+
+<ParamField path="turn_id / turnId" type="str / string" required={false}>
+  Supply a turn ID to identify individual turns in a multi-turn conversation.
+</ParamField>
+
+<ParamField path="metrics / metrics" type="List[BaseMetric] / BaseMetric[]" required={false}>
+  A list of metrics to run against the root span of this trace. Used for offline (development) evaluations.
+</ParamField>
+
+<ParamField path="metric_collection / metricCollection" type="str / string" required={false}>
+  The name of a metric collection on Confident AI to use for online (production) evaluations.
+</ParamField>
+
 <Info>
   Each attribute is **optional**, and works the same way as the [native tracing
-  features](/docs/llm-tracing/introduction) on Confident AI.
+  features](/docs/llm-tracing/introduction) on Confident AI. Python uses
+  `snake_case` (e.g. `thread_id`) and TypeScript uses `camelCase` (e.g.
+  `threadId`).
 </Info>
 </Accordion>
 
@@ -157,7 +388,11 @@ result = agent_executor.invoke(
 
 If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the language model instance's `metadata` parameter.
 
-```python main.py
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python Python
 from langchain_openai import ChatOpenAI
 from deepeval.prompt import Prompt
 
@@ -170,8 +405,31 @@ llm = ChatOpenAI(
 )
 ```
 
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript TypeScript
+import { ChatOpenAI } from "@langchain/openai";
+import { Prompt } from "deepeval";
+
+const prompt = new Prompt({ alias: "<prompt-alias>" });
+prompt.pull({ version: "00.00.01" });
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  metadata: {
+    prompt: prompt,
+  },
+});
+```
+
+</CodeBlock>
+
+</CodeBlocks>
+
 <Note>
-  Logging prompts lets you attribute specific prompts to OpenAI Agent LLM spans.
+  Logging prompts lets you attribute specific prompts to LangGraph LLM spans.
   Be sure to **pull the prompt** before logging it, otherwise the prompt will
   not be visible on Confident AI.
 </Note>
@@ -180,7 +438,7 @@ llm = ChatOpenAI(
 
 ### Online evals
 
-If your LangChain application is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/online-evals). It lets you run evaluations on all incoming traces on Confident AI's server.
+If your LangGraph agent is in production, and you still want to run evaluations on your traces, use [online evals](/docs/llm-tracing/online-evals). It lets you run evaluations on all incoming traces on Confident AI's server.
 
 <Steps>
 
@@ -193,7 +451,7 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 </Frame>
 
 <Warning>
-  The current LangChain integration supports metrics that only evaluate `Input`
+  The current LangGraph integration supports metrics that only evaluate `Input`
   and `Actual Output` in addition to the **Task Completion** metric.
 </Warning>
 
@@ -201,16 +459,21 @@ Create a metric collection on [Confident AI](https://app.confident.ai) with the 
 
 <Step title="Run evals">
 
-Set the `metric_collection` name to evaluate various components of your LangChain application.
+Set the `metric_collection` name to evaluate various components of your LangGraph agent.
 
-<Tabs>
+<Tabs group="eval-method">
 
 <Tab title="Agent Span">
-This is the top level component of your LangChain application. Also a very idle component to evaluate with the **Task Completion** metric.
 
-```python main.py {22} maxLines=100
+This is the top level component of your LangGraph agent. Also a very ideal component to evaluate with the **Task Completion** metric.
+
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python Python {19} maxLines=100
+from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
 
 from deepeval.integrations.langchain import CallbackHandler
 
@@ -218,33 +481,74 @@ def get_weather(city: str) -> str:
     """Returns the weather in a city"""
     return f"It's always sunny in {city}!"
 
-llm = ChatOpenAI(model="gpt-4o-mini")
-
-agent = create_react_agent(
-    model=llm,
+agent = create_agent(
+    model=ChatOpenAI(model="gpt-4o-mini"),
     tools=[get_weather],
-    prompt="You are a helpful assistant",
+    system_prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
     input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
     config={
-        "callbacks": [
-            CallbackHandler(metric_collection="task_completion")
-        ],
+        "callbacks": [CallbackHandler(metric_collection="<metric_collection_name>")]
     },
 )
 ```
+
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript TypeScript {27} maxLines=100
+import { createAgent } from "langchain";
+import { ChatOpenAI } from "@langchain/openai";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+
+import { DeepEvalCallbackHandler } from "deepeval/integrations/langchain";
+
+const getWeather = tool(
+  async ({ city }: { city: string }) => `It's always sunny in ${city}!`,
+  {
+    name: "get_weather",
+    description: "Returns the weather in a city",
+    schema: z.object({ city: z.string() }),
+  },
+);
+
+const agent = createAgent({
+  model: new ChatOpenAI({ model: "gpt-4o-mini" }),
+  tools: [getWeather],
+  systemPrompt: "You are a helpful assistant",
+});
+
+const result = await agent.invoke(
+  { messages: [{ role: "user", content: "what is the weather in sf" }] },
+  {
+    callbacks: [
+      new DeepEvalCallbackHandler({ metricCollection: "<metric_collection_name>" }),
+    ],
+  },
+);
+```
+
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
 <Tab title="LLM Span">
 
-For LLM spans, you can set the `metric_collection` name in the `metadata` parameter of the language model instance.
+For LLM spans, you can set the `metric_collection` or `metricCollection` name in the `metadata` parameter of the language model instance.
 
-```python main.py {12}
+<CodeBlocks >
+
+<CodeBlock language="python">
+
+```python Python {12}
+from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
 
 from deepeval.integrations.langchain import CallbackHandler
 
@@ -254,105 +558,114 @@ def get_weather(city: str) -> str:
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
-    metadata={"metric_collection": "test_collection_1"}
+    metadata={"metric_collection": "<metric_collection_name>"},
 )
 
-agent = create_react_agent(
+agent = create_agent(
     model=llm,
     tools=[get_weather],
-    prompt="You are a helpful assistant",
+    system_prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
     input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={
-        "callbacks": [
-            CallbackHandler(metric_collection="task_completion")
-        ],
-    },
+    config={"callbacks": [CallbackHandler()]},
 )
 ```
+
+</CodeBlock>
+
+<CodeBlock language="typescript">
+
+```typescript TypeScript {19}
+import { createAgent } from "langchain";
+import { ChatOpenAI } from "@langchain/openai";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+
+import { DeepEvalCallbackHandler } from "deepeval/integrations/langchain";
+
+const getWeather = tool(
+  async ({ city }: { city: string }) => `It's always sunny in ${city}!`,
+  {
+    name: "get_weather",
+    description: "Returns the weather in a city",
+    schema: z.object({ city: z.string() }),
+  },
+);
+
+const llm = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  metadata: { metricCollection: "<metric_collection_name>" },
+});
+
+const agent = createAgent({
+  model: llm,
+  tools: [getWeather],
+  systemPrompt: "You are a helpful assistant",
+});
+
+const result = await agent.invoke(
+  { messages: [{ role: "user", content: "what is the weather in sf" }] },
+  { callbacks: [new DeepEvalCallbackHandler({})] },
+);
+```
+
+</CodeBlock>
+
+</CodeBlocks>
 
 </Tab>
 
 <Tab title="Tool Span">
 
-For tool spans, you can set the `metric_collection` parameter of the DeepEval's `@tool` decorator.
+For tool spans, you can set the `metric_collection` parameter of DeepEval's `@tool` decorator.
 
 <Note>
-  If your application does not use `@tool` decorator, you can also use
+  If your application does not use the `@tool` decorator, you can also use the
   `@observe` decorator from `deepeval.tracing` to set the metric collection.
 </Note>
 
 <CodeBlocks>
 
 <CodeBlock title="Using @tool">
-```python {4,6}
+
+```python {5,7} maxLines=100
+from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
-
-from deepeval.integrations.langchain import CallbackHandler, tool
-
-@tool(metric_collection="test_collection_1")
-def get_weather(city: str) -> str:
-"""Returns the weather in a city"""
-return f"It's always sunny in {city}!"
-
-llm = ChatOpenAI(
-model="gpt-4o-mini",
-metadata={"metric_collection": "test_collection_1"}
-)
-
-agent = create_react_agent(
-model=llm,
-tools=[get_weather],
-prompt="You are a helpful assistant",
-)
-
-result = agent.invoke(
-input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-config={
-"callbacks": [
-CallbackHandler(metric_collection="task_completion")
-],
-},
-)
-
-````
-</CodeBlock>
-
-<CodeBlock title="Using @observe">
-```python {5,7}
-from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
 
 from deepeval.integrations.langchain import CallbackHandler
-from deepeval.tracing import observe
+from deepeval.integrations.langchain import tool
 
-@observe(type="tool", metric_collection="test_collection_1")
+@tool(metric_collection="<metric_collection_name>")
 def get_weather(city: str) -> str:
     """Returns the weather in a city"""
     return f"It's always sunny in {city}!"
 
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    metadata={"metric_collection": "test_collection_1"}
-)
-
-agent = create_react_agent(
-    model=llm,
+agent = create_agent(
+    model=ChatOpenAI(model="gpt-4o-mini"),
     tools=[get_weather],
-    prompt="You are a helpful assistant",
+    system_prompt="You are a helpful assistant",
 )
 
 result = agent.invoke(
     input={"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-    config={
-        "callbacks": [
-            CallbackHandler(metric_collection="task_completion")
-        ],
-    },
+    config={"callbacks": [CallbackHandler()]},
 )
+```
+
+</CodeBlock>
+
+<CodeBlock title="Using @observe">
+
+```python {4}
+from deepeval.tracing import observe
+from deepeval.integrations.langchain import CallbackHandler
+
+@observe(type="tool", metric_collection="<metric_collection_name>")
+def get_weather(city: str) -> str:
+    """Returns the weather in a city"""
+    return f"It's always sunny in {city}!"
 ```
 
 </CodeBlock>
@@ -378,4 +691,3 @@ You can view the evals on [Confident AI](https://app.confident.ai) by clicking o
 <Frame>
   <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
 </Frame>
-````
