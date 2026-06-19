@@ -1,0 +1,26 @@
+---
+tags: ["Security", "Evals", "Observability", "Quality of Life"]
+---
+
+## Govern Yourself Accordingly
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+The headliner: **Governance grew into a full policy engine**—spin up policies, stack them with controls, and roll them across every project in your org, with live compliance tracking baked in. **Metrics** now write their own criteria and rubrics. **Classifiers** picked up saved filters and workflow chaining that fires your whole pipeline off a single trigger. Round it out with the **Gemini 3 series**, charts that quit buffering, and paused-service heads-ups that actually tell you what to do about it. Let's get into it.
+
+<Frame>![Changelog June 19, 2026](/assets/changelog/2026-06-19.png)</Frame>
+
+### Added
+
+- **Governance** - Governance grew into a full policy engine. Spin up governance policies, stack them with pre-deployment and runtime controls, assign owners, and roll them out across every project in your org. A compliance matrix and daily-status views show who's passing and what needs action, the controls portfolio and project inventory lay out your whole estate at a glance, and audit logs keep the receipts. Compliance stopped living in a spreadsheet. _Govern_ as you mean to go on.
+- **AI Criteria & Rubric Generation** - Metrics can now write their own criteria and rubrics with a little help from some very capable LLMs, so the blank-box-versus-the-word-"good" staring contest is officially called off. Dataset validation got sharper too, naming the exact required fields you're missing per metric instead of waving a vague yellow flag. _Criteria_ met.
+- **Classifier Filters & Workflow Chaining** - Classifiers picked up saved filter configs and honest-to-goodness workflow chaining. Auto-classification eligibility now checks your default filters against trace snapshots, and the moment classification wraps, downstream queue and dataset ingestion kick off on their own. Pull one trigger, watch the whole pipeline fall in line. _Chain_ reaction.
+- **Gemini 3 Series Models** - Gemini 3.1 Pro Preview, 3.5 Flash, and the 3-flash variants checked into the model catalog across evaluation and model selection. Fresh horsepower, no waiting list. _Flash_ forward.
+
+### Changed
+
+- **Per-Evaluation Model Overrides** - Model separation landed: pick a model per evaluation for confidence-focused evals, backed by smarter platform- and feature-specific defaults across eval and generation flows. Point an unsupported provider at it and you get a clear error instead of a cryptic shrug. _Model_ behavior.
+- **Select All on Invitations** - The org user multi-selector finally learned select-all and deselect-all, indeterminate header state and all. Inviting the whole team is one click now, not a finger workout. _Select_ company.
+- **Faster Metric Charts** - Chart loading just got an upgrade. Metric charts that used to crawl on high-volume projects now snap into place, thanks to fresh caching under the hood. _Chart_-topping speed.
+
+That's the drop for this week—see you next Friday.
