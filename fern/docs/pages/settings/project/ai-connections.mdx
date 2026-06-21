@@ -88,6 +88,65 @@ For _SSE Streaming_ and _HTTP Streaming_ modes, your endpoints can return either
   </Tab>
 </Tabs>
 
+### SSE Event Names
+
+When your endpoint uses **SSE Streaming**, every frame in the stream can be labelled with an `event:` field, and different events often carry different things—token deltas, a final snapshot, retrieval sources, tool calls, and so on. Event names tell Confident AI **which event each value lives on**, so it reads the right frames instead of guessing.
+
+Take this stream:
+
+```
+event: delta
+data: {"text": "Paris"}
+
+event: delta
+data: {"text": " is the capital."}
+
+event: final
+data: {"answer": "Paris is the capital.", "sources": ["doc-1"], "tools": [{"name": "search"}], "session": {"threadId": "abc-123"}}
+```
+
+Here the answer streams token-by-token on the `delta` event, while the structured fields all land in one `final` event. Event names let you wire each value to its source:
+
+- **Actual output** → `delta` event, accumulating each `text` chunk into `"Paris is the capital."`
+- **Retrieval context**, **tools called**, and **state** → `final` event, read once from that frame
+
+Each value still uses its own [key path](#actual-output-key-path) or [transformer](#transformers) for extraction—the event name only decides _which frames_ that extraction runs against. SSE Event Name fields only appear in **SSE Streaming** mode.
+
+#### Actual Output Event
+
+The event whose frames build the actual output. This field is **optional**:
+
+- **Leave it blank** to feed every frame into the actual output (the classic streaming behavior shown above).
+- **Set it** to consume only frames from that event—for example `delta`, so unrelated events like `final` don't pollute the output.
+
+#### Accumulate Frames
+
+Controls how the actual output frames are combined. It's **off by default**:
+
+- **On**: each frame's extracted output is concatenated. Use this when your server streams incremental deltas (e.g. token-by-token) and never sends a complete snapshot.
+- **Off**: the latest frame replaces the previous one. Use this when each frame already contains the full output, so the final frame wins.
+
+<Tip>
+  Rule of thumb: token-by-token deltas → **Accumulate on**. A single final
+  frame (or repeated full snapshots) → **Accumulate off**.
+</Tip>
+
+#### Retrieval Context, Tools Called & State Events
+
+Unlike the actual output, these values can't be accumulated across frames—they're read **once, from the final frame of the event you name**. Point each one at the event that carries it (often a single `final` or `last_message` event):
+
+- **Retrieval Context Event** — the event whose last frame holds your retrieval context
+- **Tools Called Event** — the event whose last frame holds your tool calls
+- **State Event** — the event whose last frame holds your [multi-turn state](#configure-multiturn-state)
+
+Confident AI grabs the last frame seen for that event name, then applies the field's key path or transformer to it.
+
+<Note>
+  These extractions only run when at least one SSE event name is set. If you're
+  using any of retrieval context, tools called, or state with an SSE endpoint,
+  give each one its event name so Confident AI knows which frame to read.
+</Note>
+
 ### Payload
 
 Configure the payload that gets sent to your endpoint when Confident AI calls it. **JSON** mode lets you map available variables into a JSON structure, while the **Code** editor lets you write a Python function for conditional logic, data transformation, or full programmatic control over the request body.
