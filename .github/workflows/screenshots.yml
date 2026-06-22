@@ -15,6 +15,16 @@ on:
         type: boolean
         required: false
         default: false
+  push:
+    branches: [main]
+    paths:
+      - "screenshots/**"
+      - ".github/workflows/screenshots.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "screenshots/**"
+      - ".github/workflows/screenshots.yml"
 
 jobs:
   capture:
@@ -53,5 +63,5 @@ jobs:
           S3_BUCKET: ${{ vars.SCREENSHOTS_S3_BUCKET }}
           SHOTSCRAPER_AUTH_FILE: auth.json
           ONLY_PATH_PREFIX: ${{ github.event.inputs.only_path_prefix }}
-          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+          DRY_RUN: ${{ (github.event_name == 'pull_request' || github.event.inputs.dry_run == 'true') && '1' || '' }}
         run: python screenshots/capture.py
