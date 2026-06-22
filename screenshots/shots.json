@@ -37,6 +37,16 @@
       "height": 1330
     },
     {
+      "s3_key": "ai-connection:output-transformer.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": ["Output Parsing", "[data-docs-id='ai-connection-output-parsing-mode']", "Transformer"],
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1330
+    },
+    {
       "s3_key": "ai-connection:payload-json.png",
       "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
       "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
