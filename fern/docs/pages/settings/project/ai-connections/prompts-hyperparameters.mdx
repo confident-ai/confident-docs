@@ -1,0 +1,105 @@
+---
+subtitle: Attach prompt versions and hyperparameters to your AI connection's payload.
+slug: settings/project/ai-connections/prompts-hyperparameters
+---
+
+## Overview
+
+Prompts and hyperparameters are sent to your [AI Connection](/docs/settings/project/ai-connections) endpoint as part of the [payload](/docs/settings/project/ai-connections#payload), and both are logged alongside your test runs and experiments. This lets you trace every evaluation result back to the exact prompt versions and configuration values used to produce it.
+
+<Frame caption="Attach prompt versions and hyperparameters">
+  <img
+    data-image="settings.project.aiConnectionPrompts"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Prompts
+
+Associate prompt versions with your AI connection. When running evaluations, these prompts will be attributed to each test run, letting you trace results back to the prompts used.
+
+The `prompts` variable in your payload is a dictionary where each key maps to an object containing `alias` and `version`:
+
+```json
+{
+  "system": { "alias": "system-prompt", "version": "1.0.0" },
+  "assistant": { "alias": "assistant-prompt", "version": "2.1.0" }
+}
+```
+
+Here's an example of how your Python endpoint might handle the prompts dictionary:
+
+```python
+from deepeval.prompt import Prompt
+
+@app.post("/generate")
+def generate(request: dict):
+    # Pull different prompt versions using their keys
+    system_info = request["prompts"]["system"]
+    assistant_info = request["prompts"]["assistant"]
+
+    system_prompt = Prompt(alias=system_info["alias"]).pull(version=system_info["version"])
+    assistant_prompt = Prompt(alias=assistant_info["alias"]).pull(version=assistant_info["version"])
+
+    # Use the prompts in your generation
+    response = llm.generate(
+        system=system_prompt.text,
+        assistant=assistant_prompt.text,
+        user=request["input"]
+    )
+
+    return {"output": response}
+```
+
+For more details on working with prompts, see [Prompt Versioning](/docs/llm-evaluation/prompt-management/version-prompts).
+
+## Hyperparameters
+
+Define optional hyperparameters as string key-value pairs. These are sent to your endpoint as part of the payload and are also logged in test runs and experiments, making it easy to track which configuration was used for each evaluation.
+
+Hyperparameters are useful for passing model configuration values like `temperature`, `model_name`, or `max_tokens` to your AI app without hardcoding them into your endpoint. Since they're logged alongside test run and experiment results, you can compare how different hyperparameter values affect evaluation outcomes.
+
+The `hyperparameters` variable in your payload is a dictionary where both keys and values are strings:
+
+```json
+{
+  "temperature": "0.7",
+  "model": "gpt-4o",
+  "max_tokens": "1024"
+}
+```
+
+Here's an example of how your Python endpoint might use hyperparameters:
+
+```python
+@app.post("/generate")
+def generate(request: dict):
+    hyperparameters = request.get("hyperparameters", {})
+
+    response = llm.generate(
+        model=hyperparameters.get("model", "gpt-4o"),
+        temperature=float(hyperparameters.get("temperature", "0.7")),
+        max_tokens=int(hyperparameters.get("max_tokens", "1024")),
+        user=request["input"]
+    )
+
+    return {"output": response}
+```
+
+<Note>
+  Hyperparameter values are always strings. Cast them to the appropriate type
+  (e.g., `float`, `int`) in your endpoint as needed.
+</Note>
+
+## Next Steps
+
+With prompts and hyperparameters attached, configure how Confident AI reads your endpoint's response.
+
+<CardGroup cols={2}>
+  <Card title="Payload" icon="fa-light fa-paper-plane" href="/docs/settings/project/ai-connections#payload">
+    Map golden variables into the request body in JSON or Code mode.
+  </Card>
+  <Card title="Output Parsing" icon="fa-light fa-brackets-curly" href="/docs/settings/project/ai-connections#output-parsing">
+    Extract actual output, retrieval context, and tool calls with key paths or transformers.
+  </Card>
+</CardGroup>

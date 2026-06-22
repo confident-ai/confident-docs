@@ -705,6 +705,24 @@ navigation:
             icon: fa-light fa-globe
             collapsed: false
             contents:
+              - page: Prompts & Hyperparameters
+                path: docs/pages/settings/project/ai-connections/prompts-hyperparameters.mdx
+                icon: fa-light fa-message-lines
+              - page: Streaming
+                path: docs/pages/settings/project/ai-connections/streaming.mdx
+                icon: fa-light fa-signal-stream
+              - page: Authorization
+                path: docs/pages/settings/project/ai-connections/authorization.mdx
+                icon: fa-light fa-lock-keyhole
+              - page: Throttling & Retries
+                path: docs/pages/settings/project/ai-connections/throttling-retries.mdx
+                icon: fa-light fa-gauge-high
+              - page: Multi-Turn State
+                path: docs/pages/settings/project/ai-connections/multiturn-state.mdx
+                icon: fa-light fa-comments
+              - page: Linking Traces
+                path: docs/pages/settings/project/ai-connections/linking-traces.mdx
+                icon: fa-light fa-link
               - page: Confident Agent
                 path: docs/pages/settings/project/confident-agent.mdx
                 icon: fa-light fa-plug

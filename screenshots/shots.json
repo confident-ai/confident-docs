@@ -1,0 +1,100 @@
+{
+  "_fields": {
+    "local_storage": "TOP-LEVEL ONLY. localStorage key→value pairs seeded into the browser BEFORE the page loads, applied to every shot. Used to collapse the Getting Started panel and hide the Book-a-demo banner. ':projectId'/':aiConnectionId' are substituted from .env.",
+    "s3_key": "REQUIRED. The S3 object this image overwrites. It is the ONLY link between the picture shown in the docs and this capture — the .mdx references the same key's URL.",
+    "doc": "INFORMATIONAL ONLY (ignored at runtime). Which .mdx docs page displays this image, so humans can keep the manifest and docs in sync.",
+    "path": "REQUIRED. The platform URL route to open. ':projectId'/':aiConnectionId' are filled in from .env.",
+    "click": "Optional. Clicks ONE element before the screenshot to open the tab/panel you want to capture (e.g. the 'Output Parsing' tab). Match it by the element's exact visible TEXT (e.g. \"Headers\"), or by a CSS selector if the value starts with [ . or #. Pass an array to click several in sequence (e.g. tab -> dropdown -> option). A text match must be EXACT (and clicks the innermost match); if nothing matches, the shot FAILS with a clear error instead of capturing the wrong state.",
+    "selector": "The element of interest. The shot waits for it to appear, and — unless full_page is true — crops the image to just this element.",
+    "full_page": "true = capture the WHOLE browser window (nav + top bar + content). false/omitted = crop to 'selector'.",
+    "width": "Browser window width in pixels (default 1280).",
+    "height": "Browser window height in pixels. For full_page shots, tune this so the content fits with no empty space at the bottom and nothing cut off."
+  },
+
+  "local_storage": {
+    "getting-started-open::projectId": "false",
+    "dismissed-banner:book-a-demo-v1": "true"
+  },
+
+  "shots": [
+    {
+      "s3_key": "ai-connection:setup.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 760
+    },
+    {
+      "s3_key": "ai-connection:output-parsing.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Output Parsing",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1330
+    },
+    {
+      "s3_key": "ai-connection:payload-json.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Body",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 870
+    },
+    {
+      "s3_key": "ai-connection:payload-code.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": ["Body", "[data-docs-id='ai-connection-payload-mode']", "Code"],
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1090
+    },
+    {
+      "s3_key": "ai-connection:headers.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Headers",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 580
+    },
+    {
+      "s3_key": "ai-connection:authentication.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections/authorization.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Authentication",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 780
+    },
+    {
+      "s3_key": "ai-connection:prompts.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections/prompts-hyperparameters.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Prompts & Hyperparameters",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 760
+    },
+    {
+      "s3_key": "ai-connection:throttling.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections/throttling-retries.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Throttling",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1000
+    }
+  ]
+}
