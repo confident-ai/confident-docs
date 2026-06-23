@@ -758,6 +758,10 @@ navigation:
           - page: Users
             path: docs/pages/settings/organization/users.mdx
             icon: fa-light fa-users
+          - page: Global API Keys
+            path: docs/pages/settings/organization/global-api-keys.mdx
+            icon: fa-light fa-key
+            hidden: true
           - page: Roles & Permissions
             path: docs/pages/settings/organization/roles-and-permissions.mdx
             icon: fa-light fa-user-shield
@@ -907,6 +911,9 @@ navigation:
   - tab: changelog
 
 redirects:
+  - source: /docs/settings/project/management/global-api-keys
+    destination: /docs/settings/organization/global-api-keys
+    permanent: true
   - source: /docs/llm-tracing/features/categories
     destination: /docs/llm-tracing/features/signals
     permanent: true
