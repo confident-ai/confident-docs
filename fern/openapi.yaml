@@ -3103,7 +3103,7 @@ paths:
         - For thread items: Use `expectedOutcome` (not `expectedOutput`).
         - For trace/span items: Use `expectedOutput` (not `expectedOutcome`).
         - A criterion's `name` must match an available criterion — omit it for the default criterion, otherwise it must match a configured custom criterion or a form criteria field. A mismatched name is rejected.
-        - Form `formResponses` are addressed by each field's visible label, accepted only for queues with an attached form, and require `annotatorEmail` so they appear in the platform.
+        - Form `formResponses` are addressed by each field's visible label, accepted only for queues with an attached form.
         - Set `markAsCompleted: false` to leave the item open (default: true). For form queues, completing enforces the form's required fields.
       requestBody:
         required: true
