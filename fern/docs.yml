@@ -909,6 +909,9 @@ navigation:
           - page: Provision Projects for Agents on the Fly
             path: docs/pages/guides/provision-projects-in-code.mdx
             icon: fa-light fa-layer-group
+          - page: Authenticate AI Connections with Client Credentials
+            path: docs/pages/guides/authenticate-with-client-credentials.mdx
+            icon: fa-light fa-key
   - tab: changelog
 
 redirects:
