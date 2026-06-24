@@ -506,6 +506,7 @@ navigation:
                     contents:
                       - GET /v1/annotation-queues/{queueId}/items
                       - POST /v1/annotation-queues/{itemId}/annotate
+                      - POST /v1/annotation-queues/{name}/batch-annotate
               - section: Projects
                 contents:
                   - GET /v1/projects
