@@ -369,6 +369,17 @@ navigation:
           - page: Red Team Using DeepTeam
             path: docs/pages/red-teaming/code-driven-assessments.mdx
             icon: fa-light fa-laptop-code
+      - section: AI Governance
+        contents:
+          - page: Introduction
+            path: docs/pages/ai-governance/introduction.mdx
+            icon: fa-light fa-scale-balanced
+          - page: Governance Policies
+            path: docs/pages/ai-governance/policies.mdx
+            icon: fa-light fa-file-shield
+          - page: Governance Controls
+            path: docs/pages/ai-governance/controls.mdx
+            icon: fa-light fa-list-check
       - section: Resources
         contents:
           - page: Why Confident AI
@@ -695,6 +706,24 @@ navigation:
             icon: fa-light fa-globe
             collapsed: false
             contents:
+              - page: Prompts & Hyperparameters
+                path: docs/pages/settings/project/ai-connections/prompts-hyperparameters.mdx
+                icon: fa-light fa-message-lines
+              - page: Streaming
+                path: docs/pages/settings/project/ai-connections/streaming.mdx
+                icon: fa-light fa-signal-stream
+              - page: Authorization
+                path: docs/pages/settings/project/ai-connections/authorization.mdx
+                icon: fa-light fa-lock-keyhole
+              - page: Throttling & Retries
+                path: docs/pages/settings/project/ai-connections/throttling-retries.mdx
+                icon: fa-light fa-gauge-high
+              - page: Multi-Turn State
+                path: docs/pages/settings/project/ai-connections/multiturn-state.mdx
+                icon: fa-light fa-comments
+              - page: Linking Traces
+                path: docs/pages/settings/project/ai-connections/linking-traces.mdx
+                icon: fa-light fa-link
               - page: Confident Agent
                 path: docs/pages/settings/project/confident-agent.mdx
                 icon: fa-light fa-plug
@@ -730,6 +759,10 @@ navigation:
           - page: Users
             path: docs/pages/settings/organization/users.mdx
             icon: fa-light fa-users
+          - page: Global API Keys
+            path: docs/pages/settings/organization/global-api-keys.mdx
+            icon: fa-light fa-key
+            hidden: true
           - page: Roles & Permissions
             path: docs/pages/settings/organization/roles-and-permissions.mdx
             icon: fa-light fa-user-shield
@@ -879,6 +912,9 @@ navigation:
   - tab: changelog
 
 redirects:
+  - source: /docs/settings/project/management/global-api-keys
+    destination: /docs/settings/organization/global-api-keys
+    permanent: true
   - source: /docs/llm-tracing/features/categories
     destination: /docs/llm-tracing/features/signals
     permanent: true

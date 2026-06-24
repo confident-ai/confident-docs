@@ -175,6 +175,15 @@ function runOnDomUpdates(callback) {
     "settings.project.integrations": `${S3_BASE}/integrations.png`,
     "settings.project.team": `${S3_BASE}/settings:project:team.png`,
     "settings.project.aiConnection": `${S3_BASE}/settings:project:ai-connection.png`,
+    "settings.project.aiConnectionSetup": `${S3_BASE}/ai-connection:setup.png`,
+    "settings.project.aiConnectionPayloadJson": `${S3_BASE}/ai-connection:payload-json.png`,
+    "settings.project.aiConnectionPayloadCode": `${S3_BASE}/ai-connection:payload-code.png`,
+    "settings.project.aiConnectionHeaders": `${S3_BASE}/ai-connection:headers.png`,
+    "settings.project.aiConnectionAuthentication": `${S3_BASE}/ai-connection:authentication.png`,
+    "settings.project.aiConnectionPrompts": `${S3_BASE}/ai-connection:prompts.png`,
+    "settings.project.aiConnectionThrottling": `${S3_BASE}/ai-connection:throttling.png`,
+    "settings.project.aiConnectionOutputParsing": `${S3_BASE}/ai-connection:output-parsing.png`,
+    "settings.project.aiConnectionOutputTransformer": `${S3_BASE}/ai-connection:output-transformer.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
     "settings.project.auditLogs": `${S3_BASE}/settings:project:audit-logs.png`,
@@ -221,6 +230,7 @@ function runOnDomUpdates(callback) {
 
     "selfHosting.aws.architecture": `${S3_BASE}/self-hosting:aws-architecture.png`,
     "selfHosting.azure.architecture": `${S3_BASE}/self-hosting:azure-architecture.png`,
+    "selfHosting.gcp.architecture": `${S3_BASE}/self-hosting:gcp-architecture.png`,
 
     "logos.openai": "https://www.svgrepo.com/show/306500/openai.svg",
     "logos.langchain": "https://logo.svgcdn.com/s/langchain-dark-8x.png",

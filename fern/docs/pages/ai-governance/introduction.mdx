@@ -1,0 +1,118 @@
+---
+title: Introduction to AI Governance
+subtitle: Codify your organization's AI compliance requirements into policies, and continuously enforce them across every project.
+slug: ai-governance/introduction
+description: Get started with Confident AI's AI Governance to define policies, assess controls, and gate deployments against your compliance requirements.
+---
+
+## Overview
+
+AI Governance on Confident AI lets you turn your organization's compliance requirements into **policies** that are continuously enforced across your projects. A policy is a group of **controls** — individual, measurable requirements that are automatically assessed against the real state of each project (its datasets, traces, alerts, test runs, risk assessments, and more).
+
+Define your standard for evaluation, observability, and red teaming **once**, and apply it everywhere. Every project assigned to a policy is held to the **same quality bar**, so every team ships with confidence that their AI meets the standard your organization expects. Governance makes that bar explicit, consistent, and automatically enforced — giving everyone a shared definition of what "good" looks like.
+
+This gives compliance and engineering teams a single source of truth for answering "**Is this AI application allowed to ship?**" — and lets you block deployments that don't meet your standards.
+
+<Note>
+  AI Governance is an enterprise feature. [Contact us](/docs/support) if you'd
+  like it enabled for your organization.
+</Note>
+
+## How it works
+
+<Steps>
+  <Step title="Define controls">
+    A [control](/docs/ai-governance/controls) is a single requirement, such as
+    "traces are being logged", "p95 latency stays under 2s", or "the latest
+    official red teaming assessment passed". Controls are assessed automatically
+    and resolve to a status.
+  </Step>
+  <Step title="Group controls into a policy">
+    A [policy](/docs/ai-governance/policies) is a named group of controls —
+    typically mapped to a compliance framework such as the EU AI Act or NIST AI
+    RMF. A policy is **met** only when *all* of its controls pass.
+  </Step>
+  <Step title="Assign projects to a policy">
+    Each project belongs to **at most one** policy. Every project assigned to a
+    policy is assessed against all of that policy's controls.
+  </Step>
+  <Step title="Assess and gate">
+    Assessments run automatically on a daily schedule and on demand. You can
+    also run them as a **deploy gate** in CI/CD — blocking a release unless
+    every control passes.
+  </Step>
+</Steps>
+
+## Core concepts
+
+<CardGroup cols={2}>
+  <Card title="Governance Policies" icon="file-shield" href="/docs/ai-governance/policies">
+    A group of controls that maps to a compliance requirement. Each project
+    belongs to one policy, and the policy is met only when every control passes.
+  </Card>
+  <Card title="Governance Controls" icon="list-check" href="/docs/ai-governance/controls">
+    The individual requirements that get assessed. Spanning operational,
+    runtime, and pre-deployment checks across evals and red teaming.
+  </Card>
+</CardGroup>
+
+## Control types
+
+Controls come in four types, each covering a different slice of your AI lifecycle:
+
+| Type                             | What it checks                                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Operational**                  | Static configuration checks — e.g. datasets exist, traces are logged, alerts are configured.                                          |
+| **Runtime**                      | Threshold-based metrics over your observability data (traces, spans, threads), much like [alerts](/docs/llm-tracing/features/alerts). |
+| **Pre-deployment (evals)**       | Gates on a recent [test run](/docs/llm-evaluation/experiments) — for example, requiring the latest official run to pass.              |
+| **Pre-deployment (red teaming)** | Gates on a recent [risk assessment](/docs/red-teaming/introduction) from your red teaming workflows.                                  |
+
+See [Controls](/docs/ai-governance/controls) for the full breakdown of each type and how they're configured.
+
+## Assessment statuses
+
+Every control assessment resolves to one of four statuses:
+
+| Status    | Meaning                                                                                                          |
+| --------- | ---------------------------------------------------------------------------------------------------------------- |
+| `PASS`    | The control's requirement is satisfied.                                                                          |
+| `FAIL`    | The requirement is not satisfied — e.g. a check failed, a threshold was breached, or the gated run didn't match. |
+| `ERROR`   | The assessment couldn't run, usually due to a misconfigured control.                                             |
+| `NO_DATA` | There was no data to assess — e.g. no metrics in the window, or no qualifying run yet.                           |
+
+A policy is only considered **met** when _every_ control resolves to `PASS`. Any `FAIL`, `ERROR`, or `NO_DATA` means the policy is not met.
+
+## Gating deployments
+
+Enforce a policy in your CI/CD pipeline using the `deepeval` CLI (available in both Python and TypeScript), or call the public API directly. The gate assesses every control in the project's policy and only passes if all of them pass:
+
+<Tabs>
+<Tab title="Python">
+
+```bash
+deepeval gate
+```
+
+</Tab>
+<Tab title="TypeScript">
+
+```bash
+npx deepeval gate
+```
+
+</Tab>
+<Tab title="cURL">
+
+<EndpointRequestSnippet endpoint="POST /v1/governance/assess" />
+
+</Tab>
+</Tabs>
+
+The CLI exits with code `0` only when the policy is fully met, and a non-zero code otherwise. All three call the [`POST /v1/governance/assess`](/api-reference) endpoint under the hood using your project's API key. A non-zero exit code stops your pipeline, preventing a non-compliant deployment from shipping.
+
+## Learn more
+
+- [Policies](/docs/ai-governance/policies) — group controls and assign projects
+- [Controls](/docs/ai-governance/controls) — the four control types and how to configure them
+- [Alerts](/docs/llm-tracing/features/alerts) — the observability primitive behind runtime controls
+- [Risk Profiles](/docs/red-teaming/risk-profile) — what red teaming pre-deployment controls assess against

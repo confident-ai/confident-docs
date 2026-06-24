@@ -8,7 +8,7 @@ AI Connections let you run evaluations directly on the platform by connecting to
 
 <Frame caption="Setup AI Connection">
   <img
-    data-image="settings.project.aiConnection"
+    data-image="settings.project.aiConnectionSetup"
     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   />
 </Frame>
@@ -29,74 +29,34 @@ To create an AI connection:
 
 <div data-cta="ai-connections" />
 
-## Configuration Parameters
+## Configuring Your Endpoint
 
-There are several parameters you'll need to configure in order for your AI connection to work.
+Point your AI connection at your AI app's HTTPS endpoint. It **must accept `POST` requests** and return a response containing the actual output of your AI app.
 
-### Name
+Choose a response mode based on how your endpoint responds:
 
-Give your AI connection a unique name to identify it within your project.
+- **HTTP Response**: returns a single response containing the actual output (default).
+- **HTTP Streaming**: returns a stream of newline-delimited chunks.
+- **SSE Streaming**: returns a stream of Server-Sent Events.
 
-### AI App Endpoint
+For streaming endpoints, see [Streaming](/docs/settings/project/ai-connections/streaming) to configure chunk formats, SSE event names, and accumulate mode.
 
-Your AI app **must be accessible via an HTTPS endpoint** that accepts `POST` requests and returns any response containing the actual output of your AI app.
+## Payload
 
-You can choose between _HTTP Response_, _HTTP Streaming_, and _SSE Streaming_ modes.
-
-- **HTTP Response**: The endpoint returns a HTTP response containing the actual output.
-- **HTTP Streaming**: The endpoint returns a stream of HTTP responses containing the actual output.
-- **SSE Streaming**: The endpoint returns a stream of SSE events containing the actual output.
-
-<Note>
-  The default mode is *HTTP Response*.
-</Note>
-
-<Tip>
-If your endpoint returns a custom response format like JSON or any other formats, you can configure the actual output key path or use a transformer to extract the actual output from the response. See [Actual Output Key Path](#actual-output-key-path) and [Transformers](#transformers) for more details.
-</Tip>
-
-### Streaming Mode
-
-For _SSE Streaming_ and _HTTP Streaming_ modes, your endpoints can return either strings, JSON objects, or custom formats that can be processed using transformers for each chunks.
-
-<Tabs>
-  <Tab title="Strings">
-    For string chunks, Confident AI collects all chunks and returns a single string.
-    
-    Your model generates: 
-    ```
-    ["Hello", "World", "!"]
-    ```
-    Confident AI response: 
-    ```
-    "Hello World!"
-    ```
-  </Tab>
-  <Tab title="JSON">
-    For JSON objects, Confident AI parses the JSON object for each chunk and returns the final output.
-
-    Your model generates:
-
-    ```
-    [{"chunk": "Hello"}, {"chunk": "World"}, {"chunk": "!"}]
-    ```
-    Confident AI response after extraction: 
-    
-    ```
-    "Hello World!"
-    ```
-  </Tab>
-</Tabs>
-
-### Payload
-
-Configure the payload that gets sent to your endpoint when Confident AI calls it. **JSON** mode lets you map available variables into a JSON structure, while the **Code** editor lets you write a Python function for conditional logic, data transformation, or full programmatic control over the request body.
+The payload is the request body Confident AI sends to your endpoint when it calls it. **JSON** mode lets you map available variables into a JSON structure, while the **Code** editor lets you write a Python function for conditional logic, data transformation, or full programmatic control over the request body.
 
 <Tabs>
 
   <Tab title="JSON">
 
 JSON mode lets you define a payload using available variables. You can nest values to match your endpoint's expected structure.
+
+<Frame caption="Map golden variables into a JSON payload">
+  <img
+    data-image="settings.project.aiConnectionPayloadJson"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
 Available variables:
 
@@ -122,7 +82,7 @@ Available variables:
 | `turnId`                                   | Unique identifier for linking traces to turns      | string     |
 | `state`                                    | An object to keep state for multi-turn simulations | object     |
 
-Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](#hyperparameters) for passing hyperparameters to your endpoint.
+Use `golden.*` variables for single-turn evaluations and `conversationalGolden.*` variables for multi-turn evaluations. See [Prompts](/docs/settings/project/ai-connections/prompts-hyperparameters#prompts) for details on how to use the `prompts` dictionary, and [Hyperparameters](/docs/settings/project/ai-connections/prompts-hyperparameters#hyperparameters) for passing hyperparameters to your endpoint.
 
 Example payload:
 
@@ -148,6 +108,13 @@ Example payload:
   <Tab title="Code">
 
 Code mode gives you a built-in Python editor where you define a `generate_payload` function. The function receives a `golden` argument (typed as `Union[Golden, ConversationalGolden]`) along with `prompts`, `hyperparameters`, `testCaseId`, `turnId`, and `state`—use `isinstance` checks to handle single-turn and multi-turn goldens differently.
+
+<Frame caption="Write a Python function to build the payload">
+  <img
+    data-image="settings.project.aiConnectionPayloadCode"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
 Available `golden` attributes when `golden` is a `Golden`:
 
@@ -225,146 +192,20 @@ Whatever the function returns is what gets sent to your endpoint as the POST bod
 
 </Tabs>
 
-### Headers
+## Output Parsing
 
-Add any custom headers required by your endpoint as key-value pairs, such as API keys or content type specifications. These headers are sent with every request to your AI app.
+Once your endpoint returns a response, Confident AI needs to know how to pull the relevant values out of it. Use **key paths** to point at specific values in your JSON response, or a **transformer** when you need custom logic to extract them:
 
-### Authorization
+- **Actual Output Key Path**: where to find the actual output (required)
+- **Retrieval Context Key Path**: where to find the retrieval context (optional, for RAG metrics)
+- **Tool Call Key Path**: where to find the tools called (optional, for tool-related metrics)
 
-Configure authentication for requests to your AI app endpoint. The Authorization tab has two sections: **Secrets Manager** and **Authentication**.
-
-#### Secrets Manager
-
-A secrets manager lets you securely retrieve authentication credentials at runtime from a cloud vault, instead of storing them directly on the platform.
-
-To enable a secrets manager:
-
-1. Toggle the secrets manager **on**
-2. Select a provider (e.g. **Azure Key Vault**)
-3. Enter your **Vault URL** (e.g., `https://your-vault.vault.azure.net`)
-4. Enter your **Tenant ID**, **Client ID**, and **Client Secret** to authenticate to the vault
-
-<Note>
-  For self-hosted deployments, the secrets manager is always enabled and uses
-  managed identities for authentication, so no secrets provider credentials are
-  required.
-</Note>
-
-#### Authentication
-
-Select an authentication type from the dropdown:
-
-| Type  | Description                                                                                |
-| ----- | ------------------------------------------------------------------------------------------ |
-| None  | No authentication is applied                                                               |
-| Auth0 | Exchanges client credentials for a Bearer token via Auth0's OAuth2 client credentials flow |
-| HMAC  | Computes an HMAC-SHA256 signature of the request payload and sends it as a header          |
-
-**Auth0** requires the following fields:
-
-| Field                              | Description                                                                                              |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Auth0 Domain                       | Your Auth0 tenant domain (e.g., `your-tenant.auth0.com`)                                                 |
-| Audience                           | The API identifier this token is authorized to access                                                    |
-| Client ID / Client ID Name         | Your Auth0 application client ID, or the name of the secret in your vault if using a secrets manager     |
-| Client Secret / Client Secret Name | Your Auth0 application client secret, or the name of the secret in your vault if using a secrets manager |
-
-**HMAC** requires the following fields:
-
-| Field                    | Description                                                                         |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| Header Key               | The HTTP header name where the signature is sent (e.g., `X-Signature`)              |
-| Signature Prefix         | An optional prefix prepended to the signature (e.g., `sha256=`)                     |
-| Secret Key / Secret Name | The signing key, or the name of the secret in your vault if using a secrets manager |
-
-<Tip>
-  You can use a secrets manager with Auth0 to store your client credentials in a
-  key vault. Instead of entering the actual Client ID and Client Secret, provide
-  the names of the secrets in your vault and they will be retrieved at runtime.
-</Tip>
-
-### Prompts
-
-Associate prompt versions with your AI connection. When running evaluations, these prompts will be attributed to each test run, letting you trace results back to the prompts used.
-
-The `prompts` variable in your payload is a dictionary where each key maps to an object containing `alias` and `version`:
-
-```json
-{
-  "system": { "alias": "system-prompt", "version": "1.0.0" },
-  "assistant": { "alias": "assistant-prompt", "version": "2.1.0" }
-}
-```
-
-Here's an example of how your Python endpoint might handle the prompts dictionary:
-
-```python
-from deepeval.prompt import Prompt
-
-@app.post("/generate")
-def generate(request: dict):
-    # Pull different prompt versions using their keys
-    system_info = request["prompts"]["system"]
-    assistant_info = request["prompts"]["assistant"]
-
-    system_prompt = Prompt(alias=system_info["alias"]).pull(version=system_info["version"])
-    assistant_prompt = Prompt(alias=assistant_info["alias"]).pull(version=assistant_info["version"])
-
-    # Use the prompts in your generation
-    response = llm.generate(
-        system=system_prompt.text,
-        assistant=assistant_prompt.text,
-        user=request["input"]
-    )
-
-    return {"output": response}
-```
-
-For more details on working with prompts, see [Prompt Versioning](/docs/llm-evaluation/prompt-management/version-prompts).
-
-### Hyperparameters
-
-Define optional hyperparameters as string key-value pairs. These are sent to your endpoint as part of the payload and are also logged in test runs and experiments, making it easy to track which configuration was used for each evaluation.
-
-Hyperparameters are useful for passing model configuration values like `temperature`, `model_name`, or `max_tokens` to your AI app without hardcoding them into your endpoint. Since they're logged alongside test run and experiment results, you can compare how different hyperparameter values affect evaluation outcomes.
-
-The `hyperparameters` variable in your payload is a dictionary where both keys and values are strings:
-
-```json
-{
-  "temperature": "0.7",
-  "model": "gpt-4o",
-  "max_tokens": "1024"
-}
-```
-
-Here's an example of how your Python endpoint might use hyperparameters:
-
-```python
-@app.post("/generate")
-def generate(request: dict):
-    hyperparameters = request.get("hyperparameters", {})
-
-    response = llm.generate(
-        model=hyperparameters.get("model", "gpt-4o"),
-        temperature=float(hyperparameters.get("temperature", "0.7")),
-        max_tokens=int(hyperparameters.get("max_tokens", "1024")),
-        user=request["input"]
-    )
-
-    return {"output": response}
-```
-
-<Note>
-  Hyperparameter values are always strings. Cast them to the appropriate type
-  (e.g., `float`, `int`) in your endpoint as needed.
-</Note>
-
-### Transformers
-
-Transformers are a powerful way to apply custom logic to the actual output of your AI app. You can use transformers to extract the actual output from a custom response format using custom Python code.
-
-You can add your own transformers by navigating to **Project Settings** → **Transformers** and clicking **Create Transformer**.
+<Frame caption="Key paths support both JSON keys (strings) and list indices (integers)">
+  <img
+    data-image="settings.project.aiConnectionOutputParsing"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
 ### Actual Output Key Path
 
@@ -395,10 +236,6 @@ For nested arrays, use integers to specify the array index. For example, if your
 ```
 
 Set the key path to `["response", "output", "content", 0, "text"]`.
-
-<Frame caption="Key paths support both JSON keys (strings) and list indices (integers)">
-  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/ai-connection%3Akey-paths.png" />
-</Frame>
 
 ### Retrieval Context Key Path
 
@@ -448,541 +285,103 @@ Set the key path to `["response", "tools_called"]`.
   documentation](https://deepeval.com/docs/evaluation-test-cases#tools-called).
 </Tip>
 
-### Request Timeout
+### Transformers
 
-Set the maximum time (in seconds) that Confident AI will wait for your endpoint to respond before timing out. This helps prevent evaluations from hanging indefinitely if your AI connection is slow or unresponsive.
+When a key path isn't enough—for example, your endpoint returns a non-standard format that needs custom logic—use a **transformer** to extract the actual output with your own Python code.
 
-- **Minimum**: 1 second
-- **Default**: 60 seconds
+Switch any parser from **JSON Key Path** to **Transformer** to select a transformer instead of a key path:
 
-<Note>
-  If your AI app performs complex operations or calls external services, you may
-  need to increase the timeout to avoid premature failures.
-</Note>
+<Frame caption="Use a transformer for custom extraction logic">
+  <img
+    data-image="settings.project.aiConnectionOutputTransformer"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
-### Max Concurrency
+Add your own transformers by navigating to **Project Settings** → **Transformers** and clicking **Create Transformer**. See [Transformers](/docs/settings/project/transformers) for details.
 
-Set the maximum number of concurrent requests that Confident AI will send to your endpoint at the same time. This helps prevent overwhelming your AI app during large evaluation runs.
+## Headers
 
-- **Minimum**: 1
-- **Default**: 20
+Add any custom headers your endpoint requires as key-value pairs—such as API keys, bearer tokens, or a `Content-Type`. Whatever you add here is sent with **every** request Confident AI makes to your AI app.
 
-### Max Retries
+<Frame caption="Add custom headers sent with every request">
+  <img
+    data-image="settings.project.aiConnectionHeaders"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
 
-Set the maximum number of times Confident AI will retry a failed request to your endpoint. This helps handle transient errors without failing the entire evaluation.
+Common headers you might set:
 
-- **Minimum**: 0
-- **Default**: 0
-
-## Configure Multiturn State
-
-During multi-turn simulations, Confident AI calls your endpoint once per turn. You can use state to persist information—like a thread ID or session—across turns so your AI app can maintain context throughout the conversation.
-
-On the **first turn**, the `state` variable in your payload will be empty since no prior state exists. If your endpoint returns a state object and the state key path successfully extracts it, that state will be included in the `state` payload variable from the **second turn onwards**.
-
-```mermaid
-sequenceDiagram
-    participant C as Confident AI Platform
-    participant E as Your AI Connection Endpoint
-
-    Note over C,E: Turn 1 (no state yet)
-    C->>E: { ...payload }
-    Note over E: No state present,<br/>generate new threadId
-    E-->>C: { ...response, "state": {"threadId": "xyz"} }
-    Note over C: Extract state via key path
-
-    Note over C,E: Turn 2 (state included)
-    C->>E: { ...payload, state: {"threadId": "xyz"} }
-    Note over E: Use threadId from state<br/>to continue conversation
-    E-->>C: { ...response, "state": {"threadId": "xyz"} }
-
-    Note over C,E: Turns 3, 4, 5... (same pattern)
-    C->>E: { ...payload, state: {"threadId": "xyz"} }
-    E-->>C: { ...response, "state": {"threadId": "xyz"} }
-```
-
-### Payload
-
-To enable multiturn state, include `state` in your payload configuration so it gets sent to your endpoint on each turn:
-
-```json
-{
-  "input": golden.input,
-  "state": state
-}
-```
-
-Here's an example of how your endpoint might handle state:
-
-```python
-@app.post("/generate")
-def generate(request: dict):
-    state = request.get("state", {})
-
-    if not state:
-        thread_id = create_new_thread()
-    else:
-        thread_id = state["threadId"]
-
-    response = llm.generate(
-        thread_id=thread_id,
-        user=request["input"]
-    )
-
-    return {
-        "output": response,
-        "state": {"threadId": thread_id}
-    }
-```
-
-### State Key Path
-
-The state key path works just like the actual output key path—a list of strings or integers representing the path to the `state` object in your JSON response. This tells Confident AI where to extract state from your endpoint's response so it can be passed back on the next turn.
-
-For example, if your endpoint returns:
-
-```json
-{
-  "output": "Hello! How can I help?",
-  "state": {
-    "threadId": "abc-123"
-  }
-}
-```
-
-Set the state key path to `["state"]`.
-
-<Note>
-  State is only relevant for multi-turn evaluations (simulations). For
-  single-turn evaluations, you can ignore this setting entirely.
-</Note>
-
-## Linking Test Cases to Traces
-
-For single-turn evaluations, you can link each test case to its corresponding trace for full observability. This is done by including `testCaseId` in your payload (enabled by default) and passing it to your tracing setup.
-
-```mermaid
-sequenceDiagram
-    participant C as Confident AI
-    participant E as Your Endpoint
-    participant T as Tracing
-
-    C->>E: Ping AI Connection with testCaseId
-    E->>T: Create trace with testCaseId
-    E-->>C: Return actual_output
-    T-->>C: Send trace to Confident AI
-    Note over C: Trace linked to test case
-```
-
-Include `testCaseId` in your payload configuration and ensure your AI connection is configured to accept it.
-
-```json
-{
-  "input": golden.input,
-  "testCaseId": testCaseId
-}
-```
-
-Then, pass the `testCaseId` to your tracing implementation:
-
-<Tabs>
-
-  <Tab title="Python">
-
-```python
-from deepeval.tracing import observe, update_current_trace
-
-@observe()
-def llm_app(input: str, test_case_id: str):
-    update_current_trace(test_case_id=test_case_id)
-
-    response = llm.generate(user=input)
-    return response
-
-@app.post("/generate")
-def generate(request: dict):
-    test_case_id = request.get("testCaseId")
-    response = llm_app(request["input"], test_case_id)
-    return {"output": response}
-```
-
-  </Tab>
-  <Tab title="TypeScript">
-
-```typescript
-import OpenAI from "openai";
-import { instrumentOpenAI } from "deepeval/openai";
-import { setTracingContext } from "deepeval/tracing";
-
-const client = new OpenAI();
-instrumentOpenAI(client);
-
-const main = async () => {
-  await setTracingContext(
-    { 
-      testCaseId: "tc_123" 
-    },
-    async () => {
-      const response = await client.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: "What is the weather in France?" },
-        ],
-      });
-      console.log(response);
-    }
-  );
-};
-
-main();
-```
-
-  </Tab>
-  <Tab title="LangChain">
-
-```python
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    test_case_id = request.get("testCaseId")
-
-    result = agent_executor.invoke(
-        {"input": request["input"]},
-        config={"callbacks": [CallbackHandler(test_case_id=test_case_id)]}
-    )
-    return {"output": result["output"]}
-```
-
-  </Tab>
-  <Tab title="LangGraph">
-
-```python
-from langgraph.prebuilt import create_react_agent
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    test_case_id = request.get("testCaseId")
-
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": request["input"]}]},
-        config={"callbacks": [CallbackHandler(test_case_id=test_case_id)]}
-    )
-    return {"output": result["messages"][-1].content}
-```
-
-  </Tab>
-  <Tab title="OpenTelemetry">
-
-```python
-@app.post("/generate")
-def generate(request: dict):
-    test_case_id = request.get("testCaseId")
-
-    with tracer.start_as_current_span("llm_app") as span:
-        span.set_attribute("confident.trace.test_case_id", test_case_id)
-
-        response = llm.generate(user=request["input"])
-        return {"output": response}
-```
-
-  </Tab>
-  <Tab title="Vercel AI SDK">
-
-```typescript
-import { generateText } from "ai";
-
-const { text } = await generateText({
-  model: "openai/gpt-4o",
-  prompt: "How to make the best coffee?",
-  experimental_telemetry: {
-    isEnabled: true,
-    metadata: {
-      testCaseId: "tc_123",
-    }
-  },
-});
-console.log(text);
-```
-
-  </Tab>
-  <Tab title="OpenInference">
-<CodeBlocks>
-```python
-import os
-from openinference.instrumentation.langchain import LangChainInstrumentor
-from langchain_openai import ChatOpenAI
-from deepeval.integrations.openinference import instrument_openinference
-
-LangChainInstrumentor().instrument()
-
-instrument_openinference(
-  test_case_id="tc_123",
-)
-
-llm = ChatOpenAI(model="gpt-4o-mini")
-result = llm.invoke("What are LLMs?")
-```
-
-```typescript
-import { instrumentOpenInference } from "deepeval/integrations/openinference";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
-
-instrumentOpenInference({
-  testCaseId: "tc_123",
-});
-
-registerInstrumentations({
-  instrumentations: [new OpenAIInstrumentation()],
-});
-
-async function main() {
-  const { default: OpenAI } = await import("openai");
-  const client = new OpenAI();
-  await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: "What is OpenInference?" }],
-  });
-}
-```
-</CodeBlocks>
-
-  </Tab>
-</Tabs>
+- `Authorization` — a static API key or bearer token (e.g. `Bearer sk-...`)
+- `Content-Type` — the format of the request body (e.g. `application/json`)
+- A custom header your endpoint expects (e.g. `X-API-Key`)
 
 <Tip>
-  Once linked, you can view the full trace for each test case directly from the
-  evaluation results, making it easy to debug failures and understand model
-  behavior.
+  For authentication that needs a secrets manager or signed requests, use
+  [Authorization](/docs/settings/project/ai-connections/authorization) instead
+  of hardcoding credentials into headers.
 </Tip>
-
-## Linking Turns to Traces
-
-For multi-turn evaluations and multi-turn red-team attacks, Confident AI calls your endpoint once per turn. Each turn has its own `turnId` that you can pass to your tracing setup. This links each turn's trace to the specific turn in the conversation, letting you view traces per-turn from the evaluation or assessment results.
-
-<Note>
-  Per-turn trace linkage only works when your AI Connection's payload
-  includes both `testCaseId` and `turnId`. Both are in the default JSON
-  payload template — only custom payloads need to ensure they reference
-  these variables.
-</Note>
-
-```mermaid
-sequenceDiagram
-    participant C as Confident AI
-    participant E as Your Endpoint
-    participant T as Tracing
-
-    Note over C,E: Turn 1
-    C->>E: { turnId, ...payload }
-    E->>T: Create trace with turnId
-    E-->>C: Return actual_output
-
-    Note over C,E: Turn 2
-    C->>E: { turnId, ...payload }
-    E->>T: Create trace with turnId
-    E-->>C: Return actual_output
-
-    T-->>C: Send traces to Confident AI
-    Note over C: Each turn linked to its trace
-```
-
-Include `turnId` in your payload configuration:
-
-```json
-{
-  "input": golden.input,
-  "turnId": turnId,
-  "state": state
-}
-```
-
-Then, pass the `turnId` to your tracing implementation:
-
-<Tabs>
-
-  <Tab title="Python">
-
-```python
-from deepeval.tracing import observe, update_current_trace
-
-@observe()
-def llm_app(input: str, turn_id: str):
-    update_current_trace(turn_id=turn_id)
-
-    response = llm.generate(user=input)
-    return response
-
-@app.post("/generate")
-def generate(request: dict):
-    turn_id = request.get("turnId")
-    response = llm_app(request["input"], turn_id)
-    return {"output": response}
-```
-
-  </Tab>
-  <Tab title="TypeScript">
-
-```typescript
-import OpenAI from "openai";
-import { instrumentOpenAI } from "deepeval/openai";
-import { setTracingContext } from "deepeval/tracing";
-
-const client = new OpenAI();
-instrumentOpenAI(client);
-
-const main = async () => {
-  await setTracingContext(
-    { 
-      turnId: "turn_123" 
-    },
-    async () => {
-      const response = await client.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: "What is the weather in France?" },
-        ],
-      });
-      console.log(response);
-    }
-  );
-};
-
-main();
-```
-
-  </Tab>
-  <Tab title="LangChain">
-
-```python
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    turn_id = request.get("turnId")
-
-    result = agent_executor.invoke(
-        {"input": request["input"]},
-        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
-    )
-    return {"output": result["output"]}
-```
-
-  </Tab>
-  <Tab title="LangGraph">
-
-```python
-from langgraph.prebuilt import create_react_agent
-from deepeval.integrations.langchain import CallbackHandler
-...
-
-@app.post("/generate")
-def generate(request: dict):
-    turn_id = request.get("turnId")
-
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": request["input"]}]},
-        config={"callbacks": [CallbackHandler(turn_id=turn_id)]}
-    )
-    return {"output": result["messages"][-1].content}
-```
-
-  </Tab>
-  <Tab title="OpenTelemetry">
-
-```python
-@app.post("/generate")
-def generate(request: dict):
-    turn_id = request.get("turnId")
-
-    with tracer.start_as_current_span("llm_app") as span:
-        span.set_attribute("confident.trace.turn_id", turn_id)
-
-        response = llm.generate(user=request["input"])
-        return {"output": response}
-```
-
-  </Tab>
-  <Tab title="Vercel AI SDK">
-
-```typescript
-import { generateText } from "ai";
-
-const { text } = await generateText({
-  model: "openai/gpt-4o",
-  prompt: "How to make the best coffee?",
-  experimental_telemetry: {
-    isEnabled: true,
-    metadata: {
-      turnId: "turn_123",
-    }
-  },
-});
-console.log(text);
-```
-
-  </Tab>
-  <Tab title="OpenInference">
-<CodeBlocks>
-```python
-import os
-from openinference.instrumentation.langchain import LangChainInstrumentor
-from langchain_openai import ChatOpenAI
-from deepeval.integrations.openinference import instrument_openinference
-
-LangChainInstrumentor().instrument()
-
-instrument_openinference(
-  turn_id="turn_123",
-)
-
-llm = ChatOpenAI(model="gpt-4o-mini")
-result = llm.invoke("What are LLMs?")
-```
-
-```typescript
-import { instrumentOpenInference } from "deepeval/integrations/openinference";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { OpenAIInstrumentation } from "@arizeai/openinference-instrumentation-openai";
-
-instrumentOpenInference({
-  turnId: "turn_123",
-});
-
-registerInstrumentations({
-  instrumentations: [new OpenAIInstrumentation()],
-});
-
-async function main() {
-  const { default: OpenAI } = await import("openai");
-  const client = new OpenAI();
-  await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: "What is OpenInference?" }],
-  });
-}
-```
-</CodeBlocks>
-
-  </Tab>
-</Tabs>
-
-<Tip>
-  With `turnId` linked, each turn in the conversation gets a "View trace"
-  button — click it from the evaluation results or the risk assessment side
-  drawer to see the full trace for that specific turn.
-</Tip>
-
 
 ## Testing Your Connection
 
-After configuring your AI connection, click **Ping Endpoint** to verify everything is set up correctly. You should receive a `200` status response. If not, check the error message and adjust your configuration accordingly.
+Click **Ping Endpoint** to verify everything is set up correctly. You should receive a `200` status response—if not, check the error message and adjust your configuration accordingly.
+
+✅ Done. Your AI connection is ready to run evaluations.
+
+## Next Steps
+
+Now that your AI connection is set up, dive into the pieces that make it production-ready:
+
+<CardGroup cols={2}>
+  <Card
+    title="Prompts & Hyperparameters"
+    icon="fa-light fa-message-lines"
+    href="/docs/settings/project/ai-connections/prompts-hyperparameters"
+  >
+    Attach prompt versions and hyperparameters, logged with every test run.
+  </Card>
+  <Card
+    title="Streaming"
+    icon="fa-light fa-signal-stream"
+    href="/docs/settings/project/ai-connections/streaming"
+  >
+    Stream output over HTTP Streaming or SSE, with event names and accumulate
+    mode.
+  </Card>
+  <Card
+    title="Authorization"
+    icon="fa-light fa-lock-keyhole"
+    href="/docs/settings/project/ai-connections/authorization"
+  >
+    Secure requests with a secrets manager and Auth0 or HMAC authentication.
+  </Card>
+  <Card
+    title="Throttling & Retries"
+    icon="fa-light fa-gauge-high"
+    href="/docs/settings/project/ai-connections/throttling-retries"
+  >
+    Tune request concurrency, timeouts, and retries for endpoint requests.
+  </Card>
+  <Card
+    title="Multi-Turn State"
+    icon="fa-light fa-comments"
+    href="/docs/settings/project/ai-connections/multiturn-state"
+  >
+    Persist information across turns during multi-turn simulations.
+  </Card>
+  <Card
+    title="Linking Traces"
+    icon="fa-light fa-link"
+    href="/docs/settings/project/ai-connections/linking-traces"
+  >
+    Link test cases and turns to their traces for full observability.
+  </Card>
+  <Card
+    title="Confident Agent"
+    icon="fa-light fa-plug"
+    href="/docs/settings/project/confident-agent"
+  >
+    Reach internal endpoints behind firewalls without opening inbound ports.
+  </Card>
+</CardGroup>

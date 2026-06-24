@@ -1,0 +1,26 @@
+---
+tags: ["Observability", "Red Teaming", "Quality of Life"]
+---
+
+## Right on Time
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+This week, the platform learned to tell time. Tasks and alerts now respect onset, end-date, frequency, and run-once. Triage spread from traces all the way down to spans, threads, and test runs. Risk assessments picked up profile filters, official runs, and a BYOK option for Executive Insights.
+
+<Frame>![Changelog June 12, 2026](/assets/changelog/2026-06-12.png)</Frame>
+
+### Added
+
+- **Flexible Scheduling for Tasks & Alerts** - Dataset scheduling, exports, red teaming, and alerts all picked up the same scheduling kit—configurable onset, hard-stop on a specific run or specific date, flexible frequency, and a clean run-once switch. Your automations finally know when to clock in, when to clock out, when to repeat, and when to just punch in once and call it a day. Set your watch by them. _Time_ well spent.
+- **Triage on Spans, Threads & Test Runs** - Last week, trace triage shipped to GitHub and Linear. This week, the same workflow rolls out to spans, threads, and test runs—any unit of investigation can now become a ticket in your team's issue tracker, not just full traces. Spot a problem, span a problem, ship a ticket. _Span_ the gap between debugging and shipping.
+- **Risk Profile Filters** - Risk assessment views now filter by risk profile, so you can zero in on the threats that actually keep you up at night and scroll past the ones that don't. Focus the firepower, ignore the noise. _Filter_ the threat, focus the fire.
+- **Official Assessment Support for Risk Assessments** - Risk assessments now carry an "official" badge, so your canonical red teaming runs stand apart from the scratch "let me just try one thing" sessions. Only the assessments that actually count make it into your risk history—everything else stays in the draft pile. _Officially_ on the record.
+- **BYOK for Executive Insights** - Executive Insights reports can now be generated using your platform-preferred model. Bring your own key, bring your own model, and let your stakeholder reports come out in whichever flavor your stack already trusts. The c-suite finally gets the model you actually pay for. _Key_-note: yours.
+
+### Changed
+
+- **AND/OR Toggle Across All Filters** - Every filter on the platform now toggles between AND and OR logic. Stack conditions to narrow the haystack with surgical precision, or loosen the logic to widen the net—same filters, twice the modes, double the answers. _And_/_or_ how you like it.
+- **Model Credentials UI Polish** - The model credentials flow got a polish pass—cleaner layout, fewer misclicks, less squinting at provider configs. Small surface, big quality-of-life upgrade. _Credential_ check: passed.
+
+Next week is **Launch Week**. Brace for launch.

@@ -1,0 +1,54 @@
+---
+subtitle: Tune request concurrency, timeouts, and retries for your AI connection.
+slug: settings/project/ai-connections/throttling-retries
+---
+
+## Overview
+
+These settings control how Confident AI sends requests to your [AI Connection](/docs/settings/project/ai-connections) endpoint—how long to wait for a response, how many requests to send at once, and how many times to retry on failure. Tune them to keep large evaluation runs from overwhelming your AI app while staying resilient to transient errors.
+
+<Frame caption="Tune timeout, concurrency, and retries">
+  <img
+    data-image="settings.project.aiConnectionThrottling"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Request Timeout
+
+Set the maximum time (in seconds) that Confident AI will wait for your endpoint to respond before timing out. This helps prevent evaluations from hanging indefinitely if your AI connection is slow or unresponsive.
+
+- **Minimum**: 1 second
+- **Default**: 60 seconds
+
+<Note>
+  If your AI app performs complex operations or calls external services, you may
+  need to increase the timeout to avoid premature failures.
+</Note>
+
+## Max Concurrency
+
+Set the maximum number of concurrent requests that Confident AI will send to your endpoint at the same time. This helps prevent overwhelming your AI app during large evaluation runs.
+
+- **Minimum**: 1
+- **Default**: 20
+
+## Max Retries
+
+Set the maximum number of times Confident AI will retry a failed request to your endpoint. This helps handle transient errors without failing the entire evaluation.
+
+- **Minimum**: 0
+- **Default**: 0
+
+## Next Steps
+
+With throttling and retries dialed in, secure your endpoint and link results back to traces.
+
+<CardGroup cols={2}>
+  <Card title="Authorization" icon="fa-light fa-lock-keyhole" href="/docs/settings/project/ai-connections/authorization">
+    Secure requests with a secrets manager and Auth0 or HMAC authentication.
+  </Card>
+  <Card title="Linking Traces" icon="fa-light fa-link" href="/docs/settings/project/ai-connections/linking-traces">
+    Link test cases and turns to their traces for full observability.
+  </Card>
+</CardGroup>

@@ -1,0 +1,123 @@
+---
+title: Governance Controls
+subtitle: The individual, assessable requirements that make up a policy.
+slug: ai-governance/controls
+description: Understand the four governance control types on Confident AI — operational, runtime, and pre-deployment for evals and red teaming.
+---
+
+A **control** is a single, measurable requirement that is automatically assessed against the real state of a project. Controls are grouped into [policies](/docs/ai-governance/policies), and a policy is met only when all of its controls pass.
+
+Every assessment resolves to one of four statuses:
+
+| Status | Meaning |
+| --- | --- |
+| `PASS` | The requirement is satisfied. |
+| `FAIL` | The requirement is not satisfied. |
+| `ERROR` | The assessment couldn't run, usually due to a misconfigured control. |
+| `NO_DATA` | There was no data to assess in the evaluated window. |
+
+## Control types
+
+There are four control types, each assessing a different part of your AI lifecycle.
+
+<CardGroup cols={2}>
+  <Card title="Operational" icon="gear">
+    Static configuration checks — is the project set up the way your standards require?
+  </Card>
+  <Card title="Runtime" icon="gauge-high">
+    Threshold-based checks over your observability metrics.
+  </Card>
+  <Card title="Pre-deployment (evals)" icon="flask">
+    Gates on a recent evaluation test run.
+  </Card>
+  <Card title="Pre-deployment (red teaming)" icon="user-secret">
+    Gates on a recent red teaming risk assessment.
+  </Card>
+</CardGroup>
+
+### Operational controls
+
+Operational controls verify that a project is configured according to your standards. They are **static checks** — assessed purely from the current state of the project, with no thresholds to configure. These controls ship with the platform and can't be created manually; you simply add the ones you need to a policy.
+
+Operational controls cover areas such as observability, datasets, integrations, and threat detection:
+
+| Category | Control | Passes when the project has… |
+| --- | --- | --- |
+| **Alerts** | Has scheduled alerts | At least one scheduled alert |
+| | Has scheduled alerts on traces | A scheduled alert on traces |
+| | Has scheduled alerts on spans | A scheduled alert on spans |
+| | Has scheduled alerts on threads | A scheduled alert on threads |
+| **Scheduled jobs** | Has scheduled eval test runs | A recurring evaluation test run |
+| | Has scheduled risk assessments | A recurring red teaming risk assessment |
+| **Datasets** | Has dataset ingestion | At least one dataset |
+| | Has single-turn datasets | A single-turn dataset |
+| | Has multi-turn datasets | A multi-turn dataset |
+| | Has dataset versions | A versioned dataset |
+| **Tracing** | Has logged traces | Traces logged in the last 30 days |
+| | Has logged threads | Threads logged in the last 30 days |
+| | Has queue ingestion | An annotation queue receiving items |
+| **Integrations** | Has alert integrations | A notification integration (Slack, Discord, Email, PagerDuty, or Teams) |
+| | Has ticketing integrations | A ticketing integration (Linear or GitHub Issues) |
+| **Classifiers** | Has trace classifiers enabled | Trace classifiers enabled |
+| | Has thread classifiers enabled | Thread classifiers enabled |
+| **Metrics** | Has custom metrics | At least one custom metric |
+| | Has metric collections | At least one metric collection |
+| **Threat detection** | Has trace threat detection enabled | Trace threat detection enabled |
+| | Has thread threat detection enabled | Thread threat detection enabled |
+
+<Note>
+  Time-bound checks (logged traces and threads) evaluate the **last 30 days** of activity.
+</Note>
+
+### Runtime controls
+
+Runtime controls assess a metric over your observability data and check it against a threshold — the same model used by [alerts](/docs/llm-tracing/features/alerts). They are evaluated over a **trailing 24-hour window**.
+
+Configure a runtime control with:
+
+- **Data model** — **Trace**, **Span**, or **Thread**
+- **Aggregation** — the metric to compute; options depend on the data model (e.g. count, error rate, average/percentile latency, token cost, unique end users)
+- **Threshold** — a direction (**Above** or **Below**) and a numeric value
+- **Filters** — optionally narrow the data the control evaluates (environment, tags, metadata, and more)
+
+The control **fails** when the aggregated metric crosses the threshold (above the value for `Above`, below it for `Below`), and resolves to `NO_DATA` when there's no matching data in the window.
+
+<Tip>
+  Runtime controls are ideal for codifying production SLAs — like keeping error rates or latency within bounds — directly into a governance policy.
+</Tip>
+
+### Pre-deployment controls (evals)
+
+These controls gate on a recent evaluation [test run](/docs/llm-evaluation/experiments). A control passes when a qualifying test run exists and matches the configured filters.
+
+Choose how the gating run is selected:
+
+- **Latest official run** — gate on the most recent run marked **official** in the project, or
+- **Identifier + window** — gate on the latest completed run matching a given **identifier** within a rolling **window** (7, 14, 30, or 90 days)
+
+You can also apply **filters** (including hyperparameters) — the selected run must match them to pass.
+
+| Status | When |
+| --- | --- |
+| `PASS` | A qualifying run exists and matches the filters. |
+| `FAIL` | A run exists but doesn't match the filters. |
+| `NO_DATA` | No qualifying run was found. |
+
+<Note>
+  Mark a test run as **official** to designate it as the source of truth for gating, instead of relying on an identifier and window.
+</Note>
+
+### Pre-deployment controls (red teaming)
+
+These work exactly like the evals pre-deployment controls, but gate on a [red teaming risk assessment](/docs/red-teaming/introduction) instead of a test run. Select the gating assessment by its latest **official** result, or by **identifier + window**, and optionally apply filters.
+
+This lets you require, for example, that the latest official risk assessment passed before a release is allowed to ship.
+
+## Versioning
+
+Controls are **versioned**. Each time you change a control's configuration, a new version is appended to its history. Assessments always run against the **latest** version, while older versions remain for audit purposes.
+
+## Next steps
+
+- [Policies](/docs/ai-governance/policies) — group controls and assign projects
+- [Introduction to AI Governance](/docs/ai-governance/introduction) — how it all fits together

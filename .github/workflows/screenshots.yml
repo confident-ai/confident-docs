@@ -1,0 +1,67 @@
+# Capture docs screenshots and upload them to S3. See screenshots/README.md for
+# the manifest format and the secrets/variables this workflow expects.
+
+name: screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      only_path_prefix:
+        description: "Only capture shots whose manifest path starts with this prefix (blank = all)"
+        required: false
+        default: "/project/:projectId/project-settings/ai-connections"
+      dry_run:
+        description: "Capture but do not upload to S3"
+        type: boolean
+        required: false
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "screenshots/**"
+      - ".github/workflows/screenshots.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "screenshots/**"
+      - ".github/workflows/screenshots.yml"
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install shot-scraper
+        run: |
+          pip install shot-scraper
+          shot-scraper install
+
+      - name: Write auth session
+        env:
+          SHOTSCRAPER_AUTH: ${{ secrets.SHOTSCRAPER_AUTH }}
+        run: printf '%s' "$SHOTSCRAPER_AUTH" > auth.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Capture and upload screenshots
+        env:
+          PLATFORM_BASE_URL: ${{ vars.PLATFORM_BASE_URL }}
+          CONFIDENT_PROJECT_ID: ${{ secrets.CONFIDENT_PROJECT_ID }}
+          CONFIDENT_AI_CONNECTION_ID: ${{ secrets.CONFIDENT_AI_CONNECTION_ID }}
+          S3_BUCKET: ${{ vars.SCREENSHOTS_S3_BUCKET }}
+          SHOTSCRAPER_AUTH_FILE: auth.json
+          ONLY_PATH_PREFIX: ${{ github.event.inputs.only_path_prefix }}
+          DRY_RUN: ${{ (github.event_name == 'pull_request' || github.event.inputs.dry_run == 'true') && '1' || '' }}
+        run: python screenshots/capture.py
