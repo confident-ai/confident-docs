@@ -418,7 +418,7 @@ navigation:
         skip-slug: true
         paginated: true
         layout:
-          - section: Data Models
+          - section: Project data models
             skip-slug: true
             contents:
               - section: Metrics
@@ -507,6 +507,9 @@ navigation:
                       - GET /v1/annotation-queues/{queueId}/items
                       - POST /v1/annotation-queues/{itemId}/annotate
                       - POST /v1/annotation-queues/{name}/batch-annotate
+          - section: Organization data models
+            skip-slug: true
+            contents:
               - section: Projects
                 contents:
                   - GET /v1/projects
@@ -584,6 +587,12 @@ navigation:
                   - section: Permissions
                     contents:
                       - GET /v1/organization/permissions
+              - section: Governance Policies
+                contents:
+                  - GET /v1/organization/governance-policies
+                  - GET /v1/organization/governance-policies/{policyId}/projects
+                  - POST /v1/organization/governance-policies/{policyId}/assign
+                  - POST /v1/organization/governance-policies/{policyId}/unassign
           - section: Evals
             skip-slug: true
             contents:
@@ -909,6 +918,9 @@ navigation:
           - page: Provision Projects for Agents on the Fly
             path: docs/pages/guides/provision-projects-in-code.mdx
             icon: fa-light fa-layer-group
+          - page: Assign Projects to Governance Policies on the Fly
+            path: docs/pages/guides/assign-projects-to-policies-in-code.mdx
+            icon: fa-light fa-shield-halved
           - page: Authenticate AI Connections with Client Credentials
             path: docs/pages/guides/authenticate-with-client-credentials.mdx
             icon: fa-light fa-key
