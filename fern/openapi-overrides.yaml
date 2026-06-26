@@ -336,6 +336,51 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
+  /v1/annotation-queues/{itemId}/annotate:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue item to annotate.
+
+  /v1/annotation-queues/{name}/batch-annotate:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the annotation queue whose items are being annotated.
+
+  /v1/governance/assess:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
   /v1/traces:
     post:
       parameters:

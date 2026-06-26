@@ -1,0 +1,136 @@
+---
+subtitle: Stream actual output from your AI app over HTTP Streaming or SSE.
+slug: settings/project/ai-connections/streaming
+---
+
+## Overview
+
+When your AI app streams its response instead of returning it all at once, you can configure your [AI Connection](/docs/settings/project/ai-connections) to read from that stream. Confident AI supports two streaming response modes in addition to the default single-shot HTTP Response:
+
+- **HTTP Streaming** — your endpoint returns a stream of newline-delimited chunks (NDJSON).
+- **SSE Streaming** — your endpoint returns a stream of Server-Sent Events (`text/event-stream`).
+
+You pick the mode in the **AI App Endpoint** section of your AI connection. Confident AI reads each chunk as it arrives, extracts the actual output (and optionally retrieval context, tools called, and state), and assembles the final result.
+
+<Note>
+  The default mode is *HTTP Response*. Switch to a streaming mode only if your
+  endpoint actually streams its response.
+</Note>
+
+## Chunk Formats
+
+For both **HTTP Streaming** and **SSE Streaming**, each chunk can be a plain string, a JSON object, or a custom format that you extract with a [transformer](/docs/settings/project/ai-connections#transformers) or [key path](/docs/settings/project/ai-connections#actual-output-key-path).
+
+<Tabs>
+  <Tab title="Strings">
+    For string chunks, Confident AI collects every chunk and joins them into a single string.
+
+    Your model streams:
+
+    ```json
+    ["Hello", " world", "!"]
+    ```
+
+    Confident AI returns:
+
+    ```json
+    "Hello world!"
+    ```
+
+  </Tab>
+  <Tab title="JSON">
+    For JSON objects, Confident AI parses each chunk and joins the extracted values into the final output.
+
+    Your model streams:
+
+    ```json
+    [{ "chunk": "Hello" }, { "chunk": " world" }, { "chunk": "!" }]
+    ```
+
+    Confident AI returns:
+
+    ```json
+    "Hello world!"
+    ```
+
+  </Tab>
+</Tabs>
+
+Here's how the two streaming modes differ on the wire:
+
+- **HTTP Streaming** — send one JSON object (or string) per line. `application/x-ndjson` is the recommended `Content-Type`. Each non-empty line is parsed independently.
+- **SSE Streaming** — send standard `data:` frames over `text/event-stream`, and end the stream with `data: [DONE]`. Each `data:` payload is parsed as JSON.
+
+## SSE Events
+
+Server-Sent Events can carry an **event name** on each frame (the `event:` field). This lets a single stream interleave different kinds of data—incremental output tokens, retrieval sources, tool calls, and state—on separately named events. For SSE connections, you can tell Confident AI which named event carries each field.
+
+<Note>
+  Event names and accumulate mode apply to **SSE Streaming** only. HTTP
+  Streaming has no concept of named events—every chunk contributes to the actual
+  output.
+</Note>
+
+### Specifying Event Names
+
+In the **Output parsing** tab of your AI connection, each field has an **SSE Event Name** input:
+
+- **Actual Output** — _optional_. Leave it blank to read output from every frame, or set it (e.g. `last_message`) to read output only from frames of that event.
+- **Retrieval Context, Tools Called, and State** — _required for SSE_. Unlike actual output, these values can't be accumulated across frames, so they're read from the **final frame** of the event you name here.
+
+### Accumulate Events
+
+The **Accumulate Events** toggle (Actual Output only, SSE only) controls how output frames combine:
+
+- **On (default)** — every frame for the output event is concatenated to build the final value. Enable this when your server streams incremental deltas (e.g. token-by-token) and never sends a complete final snapshot.
+- **Off** — each frame replaces the previous one (the last frame wins). Use this when the final frame already contains the full output.
+
+<Tip>
+  If you don't name any SSE events, Confident AI accumulates every frame's
+  output by default—identical to plain string or JSON streaming.
+</Tip>
+
+### Example
+
+Given an SSE stream like this:
+
+```
+event: token
+data: {"delta": "Hello"}
+
+event: token
+data: {"delta": " world"}
+
+event: last_message
+data: {"answer": "Hello world", "sources": ["doc-1", "doc-2"]}
+
+data: [DONE]
+```
+
+There are two ways to extract the final output `"Hello world"`:
+
+- **Accumulate deltas** — set the Actual Output **SSE Event Name** to `token`, turn **Accumulate Events** on, and set the **Actual Output Key Path** to `["delta"]`. Confident AI concatenates `"Hello"` + `" world"`.
+- **Read the final snapshot** — set the Actual Output **SSE Event Name** to `last_message`, turn **Accumulate Events** off, and set the **Actual Output Key Path** to `["answer"]`. Confident AI reads the full answer from the last `last_message` frame.
+
+To also capture retrieval context, set the Retrieval Context **SSE Event Name** to `last_message` and its key path to `["sources"]`—it's read from that event's final frame.
+
+## Next Steps
+
+With streaming configured, round out your AI connection setup with authentication and trace linkage.
+
+<CardGroup cols={2}>
+  <Card
+    title="Authorization"
+    icon="fa-light fa-lock-keyhole"
+    href="/docs/settings/project/ai-connections/authorization"
+  >
+    Secure requests with a secrets manager and Auth0 or HMAC authentication.
+  </Card>
+  <Card
+    title="Linking Traces"
+    icon="fa-light fa-link"
+    href="/docs/settings/project/ai-connections/linking-traces"
+  >
+    Link test cases and turns to their traces for full observability.
+  </Card>
+</CardGroup>

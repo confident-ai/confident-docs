@@ -1,2 +1,12 @@
 sdks
 *.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Screenshot automation: local config, saved login session(s) (secret), capture output
+.env
+auth*.json
+screenshots/_shots/
+_shots/

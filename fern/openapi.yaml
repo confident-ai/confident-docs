@@ -937,6 +937,31 @@ paths:
                     id: "THREAD-ID"
                   deprecated: false
 
+  /v1/governance/assess:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Assess Governance
+      operationId: assessGovernance
+      description: Assesses all governance controls for the project against the governance policy it belongs to, and returns whether every control passed.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessGovernanceResponse"
+              examples:
+                AssessGovernance:
+                  success: true
+                  data:
+                    passed: false
+                    governancePolicy:
+                      id: "GOVERNANCE-POLICY-ID"
+                      name: "EU AI Act"
+                  deprecated: false
+
   /v1/traces:
     post:
       x-fern-server-name: Confident AI
@@ -3070,41 +3095,33 @@ paths:
       summary: Annotate Queue Item
       operationId: annotateItem
       description: |
-        Creates an annotation for a single queue item. This endpoint automatically associates the annotation with the correct trace, span, or thread based on the queue item.
+        Annotates a single queue item, associating the work with the item's trace, span, or thread automatically. Supports both plain queues and queues with an attached form.
+
+        Submit criteria ratings (the flat `rating` fields or the `annotations` array) and, for form queues, custom-field answers (`formResponses`). At least one must be present.
 
         **Validation rules:**
-        - For thread items: Use `expectedOutcome` (not `expectedOutput`)
-        - For trace/span items: Use `expectedOutput` (not `expectedOutcome`)
-        - Set `markAsCompleted: true` to automatically mark the queue item as completed after annotation (default: true)
-      parameters:
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
-        - in: path
-          name: itemId
-          required: true
-          schema:
-            type: string
-          description: The ID of the queue item to annotate.
+        - For thread items: Use `expectedOutcome` (not `expectedOutput`).
+        - For trace/span items: Use `expectedOutput` (not `expectedOutcome`).
+        - A criterion's `name` must match an available criterion — omit it for the default criterion, otherwise it must match a configured custom criterion or a form criteria field. A mismatched name is rejected.
+        - Form `formResponses` are addressed by each field's visible label, accepted only for queues with an attached form.
+        - Set `markAsCompleted: false` to leave the item open (default: true). For form queues, completing enforces the form's required fields.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/AnnotateItem"
-            example:
-              rating: 1
-              type: "THUMBS_RATING"
-              name: "Quality Check"
-              explanation: "Response is accurate and helpful"
-              markAsCompleted: true
+            examples:
+              simple:
+                summary: Single default rating (plain queue)
+                value:
+                  rating: 1
+                  type: "THUMBS_RATING"
+                  explanation: "Response is accurate and helpful"
+                  markAsCompleted: true
       responses:
         "200":
-          description: Successfully created annotation for queue item
+          description: Successfully annotated the queue item
           content:
             application/json:
               schema:
@@ -3113,6 +3130,69 @@ paths:
                 success: true
                 data:
                   id: "annotation-uuid"
+                  annotationIds:
+                    - "annotation-uuid"
+                  formResponseIds:
+                    - "form-response-uuid-1"
+                    - "form-response-uuid-2"
+
+  /v1/annotation-queues/{name}/batch-annotate:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Annotation Queues
+      summary: Batch Annotate Queue Items
+      operationId: batchAnnotateItems
+      description: |
+        Annotates many items in a queue in one request. Each entry in `items` carries a `queueItemId` plus the same body as the single-item annotate endpoint.
+
+        `annotatorEmail` and `markAsCompleted` set at the top level act as defaults applied to any item that omits them; a per-item value takes precedence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchAnnotate"
+            example:
+              annotatorEmail: "annotator@yourcompany.com"
+              markAsCompleted: true
+              items:
+                - queueItemId: "queue-item-uuid-1"
+                  rating: 1
+                  type: "THUMBS_RATING"
+                  name: "Correctness"
+                  explanation: "Matches the expected answer"
+                  formResponses:
+                    - label: "Clarity"
+                      value: "Very clear"
+                    - label: "Overall"
+                      value: 10
+                - queueItemId: "queue-item-uuid-2"
+                  rating: 0
+                  type: "THUMBS_RATING"
+                  name: "Correctness"
+      responses:
+        "200":
+          description: Batch processed; inspect each result's `success` flag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchAnnotateResponse"
+              example:
+                success: true
+                data:
+                  results:
+                    - queueItemId: "queue-item-uuid-1"
+                      success: true
+                      id: "annotation-uuid-1"
+                      annotationIds:
+                        - "annotation-uuid-1"
+                      formResponseIds:
+                        - "form-response-uuid-1"
+                        - "form-response-uuid-2"
+                    - queueItemId: "queue-item-uuid-2"
+                      success: false
+                      error: "No matching criterion for annotation 'Correctness' (THUMBS_RATING). Valid criteria: ..."
 
   /v1/projects:
     get:
@@ -6735,6 +6815,42 @@ components:
         - data
         - deprecated
 
+    AssessGovernanceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the governance controls were successfully assessed.
+        data:
+          type: object
+          properties:
+            passed:
+              type: boolean
+              description: This is true if every governance control passed the assessment.
+            governancePolicy:
+              type: object
+              description: The governance policy the project was assessed against.
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the governance policy.
+                name:
+                  type: string
+                  description: The name of the governance policy.
+              required:
+                - id
+                - name
+          required:
+            - passed
+            - governancePolicy
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
     EvaluateTraceRequest:
       type: object
       properties:
@@ -8606,53 +8722,202 @@ components:
 
     AnnotateItem:
       type: object
+      description: |
+        Provide criteria ratings (the flat `rating` fields below, or the `annotations` array) and/or custom form-field answers (`responses`). At least one of these must be present.
+      properties:
+        rating:
+          type: integer
+          description: Rating value for a single criterion (0-1 for THUMBS_RATING, 1-5 for FIVE_STAR_RATING). Shorthand for a one-entry `annotations` array.
+        type:
+          type: string
+          enum: [THUMBS_RATING, FIVE_STAR_RATING]
+          default: THUMBS_RATING
+          description: Type of the rating.
+        name:
+          type: string
+          description: Criterion name. Omit for the default criterion; otherwise it must match a configured custom criterion (or a form criteria field), or the annotation will not appear.
+        expectedOutcome:
+          type: string
+          description: Expected outcome (for thread items only).
+        expectedOutput:
+          type: string
+          description: Expected output (for trace/span items only).
+        explanation:
+          type: string
+          description: Explanation for the rating.
+        annotations:
+          type: array
+          description: One entry per criterion. Use instead of the flat fields to rate multiple criteria in a single request.
+          items:
+            $ref: "#/components/schemas/AnnotateCriteria"
+        formResponses:
+          type: array
+          description: Answers to a form's custom fields, addressed by each field's visible label. Accepted only for queues with an attached form, and requires `annotatorEmail`.
+          items:
+            $ref: "#/components/schemas/AnnotateFormResponse"
+        annotatorEmail:
+          type: string
+          format: email
+          description: Project member to attribute the work to. Required when submitting `formResponses`, otherwise they will not appear in the platform.
+        markAsCompleted:
+          type: boolean
+          default: true
+          description: Whether to mark the queue item as completed. For form queues, completing enforces the form's required fields.
+
+    AnnotateCriteria:
+      type: object
       required:
         - rating
       properties:
         rating:
           type: integer
-          description: Rating value (0-1 for THUMBS_RATING, 1-5 for FIVE_STAR_RATING)
+          description: Rating value (0-1 for THUMBS_RATING, 1-5 for FIVE_STAR_RATING).
         type:
           type: string
           enum: [THUMBS_RATING, FIVE_STAR_RATING]
           default: THUMBS_RATING
-          description: Type of rating
+          description: Type of the rating.
         name:
           type: string
-          default: Default
-          description: Name of the annotation
-        expectedOutcome:
-          type: string
-          description: Expected outcome (for threads only)
-        expectedOutput:
-          type: string
-          description: Expected output (for traces/spans only)
+          description: Criterion name. Omit for the default criterion; otherwise it must match a configured custom criterion or a form criteria field.
         explanation:
           type: string
-          description: Explanation for the rating
-        markAsCompleted:
-          type: boolean
-          default: true
-          description: Whether to mark the queue item as completed
+          description: Explanation for the rating.
+        expectedOutput:
+          type: string
+          description: Expected output (for trace/span items only).
+        expectedOutcome:
+          type: string
+          description: Expected outcome (for thread items only).
+
+    AnnotateFormResponse:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+          description: The visible label of the custom field being answered. Must be unique within the form and must not be a criteria field's label.
+        value:
+          nullable: true
+          description: The answer, shaped to the field type. Null clears the answer.
+          oneOf:
+            - type: string
+              description: Text or single-select fields.
+            - type: number
+              description: Number or decimal fields.
+            - type: boolean
+              description: Yes/No fields (also accepts the strings "Yes"/"No").
+            - type: array
+              items:
+                type: string
+              description: Multi-select fields.
 
     AnnotateItemResponse:
       type: object
       properties:
         success:
           type: boolean
-          description: Indicates if the annotation was successfully created for the queue item.
+          description: Indicates if the queue item was successfully annotated.
         data:
           type: object
-          description: Contains the created annotation information.
+          description: Contains the created annotation and form-response identifiers.
           properties:
             id:
               type: string
-              description: The unique identifier of the created annotation.
-          required:
-            - id
+              nullable: true
+              description: The first created annotation's id, kept for backward compatibility. Null when only form responses were submitted.
+            annotationIds:
+              type: array
+              items:
+                type: string
+              description: Identifiers of the created annotations.
+            formResponseIds:
+              type: array
+              items:
+                type: string
+              description: Identifiers of the created form responses.
       required:
         - success
         - data
+
+    BatchAnnotateItem:
+      allOf:
+        - type: object
+          required:
+            - queueItemId
+          properties:
+            queueItemId:
+              type: string
+              description: The id of the queue item to annotate.
+        - $ref: "#/components/schemas/AnnotateItem"
+
+    BatchAnnotate:
+      type: object
+      required:
+        - items
+      properties:
+        annotatorEmail:
+          type: string
+          format: email
+          description: Default annotator for items that omit it. A per-item `annotatorEmail` takes precedence. Required (here or per item) whenever an item submits `formResponses`.
+        markAsCompleted:
+          type: boolean
+          description: Default completion flag for items that omit it (effectively `true`). A per-item value takes precedence.
+        items:
+          type: array
+          minItems: 1
+          description: The items to annotate. Processed independently (best-effort).
+          items:
+            $ref: "#/components/schemas/BatchAnnotateItem"
+
+    BatchAnnotateResult:
+      type: object
+      description: The outcome for a single item. `success` distinguishes the success and failure shapes.
+      required:
+        - queueItemId
+        - success
+      properties:
+        queueItemId:
+          type: string
+        success:
+          type: boolean
+        id:
+          type: string
+          nullable: true
+          description: First created annotation's id (success only; null when only form responses were submitted).
+        annotationIds:
+          type: array
+          items:
+            type: string
+          description: Identifiers of the created annotations (success only).
+        formResponseIds:
+          type: array
+          items:
+            type: string
+          description: Identifiers of the created form responses (success only).
+        error:
+          type: string
+          description: Why this item failed (failure only).
+
+    BatchAnnotateResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          description: Indicates the batch request was well-formed and processed. Per-item outcomes are in `data.results`.
+        data:
+          type: object
+          required:
+            - results
+          properties:
+            results:
+              type: array
+              items:
+                $ref: "#/components/schemas/BatchAnnotateResult"
 
     # Metrics Data Schemas
     MetricDataItem:
