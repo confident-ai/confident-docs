@@ -65,18 +65,3 @@ To create a schedule:
    - **Filters** — optionally limit the export to traces matching specific conditions; leave empty to export all traces in each window
    - **Description** *(optional)* — internal context about the schedule's purpose or owner
 4. Click **Create schedule**
-
-## OTLP Export
-
-Alongside CSV, traces will be exportable in [OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) (OTLP) format, so you can forward them to any OTLP-compatible destination — observability platforms such as Datadog, New Relic, and Honeycomb, or a generic OTLP collector — without building your own transformation layer.
-
-The two formats serve different purposes:
-
-| Format | Best for | Output |
-| ------ | -------- | ------ |
-| **CSV** | Analytics, audits, and loading into a data warehouse | Flat rows uploaded to a data store (e.g. S3) |
-| **OTLP** | Forwarding to other observability tooling | OpenTelemetry spans sent to an OTLP endpoint |
-
-Unlike CSV, OTLP export preserves the full trace and span structure along with AI/LLM-specific attributes, following the OpenTelemetry [GenAI semantic conventions](/integrations/opentelemetry). This is the same format Confident AI accepts on ingestion, so traces arrive in your downstream tooling with the same shape they have in the Observatory.
-
-OTLP export will support both the one-off and scheduled models described above, with an OTLP endpoint configurable as an export destination under **Project Settings** → **Exports**.
