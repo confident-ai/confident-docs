@@ -4929,7 +4929,7 @@ paths:
         - Organization Governance Policies
       summary: Assign Projects to Governance Policy
       operationId: assignProjectsToGovernancePolicy
-      description: Assigns one or more projects to a governance policy. A project already on a different policy is moved to this one; the returned `count` is the number of projects actually moved (re-assigning an already-enrolled project yields `0`).
+      description: Assigns one or more projects to a governance policy. A project already on a different policy is moved to this one. This is a partial-success operation. Projects that exist are assigned and returned in `assignedProjectIds`, while ids that do not exist in the organization are reported in `notFoundProjectIds` instead of failing the request. `count` is the number now assigned (re-assigning an already-enrolled project still counts it).
       parameters:
         - name: policyId
           in: path
@@ -4960,6 +4960,10 @@ paths:
                   governancePolicy:
                     id: "gov-policy-uuid-1"
                     name: "Production Gate"
+                  assignedProjectIds:
+                    - "project-uuid-1"
+                    - "project-uuid-2"
+                  notFoundProjectIds: []
                   count: 2
   /v1/organization/governance-policies/{policyId}/unassign:
     post:
@@ -4968,7 +4972,7 @@ paths:
         - Organization Governance Policies
       summary: Unassign Projects from Governance Policy
       operationId: unassignProjectsFromGovernancePolicy
-      description: Removes one or more projects from a governance policy. Only projects currently on this policy are affected; the returned `count` is the number actually removed.
+      description: Removes one or more projects from a governance policy. This is a partial-success operation. Projects currently on this policy are removed and returned in `unassignedProjectIds`, while ids that are not on this policy (unknown, foreign, or on another policy) are reported in `skippedProjectIds` instead of failing the request. `count` is the number removed.
       parameters:
         - name: policyId
           in: path
@@ -4991,13 +4995,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GovernancePolicyAssignmentResponse"
+                $ref: "#/components/schemas/GovernancePolicyUnassignmentResponse"
               example:
                 success: true
                 data:
                   governancePolicy:
                     id: "gov-policy-uuid-1"
                     name: "Production Gate"
+                  unassignedProjectIds:
+                    - "project-uuid-1"
+                  skippedProjectIds: []
                   count: 1
 
   /v1/organization/governance-policies/{policyId}/projects:
@@ -7092,11 +7099,65 @@ components:
               required:
                 - id
                 - name
+            assignedProjectIds:
+              type: array
+              description: Ids of the projects now assigned to this policy, including any that were already enrolled.
+              items:
+                type: string
+            notFoundProjectIds:
+              type: array
+              description: Ids that do not exist in this organization. They are skipped (not assigned) and reported here rather than failing the request.
+              items:
+                type: string
             count:
               type: integer
-              description: The number of projects actually moved (assign) or removed (unassign).
+              description: The number of projects now assigned (the length of assignedProjectIds).
           required:
             - governancePolicy
+            - assignedProjectIds
+            - notFoundProjectIds
+            - count
+      required:
+        - success
+        - data
+
+    GovernancePolicyUnassignmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful
+        data:
+          type: object
+          properties:
+            governancePolicy:
+              type: object
+              description: The governance policy that was modified.
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+              required:
+                - id
+                - name
+            unassignedProjectIds:
+              type: array
+              description: Ids of the projects removed from this policy.
+              items:
+                type: string
+            skippedProjectIds:
+              type: array
+              description: Ids that were not on this policy (unknown, foreign, or on another policy). They are skipped and reported here rather than failing the request.
+              items:
+                type: string
+            count:
+              type: integer
+              description: The number of projects removed (the length of unassignedProjectIds).
+          required:
+            - governancePolicy
+            - unassignedProjectIds
+            - skippedProjectIds
             - count
       required:
         - success
