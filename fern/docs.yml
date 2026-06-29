@@ -816,6 +816,9 @@ navigation:
           - page: API Keys
             path: docs/pages/settings/project/management/api-keys.mdx
             icon: fa-light fa-key
+          - page: Governance Policies
+            path: docs/pages/settings/project/management/governance-policies.mdx
+            icon: fa-light fa-shield-halved
   - tab: self-hosting
     layout:
       - page: Self-Hosting

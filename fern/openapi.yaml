@@ -7094,8 +7094,10 @@ components:
               properties:
                 id:
                   type: string
+                  description: The unique identifier of the governance policy.
                 name:
                   type: string
+                  description: The name of the governance policy.
               required:
                 - id
                 - name
@@ -7136,8 +7138,10 @@ components:
               properties:
                 id:
                   type: string
+                  description: The unique identifier of the governance policy.
                 name:
                   type: string
+                  description: The name of the governance policy.
               required:
                 - id
                 - name
@@ -7180,8 +7184,10 @@ components:
                 properties:
                   id:
                     type: string
+                    description: The unique identifier of the project.
                   name:
                     type: string
+                    description: The name of the project.
                 required:
                   - id
                   - name
@@ -9400,8 +9406,10 @@ components:
           properties:
             id:
               type: string
+              description: The unique identifier of the governance policy.
             name:
               type: string
+              description: The name of the governance policy.
 
     GetProjectsResponse:
       type: object

@@ -1,0 +1,183 @@
+---
+subtitle: List governance policies and enroll projects into them in code.
+slug: settings/project/management/governance-policies
+description: Manage governance policy enrollment programmatically with the Admin SDK for Python and TypeScript — list policies, read a policy's enrolled projects, and assign or unassign projects.
+---
+
+## Overview
+
+[AI governance](/docs/ai-governance/introduction) policies are **organization-scoped** bundles of controls that gate how your projects ship. Policies and their controls are created and configured in the platform UI; the Admin SDK lets you **enroll projects into a policy in code** — ideal for CI/CD pipelines that provision one project per customer or per agent. Each project belongs to at most one policy.
+
+<Note>
+
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client. Governance policies live under the **`governance`** namespace on the organization client (`client.organization().governance`); there is no project-scoped equivalent.
+
+</Note>
+
+## List Policies
+
+List every governance policy in your organization. Each policy includes its `controls` and a `projectsCount`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from confidentai import ConfidentAI
+
+client = ConfidentAI()
+
+org = client.organization()
+
+policies = org.governance.policies.list()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentAI } from "confidentai";
+
+const client = new ConfidentAI();
+
+const org = client.organization();
+
+const policies = await org.governance.policies.list();
+```
+
+</Tab>
+
+</Tabs>
+
+## List a Policy's Projects
+
+Page through the projects currently enrolled in a policy.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+org = client.organization()
+
+projects = org.governance.policies.list_projects(
+    "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+    page=1,
+    page_size=25,
+)
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const org = client.organization();
+
+const projects = await org.governance.policies.listProjects(
+  "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+  { page: 1, pageSize: 25 },
+);
+```
+
+</Tab>
+
+</Tabs>
+
+## Assign Projects
+
+Assign one or more projects to a policy. Assignment is **additive and partial**: every project that exists is enrolled and returned in `assignedProjectIds` (projects on a different policy are moved over), while ids that don't exist in your organization come back in `notFoundProjectIds` instead of failing the call. Re-assigning an already-enrolled project still counts it, so this is safe to run on every pipeline execution.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+org = client.organization()
+
+result = org.governance.policies.assign(
+    "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+    project_ids=["clq9z3x1k0001la08f7t3g5p2"],
+)
+print(result.assigned_project_ids)   # ["clq9z3x1k0001la08f7t3g5p2"]
+print(result.not_found_project_ids)  # []
+print(result.count)                  # 1
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const org = client.organization();
+
+const result = await org.governance.policies.assign(
+  "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+  { projectIds: ["clq9z3x1k0001la08f7t3g5p2"] },
+);
+console.log(result.assignedProjectIds); // ["clq9z3x1k0001la08f7t3g5p2"]
+console.log(result.notFoundProjectIds); // []
+console.log(result.count);              // 1
+```
+
+</Tab>
+
+</Tabs>
+
+## Unassign Projects
+
+Remove projects from a policy (for example, when deprovisioning a customer). Removal is also partial: projects currently on the policy are removed and returned in `unassignedProjectIds`, while ids that aren't on this policy (unknown, foreign, or on another policy) come back in `skippedProjectIds`.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+org = client.organization()
+
+result = org.governance.policies.unassign(
+    "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+    project_ids=["clq9z3x1k0001la08f7t3g5p2"],
+)
+print(result.unassigned_project_ids)  # ["clq9z3x1k0001la08f7t3g5p2"]
+print(result.skipped_project_ids)     # []
+print(result.count)                   # 1
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+const org = client.organization();
+
+const result = await org.governance.policies.unassign(
+  "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
+  { projectIds: ["clq9z3x1k0001la08f7t3g5p2"] },
+);
+console.log(result.unassignedProjectIds); // ["clq9z3x1k0001la08f7t3g5p2"]
+console.log(result.skippedProjectIds);    // []
+console.log(result.count);                // 1
+```
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+Each request also returns the modified `governancePolicy` (`{ id, name }`). For async code, every method has an `a_`-prefixed counterpart (`a_list`, `a_list_projects`, `a_assign`, `a_unassign`).
+
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Assign Projects to Policies in CI/CD" icon="shield-halved" href="/docs/guides/assign-projects-to-governance-policies">
+    A full pipeline walkthrough for enrolling each project as it is provisioned.
+  </Card>
+  <Card title="AI Governance" icon="building-columns" href="/docs/ai-governance/introduction">
+    Configure governance policies and the controls that gate your deployments.
+  </Card>
+</CardGroup>
