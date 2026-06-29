@@ -24,7 +24,7 @@ Each building block exists independently at both the **organization** and **proj
 
 <Note>
 
-All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client.
+All methods on this page require an **Organization API Key**. See the [Quickstart](/docs/settings/project/management/quickstart) to create a client. Permissions, policies, and roles are grouped under the **`iam`** namespace on both clients — `client.organization().iam` and `client.project(id).iam`.
 
 </Note>
 
@@ -44,8 +44,8 @@ client = ConfidentAI()
 org = client.organization()
 project = client.project("clq9z3x1k0001la08f7t3g5p2")
 
-permissions = org.permissions.list()
-project_permissions = project.permissions.list()
+permissions = org.iam.permissions.list()
+project_permissions = project.iam.permissions.list()
 ```
 
 </Tab>
@@ -60,8 +60,8 @@ const client = new ConfidentAI();
 const org = client.organization();
 const project = client.project("clq9z3x1k0001la08f7t3g5p2");
 
-const permissions = await org.permissions.list();
-const projectPermissions = await project.permissions.list();
+const permissions = await org.iam.permissions.list();
+const projectPermissions = await project.iam.permissions.list();
 ```
 
 </Tab>
@@ -85,25 +85,25 @@ org = client.organization()
 project = client.project("clq9z3x1k0001la08f7t3g5p2")
 
 # List
-policies = org.policies.list()
-project_policies = project.policies.list()
+policies = org.iam.policies.list()
+project_policies = project.iam.policies.list()
 
 # Create
-policy = org.policies.create(
+policy = org.iam.policies.create(
     "Dataset Editor",
     permission_ids=["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e"],
     description="Can edit datasets",
 )
 
 # Update
-policy = org.policies.update(
+policy = org.iam.policies.update(
     "a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d",
     name="Dataset Editor",
     permission_ids=["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e", "2a7e9c1d-4b6f-4a8c-1d3e-7f5a9b2c0e4d"],
 )
 
 # Delete
-org.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d")
+org.iam.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d")
 ```
 
 </Tab>
@@ -115,24 +115,24 @@ const org = client.organization();
 const project = client.project("clq9z3x1k0001la08f7t3g5p2");
 
 // List
-const policies = await org.policies.list();
-const projectPolicies = await project.policies.list();
+const policies = await org.iam.policies.list();
+const projectPolicies = await project.iam.policies.list();
 
 // Create
-const policy = await org.policies.create({
+const policy = await org.iam.policies.create({
   name: "Dataset Editor",
   permissionIds: ["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e"],
   description: "Can edit datasets",
 });
 
 // Update
-const updated = await org.policies.update("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", {
+const updated = await org.iam.policies.update("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", {
   name: "Dataset Editor",
   permissionIds: ["5e9a1c3d-7b2f-4e8a-9c1d-3a6b5f0e2d4c", "8d2c4f6a-1e3b-4c7d-9a5e-2b8f1d0c6a3e", "2a7e9c1d-4b6f-4a8c-1d3e-7f5a9b2c0e4d"],
 });
 
 // Delete
-await org.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d");
+await org.iam.policies.delete("a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d");
 ```
 
 </Tab>
@@ -162,25 +162,25 @@ org = client.organization()
 project = client.project("clq9z3x1k0001la08f7t3g5p2")
 
 # List
-roles = org.roles.list()
-project_roles = project.roles.list()
+roles = org.iam.roles.list()
+project_roles = project.iam.roles.list()
 
 # Create
-role = org.roles.create(
+role = org.iam.roles.create(
     "Data Scientist",
     policy_ids=["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d"],
     description="Read/write datasets and prompts",
 )
 
 # Update
-role = org.roles.update(
+role = org.iam.roles.update(
     "b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e",
     name="Data Scientist",
     policy_ids=["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", "c4f8a2e6-1d3b-4e9a-8c7d-5b2f1a0e6d3c"],
 )
 
 # Delete
-org.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e")
+org.iam.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e")
 ```
 
 </Tab>
@@ -192,24 +192,24 @@ const org = client.organization();
 const project = client.project("clq9z3x1k0001la08f7t3g5p2");
 
 // List
-const roles = await org.roles.list();
-const projectRoles = await project.roles.list();
+const roles = await org.iam.roles.list();
+const projectRoles = await project.iam.roles.list();
 
 // Create
-const role = await org.roles.create({
+const role = await org.iam.roles.create({
   name: "Data Scientist",
   policyIds: ["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d"],
   description: "Read/write datasets and prompts",
 });
 
 // Update
-const updated = await org.roles.update("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e", {
+const updated = await org.iam.roles.update("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e", {
   name: "Data Scientist",
   policyIds: ["a17c4e2d-9b3f-4a6c-8d1e-2f5a9c3b7e0d", "c4f8a2e6-1d3b-4e9a-8c7d-5b2f1a0e6d3c"],
 });
 
 // Delete
-await org.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e");
+await org.iam.roles.delete("b3f1c2a9-7d4e-4c1b-9a2f-1e6d8c0a4b7e");
 ```
 
 </Tab>
