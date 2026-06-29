@@ -353,6 +353,40 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
+  /v1/annotation-queues/{itemId}/annotate:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          description: The ID of the queue item to annotate.
+
+  /v1/annotation-queues/{name}/batch-annotate:
+    post:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the annotation queue whose items are being annotated.
+
   /v1/governance/assess:
     post:
       parameters:
@@ -1652,6 +1686,83 @@ paths:
           schema:
             type: string
           example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/governance-policies:
+    get:
+      parameters:
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/governance-policies/{policyId}/assign:
+    post:
+      parameters:
+        - in: path
+          name: policyId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the governance policy.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/governance-policies/{policyId}/unassign:
+    post:
+      parameters:
+        - in: path
+          name: policyId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the governance policy.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+
+  /v1/organization/governance-policies/{policyId}/projects:
+    get:
+      parameters:
+        - in: path
+          name: policyId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the governance policy.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The organization API key for your Confident AI organization.
+          schema:
+            type: string
+          example: "<ORGANIZATION-API-KEY>"
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (must be a positive integer, default is 1).
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Number of items per page (max 100, default is 25).
 
   /v1/projects/{projectId}/permissions:
     get:

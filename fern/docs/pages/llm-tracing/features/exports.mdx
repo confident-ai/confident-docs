@@ -26,11 +26,18 @@ For exports with 100 or fewer traces, the CSV downloads immediately to your brow
 
 ## Scheduled Exports
 
-Schedule recurring exports that automatically upload a CSV to a data store at a chosen frequency. This is configured under **Project Settings** → **Exports**, which has two tabs: **Export Destinations** and **Schedule**.
+Schedule recurring exports that automatically upload a CSV to a data store at a chosen frequency. This is configured under **Project Settings** → **Exports**, in the **Export Destinations** and **Schedule** tabs.
 
 <Note>
   You must configure at least one export destination before you can create a schedule.
 </Note>
+
+<Tip>
+  The **Exports** page also has a **Forwarding** tab, which continuously streams
+  traces to an external collector in OTLP format — a live alternative to
+  scheduled CSV snapshots. See [Trace
+  Forwarding](/integrations/opentelemetry/trace-forwarding).
+</Tip>
 
 ### Export Destinations
 

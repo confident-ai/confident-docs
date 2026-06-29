@@ -1,0 +1,317 @@
+---
+title: Assign Projects to Governance Policies on the Fly
+subtitle: Enroll each project into the right governance policy straight from your CI/CD pipeline, so every deployment is gated without any manual UI steps.
+slug: guides/assign-projects-to-governance-policies
+description: Use the Admin SDK to list governance policies and assign projects to them programmatically, enrolling per-customer or per-agent projects into the right policy as part of your deployment pipeline.
+---
+
+## Overview
+
+This guide is for teams running [AI governance](/docs/ai-governance/introduction) at scale — typically one Confident AI project per customer or per agent — that need every project enrolled into a governance policy **automatically**, without anyone clicking through the platform UI.
+
+It builds directly on [Provision Projects for Agents on the Fly](/docs/guides/multi-tenant-project-isolation): once your pipeline creates a project, the next step is to enroll that project into the governance policy that gates its deployment. A governance policy is organization-scoped (a named bundle of controls), and **each project belongs to at most one policy**.
+
+In this guide, you will:
+
+- **Configure the Admin SDK** with one Organization API Key.
+- **Find the target governance policy** by name.
+- **Assign the project to the policy** in code, as part of your pipeline.
+- **Verify enrollment** by reading the project's policy back.
+
+```mermaid
+flowchart LR
+    Pipeline["CI/CD pipeline<br/>(per customer)"]
+    Pipeline --> Create["Create project"]
+    Create --> Assign["Assign project to<br/>governance policy"]
+    Assign --> Gate["Deployment gated<br/>by policy controls"]
+
+    classDef pipeline fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a
+    classDef step fill:#eef2ff,stroke:#4f46e5,stroke-width:1px,color:#1e293b
+    class Pipeline pipeline
+    class Create,Assign,Gate step
+```
+
+## Build It
+
+<Steps>
+
+<Step title="Install the Admin SDK">
+
+Governance policies are managed with the `confidentai` Admin SDK.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+pip install confidentai
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+npm install confidentai
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Configure the Admin SDK">
+
+<Warning>
+
+You need an **Organization API Key** before you start. [Retrieve yours here](/docs/api-reference/authentication#organization-level-auth).
+
+</Warning>
+
+Set `CONFIDENT_ORG_API_KEY` to your Organization API Key. The Admin SDK reads this variable by default when you create a client.
+
+```bash
+export CONFIDENT_ORG_API_KEY="confident_us_org_..."
+```
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python title="main.py"
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts"
+import { ConfidentAI } from "confidentai";
+
+const confidentAI = new ConfidentAI();
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Find the Target Policy">
+
+Governance policies are created and configured (with their controls) in the platform UI. From code, list them and pick the one your deployment should be gated by — usually by name.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python title="main.py" {5-11}
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
+
+def find_policy_id(policy_name: str) -> str:
+    organization = confident_ai.organization()
+    policies = organization.governance.policies.list()
+    for policy in policies:
+        if policy.name == policy_name:
+            return policy.id
+    raise ValueError(f"No governance policy named {policy_name!r}")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" {5-13}
+import { ConfidentAI } from "confidentai";
+
+const confidentAI = new ConfidentAI();
+
+async function findPolicyId(policyName: string): Promise<string> {
+  const organization = confidentAI.organization();
+  const policies = await organization.governance.policies.list();
+  const policy = policies.find((p) => p.name === policyName);
+  if (!policy) {
+    throw new Error(`No governance policy named ${policyName}`);
+  }
+  return policy.id;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+Each policy in the list includes its `controls` and a `projectsCount`. To page through the projects already enrolled in a policy, use `governance.policies.list_projects(policy_id)` (TypeScript: `governance.policies.listProjects(policyId)`).
+
+</Tip>
+
+</Step>
+
+<Step title="Assign the Project">
+
+Assign the project to the policy. Assignment is **additive and partial**: every project that exists is enrolled and returned in `assignedProjectIds` (any on a different policy are moved over), while the policy's other projects are left untouched. Ids that don't exist in your organization come back in `notFoundProjectIds` instead of failing the call — so one stale id never tanks the whole batch. Re-assigning an already-enrolled project still counts it, so this is safe to run on every pipeline execution.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python title="main.py" {7-13}
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
+
+# find_policy_id() is defined above
+
+def enroll_project(project_id: str, policy_name: str = "Production Gate") -> list[str]:
+    policy_id = find_policy_id(policy_name)
+    organization = confident_ai.organization()
+    result = organization.governance.policies.assign(
+        policy_id, project_ids=[project_id]
+    )
+    return result.assigned_project_ids
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript title="index.ts" {7-17}
+import { ConfidentAI } from "confidentai";
+
+const confidentAI = new ConfidentAI();
+
+// findPolicyId() is defined above
+
+async function enrollProject(
+  projectId: string,
+  policyName = "Production Gate",
+): Promise<string[]> {
+  const policyId = await findPolicyId(policyName);
+  const organization = confidentAI.organization();
+  const result = await organization.governance.policies.assign(policyId, {
+    projectIds: [projectId],
+  });
+  return result.assignedProjectIds;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<Tip>
+
+To remove projects from a policy (for example when deprovisioning a customer), use `governance.policies.unassign(policyId, ...)` the same way — it returns `unassignedProjectIds` and `skippedProjectIds`.
+
+</Tip>
+
+</Step>
+
+<Step title="Verify Enrollment">
+
+Read the project back and confirm it is enrolled. Every project returned by `projects.list()` (and `project(id).get()`) includes its `governancePolicy` — `{ id, name }` when enrolled, or `null` when not.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
+
+project = confident_ai.project("project-uuid-1").get()
+print(project.governance_policy)  # NamedRef(id="...", name="Production Gate")
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { ConfidentAI } from "confidentai";
+
+const confidentAI = new ConfidentAI();
+
+const project = await confidentAI.project("project-uuid-1").get();
+console.log(project.governancePolicy); // { id: "...", name: "Production Gate" }
+```
+
+</Tab>
+
+</Tabs>
+
+Done! Your pipeline now enrolls each project into the right governance policy using a single Organization API Key.
+
+</Step>
+
+</Steps>
+
+## Gate Deployments in CI
+
+Everything above is the **platform team's** job — enroll each project into the right policy once, as part of provisioning. From then on, the **product team** that owns a project gates its own deployments with the `deepeval` CLI. They don't need the Organization API Key; they only need that project's **Project API Key** (`CONFIDENT_API_KEY`).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+export CONFIDENT_API_KEY="confident_us_proj_..."
+deepeval gate
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+export CONFIDENT_API_KEY="confident_us_proj_..."
+npx deepeval gate
+```
+
+</Tab>
+
+</Tabs>
+
+`deepeval gate` assesses every control in the project's policy and exits with code `0` only when the whole policy passes — any failure exits non-zero and stops the deployment. See [Gate deployments on a policy](/docs/ai-governance/policies#gate-deployments-on-a-policy) for the full reference.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Provision Projects on the Fly"
+    icon="layer-group"
+    href="/docs/guides/multi-tenant-project-isolation"
+  >
+    Create a dedicated project per customer or agent — the step before enrollment.
+  </Card>
+  <Card
+    title="AI Governance"
+    icon="building-columns"
+    href="/docs/ai-governance/introduction"
+  >
+    Configure governance policies and the controls that gate your deployments.
+  </Card>
+  <Card
+    title="List Governance Policies"
+    icon="code"
+    href="/docs/api-reference"
+  >
+    See the governance-policy endpoints in the API reference under Organization data models.
+  </Card>
+  <Card
+    title="Manage Projects"
+    icon="folder"
+    href="/docs/settings/project/management/projects"
+  >
+    Update and clean up the projects your pipeline creates.
+  </Card>
+</CardGroup>
