@@ -2305,8 +2305,7 @@ paths:
       description: >-
         Creates a new in-progress test run and returns its id. Use this id as
         the `testRunId` when ingesting traces (`POST /v1/traces`) so that each
-        trace becomes one test case in this run, evaluated against the run's
-        metric collection.
+        trace becomes one test case in this run.
       requestBody:
         description: ""
         required: false
