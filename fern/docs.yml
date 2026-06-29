@@ -455,6 +455,7 @@ navigation:
                 contents:
                   - GET /v1/test-runs
                   - GET /v1/test-runs/{testRunId}
+                  - POST /v1/test-runs/{testRunId}/official
               - section: Traces
                 contents:
                   - GET /v1/traces

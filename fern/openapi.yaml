@@ -2077,6 +2077,31 @@ paths:
                               verboseLogs: "..."
                     deprecated: false
 
+  /v1/test-runs/{testRunId}/official:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Mark Test Run as Official
+      operationId: markTestRunOfficial
+      description: >-
+        Marks a test run as the official baseline for your project. The official
+        run is used as the point of comparison when detecting regressions via the
+        compare endpoint. Only the most recent official run is used as the
+        baseline.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarkTestRunOfficialResponse"
+              example:
+                success: true
+                data:
+                  message: "Marked test run as official"
+                deprecated: false
+
   /v1/metrics-data:
     get:
       x-fern-server-name: Confident AI
@@ -8730,6 +8755,29 @@ components:
         - metric
         - passes
         - scores
+
+    MarkTestRunOfficialResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: This is true if the test run was successfully marked as official.
+        data:
+          type: object
+          additionalProperties: false
+          properties:
+            message:
+              type: string
+              description: A confirmation message.
+          required:
+            - message
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
 
     ListAnnotationsResponse:
       type: object
