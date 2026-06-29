@@ -79,7 +79,7 @@ export CONFIDENT_ORG_API_KEY="confident_us_org_..."
 
 <Tab title="Python" language="python">
 
-```python title="ci/confident.py"
+```python title="main.py"
 from confidentai import ConfidentAI
 
 confident_ai = ConfidentAI()
@@ -89,10 +89,10 @@ confident_ai = ConfidentAI()
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="ci/confident.ts"
+```typescript title="index.ts"
 import { ConfidentAI } from "confidentai";
 
-export const confidentAI = new ConfidentAI();
+const confidentAI = new ConfidentAI();
 ```
 
 </Tab>
@@ -109,11 +109,14 @@ Governance policies are created and configured (with their controls) in the plat
 
 <Tab title="Python" language="python">
 
-```python title="ci/governance.py" {6-10}
-from ci.confident import confident_ai
+```python title="main.py" {5-11}
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
 
 def find_policy_id(policy_name: str) -> str:
-    policies = confident_ai.organization().governance.policies.list()
+    organization = confident_ai.organization()
+    policies = organization.governance.policies.list()
     for policy in policies:
         if policy.name == policy_name:
             return policy.id
@@ -124,11 +127,14 @@ def find_policy_id(policy_name: str) -> str:
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="ci/governance.ts" {6-11}
-import { confidentAI } from "./confident";
+```typescript title="index.ts" {5-13}
+import { ConfidentAI } from "confidentai";
 
-export async function findPolicyId(policyName: string): Promise<string> {
-  const policies = await confidentAI.organization().governance.policies.list();
+const confidentAI = new ConfidentAI();
+
+async function findPolicyId(policyName: string): Promise<string> {
+  const organization = confidentAI.organization();
+  const policies = await organization.governance.policies.list();
   const policy = policies.find((p) => p.name === policyName);
   if (!policy) {
     throw new Error(`No governance policy named ${policyName}`);
@@ -151,41 +157,49 @@ Each policy in the list includes its `controls` and a `projectsCount`. To page t
 
 <Step title="Assign the Project">
 
-Assign the project to the policy. Assignment is **additive**: the listed projects are moved onto this policy (any that were on a different policy are moved over), while the policy's other projects are left untouched. The returned `count` is the number of projects **actually moved** — re-assigning an already-enrolled project returns `0`, which makes this safe to run on every pipeline execution.
+Assign the project to the policy. Assignment is **additive and partial**: every project that exists is enrolled and returned in `assignedProjectIds` (any on a different policy are moved over), while the policy's other projects are left untouched. Ids that don't exist in your organization come back in `notFoundProjectIds` instead of failing the call — so one stale id never tanks the whole batch. Re-assigning an already-enrolled project still counts it, so this is safe to run on every pipeline execution.
 
 <Tabs>
 
 <Tab title="Python" language="python">
 
-```python title="ci/enroll.py" {7-10}
-from ci.confident import confident_ai
-from ci.governance import find_policy_id
+```python title="main.py" {7-13}
+from confidentai import ConfidentAI
 
-def enroll_project(project_id: str, policy_name: str = "Production Gate") -> int:
+confident_ai = ConfidentAI()
+
+# find_policy_id() is defined above
+
+def enroll_project(project_id: str, policy_name: str = "Production Gate") -> list[str]:
     policy_id = find_policy_id(policy_name)
-    result = confident_ai.organization().governance.policies.assign(
+    organization = confident_ai.organization()
+    result = organization.governance.policies.assign(
         policy_id, project_ids=[project_id]
     )
-    return result.count
+    return result.assigned_project_ids
 ```
 
 </Tab>
 
 <Tab title="TypeScript" language="typescript">
 
-```typescript title="ci/enroll.ts" {7-12}
-import { confidentAI } from "./confident";
-import { findPolicyId } from "./governance";
+```typescript title="index.ts" {7-17}
+import { ConfidentAI } from "confidentai";
 
-export async function enrollProject(
+const confidentAI = new ConfidentAI();
+
+// findPolicyId() is defined above
+
+async function enrollProject(
   projectId: string,
   policyName = "Production Gate",
-): Promise<number> {
+): Promise<string[]> {
   const policyId = await findPolicyId(policyName);
-  const result = await confidentAI
-    .organization()
-    .governance.policies.assign(policyId, { projectIds: [projectId] });
-  return result.count;
+  const organization = confidentAI.organization();
+  const result = await organization.governance.policies.assign(policyId, {
+    projectIds: [projectId],
+  });
+  return result.assignedProjectIds;
 }
 ```
 
@@ -195,7 +209,7 @@ export async function enrollProject(
 
 <Tip>
 
-To remove projects from a policy (for example when deprovisioning a customer), use `governance.policies.unassign(policyId, ...)` with the same shape.
+To remove projects from a policy (for example when deprovisioning a customer), use `governance.policies.unassign(policyId, ...)` the same way — it returns `unassignedProjectIds` and `skippedProjectIds`.
 
 </Tip>
 
@@ -210,7 +224,9 @@ Read the project back and confirm it is enrolled. Every project returned by `pro
 <Tab title="Python" language="python">
 
 ```python
-from ci.confident import confident_ai
+from confidentai import ConfidentAI
+
+confident_ai = ConfidentAI()
 
 project = confident_ai.project("project-uuid-1").get()
 print(project.governance_policy)  # NamedRef(id="...", name="Production Gate")
@@ -221,7 +237,9 @@ print(project.governance_policy)  # NamedRef(id="...", name="Production Gate")
 <Tab title="TypeScript" language="typescript">
 
 ```typescript
-import { confidentAI } from "./confident";
+import { ConfidentAI } from "confidentai";
+
+const confidentAI = new ConfidentAI();
 
 const project = await confidentAI.project("project-uuid-1").get();
 console.log(project.governancePolicy); // { id: "...", name: "Production Gate" }
@@ -236,6 +254,34 @@ Done! Your pipeline now enrolls each project into the right governance policy us
 </Step>
 
 </Steps>
+
+## Gate Deployments in CI
+
+Everything above is the **platform team's** job — enroll each project into the right policy once, as part of provisioning. From then on, the **product team** that owns a project gates its own deployments with the `deepeval` CLI. They don't need the Organization API Key; they only need that project's **Project API Key** (`CONFIDENT_API_KEY`).
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+export CONFIDENT_API_KEY="confident_us_proj_..."
+deepeval gate
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+export CONFIDENT_API_KEY="confident_us_proj_..."
+npx deepeval gate
+```
+
+</Tab>
+
+</Tabs>
+
+`deepeval gate` assesses every control in the project's policy and exits with code `0` only when the whole policy passes — any failure exits non-zero and stops the deployment. See [Gate deployments on a policy](/docs/ai-governance/policies#gate-deployments-on-a-policy) for the full reference.
 
 ## Next Steps
 
