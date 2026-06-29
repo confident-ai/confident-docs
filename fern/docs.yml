@@ -634,6 +634,9 @@ navigation:
               - page: Trace Broadcasting
                 path: docs/pages/integrations/opentelemetry/trace-broadcasting.mdx
                 icon: fa-light fa-tower-broadcast
+              - page: Trace Forwarding
+                path: docs/pages/integrations/opentelemetry/trace-forwarding.mdx
+                icon: fa-light fa-share-from-square
       - section: Third-Party Integrations
         contents:
           - page: OpenAI
