@@ -106,6 +106,9 @@ def load_settings() -> Settings:
     connection_id = os.environ.get("CONFIDENT_AI_CONNECTION_ID", "").strip()
     if connection_id:
         tokens[":aiConnectionId"] = connection_id
+    annotation_form_id = os.environ.get("CONFIDENT_ANNOTATION_FORM_ID", "").strip()
+    if annotation_form_id:
+        tokens[":annotationFormId"] = annotation_form_id
 
     return Settings(
         base_url=require_env("PLATFORM_BASE_URL").rstrip("/"),

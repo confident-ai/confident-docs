@@ -84,7 +84,7 @@ The optional top-level **`local_storage`** object is a **default applied to ever
 | Field | Required | What it does |
 | --- | --- | --- |
 | `s3_key` | yes | The S3 object to overwrite. This is the **only** link between the docs image and this capture. |
-| `path` | yes | Platform route to visit. May contain `:projectId` / `:aiConnectionId` tokens (filled from env). |
+| `path` | yes | Platform route to visit. May contain `:projectId` / `:aiConnectionId` / `:annotationFormId` tokens (filled from env). |
 | `selector` | no | CSS selector of the element of interest. The shot always **waits for** this element to render before capturing, and—unless `full_page` is set—**crops** the image to it. |
 | `full_page` | no | `true` = capture the whole browser window (global nav, top bar, content) instead of cropping to `selector`; the shot still waits for `selector` first. Omit/`false` = crop to `selector`. |
 | `click` | no | Click before capturing — a CSS selector (`[ . #`) **or** the exact visible text of an element (e.g. a tab label like `"Output Parsing"`). Pass an **array** to run clicks in order, e.g. `["Body", "[data-docs-id='ai-connection-payload-mode']", "Code"]` to open a tab, then a dropdown, then an option. If a `click` matches **nothing**, the shot **fails loudly** (rather than silently capturing the wrong state) — check the label text and that the element is deployed. |
@@ -141,6 +141,7 @@ Set these in a `.env` file at the repo root (copy `.env.example` and fill it in)
 | `CONFIDENT_PROJECT_ID` | yes | — | fills `:projectId` in every path |
 | `S3_BUCKET` | yes | — | docs bucket, `confident-docs` |
 | `CONFIDENT_AI_CONNECTION_ID` | only if a path uses `:aiConnectionId` | — | fills `:aiConnectionId` |
+| `CONFIDENT_ANNOTATION_FORM_ID` | only if a path uses `:annotationFormId` | — | fills `:annotationFormId` (the annotation form editor shots) |
 | `SHOTSCRAPER_AUTH_FILE` | no | `auth.json` | saved logged-in session |
 | `SHOTS_FILE` | no | `screenshots/shots.json` | alternate manifest |
 | `ONLY_PATH_PREFIX` | no | _(all)_ | only capture shots whose `path` starts with this prefix |
@@ -268,6 +269,7 @@ Secrets (**Settings → Secrets and variables → Actions**), or via `gh`:
 gh secret set SHOTSCRAPER_AUTH < auth.json
 gh secret set CONFIDENT_PROJECT_ID --body "<projectId>"
 gh secret set CONFIDENT_AI_CONNECTION_ID --body "<aiConnectionId>"
+gh secret set CONFIDENT_ANNOTATION_FORM_ID --body "<annotationFormId>"
 gh secret set AWS_ACCESS_KEY_ID --body "<key>"
 gh secret set AWS_SECRET_ACCESS_KEY --body "<secret>"
 
@@ -280,6 +282,7 @@ gh variable set SCREENSHOTS_S3_BUCKET --body "confident-docs"
 | `SHOTSCRAPER_AUTH` | secret | contents of `auth.json` |
 | `CONFIDENT_PROJECT_ID` | secret | seeded demo project id |
 | `CONFIDENT_AI_CONNECTION_ID` | secret | seeded demo AI connection id |
+| `CONFIDENT_ANNOTATION_FORM_ID` | secret | seeded demo annotation form id |
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | secret | write access to the docs bucket |
 | `PLATFORM_BASE_URL` | variable | environment to screenshot |
 | `SCREENSHOTS_S3_BUCKET` | variable | `confident-docs` |

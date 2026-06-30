@@ -105,6 +105,34 @@
       "full_page": true,
       "width": 1512,
       "height": 1000
+    },
+    {
+      "s3_key": "settings:project:annotation-forms.png",
+      "doc": "fern/docs/pages/settings/project/annotation-options.mdx",
+      "path": "/project/:projectId/project-settings/annotation",
+      "selector": "[data-docs-id='annotation-forms-section']",
+      "full_page": true,
+      "width": 1512,
+      "height": 900
+    },
+    {
+      "s3_key": "settings:project:annotation-form-editor.png",
+      "doc": "fern/docs/pages/settings/project/annotation-options.mdx",
+      "path": "/project/:projectId/project-settings/annotation/:annotationFormId",
+      "selector": "[data-docs-id='annotation-form-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1000
+    },
+    {
+      "s3_key": "settings:project:annotation-form-preview.png",
+      "doc": "fern/docs/pages/settings/project/annotation-options.mdx",
+      "path": "/project/:projectId/project-settings/annotation/:annotationFormId",
+      "click": "Preview",
+      "selector": "[data-docs-id='annotation-form-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 900
     }
   ]
 }

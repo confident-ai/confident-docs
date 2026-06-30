@@ -605,6 +605,9 @@ navigation:
               - section: Simulate
                 contents:
                   - POST /v1/simulate
+              - section: Governance
+                contents:
+                  - POST /v1/governance/assess
           - section: Legacy
             skip-slug: true
             contents:
