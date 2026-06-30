@@ -1144,16 +1144,16 @@ paths:
                 success: true
                 data:
                   traces:
-                      name: "Trace Name"
-                      startTime: "2025-01-15T10:30:00Z"
-                      endTime: "2025-01-15T10:30:05Z"
-                      uuid: "TRACE-UUID"
-                      projectId: "PROJECT-ID"
-                      environment: "production"
-                      threadId: "THREAD-ID"
-                      userId: "USER-ID"
-                      tags:
-                        - "General QA"
+                    name: "Trace Name"
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:05Z"
+                    uuid: "TRACE-UUID"
+                    projectId: "PROJECT-ID"
+                    environment: "production"
+                    threadId: "THREAD-ID"
+                    userId: "USER-ID"
+                    tags:
+                      - "General QA"
                   totalTraces: 1
                 deprecated: false
 
@@ -1191,24 +1191,24 @@ paths:
               example:
                 success: true
                 data:
-                    uuid: "TRACE-ID"
-                    name: "Trace Name"
-                    startTime: "2025-01-15T10:30:00Z"
-                    endTime: "2025-01-15T10:30:05Z"
-                    projectId: "PROJECT-ID"
-                    environment: "production"
-                    spans:
-                      - id: "SPAN-ID"
-                        uuid: "SPAN-UUID"
-                        name: "Span Name"
-                        startTime: "2025-01-15T10:30:00Z"
-                        endTime: "2025-01-15T10:30:05Z"
-                        traceUuid: "TRACE-UUID"
-                        status: "SUCCESS"
-                        type: "LLM"
-                        provider: "OpenAI"
-                        integration: "LangChain"
-                        model: "gpt-4o"
+                  uuid: "TRACE-ID"
+                  name: "Trace Name"
+                  startTime: "2025-01-15T10:30:00Z"
+                  endTime: "2025-01-15T10:30:05Z"
+                  projectId: "PROJECT-ID"
+                  environment: "production"
+                  spans:
+                    - id: "SPAN-ID"
+                      uuid: "SPAN-UUID"
+                      name: "Span Name"
+                      startTime: "2025-01-15T10:30:00Z"
+                      endTime: "2025-01-15T10:30:05Z"
+                      traceUuid: "TRACE-UUID"
+                      status: "SUCCESS"
+                      type: "LLM"
+                      provider: "OpenAI"
+                      integration: "LangChain"
+                      model: "gpt-4o"
                 deprecated: false
 
   /v1/spans:
@@ -1272,7 +1272,7 @@ paths:
           name: promptAlias
           required: false
           schema:
-            type: string 
+            type: string
           description: This filters the spans by the prompt alias used.
         - in: query
           name: promptCommitHash
@@ -1385,12 +1385,12 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Successfully retrieved the detailed span.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RetrieveSpanResponse'
+                $ref: "#/components/schemas/RetrieveSpanResponse"
               examples:
                 LLMSpan:
                   success: true
@@ -5100,10 +5100,10 @@ paths:
         - Dashboards
       summary: List Dashboards
       operationId: listDashboards
-      description: Lists all dashboards in your Confident AI project.
+      description: Lists dashboard overviews in your Confident AI project — metadata and widget counts only. Widget configurations are returned by the dashboard detail endpoint, and computed widget data by the query endpoints.
       responses:
         "200":
-          description: ""
+          description: The dashboard overviews in your project.
           content:
             application/json:
               schema:
@@ -5117,6 +5117,9 @@ paths:
                         name: "Production Overview"
                         description: null
                         private: false
+                        projectId: "PROJECT-ID"
+                        userId: null
+                        widgetCount: 2
                         createdAt: "2024-01-01T00:00:00.000Z"
                         updatedAt: "2024-01-01T00:00:00.000Z"
                   deprecated: false
@@ -5126,9 +5129,9 @@ paths:
         - Dashboards
       summary: Create Dashboard
       operationId: createDashboard
-      description: Creates a dashboard, optionally with starter widgets. Widget layout is assigned automatically.
+      description: Creates a dashboard, optionally with starter widget configurations, and returns the id of the created dashboard. Use the dashboard detail endpoint for its full configuration, or a query endpoint for computed widget data.
       requestBody:
-        description: ""
+        description: The dashboard configuration to create.
         required: true
         content:
           application/json:
@@ -5151,7 +5154,7 @@ paths:
                         aggregation: COUNT
       responses:
         "200":
-          description: ""
+          description: The id of the created dashboard.
           content:
             application/json:
               schema:
@@ -5169,7 +5172,7 @@ paths:
         - Dashboards
       summary: Get Dashboard
       operationId: getDashboard
-      description: Retrieves a single dashboard with its widgets and lines.
+      description: Retrieves a single dashboard with embedded widget configurations and lines. This endpoint does not compute widget data; use a query endpoint for rendered data.
       parameters:
         - in: path
           name: dashboardId
@@ -5179,30 +5182,48 @@ paths:
           description: The id of the dashboard.
       responses:
         "200":
-          description: ""
+          description: The requested dashboard with embedded widget configurations.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DashboardResponse"
+                $ref: "#/components/schemas/DashboardObjectResponse"
               example:
                 success: true
                 data:
-                  id: "DASHBOARD-ID"
-                  name: "Production Overview"
-                  description: null
-                  private: false
-                  createdAt: "2024-01-01T00:00:00.000Z"
-                  updatedAt: "2024-01-01T00:00:00.000Z"
-                  widgets:
-                    - id: "WIDGET-ID"
-                      name: "Trace Count"
-                      description: null
-                      startTime: null
-                      endTime: null
-                      lines:
-                        - id: "LINE-ID"
-                          name: "Count"
-                          color: BLUE
+                  dashboard:
+                    id: "DASHBOARD-ID"
+                    name: "Production Overview"
+                    description: null
+                    private: false
+                    projectId: "PROJECT-ID"
+                    userId: null
+                    createdAt: "2024-01-01T00:00:00.000Z"
+                    updatedAt: "2024-01-01T00:00:00.000Z"
+                    widgets:
+                      - id: "WIDGET-ID"
+                        name: "Trace Count"
+                        description: null
+                        type: LINE
+                        unit: COUNT
+                        mode: TIME_SERIES
+                        bucketMode: null
+                        dimension: null
+                        topK: null
+                        startTime: null
+                        endTime: null
+                        layout:
+                          x: 0
+                          y: 0
+                          w: 6
+                          h: 2
+                        lines:
+                          - id: "LINE-ID"
+                            name: "Count"
+                            color: BLUE
+                            dataModel: TRACE
+                            aggregation: COUNT
+                            filters: null
+                            extraQueryParams: null
                 deprecated: false
     put:
       x-fern-server-name: Confident AI
@@ -5210,7 +5231,7 @@ paths:
         - Dashboards
       summary: Update Dashboard
       operationId: updateDashboard
-      description: Updates a dashboard's metadata. Only the provided fields are changed.
+      description: Updates a dashboard's metadata and returns the id of the updated dashboard. Only the provided fields are changed.
       parameters:
         - in: path
           name: dashboardId
@@ -5219,7 +5240,7 @@ paths:
             type: string
           description: The id of the dashboard.
       requestBody:
-        description: ""
+        description: The dashboard metadata fields to update.
         required: true
         content:
           application/json:
@@ -5229,7 +5250,7 @@ paths:
               name: "Renamed Dashboard"
       responses:
         "200":
-          description: ""
+          description: The id of the updated dashboard.
           content:
             application/json:
               schema:
@@ -5255,7 +5276,7 @@ paths:
           description: The id of the dashboard.
       responses:
         "200":
-          description: ""
+          description: The id of the deleted dashboard.
           content:
             application/json:
               schema:
@@ -5266,72 +5287,14 @@ paths:
                   id: "DASHBOARD-ID"
                 deprecated: false
 
-  /v1/dashboards/{dashboardId}/widgets:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Dashboards
-      summary: List Widgets
-      operationId: listDashboardWidgets
-      description: Lists all widgets on a dashboard, each with its full configuration and lines.
-      parameters:
-        - in: path
-          name: dashboardId
-          required: true
-          schema:
-            type: string
-          description: The id of the dashboard.
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DashboardWidgetListResponse"
-              example:
-                success: true
-                data:
-                  widgets:
-                    - id: "WIDGET-ID"
-                      name: "Trace Count"
-                      description: null
-                      type: LINE
-                      unit: COUNT
-                      mode: TIME_SERIES
-                      bucketMode: null
-                      dimension: null
-                      topK: null
-                      startTime: null
-                      endTime: null
-                      lines:
-                        - id: "LINE-ID"
-                          name: "Count"
-                          color: BLUE
-                          dataModel: TRACE
-                          aggregation: COUNT
-                          filters: null
-                      data:
-                        kind: timeseries
-                        unit: COUNT
-                        xAxis:
-                          type: time
-                        series:
-                          - key: "Count"
-                            name: "Count"
-                            color: BLUE
-                        points:
-                          - x: "2024-06-01T00:00:00.000Z"
-                            Count: 42
-                          - x: "2024-06-02T00:00:00.000Z"
-                            Count: 57
-                deprecated: false
+  /v1/dashboards/{dashboardId}/query:
     post:
       x-fern-server-name: Confident AI
       tags:
         - Dashboards
-      summary: Create Widget
-      operationId: createDashboardWidget
-      description: Adds a widget to a dashboard. Layout is assigned automatically.
+      summary: Query Dashboard Data
+      operationId: queryDashboardData
+      description: Fetches computed data for all widgets on a dashboard, or for a provided subset of widget IDs. Request time range fields override widget defaults for this query only.
       parameters:
         - in: path
           name: dashboardId
@@ -5340,7 +5303,64 @@ paths:
             type: string
           description: The id of the dashboard.
       requestBody:
-        description: ""
+        description: Optional time range and widget filter for the dashboard data query. Send `{}` to use each widget's saved/default time range.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DashboardQueryRequest"
+            example:
+              startTime: "2024-01-01T00:00:00.000Z"
+              endTime: "2024-01-31T23:59:59.999Z"
+              granularity: day
+              widgetIds:
+                - "WIDGET-ID"
+      responses:
+        "200":
+          description: The computed data for the requested dashboard widgets.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardQueryResponse"
+              example:
+                success: true
+                data:
+                  results:
+                    - widgetId: "WIDGET-ID"
+                      status: ok
+                      type: LINE
+                      mode: TIME_SERIES
+                      kind: TIME_SERIES
+                      unit: COUNT
+                      xAxis:
+                        type: time
+                      series:
+                        - key: "Count"
+                          name: "Count"
+                          color: BLUE
+                          lineId: "LINE-ID"
+                          points:
+                            - x: "2024-01-01T00:00:00.000Z"
+                              y: 42
+                deprecated: false
+
+  /v1/dashboards/{dashboardId}/widgets:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Dashboards
+      summary: Create Widget
+      operationId: createDashboardWidget
+      description: Adds a widget configuration to a dashboard and returns the id of the created widget. Use the dashboard detail endpoint for its full configuration, or a query endpoint for computed widget data.
+      parameters:
+        - in: path
+          name: dashboardId
+          required: true
+          schema:
+            type: string
+          description: The id of the dashboard.
+      requestBody:
+        description: The widget configuration to add to the dashboard.
         required: true
         content:
           application/json:
@@ -5372,7 +5392,7 @@ paths:
                     aggregation: P90_LATENCY
       responses:
         "200":
-          description: ""
+          description: The id of the created widget.
           content:
             application/json:
               schema:
@@ -5384,76 +5404,13 @@ paths:
                 deprecated: false
 
   /v1/dashboards/{dashboardId}/widgets/{widgetId}:
-    get:
-      x-fern-server-name: Confident AI
-      tags:
-        - Dashboards
-      summary: Get Widget
-      operationId: getDashboardWidget
-      description: Retrieves a single widget with its full configuration and lines.
-      parameters:
-        - in: path
-          name: dashboardId
-          required: true
-          schema:
-            type: string
-          description: The id of the dashboard.
-        - in: path
-          name: widgetId
-          required: true
-          schema:
-            type: string
-          description: The id of the widget.
-      responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DashboardWidgetResponse"
-              example:
-                success: true
-                data:
-                  id: "WIDGET-ID"
-                  name: "Trace Count"
-                  description: null
-                  type: LINE
-                  unit: COUNT
-                  mode: TIME_SERIES
-                  bucketMode: null
-                  dimension: null
-                  topK: null
-                  startTime: null
-                  endTime: null
-                  lines:
-                    - id: "LINE-ID"
-                      name: "Count"
-                      color: BLUE
-                      dataModel: TRACE
-                      aggregation: COUNT
-                      filters: null
-                  data:
-                    kind: timeseries
-                    unit: COUNT
-                    xAxis:
-                      type: time
-                    series:
-                      - key: "Count"
-                        name: "Count"
-                        color: BLUE
-                    points:
-                      - x: "2024-06-01T00:00:00.000Z"
-                        Count: 42
-                      - x: "2024-06-02T00:00:00.000Z"
-                        Count: 57
-                deprecated: false
     put:
       x-fern-server-name: Confident AI
       tags:
         - Dashboards
       summary: Update Widget
       operationId: updateDashboardWidget
-      description: Updates a widget. Provided fields replace its configuration, omitted scalar fields are cleared, and layout is preserved. If lines are provided they replace the existing lines.
+      description: Updates a widget configuration and returns the id of the updated widget. Provided fields replace its configuration, omitted scalar fields are cleared, and lines replace the existing lines when provided.
       parameters:
         - in: path
           name: dashboardId
@@ -5468,7 +5425,7 @@ paths:
             type: string
           description: The id of the widget.
       requestBody:
-        description: ""
+        description: The replacement widget configuration. If `lines` is provided, it replaces the widget's existing lines.
         required: true
         content:
           application/json:
@@ -5485,7 +5442,7 @@ paths:
                   aggregation: COUNT
       responses:
         "200":
-          description: ""
+          description: The id of the updated widget.
           content:
             application/json:
               schema:
@@ -5501,7 +5458,7 @@ paths:
         - Dashboards
       summary: Delete Widget
       operationId: deleteDashboardWidget
-      description: Removes a widget from a dashboard.
+      description: Detaches a widget from a dashboard. The widget is hard-deleted only when it is no longer attached to any other dashboard.
       parameters:
         - in: path
           name: dashboardId
@@ -5517,7 +5474,7 @@ paths:
           description: The id of the widget.
       responses:
         "200":
-          description: ""
+          description: The id of the affected widget.
           content:
             application/json:
               schema:
@@ -5527,6 +5484,81 @@ paths:
                 data:
                   id: "WIDGET-ID"
                 deprecated: false
+
+  /v1/dashboards/{dashboardId}/widgets/{widgetId}/query:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Dashboards
+      summary: Query Widget Data
+      operationId: queryDashboardWidgetData
+      description: Fetches computed data for one widget. Request time range fields override widget defaults for this query only.
+      parameters:
+        - in: path
+          name: dashboardId
+          required: true
+          schema:
+            type: string
+          description: The id of the dashboard.
+        - in: path
+          name: widgetId
+          required: true
+          schema:
+            type: string
+          description: The id of the widget.
+      requestBody:
+        description: Optional time range override for the widget data query. Send `{}` to use the widget's saved/default time range.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DashboardWidgetQueryRequest"
+            example:
+              startTime: "2024-01-01T00:00:00.000Z"
+              endTime: "2024-01-31T23:59:59.999Z"
+              granularity: day
+      responses:
+        "200":
+          description: The computed data for the requested widget.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardWidgetQueryResponse"
+              examples:
+                TimeSeries:
+                  success: true
+                  data:
+                    widgetId: "WIDGET-ID"
+                    type: LINE
+                    mode: TIME_SERIES
+                    kind: TIME_SERIES
+                    unit: COUNT
+                    xAxis:
+                      type: time
+                    series:
+                      - key: "Count"
+                        name: "Count"
+                        color: BLUE
+                        lineId: "LINE-ID"
+                        points:
+                          - x: "2024-01-01T00:00:00.000Z"
+                            y: 42
+                  deprecated: false
+                BigNumber:
+                  success: true
+                  data:
+                    widgetId: "WIDGET-ID"
+                    type: BIG_NUMBER
+                    mode: DIMENSION_SERIES
+                    kind: BIG_NUMBER
+                    unit: COUNT
+                    values:
+                      - key: "Count"
+                        name: "Count"
+                        color: BLUE
+                        lineId: "LINE-ID"
+                        value: 42
+                  deprecated: false
 
 components:
   schemas:
@@ -6056,7 +6088,7 @@ components:
           required:
             - datasets
         deprecated:
-          type: boolean 
+          type: boolean
           description: "This is true if this datasets endpoint is deprecated."
       required:
         - success
@@ -6459,7 +6491,7 @@ components:
           description: A unique identifier for the dataset version.
         version:
           type: string
-          description: "The version label (e.g. `\"00.00.01\"`)."
+          description: 'The version label (e.g. `"00.00.01"`).'
         createdAt:
           type: string
           format: date-time
@@ -7325,7 +7357,7 @@ components:
               type: array
               description: The list of spans for the current page.
               items:
-                $ref: '#/components/schemas/GetSpan'
+                $ref: "#/components/schemas/GetSpan"
             totalSpans:
               type: integer
               description: The total number of spans matching the query across all pages.
@@ -7704,7 +7736,7 @@ components:
           description: The unique name of the branch to create in the prompt.
       required:
         - branch
-        
+
     CreatePromptBranchResponse:
       type: object
       properties:
@@ -7853,7 +7885,7 @@ components:
           required:
             - prompts
         deprecated:
-          type: boolean 
+          type: boolean
           description: "This is true if this prompts endpoint is deprecated."
       required:
         - success
@@ -8365,7 +8397,7 @@ components:
           type: string
           nullable: true
           deprecated: true
-          description: The email address of the user created this annotation. The field is being deprecated. Please use `user.email` instead. 
+          description: The email address of the user created this annotation. The field is being deprecated. Please use `user.email` instead.
       required:
         - id
         - rating
@@ -10785,14 +10817,23 @@ components:
 
     DashboardWidgetMode:
       type: string
-      description: Whether a widget plots a time series or a breakdown across a dimension.
+      description: >-
+        How a widget aggregates its lines. `TIME_SERIES` plots each configured
+        line over time; `DIMENSION_SERIES` takes a single metric and splits it
+        into one series per value of the widget's dimension. This is the widget's
+        saved configuration — it does not by itself describe the shape of a query
+        response (use `kind` on the query result for that).
       enum:
         - TIME_SERIES
         - DIMENSION_SERIES
 
     DashboardWidgetBucketMode:
       type: string
-      description: How a widget's data points are bucketed.
+      description: >-
+        How a widget's data is bucketed over the query time range. `SERIES`
+        splits the range into one bucket per `granularity` interval (a time
+        series); `RANGE` aggregates the whole range into a single bucket (one
+        total, as used by BIG_NUMBER widgets). Defaults to `SERIES` when omitted.
       enum:
         - SERIES
         - RANGE
@@ -11025,6 +11066,71 @@ components:
         - operator
         - groups
 
+    DashboardLineExtraQueryParams:
+      type: object
+      nullable: true
+      description: >-
+        Advanced, per-line query parameters. Which keys take effect depends on
+        the line's `dataModel`, and unrecognized keys are ignored. All values are
+        strings. Most lines leave this `null`.
+      properties:
+        spanType:
+          type: string
+          description: >-
+            For a `SPAN` line, restricts aggregation to a single span type. Not
+            needed for the typed span models (`LLM_SPAN`, `AGENT_SPAN`,
+            `RETRIEVER_SPAN`, `TOOL_SPAN`, `CUSTOM_SPAN`), which already imply
+            their span type.
+          enum:
+            - LLM
+            - AGENT
+            - RETRIEVER
+            - TOOL
+            - CUSTOM
+        metricMetadataKey:
+          type: string
+          description: >-
+            For span (`SPAN`, `LLM_SPAN`, `AGENT_SPAN`, `RETRIEVER_SPAN`,
+            `TOOL_SPAN`, `CUSTOM_SPAN`), `TRACE`, and `THREAD` lines, the
+            metadata field key whose numeric value is aggregated.
+        category:
+          type: string
+          description: For a `METRIC_DATA` line, the entity category the metric is attached to.
+          enum:
+            - SINGLE_TURN
+            - MULTI_TURN
+            - TEST_RUN
+            - TRACE
+            - SPAN
+            - LLM_SPAN
+            - AGENT_SPAN
+            - RETRIEVER_SPAN
+            - TOOL_SPAN
+            - CUSTOM_SPAN
+            - THREAD
+        metricName:
+          type: string
+          description: For a `METRIC_DATA` line, the name of the metric to aggregate.
+        dataType:
+          type: string
+          description: For an `ANNOTATION` line, which annotated entity type to aggregate over.
+          enum:
+            - Traces
+            - Spans
+            - Threads
+        source:
+          type: string
+          description: >-
+            For an `ANNOTATION` line, whether to aggregate annotations left by
+            end users or by reviewers.
+          enum:
+            - User
+            - Reviewer
+      additionalProperties:
+        type: string
+      example:
+        metricMetadataKey: tokenCount
+
     DashboardLineInput:
       type: object
       description: A single series within a widget.
@@ -11040,12 +11146,14 @@ components:
           $ref: "#/components/schemas/DashboardAggregation"
         filters:
           $ref: "#/components/schemas/DashboardFilterSet"
+        extraQueryParams:
+          $ref: "#/components/schemas/DashboardLineExtraQueryParams"
       required:
         - name
 
     DashboardWidgetInput:
       type: object
-      description: A widget to create. Layout is assigned automatically and is not accepted as input.
+      description: A widget configuration to create or update. If layout is omitted, the server assigns a default grid position.
       properties:
         name:
           type: string
@@ -11076,13 +11184,33 @@ components:
           format: date-time
           nullable: true
           description: The end of the widget's custom time range, if set.
+        layout:
+          $ref: "#/components/schemas/DashboardLayout"
         lines:
           type: array
+          nullable: true
           description: The series to show in the widget.
           items:
             $ref: "#/components/schemas/DashboardLineInput"
       required:
         - name
+
+    DashboardLayout:
+      type: object
+      description: A widget's position on the dashboard grid.
+      properties:
+        x:
+          type: number
+          description: The widget's left edge as a column index on the 12-column grid.
+        y:
+          type: number
+          description: The widget's top edge as a row index on the grid.
+        w:
+          type: number
+          description: The widget's width in grid columns.
+        h:
+          type: number
+          description: The widget's height in grid rows.
 
     DashboardLine:
       type: object
@@ -11102,6 +11230,8 @@ components:
           $ref: "#/components/schemas/DashboardAggregation"
         filters:
           $ref: "#/components/schemas/DashboardFilterSet"
+        extraQueryParams:
+          $ref: "#/components/schemas/DashboardLineExtraQueryParams"
 
     DashboardWidget:
       type: object
@@ -11139,237 +11269,17 @@ components:
           format: date-time
           nullable: true
           description: The end of the widget's custom time range, if set.
+        layout:
+          $ref: "#/components/schemas/DashboardLayout"
         lines:
           type: array
           description: The series shown in the widget.
           items:
             $ref: "#/components/schemas/DashboardLine"
-        data:
-          $ref: "#/components/schemas/DashboardWidgetData"
-          description: The widget's plottable graph data for its default time range (the last 30 days, or the widget's saved time range).
 
-    DashboardWidgetSeries:
+    DashboardOverview:
       type: object
-      description: One plotted series, mapping its key to a display name and color.
-      properties:
-        key:
-          type: string
-          description: The key this series uses in each data point — the line's (unique) name, or the dimension value for breakdowns. Not an internal id.
-        name:
-          type: string
-          description: The series' display name.
-        color:
-          $ref: "#/components/schemas/DashboardLineColor"
-          description: The series' color.
-      required:
-        - key
-        - name
-
-    DashboardWidgetPoint:
-      type: object
-      description: A single point on the chart. `x` is the time bucket (ISO 8601) or dimension value; every other key is a series key (matching `series[].key`) mapped to its numeric value (null when there is no data).
-      properties:
-        x:
-          type: string
-          description: The point's position on the x-axis — a time bucket or a dimension value.
-      additionalProperties:
-        type: number
-        nullable: true
-      required:
-        - x
-
-    DashboardWidgetDataBigNumber:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum: [bigNumber]
-          description: Discriminator for the BIG_NUMBER data shape.
-        unit:
-          $ref: "#/components/schemas/DashboardWidgetUnit"
-          description: The unit the value is measured in.
-        value:
-          type: number
-          nullable: true
-          description: The aggregated scalar value (null when there is no data).
-      required:
-        - kind
-        - value
-
-    DashboardWidgetDataTimeSeries:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum: [timeseries]
-          description: Discriminator for the time-series data shape.
-        unit:
-          $ref: "#/components/schemas/DashboardWidgetUnit"
-          description: The unit the series values are measured in.
-        xAxis:
-          type: object
-          description: Describes the x-axis.
-          properties:
-            type:
-              type: string
-              enum: [time]
-              description: The x-axis is time-based.
-          required:
-            - type
-        series:
-          type: array
-          description: The series plotted on the chart.
-          items:
-            $ref: "#/components/schemas/DashboardWidgetSeries"
-        points:
-          type: array
-          description: The data points, ordered by time.
-          items:
-            $ref: "#/components/schemas/DashboardWidgetPoint"
-      required:
-        - kind
-        - series
-        - points
-
-    DashboardWidgetDataDimension:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum: [dimension]
-          description: Discriminator for the dimension-breakdown data shape.
-        unit:
-          $ref: "#/components/schemas/DashboardWidgetUnit"
-          description: The unit the series values are measured in.
-        xAxis:
-          type: object
-          description: Describes the x-axis.
-          properties:
-            type:
-              type: string
-              enum: [dimension]
-              description: The x-axis is dimension-based.
-          required:
-            - type
-        series:
-          type: array
-          description: The series plotted on the chart.
-          items:
-            $ref: "#/components/schemas/DashboardWidgetSeries"
-        points:
-          type: array
-          description: One data point per dimension value (top-K limited).
-          items:
-            $ref: "#/components/schemas/DashboardWidgetPoint"
-      required:
-        - kind
-        - series
-        - points
-
-    DashboardWidgetDataTable:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum: [table]
-          description: Discriminator for the table data shape.
-        columns:
-          type: array
-          description: The table's columns — a leading dimension column followed by one column per line.
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-                description: The key used for this column in each row.
-              label:
-                type: string
-                description: The column's display label.
-            required:
-              - key
-              - label
-        rows:
-          type: array
-          description: The table's rows, keyed by column key.
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-                description: The key of the row
-              value:
-                type: string | double
-                description: The value of the item in row
-      required:
-        - kind
-        - columns
-        - rows
-
-    DashboardWidgetData:
-      description: A widget's plottable graph data. The shape depends on the widget — `kind` discriminates between a time series, a dimension breakdown, a table, or a single big number.
-      oneOf:
-        - $ref: "#/components/schemas/DashboardWidgetDataTimeSeries"
-          description: A time series, for LINE/AREA/BAR widgets in TIME_SERIES mode. The x-axis is time; series are one per line, or one per dimension value for a breakdown.
-        - $ref: "#/components/schemas/DashboardWidgetDataDimension"
-          description: A breakdown across a dimension, for BAR/STACKED_BAR widgets in DIMENSION_SERIES mode. The x-axis is the dimension's values; series are one per line.
-        - $ref: "#/components/schemas/DashboardWidgetDataTable"
-          description: Tabular data, for TABLE widgets. One column per line plus a dimension column; one row per dimension (or time) bucket.
-        - $ref: "#/components/schemas/DashboardWidgetDataBigNumber"
-          description: A single scalar value, for BIG_NUMBER widgets.
-      discriminator:
-        propertyName: kind
-        mapping:
-          timeseries: "#/components/schemas/DashboardWidgetDataTimeSeries"
-          dimension: "#/components/schemas/DashboardWidgetDataDimension"
-          table: "#/components/schemas/DashboardWidgetDataTable"
-          bigNumber: "#/components/schemas/DashboardWidgetDataBigNumber"
-
-    DashboardLineSummary:
-      type: object
-      description: A lightweight summary of a series within a widget.
-      properties:
-        id:
-          type: string
-          description: The unique id of the line.
-        name:
-          type: string
-          description: The line's name.
-        color:
-          $ref: "#/components/schemas/DashboardLineColor"
-
-    DashboardWidgetSummary:
-      type: object
-      description: A lightweight summary of a widget, returned in the dashboard detail.
-      properties:
-        id:
-          type: string
-          description: The unique id of the widget.
-        name:
-          type: string
-          description: The widget's name.
-        description:
-          type: string
-          nullable: true
-          description: An optional description of the widget.
-        startTime:
-          type: string
-          format: date-time
-          nullable: true
-          description: The start of the widget's custom time range, if set.
-        endTime:
-          type: string
-          format: date-time
-          nullable: true
-          description: The end of the widget's custom time range, if set.
-        lines:
-          type: array
-          description: The series shown in the widget.
-          items:
-            $ref: "#/components/schemas/DashboardLineSummary"
-
-    DashboardSummary:
-      type: object
-      description: A lightweight summary of a dashboard, returned in list responses.
+      description: A lightweight overview of a dashboard, returned in list responses.
       properties:
         id:
           type: string
@@ -11384,6 +11294,16 @@ components:
         private:
           type: boolean
           description: Whether the dashboard is private to its creator.
+        projectId:
+          type: string
+          description: The id of the project that owns the dashboard.
+        userId:
+          type: string
+          nullable: true
+          description: The id of the dashboard creator, when available.
+        widgetCount:
+          type: integer
+          description: The number of widgets on the dashboard.
         createdAt:
           type: string
           format: date-time
@@ -11410,6 +11330,13 @@ components:
         private:
           type: boolean
           description: Whether the dashboard is private to its creator.
+        projectId:
+          type: string
+          description: The id of the project that owns the dashboard.
+        userId:
+          type: string
+          nullable: true
+          description: The id of the dashboard creator, when available.
         createdAt:
           type: string
           format: date-time
@@ -11420,12 +11347,13 @@ components:
           description: When the dashboard was last updated.
         widgets:
           type: array
-          description: The widgets on the dashboard, with summary configuration.
+          description: Full widget configurations embedded in the dashboard.
           items:
-            $ref: "#/components/schemas/DashboardWidgetSummary"
+            $ref: "#/components/schemas/DashboardWidget"
 
     CreateDashboardRequest:
       type: object
+      description: The dashboard to create, optionally with starter widgets.
       properties:
         name:
           type: string
@@ -11472,9 +11400,9 @@ components:
           properties:
             dashboards:
               type: array
-              description: The list of dashboard summaries.
+              description: The list of dashboard overviews.
               items:
-                $ref: "#/components/schemas/DashboardSummary"
+                $ref: "#/components/schemas/DashboardOverview"
           required:
             - dashboards
         deprecated:
@@ -11485,41 +11413,7 @@ components:
         - data
         - deprecated
 
-    DashboardResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: Indicates if the request was successful.
-        data:
-          $ref: "#/components/schemas/Dashboard"
-          description: The dashboard, including its widgets.
-        deprecated:
-          type: boolean
-          description: Indicates if this endpoint is deprecated.
-      required:
-        - success
-        - data
-        - deprecated
-
-    DashboardWidgetResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: Indicates if the request was successful.
-        data:
-          $ref: "#/components/schemas/DashboardWidget"
-          description: The widget, with its full configuration.
-        deprecated:
-          type: boolean
-          description: Indicates if this endpoint is deprecated.
-      required:
-        - success
-        - data
-        - deprecated
-
-    DashboardWidgetListResponse:
+    DashboardObjectResponse:
       type: object
       properties:
         success:
@@ -11527,15 +11421,12 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
-          description: The widgets on the dashboard.
+          description: The dashboard, including its widget configurations.
           properties:
-            widgets:
-              type: array
-              description: The list of widgets, each with its full configuration.
-              items:
-                $ref: "#/components/schemas/DashboardWidget"
+            dashboard:
+              $ref: "#/components/schemas/Dashboard"
           required:
-            - widgets
+            - dashboard
         deprecated:
           type: boolean
           description: Indicates if this endpoint is deprecated.
@@ -11552,13 +11443,372 @@ components:
           description: Indicates if the request was successful.
         data:
           type: object
-          description: The id of the affected resource.
+          description: The id of the affected dashboard or widget.
           properties:
             id:
               type: string
-              description: The id of the created, updated, or deleted resource.
+              description: The id of the affected dashboard or widget.
           required:
             - id
+        deprecated:
+          type: boolean
+          description: Indicates if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    DashboardAggregateGranularity:
+      type: string
+      description: Bucket size for computed widget data.
+      enum:
+        - thirty_minutes
+        - hour
+        - day
+        - week
+        - month
+
+    DashboardWidgetQueryRequest:
+      type: object
+      description: Query overrides for a single widget. `startTime` and `endTime` must be provided together.
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: ISO 8601 start time for the query range. Must be provided with `endTime`.
+        endTime:
+          type: string
+          format: date-time
+          description: ISO 8601 end time for the query range. Must be provided with `startTime`.
+        granularity:
+          $ref: "#/components/schemas/DashboardAggregateGranularity"
+          description: Optional bucket granularity override for the query.
+
+    DashboardQueryRequest:
+      type: object
+      description: Query overrides for dashboard widgets. `startTime` and `endTime` must be provided together.
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: ISO 8601 start time for the query range. Must be provided with `endTime`.
+        endTime:
+          type: string
+          format: date-time
+          description: ISO 8601 end time for the query range. Must be provided with `startTime`.
+        granularity:
+          $ref: "#/components/schemas/DashboardAggregateGranularity"
+          description: Optional bucket granularity override for the query.
+        widgetIds:
+          type: array
+          description: Optional subset of widget IDs to query. If omitted, all widgets on the dashboard are queried.
+          items:
+            type: string
+
+    DashboardSeriesPoint:
+      type: object
+      description: A single point in a series — an x/y pair for one time bucket or category.
+      properties:
+        x:
+          type: string
+          description: Time bucket start or category label.
+        y:
+          type: number
+          nullable: true
+          description: Numeric value for the series at this point, or null when no data is available.
+      required:
+        - x
+        - y
+
+    DashboardSeries:
+      type: object
+      description: One plotted series in a TIME_SERIES or DIMENSION widget result.
+      properties:
+        key:
+          type: string
+          description: Stable key that uniquely identifies this series within the result. Use it to correlate series across queries or as a render key.
+        name:
+          type: string
+          description: Display name for the series.
+        color:
+          type: string
+          description: Display color for the series.
+        lineId:
+          type: string
+          description: The line id that produced this series, when applicable.
+        points:
+          type: array
+          description: Points in this series.
+          items:
+            $ref: "#/components/schemas/DashboardSeriesPoint"
+      required:
+        - key
+        - name
+        - color
+        - points
+
+    DashboardScalarValue:
+      type: object
+      description: A single headline value in a BIG_NUMBER widget result.
+      properties:
+        key:
+          type: string
+          description: Stable key that uniquely identifies this value within the result.
+        name:
+          type: string
+          description: Display name for the value.
+        color:
+          type: string
+          description: Display color for the value.
+        lineId:
+          type: string
+          description: The line id that produced this value, when applicable.
+        value:
+          type: number
+          nullable: true
+          description: Scalar value, or null when no data is available.
+      required:
+        - key
+        - name
+        - color
+        - value
+
+    DashboardWidgetData:
+      type: object
+      description: Computed data for a dashboard widget. The `kind` field indicates which shape-specific fields are populated.
+      properties:
+        widgetId:
+          type: string
+          description: The id of the queried widget.
+        type:
+          $ref: "#/components/schemas/DashboardWidgetType"
+          description: >-
+            The widget's visualization (display) type, echoed from its
+            configuration. This is how the widget is drawn and does not determine
+            which data fields are populated — use `kind` for that.
+        mode:
+          $ref: "#/components/schemas/DashboardWidgetMode"
+          description: >-
+            The widget's configured aggregation mode, echoed from its
+            configuration. When reading the response, branch on `kind` rather
+            than `mode`.
+        kind:
+          type: string
+          description: >-
+            The shape of the data in this response, and the field you should
+            branch on when reading it. `TIME_SERIES` and `DIMENSION` populate
+            `series` (with `xAxis.type` `time` and `category` respectively);
+            `BIG_NUMBER` populates `values`; `TABLE` populates `columns` and
+            `rows`. It is derived from `type` and `mode`, so it can differ from
+            `mode` — e.g. a `DIMENSION_SERIES` widget displayed as a `TABLE`
+            returns `kind: TABLE`.
+          enum:
+            - TIME_SERIES
+            - DIMENSION
+            - BIG_NUMBER
+            - TABLE
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: Unit for the returned values, when applicable.
+        xAxis:
+          type: object
+          description: Present for TIME_SERIES and DIMENSION data.
+          properties:
+            type:
+              type: string
+              description: Axis type for the returned data.
+              enum:
+                - time
+                - category
+          required:
+            - type
+        series:
+          type: array
+          description: Present for TIME_SERIES and DIMENSION data.
+          items:
+            $ref: "#/components/schemas/DashboardSeries"
+        values:
+          type: array
+          description: Present for BIG_NUMBER data.
+          items:
+            $ref: "#/components/schemas/DashboardScalarValue"
+        columns:
+          type: array
+          description: >-
+            Column definitions for TABLE data. The first column is the dimension
+            (key `dimension`); the remaining columns are one per line, keyed by
+            the line's name.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                description: Stable column key. Read each row's value for this column as `row[key]`.
+              label:
+                type: string
+                description: Display label for the column.
+            required:
+              - key
+              - label
+        rows:
+          type: array
+          description: Present for TABLE data.
+          items:
+            type: object
+            description: >-
+              A table row. Each value is keyed by its column's `key` — the
+              dimension value under `dimension`, and each line's value under the
+              line's name.
+            additionalProperties: true
+      required:
+        - widgetId
+        - kind
+
+    DashboardWidgetQueryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          $ref: "#/components/schemas/DashboardWidgetData"
+          description: The computed widget data.
+        deprecated:
+          type: boolean
+          description: Indicates if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    DashboardQueryResult:
+      type: object
+      description: One widget's batch query result. When `status` is `error`, only `widgetId`, `status`, and `error` are populated.
+      properties:
+        widgetId:
+          type: string
+          description: The id of the queried widget.
+        status:
+          type: string
+          description: Whether this widget's batch query succeeded.
+          enum:
+            - ok
+            - error
+        type:
+          $ref: "#/components/schemas/DashboardWidgetType"
+          description: >-
+            The widget's visualization (display) type, echoed from its
+            configuration. Does not determine which data fields are populated —
+            use `kind` for that. Present when `status` is `ok`.
+        mode:
+          $ref: "#/components/schemas/DashboardWidgetMode"
+          description: >-
+            The widget's configured aggregation mode, echoed from its
+            configuration. Branch on `kind` rather than `mode` when reading the
+            data. Present when `status` is `ok`.
+        kind:
+          type: string
+          description: >-
+            The shape of the data in this result, and the field you should branch
+            on when reading it. `TIME_SERIES` and `DIMENSION` populate `series`
+            (with `xAxis.type` `time` and `category` respectively); `BIG_NUMBER`
+            populates `values`; `TABLE` populates `columns` and `rows`. It is
+            derived from `type` and `mode`, so it can differ from `mode`. Present
+            when `status` is `ok`.
+          enum:
+            - TIME_SERIES
+            - DIMENSION
+            - BIG_NUMBER
+            - TABLE
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: Unit for the returned values, when applicable.
+        xAxis:
+          type: object
+          description: Present for TIME_SERIES and DIMENSION results.
+          properties:
+            type:
+              type: string
+              description: Axis type for the returned data.
+              enum:
+                - time
+                - category
+          required:
+            - type
+        series:
+          type: array
+          description: Present for TIME_SERIES and DIMENSION results.
+          items:
+            $ref: "#/components/schemas/DashboardSeries"
+        values:
+          type: array
+          description: Present for BIG_NUMBER results.
+          items:
+            $ref: "#/components/schemas/DashboardScalarValue"
+        columns:
+          type: array
+          description: >-
+            Column definitions for TABLE results. The first column is the
+            dimension (key `dimension`); the remaining columns are one per line,
+            keyed by the line's name.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                description: Stable column key. Read each row's value for this column as `row[key]`.
+              label:
+                type: string
+                description: Display label for the column.
+            required:
+              - key
+              - label
+        rows:
+          type: array
+          description: Present for TABLE results.
+          items:
+            type: object
+            description: >-
+              A table row. Each value is keyed by its column's `key` — the
+              dimension value under `dimension`, and each line's value under the
+              line's name.
+            additionalProperties: true
+        error:
+          type: object
+          description: Present only when `status` is `error`.
+          properties:
+            code:
+              type: string
+              description: Machine-readable query error code.
+              enum:
+                - QUERY_FAILED
+            message:
+              type: string
+              description: Human-readable query error message.
+          required:
+            - code
+            - message
+      required:
+        - widgetId
+        - status
+
+    DashboardQueryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          type: object
+          description: The batch query payload.
+          properties:
+            results:
+              type: array
+              description: Computed data or error details for each queried widget.
+              items:
+                $ref: "#/components/schemas/DashboardQueryResult"
+          required:
+            - results
         deprecated:
           type: boolean
           description: Indicates if this endpoint is deprecated.

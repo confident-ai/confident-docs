@@ -1831,22 +1831,7 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/dashboards/{dashboardId}/widgets:
-    get:
-      parameters:
-        - in: path
-          name: dashboardId
-          required: true
-          schema:
-            type: string
-          description: The id of the dashboard.
-        - in: header
-          name: CONFIDENT_API_KEY
-          required: true
-          description: The API key of your Confident AI project.
-          schema:
-            type: string
-          example: "<PROJECT-API-KEY>"
+  /v1/dashboards/{dashboardId}/query:
     post:
       parameters:
         - in: path
@@ -1863,8 +1848,25 @@ paths:
             type: string
           example: "<PROJECT-API-KEY>"
 
-  /v1/dashboards/{dashboardId}/widgets/{widgetId}:
-    get:
+  /v1/dashboards/{dashboardId}/widgets:
+    post:
+      parameters:
+        - in: path
+          name: dashboardId
+          required: true
+          schema:
+            type: string
+          description: The id of the dashboard.
+        - in: header
+          name: CONFIDENT_API_KEY
+          required: true
+          description: The API key of your Confident AI project.
+          schema:
+            type: string
+          example: "<PROJECT-API-KEY>"
+
+  /v1/dashboards/{dashboardId}/widgets/{widgetId}/query:
+    post:
       parameters:
         - in: path
           name: dashboardId
@@ -1885,6 +1887,8 @@ paths:
           schema:
             type: string
           example: "<PROJECT-API-KEY>"
+
+  /v1/dashboards/{dashboardId}/widgets/{widgetId}:
     put:
       parameters:
         - in: path

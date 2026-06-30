@@ -514,13 +514,13 @@ navigation:
                   - GET /v1/dashboards/{dashboardId}
                   - PUT /v1/dashboards/{dashboardId}
                   - DELETE /v1/dashboards/{dashboardId}
+                  - POST /v1/dashboards/{dashboardId}/query
                   - section: Widgets
                     contents:
-                      - GET /v1/dashboards/{dashboardId}/widgets
                       - POST /v1/dashboards/{dashboardId}/widgets
-                      - GET /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
+                      - POST /v1/dashboards/{dashboardId}/widgets/{widgetId}/query
           - section: Organization data models
             skip-slug: true
             contents:
