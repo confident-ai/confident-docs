@@ -5310,6 +5310,20 @@ paths:
                           dataModel: TRACE
                           aggregation: COUNT
                           filters: null
+                      data:
+                        kind: timeseries
+                        unit: COUNT
+                        xAxis:
+                          type: time
+                        series:
+                          - key: "Count"
+                            name: "Count"
+                            color: BLUE
+                        points:
+                          - x: "2024-06-01T00:00:00.000Z"
+                            Count: 42
+                          - x: "2024-06-02T00:00:00.000Z"
+                            Count: 57
                 deprecated: false
     post:
       x-fern-server-name: Confident AI
@@ -5418,6 +5432,20 @@ paths:
                       dataModel: TRACE
                       aggregation: COUNT
                       filters: null
+                  data:
+                    kind: timeseries
+                    unit: COUNT
+                    xAxis:
+                      type: time
+                    series:
+                      - key: "Count"
+                        name: "Count"
+                        color: BLUE
+                    points:
+                      - x: "2024-06-01T00:00:00.000Z"
+                        Count: 42
+                      - x: "2024-06-02T00:00:00.000Z"
+                        Count: 57
                 deprecated: false
     put:
       x-fern-server-name: Confident AI
@@ -11116,6 +11144,183 @@ components:
           description: The series shown in the widget.
           items:
             $ref: "#/components/schemas/DashboardLine"
+        data:
+          $ref: "#/components/schemas/DashboardWidgetData"
+          description: The widget's plottable graph data for its default time range (the last 30 days, or the widget's saved time range).
+
+    DashboardWidgetSeries:
+      type: object
+      description: One plotted series, mapping its key to a display name and color.
+      properties:
+        key:
+          type: string
+          description: The key this series uses in each data point — the line's (unique) name, or the dimension value for breakdowns. Not an internal id.
+        name:
+          type: string
+          description: The series' display name.
+        color:
+          $ref: "#/components/schemas/DashboardLineColor"
+          description: The series' color.
+      required:
+        - key
+        - name
+
+    DashboardWidgetPoint:
+      type: object
+      description: A single point on the chart. `x` is the time bucket (ISO 8601) or dimension value; every other key is a series key (matching `series[].key`) mapped to its numeric value (null when there is no data).
+      properties:
+        x:
+          type: string
+          description: The point's position on the x-axis — a time bucket or a dimension value.
+      additionalProperties:
+        type: number
+        nullable: true
+      required:
+        - x
+
+    DashboardWidgetDataBigNumber:
+      type: object
+      description: A single scalar value, for BIG_NUMBER widgets.
+      properties:
+        kind:
+          type: string
+          enum: [bigNumber]
+          description: Discriminator for the BIG_NUMBER data shape.
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: The unit the value is measured in.
+        value:
+          type: number
+          nullable: true
+          description: The aggregated scalar value (null when there is no data).
+      required:
+        - kind
+        - value
+
+    DashboardWidgetDataTimeSeries:
+      type: object
+      description: A time series, for LINE/AREA/BAR widgets in TIME_SERIES mode. The x-axis is time; series are one per line, or one per dimension value for a breakdown.
+      properties:
+        kind:
+          type: string
+          enum: [timeseries]
+          description: Discriminator for the time-series data shape.
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: The unit the series values are measured in.
+        xAxis:
+          type: object
+          description: Describes the x-axis.
+          properties:
+            type:
+              type: string
+              enum: [time]
+              description: The x-axis is time-based.
+          required:
+            - type
+        series:
+          type: array
+          description: The series plotted on the chart.
+          items:
+            $ref: "#/components/schemas/DashboardWidgetSeries"
+        points:
+          type: array
+          description: The data points, ordered by time.
+          items:
+            $ref: "#/components/schemas/DashboardWidgetPoint"
+      required:
+        - kind
+        - series
+        - points
+
+    DashboardWidgetDataDimension:
+      type: object
+      description: A breakdown across a dimension, for BAR/STACKED_BAR widgets in DIMENSION_SERIES mode. The x-axis is the dimension's values; series are one per line.
+      properties:
+        kind:
+          type: string
+          enum: [dimension]
+          description: Discriminator for the dimension-breakdown data shape.
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: The unit the series values are measured in.
+        xAxis:
+          type: object
+          description: Describes the x-axis.
+          properties:
+            type:
+              type: string
+              enum: [dimension]
+              description: The x-axis is dimension-based.
+          required:
+            - type
+        series:
+          type: array
+          description: The series plotted on the chart.
+          items:
+            $ref: "#/components/schemas/DashboardWidgetSeries"
+        points:
+          type: array
+          description: One data point per dimension value (top-K limited).
+          items:
+            $ref: "#/components/schemas/DashboardWidgetPoint"
+      required:
+        - kind
+        - series
+        - points
+
+    DashboardWidgetDataTable:
+      type: object
+      description: Tabular data, for TABLE widgets. One column per line plus a dimension column; one row per dimension (or time) bucket.
+      properties:
+        kind:
+          type: string
+          enum: [table]
+          description: Discriminator for the table data shape.
+        columns:
+          type: array
+          description: The table's columns — a leading dimension column followed by one column per line.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                description: The key used for this column in each row.
+              label:
+                type: string
+                description: The column's display label.
+            required:
+              - key
+              - label
+        rows:
+          type: array
+          description: The table's rows, keyed by column key.
+          items:
+            type: object
+            additionalProperties:
+              nullable: true
+              oneOf:
+                - type: string
+                - type: number
+      required:
+        - kind
+        - columns
+        - rows
+
+    DashboardWidgetData:
+      description: A widget's plottable graph data. The shape depends on the widget — `kind` discriminates between a time series, a dimension breakdown, a table, or a single big number.
+      oneOf:
+        - $ref: "#/components/schemas/DashboardWidgetDataTimeSeries"
+        - $ref: "#/components/schemas/DashboardWidgetDataDimension"
+        - $ref: "#/components/schemas/DashboardWidgetDataTable"
+        - $ref: "#/components/schemas/DashboardWidgetDataBigNumber"
+      discriminator:
+        propertyName: kind
+        mapping:
+          timeseries: "#/components/schemas/DashboardWidgetDataTimeSeries"
+          dimension: "#/components/schemas/DashboardWidgetDataDimension"
+          table: "#/components/schemas/DashboardWidgetDataTable"
+          bigNumber: "#/components/schemas/DashboardWidgetDataBigNumber"
 
     DashboardLineSummary:
       type: object
