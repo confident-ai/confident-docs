@@ -11180,7 +11180,6 @@ components:
 
     DashboardWidgetDataBigNumber:
       type: object
-      description: A single scalar value, for BIG_NUMBER widgets.
       properties:
         kind:
           type: string
@@ -11199,7 +11198,6 @@ components:
 
     DashboardWidgetDataTimeSeries:
       type: object
-      description: A time series, for LINE/AREA/BAR widgets in TIME_SERIES mode. The x-axis is time; series are one per line, or one per dimension value for a breakdown.
       properties:
         kind:
           type: string
@@ -11235,7 +11233,6 @@ components:
 
     DashboardWidgetDataDimension:
       type: object
-      description: A breakdown across a dimension, for BAR/STACKED_BAR widgets in DIMENSION_SERIES mode. The x-axis is the dimension's values; series are one per line.
       properties:
         kind:
           type: string
@@ -11271,7 +11268,6 @@ components:
 
     DashboardWidgetDataTable:
       type: object
-      description: Tabular data, for TABLE widgets. One column per line plus a dimension column; one row per dimension (or time) bucket.
       properties:
         kind:
           type: string
@@ -11297,11 +11293,13 @@ components:
           description: The table's rows, keyed by column key.
           items:
             type: object
-            additionalProperties:
-              nullable: true
-              oneOf:
-                - type: string
-                - type: number
+            properties:
+              key:
+                type: string
+                description: The key of the row
+              value:
+                type: string | double
+                description: The value of the item in row
       required:
         - kind
         - columns
@@ -11311,9 +11309,13 @@ components:
       description: A widget's plottable graph data. The shape depends on the widget — `kind` discriminates between a time series, a dimension breakdown, a table, or a single big number.
       oneOf:
         - $ref: "#/components/schemas/DashboardWidgetDataTimeSeries"
+          description: A time series, for LINE/AREA/BAR widgets in TIME_SERIES mode. The x-axis is time; series are one per line, or one per dimension value for a breakdown.
         - $ref: "#/components/schemas/DashboardWidgetDataDimension"
+          description: A breakdown across a dimension, for BAR/STACKED_BAR widgets in DIMENSION_SERIES mode. The x-axis is the dimension's values; series are one per line.
         - $ref: "#/components/schemas/DashboardWidgetDataTable"
+          description: Tabular data, for TABLE widgets. One column per line plus a dimension column; one row per dimension (or time) bucket.
         - $ref: "#/components/schemas/DashboardWidgetDataBigNumber"
+          description: A single scalar value, for BIG_NUMBER widgets.
       discriminator:
         propertyName: kind
         mapping:
