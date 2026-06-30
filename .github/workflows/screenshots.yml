@@ -60,6 +60,7 @@ jobs:
           PLATFORM_BASE_URL: ${{ vars.PLATFORM_BASE_URL }}
           CONFIDENT_PROJECT_ID: ${{ secrets.CONFIDENT_PROJECT_ID }}
           CONFIDENT_AI_CONNECTION_ID: ${{ secrets.CONFIDENT_AI_CONNECTION_ID }}
+          CONFIDENT_ANNOTATION_FORM_ID: ${{ secrets.CONFIDENT_ANNOTATION_FORM_ID }}
           S3_BUCKET: ${{ vars.SCREENSHOTS_S3_BUCKET }}
           SHOTSCRAPER_AUTH_FILE: auth.json
           ONLY_PATH_PREFIX: ${{ github.event.inputs.only_path_prefix }}

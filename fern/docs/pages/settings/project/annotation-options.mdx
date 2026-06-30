@@ -1,5 +1,5 @@
 ---
-subtitle: Define and manage annotation criteria for human-in-the-loop evaluation workflows in your project.
+subtitle: Define and manage annotation criteria and reusable annotation forms for human-in-the-loop evaluation workflows in your project.
 slug: settings/project/annotation-options
 description: Learn about annotation option configuration
 ---
@@ -7,7 +7,10 @@ description: Learn about annotation option configuration
 Enable or disable different human annotation options for your project. These criteria are used **for all annotations** within your project on Confident AI.
 
 <Frame caption="Manage Annotation Options">
-  <img data-image="settings.project.annotationOptions" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+  <img
+    data-image="settings.project.annotationOptions"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
 </Frame>
 
 <Tip>
@@ -46,3 +49,87 @@ To add a custom criteria:
 4. Click **Save**
 
 To delete a custom criteria, click the trash icon next to the criteria you want to remove.
+
+## Annotation Forms
+
+Annotation criteria apply to **every** annotation in your project. **Annotation forms** go a step further: they let you assemble a reusable set of fields — criteria plus custom questions — and attach them to specific [annotation queues](/docs/human-in-the-loop/annotation-queues). When a queue has a form attached, annotators fill in that form instead of the project's default annotation options.
+
+A form can mix two kinds of fields:
+
+- **Criteria fields** — score one of your project's annotation options (a default rating or a [custom criterion](#custom-criteria)). Answers are saved as regular annotations.
+- **Custom fields** — collect extra structured input such as text, numbers, or choices. Answers are saved as form responses alongside the annotated item.
+
+### Field Types
+
+| Type                | Description                                                          |
+| ------------------- | -------------------------------------------------------------------- |
+| **Criteria**        | Score a single annotation criterion (a default rating or custom one) |
+| **Text**            | Free-form text answer                                                |
+| **Number**          | Whole number answer                                                  |
+| **Decimal**         | Decimal number answer                                                |
+| **Yes / No**        | A yes / no toggle                                                    |
+| **Single choice**   | Pick one option from a list you define                               |
+| **Multiple choice** | Pick one or more options from a list you define                      |
+
+### Create a Form
+
+<Steps>
+
+<Step title="Open the Forms section">
+
+On this **Annotation** settings page, scroll to **Forms** and click **Create form**. Give the form a **Name** (e.g. _Response quality review_) and click **Create** to open the form editor.
+
+<Frame caption="The Forms section on the Annotation settings page">
+  <img
+    data-image="settings.project.annotationForms"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+</Step>
+
+<Step title="Add and configure fields">
+
+Click **Add** to append a field, then configure it:
+
+- Pick a **Type** from the table above.
+- For **Criteria** fields, choose which criterion to score (**Default** ratings or one of your custom criteria) and toggle the optional inputs you want to collect: **Explanation**, **Expected Output**, and **Expected Outcome**.
+- For **Single choice** / **Multiple choice** fields, define the selectable **Options**.
+- Add an optional **Description** to guide annotators, and toggle **Required** to make the field mandatory.
+
+Drag fields to reorder them, or use the trash icon to remove one.
+
+<Frame caption="Configuring fields in the annotation form editor">
+  <img
+    data-image="settings.project.annotationFormEditor"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+</Step>
+
+<Step title="Preview and save">
+
+Switch to the **Preview** tab to see exactly what annotators will fill in, then click **Save**.
+
+<Frame caption="Previewing the form as annotators will see it">
+  <img
+    data-image="settings.project.annotationFormPreview"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+</Step>
+
+</Steps>
+
+### Attach a Form to a Queue
+
+When creating an [annotation queue](/docs/human-in-the-loop/annotation-queues), use the **Form (optional)** dropdown to pick a form. This replaces the queue's default fields with those defined on the form. Leave it set to **Default** to use your project's annotation options instead.
+
+<Note>
+  Criteria answers are stored as normal annotations and appear wherever
+  annotations are shown — the Observatory, test case details, and CSV exports.
+  Custom field answers are stored as form responses and shown alongside the
+  annotated trace, span, thread, or test case.
+</Note>
