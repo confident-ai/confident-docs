@@ -1014,6 +1014,21 @@ paths:
                     output: "The capital of France is Paris."
                     startTime: "2025-01-15T10:30:00Z"
                     endTime: "2025-01-15T10:30:02Z"
+              Test-Run-Id:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                testRunId: "<TEST-RUN-ID>"
+                metricCollection: "Collection Name"
+                baseSpans:
+                  - uuid: "<SPAN-UUID>"
+                    name: "Agent"
+                    input: "What is the capital of France?"
+                    output: "Let me look that up for you."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:02Z"
               Thread-Id:
                 uuid: "<TRACE-UUID>"
                 input: "What is the capital of France?"
@@ -2283,6 +2298,30 @@ paths:
                   pageSize: 25
 
   /v1/test-runs:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Create Test Run
+      operationId: createTestRun
+      description: >-
+        Creates a new in-progress test run and returns its id. Use this id as
+        the `testRunId` when ingesting traces (`POST /v1/traces`) so that each
+        trace becomes one test case in this run.
+      requestBody:
+        description: ""
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestRun"
+      responses:
+        "200":
+          description: The created test run id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTestRunResponse"
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -7214,6 +7253,9 @@ components:
         metricCollection:
           type: string
           description: This is the metric collection you wish to use to evaluate the trace.
+        testRunId:
+          type: string
+          description: This is the unique identifier of the test run to associate the trace with. When set, the trace becomes one test case in that test run, and `metricCollection` is required. Create a test run with the `POST /v1/test-runs` endpoint to get this id.
         retrievalContext:
           type: array
           items:
@@ -7259,6 +7301,40 @@ components:
         link:
           type: string
           description: This is the URL to the trace on the Confident AI platform.
+        deprecated:
+          type: boolean
+          description: This is true if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+        - link
+
+    CreateTestRun:
+      type: object
+      properties:
+        metricCollection:
+          type: string
+          description: This is the metric collection used to evaluate the test cases formed from traces ingested into this test run.
+        identifier:
+          type: string
+          description: This is an optional human-readable identifier for the test run, shown on the Confident AI platform.
+    CreateTestRunResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: A boolean indicating the success or failure of the API call
+        data:
+          type: object
+          description: This maps to the test run id.
+          properties:
+            id:
+              type: string
+              description: This is the unique identifier of the created test run. Pass it as `testRunId` when ingesting traces.
+        link:
+          type: string
+          description: This is the URL to the test run on the Confident AI platform.
         deprecated:
           type: boolean
           description: This is true if this endpoint is deprecated.
