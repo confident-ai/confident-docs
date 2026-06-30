@@ -507,6 +507,18 @@ navigation:
                       - GET /v1/annotation-queues/{queueId}/items
                       - POST /v1/annotation-queues/{itemId}/annotate
                       - POST /v1/annotation-queues/{name}/batch-annotate
+              - section: Dashboards
+                contents:
+                  - GET /v1/dashboards
+                  - POST /v1/dashboards
+                  - GET /v1/dashboards/{dashboardId}
+                  - PUT /v1/dashboards/{dashboardId}
+                  - DELETE /v1/dashboards/{dashboardId}
+                  - section: Widgets
+                    contents:
+                      - POST /v1/dashboards/{dashboardId}/widgets
+                      - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
+                      - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
           - section: Organization data models
             skip-slug: true
             contents:
