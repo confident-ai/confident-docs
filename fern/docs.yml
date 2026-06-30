@@ -516,7 +516,9 @@ navigation:
                   - DELETE /v1/dashboards/{dashboardId}
                   - section: Widgets
                     contents:
+                      - GET /v1/dashboards/{dashboardId}/widgets
                       - POST /v1/dashboards/{dashboardId}/widgets
+                      - GET /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
           - section: Organization data models
