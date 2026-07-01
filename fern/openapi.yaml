@@ -123,6 +123,10 @@ tags:
     description: List governance policies and assign projects to them
     externalDocs:
       description: Learn about AI governance
+  - name: Risk Assessments
+    description: Run red-team risk assessments and list available frameworks
+    externalDocs:
+      description: Learn about risk assessments
   - name: Legacy
     description: Deprecated endpoints kept for backward compatibility. Avoid using these in new integrations.
     externalDocs:
@@ -1990,6 +1994,77 @@ paths:
                 data:
                   id: "br_123456"
                 deprecated: false
+
+  /v1/risk-assessments/frameworks:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - Risk Assessments
+      summary: List Frameworks
+      operationId: listRiskAssessmentFrameworks
+      description: |
+        Lists the red-team frameworks in your project along with their risk categories. Use the returned risk category names when running a risk assessment. Requires an Enterprise plan.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListRiskAssessmentFrameworksResponse"
+              example:
+                success: true
+                data:
+                  frameworks:
+                    - id: "FRAMEWORK-ID"
+                      name: "OWASP Top 10 for LLMs"
+                      description: "Standard LLM risk framework"
+                      riskCategories:
+                        - name: "Prompt Injection"
+                          numVulnerabilityTypes: 4
+                          numAttackMethods: 6
+
+  /v1/risk-assessments/frameworks/{frameworkId}/run:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Risk Assessments
+      summary: Run Risk Assessment
+      operationId: runRiskAssessment
+      description: |
+        Starts a risk assessment run asynchronously against a framework's risk categories, then returns a link to the assessment.
+
+        Target your application with either an AI connection (by name) or a prompt (by alias and commit). Provide exactly one, or set `generationMode` to disambiguate. Requires an Enterprise plan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunRiskAssessmentRequest"
+            examples:
+              AI Connection:
+                value:
+                  identifier: "Weekly production scan"
+                  riskCategories: ["Prompt Injection", "PII Leakage"]
+                  exposure: "MEDIUM"
+                  aiConnectionName: "Production Chatbot"
+              Prompt:
+                value:
+                  riskCategories: ["Prompt Injection"]
+                  exposure: "HIGH"
+                  promptAlias: "support-agent"
+                  promptCommit: "bab04ce"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunRiskAssessmentResponse"
+              example:
+                success: true
+                data:
+                  id: "RISK-ASSESSMENT-ID"
+                link: "https://app.confident-ai.com/project/<PROJECT-ID>/risk-profile/assessments/<RISK-ASSESSMENT-ID>"
 
   /v1/test-runs/{testRunId}:
     get:
@@ -9388,6 +9463,122 @@ components:
         - message
 
     # Annotation Queue Schemas
+    ListRiskAssessmentFrameworksResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          type: object
+          properties:
+            frameworks:
+              description: List of all frameworks present in this project
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the framework. Use this value when running an assessment.
+                  name:
+                    type: string
+                    description: The name of the framework.
+                  description:
+                    type: string
+                    nullable: true
+                    description: The description of the framework.
+                  riskCategories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the risk category. Use this value when running an assessment.
+                        numVulnerabilityTypes:
+                          type: integer
+                          description: The number of vulnerability types in this category.
+                        numAttackMethods:
+                          type: integer
+                          description: The number of attack methods in this category.
+                      required:
+                        - name
+                        - numVulnerabilityTypes
+                        - numAttackMethods
+                required:
+                  - id
+                  - name
+                  - riskCategories
+          required:
+            - frameworks
+      required:
+        - success
+        - data
+
+    RunRiskAssessmentRequest:
+      type: object
+      required:
+        - riskCategories
+        - exposure
+      properties:
+        riskCategories:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          description: The names of the risk categories to assess, exactly as returned by the list frameworks endpoint.
+        exposure:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          description: The exposure level of the application under test.
+        identifier:
+          type: string
+          description: An optional label for the run.
+        aiConnectionName:
+          type: string
+          description: The name of the AI connection to target. Required for AI_CONNECTION mode.
+        promptAlias:
+          type: string
+          description: The alias of the prompt to target. Required for PROMPT mode.
+        promptCommit:
+          type: string
+          description: The prompt commit hash to target. Defaults to the latest commit on the prompt's main branch.
+        generationMode:
+          type: string
+          enum: [AI_CONNECTION, PROMPT]
+          description: The target type. Optional when exactly one of aiConnectionName or promptAlias is provided.
+        attackEngine:
+          type: object
+          description: Optional attack generation settings.
+          properties:
+            generationGuidelines:
+              type: array
+              items:
+                type: string
+              description: Freeform guidelines that steer attack generation.
+
+    RunRiskAssessmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the risk assessment run was started.
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The unique identifier of the created risk assessment.
+          required:
+            - id
+        link:
+          type: string
+          description: A link to view the risk assessment.
+      required:
+        - success
+        - data
+
     CreateAnnotationQueue:
       type: object
       required:
