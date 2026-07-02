@@ -708,6 +708,9 @@ navigation:
           - page: Portkey
             path: docs/pages/integrations/third-party/portkey-ai.mdx
             icon: fa-light fa-hexagon
+          - page: TrueFoundry
+            path: docs/pages/integrations/third-party/true-foundry.mdx
+            icon: fa-light fa-cubes
   - tab: settings
     layout:
       - page: Platform Settings
