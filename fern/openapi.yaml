@@ -2003,7 +2003,7 @@ paths:
       summary: List Frameworks
       operationId: listRiskAssessmentFrameworks
       description: |
-        Lists the red-team frameworks in your project along with their risk categories. Use the returned risk category names when running a risk assessment. Requires an Enterprise plan.
+        Lists the red-team frameworks in your project along with their risk categories. Use the returned risk category names when [running a risk assessment](https://www.confident-ai.com/docs/api-reference/run-assessments/run-risk-assessment). Requires an Enterprise plan. 
       responses:
         "200":
           description: ""
@@ -9537,10 +9537,10 @@ components:
           description: An optional label for the run.
         aiConnectionName:
           type: string
-          description: The name of the AI connection to target. Required for AI_CONNECTION mode.
+          description: The name of the AI connection to target, you can find this in the Project Settings → AI Connections on the platform. Required for `AI_CONNECTION` mode.
         promptAlias:
           type: string
-          description: The alias of the prompt to target. Required for PROMPT mode.
+          description: The alias of the prompt to target. Required for `PROMPT` mode.
         promptCommit:
           type: string
           description: The prompt commit hash to target. Defaults to the latest commit on the prompt's main branch.
@@ -9556,7 +9556,7 @@ components:
               type: array
               items:
                 type: string
-              description: Freeform guidelines that steer attack generation.
+              description: Freeform guidelines that are used to guide the simulator model when generating attacks, give clear instructions to generate attacks that are more customized for your use case.
 
     RunRiskAssessmentResponse:
       type: object
