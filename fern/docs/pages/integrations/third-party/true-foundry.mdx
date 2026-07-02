@@ -14,45 +14,41 @@ Confident AI integrates with TrueFoundry AI to trace your LLM calls across every
 <Steps>
 
     <Step title="Create a Confident AI API key">
-
-    Log in to your [Confident AI](https://app.confident.ai) dashboard, open your project, and go to **Settings → API Keys**. Create a new API key and store it securely, you'll use it as the `x-confident-api-key` header when configuring TrueFoundry.
-
+        Log in to your [Confident AI](https://app.confident.ai) dashboard, open your project, and go to **Settings → API Keys**. Create a new API key and store it securely, you'll use it as the `x-confident-api-key` header when configuring TrueFoundry.
     </Step>
 
     <Step title="Configure OTEL export in TrueFoundry">
+        In the TrueFoundry dashboard, go to **AI Gateway → Controls → Settings**, scroll to **OTEL Config**, and click the edit (pencil) control.
 
-    In the TrueFoundry dashboard, go to **AI Gateway → Controls → Settings**, scroll to **OTEL Config**, and click the edit (pencil) control.
+        - Enable **Otel Traces Exporter Configuration**.
+        - Select **HTTP Configuration**.
+        - Set **Endpoint** to your Confident AI OTLP traces URL:
 
-    - Enable **Otel Traces Exporter Configuration**.
-    - Select **HTTP Configuration**.
-    - Set **Endpoint** to your Confident AI OTLP traces URL:
+        ```bash
+        https://otel.confident-ai.com/v1/traces
+        ```
 
-    ```bash
-    https://otel.confident-ai.com/v1/traces
-    ```
+        <Tip>
+        For users in the EU region, use the EU endpoint instead:
 
-    <Tip>
-    For users in the EU region, use the EU endpoint instead:
+        ```bash
+        https://eu.otel.confident-ai.com/v1/traces
+        ```
+        </Tip>
 
-    ```bash
-    https://eu.otel.confident-ai.com/v1/traces
-    ```
-    </Tip>
-
-    - Set **Encoding** to `Json`.
-
+        - Set **Encoding** to `Json`.
     </Step>
 
     <Step title="Configure headers and save">
 
-    Enable **Headers** and add the following:
+        Enable **Headers** and add the following:
 
-    | Header                | Value                      |
-    | --------------------- | -------------------------- |
-    | `Content-Type`        | `application/json`         |
-    | `x-confident-api-key` | `<your-confident-api-key>` |
+        | Header                | Value                      |
+        | --------------------- | -------------------------- |
+        | `Content-Type`        | `application/json`         |
+        | `x-confident-api-key` | `<your-confident-api-key>` |
 
-    Replace `<your-confident-api-key>` with the key from step 1, then click **Save**.
+        Replace `<your-confident-api-key>` with the key from step 1, then click **Save**.
 
     <Tip>
         Leave **Exclude Request Data** unchecked if you want Confident AI to receive LLM request and response payloads via the `tfy.input` and `tfy.output` span attributes. Confident AI accepts OTLP over HTTP only, gRPC is not supported.
@@ -62,7 +58,7 @@ Confident AI integrates with TrueFoundry AI to trace your LLM calls across every
 
     <Step title="Verify traces in the Observatory">
 
-    Send a few requests through your TrueFoundry AI Gateway, then confirm gateway traffic is flowing in TrueFoundry's **Monitor** page. In Confident AI, go to **Observability → Traces** to confirm new traces appear with latency, environment, and status details for your gateway requests.
+        Send a few requests through your TrueFoundry AI Gateway, then confirm gateway traffic is flowing in TrueFoundry's **Monitor** page. In Confident AI, go to **Observability → Traces** to confirm new traces appear with latency, environment, and status details for your gateway requests.
 
     </Step>
 
