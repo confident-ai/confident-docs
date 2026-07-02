@@ -456,6 +456,9 @@ navigation:
                   - GET /v1/test-runs
                   - POST /v1/test-runs
                   - GET /v1/test-runs/{testRunId}
+              - section: Risk Assessments
+                contents:
+                  - GET /v1/risk-assessments/frameworks
               - section: Traces
                 contents:
                   - GET /v1/traces
@@ -617,6 +620,9 @@ navigation:
                   - POST /v1/evaluate/spans/{spanUuid}
                   - POST /v1/evaluate/traces/{traceUuid}
                   - POST /v1/evaluate/threads/{threadId}
+              - section: Run Assessments
+                contents:
+                  - POST /v1/risk-assessments/frameworks/{frameworkId}/run
               - section: Simulate
                 contents:
                   - POST /v1/simulate
