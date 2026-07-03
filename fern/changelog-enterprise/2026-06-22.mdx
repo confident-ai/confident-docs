@@ -1,0 +1,21 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.16
+
+Migrates dashboards to the unified Widget data model and adds a governance controls page, backed by a supporting database migration.
+
+### New Features
+- **Governance Controls Page** — New page to configure and review governance controls across projects.
+- **Widget Data Model** — Dashboards migrated to a unified Widget model, replacing the legacy Graph model.
+
+### Improvements
+- **Governance Runs Consolidation** — Removed standalone governance runs in favor of the controls model.
+
+### Fixes
+- **Risk Assessment Pages** — Fixed rendering on risk-assessment pages.
+
+### Upgrade Notes
+
+Run the Graph-to-Widget migration before starting this version; it backfills existing dashboards onto the Widget model.

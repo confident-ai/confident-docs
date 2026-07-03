@@ -1,0 +1,36 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.9
+
+Adds pre-deployment governance controls, an organization-level API, workflow graphs, test-run and trace filters, and AWS inference support, with data-model cleanup migrations.
+
+### Highlights
+- Pre-deployment governance controls
+- Organization-level API endpoints
+- Test-run and trace filtering
+
+### New Features
+- **Pre-Deployment Controls** — Governance controls that run before deployment.
+- **Organization API Endpoints** — Organization-level endpoints for programmatic provisioning and management.
+- **Workflow Graphs** — Graph view for workflows.
+- **AWS Inference Support** — Added AWS inference as a model provider option.
+- **Test Run Filters** — Filter test runs.
+- **Trace Tool Filter** — Filter traces by tool.
+- **Project & Organization Settings** — Reorganized project and organization settings.
+
+### Improvements
+- **Multi-Root Ingestion Pipeline** — Support for multi-root trace ingestion.
+- **Model Costs** — Updated model cost data.
+
+### Fixes
+- **Risk Assessment** — Fixed filter pagination and an assessment bug.
+- **Annotation Queue** — Fixed annotation-queue handling.
+- **Multi-Turn Simulation** — Fixed multi-turn simulation display.
+- **UI** — Fixed dialog width, button timeouts, and color palette.
+- **Config Types** — Fixed configuration type handling.
+
+### Upgrade Notes
+
+This release includes several migrations (v2.0.8 data migration, `startAt`, usage token count) and drops stale model tables. Run pending migrations and back up your database before upgrading.
