@@ -123,6 +123,10 @@ tags:
     description: List governance policies and assign projects to them
     externalDocs:
       description: Learn about AI governance
+  - name: AI Connections
+    description: List the AI connections in your project
+    externalDocs:
+      description: Learn about AI connections
   - name: Risk Assessments
     description: Run red-team risk assessments and list available frameworks
     externalDocs:
@@ -1995,6 +1999,30 @@ paths:
                   id: "br_123456"
                 deprecated: false
 
+  /v1/ai-connections:
+    get:
+      x-fern-server-name: Confident AI
+      tags:
+        - AI Connections
+      summary: List AI Connections
+      operationId: listAIConnections
+      description: Lists the AI connections in your project.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAIConnectionsResponse"
+              example:
+                success: true
+                data:
+                  aiConnections:
+                    - id: "AI-CONNECTION-ID"
+                      name: "Production Chatbot"
+                      endpoint: "https://api.example.com/chat"
+                      active: true
+
   /v1/risk-assessments/frameworks:
     get:
       x-fern-server-name: Confident AI
@@ -2046,7 +2074,7 @@ paths:
                   identifier: "Weekly production scan"
                   riskCategories: ["Prompt Injection", "PII Leakage"]
                   exposure: "MEDIUM"
-                  aiConnectionName: "Production Chatbot"
+                  aiConnectionId: "AI-CONNECTION-ID"
               Prompt:
                 value:
                   riskCategories: ["Prompt Injection"]
@@ -9462,7 +9490,43 @@ components:
       required:
         - message
 
-    # Annotation Queue Schemas
+    ListAIConnectionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          type: object
+          properties:
+            aiConnections:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the AI connection.
+                  name:
+                    type: string
+                    description: The name of the AI connection.
+                  endpoint:
+                    type: string
+                    nullable: true
+                    description: The endpoint of the AI connection where requests are made.
+                  active:
+                    type: boolean
+                    description: Whether the AI connection is active.
+                required:
+                  - id
+                  - name
+                  - active
+          required:
+            - aiConnections
+      required:
+        - success
+        - data
+
     ListRiskAssessmentFrameworksResponse:
       type: object
       properties:
@@ -9535,9 +9599,9 @@ components:
         identifier:
           type: string
           description: An optional label for the run.
-        aiConnectionName:
+        aiConnectionId:
           type: string
-          description: The name of the AI connection to target, you can find this in the Project Settings → AI Connections on the platform. Required for `AI_CONNECTION` mode.
+          description: The ID of the AI connection to target, you can find this in the Project Settings → AI Connections on the platform. Required for `AI_CONNECTION` mode.
         promptAlias:
           type: string
           description: The alias of the prompt to target. Required for `PROMPT` mode.
@@ -9547,7 +9611,7 @@ components:
         generationMode:
           type: string
           enum: [AI_CONNECTION, PROMPT]
-          description: The target type. Optional when exactly one of aiConnectionName or promptAlias is provided.
+          description: The target type. Optional when exactly one of `aiConnectionId` or `promptAlias` is provided.
         attackEngine:
           type: object
           description: Optional attack generation settings.

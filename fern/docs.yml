@@ -456,6 +456,9 @@ navigation:
                   - GET /v1/test-runs
                   - POST /v1/test-runs
                   - GET /v1/test-runs/{testRunId}
+              - section: AI Connections
+                contents:
+                  - GET /v1/ai-connections
               - section: Risk Assessments
                 contents:
                   - GET /v1/risk-assessments/frameworks
