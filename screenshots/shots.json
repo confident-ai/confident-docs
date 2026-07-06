@@ -113,7 +113,10 @@
       "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
       "click": "Throttling",
       "selector": "[data-docs-id='ai-connection-default-generations']",
-      "width": 1512
+      "wait": 2500,
+      "full_page": true,
+      "width": 1512,
+      "height": 1320
     },
     {
       "s3_key": "settings:project:annotation-form-editor.png",
