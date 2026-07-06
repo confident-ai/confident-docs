@@ -46,6 +46,11 @@ tabs:
     icon: fa-light fa-clock-rotate-left
     display-name: Changelog
     changelog: ./changelog
+  enterprise-changelog:
+    slug: enterprise-changelog
+    icon: fa-light fa-rocket
+    display-name: Enterprise Releases
+    changelog: ./changelog-enterprise
 
 navigation:
   - tab: documentation
@@ -958,6 +963,7 @@ navigation:
             path: docs/pages/guides/authenticate-with-client-credentials.mdx
             icon: fa-light fa-key
   - tab: changelog
+  - tab: enterprise-changelog
 
 redirects:
   - source: /docs/settings/project/management/global-api-keys

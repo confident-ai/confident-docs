@@ -1,0 +1,35 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.11
+
+Finalizes the scheduling-settings migration by dropping legacy columns, adds official risk assessments, and hardens streaming JSON parsing.
+
+### New Features
+- **Official Risk Assessments** — Mark risk assessments as official to separate canonical runs from scratch runs.
+
+### Improvements
+- **Robust JSON Parsing** — Extract JSON even when wrapped in markdown or model reasoning, rather than failing on strict parsing.
+
+### Fixes
+- **Streaming JSON** — Fixed streaming JSON parse errors.
+
+### Upgrade Notes
+
+Drops legacy scheduling columns; run the drop-legacy-scheduling-columns migration after the v2.0.10 scheduling migration.
+
+## v2.0.10
+
+Rebuilds the alerts page with full history, adds pannable graphs, and lays the groundwork for flexible scheduling.
+
+### New Features
+- **New Alerts Page** — Rebuilt alerts page where each alert retains its full history.
+- **Pannable Graphs** — Graphs can now be panned.
+
+### Improvements
+- **Metadata Counts** — Fixed count deduplication and added metadata counts.
+
+### Upgrade Notes
+
+Run the scheduling-settings migrations before starting this version.

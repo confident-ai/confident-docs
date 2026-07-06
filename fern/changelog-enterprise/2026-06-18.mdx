@@ -1,0 +1,45 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.14
+
+Launch-week release. Adds AI-generated metric criteria and rubrics, per-evaluation model overrides, classifier filters and workflow chaining, executive insight and risk-assessment reports, dashboard templates, AI-feature usage and cost tracking, and the ability to pause online metric evaluations.
+
+### Highlights
+- AI-generated metric criteria and rubrics
+- Per-evaluation model overrides
+- Executive Insight and Risk Assessment reports
+- AI-feature usage and cost tracking
+
+### New Features
+- **AI Criteria & Rubric Generation** — Metrics can generate their own criteria and scoring rubrics using LLMs.
+- **Per-Evaluation Model Overrides** — Select the evaluation model per metric, with platform- and feature-specific defaults.
+- **Classifier Filters & Workflow Chaining** — Classifiers support saved filter configurations and downstream workflow chaining.
+- **Executive Insight Reports** — Generate executive-level insight reports, including support for custom (BYOK) models.
+- **Risk Assessment Reports** — Templated risk-assessment reporting.
+- **Dashboard Templates** — Prebuilt dashboard templates.
+- **AI-Feature Usage & Cost Tracking** — Track LLM usage and cost per AI feature, including signals.
+- **Pause Online Metric Evaluations** — Operators can pause online metric evaluations per project.
+- **Red Teaming Controls** — Governance controls for red teaming.
+- **Offloaded Span I/O** — Spans can include offloaded input/output payloads.
+- **Organization Invitations** — Improved organization invitation flow, including select-all.
+
+### Improvements
+- **AND/OR Filter Groups** — Filters support grouped AND/OR logic.
+- **Faster Graphs** — Reduced graph and metric-chart load times on high-volume projects.
+- **Report Standardization** — Standardized the reporting pipeline and removed legacy report logic.
+- **Evaluation Model Defaults** — Updated default evaluation model to gpt-5-nano for lower cost and latency.
+- **Model Call Logging** — Added logging for model and AI-connection requests.
+
+### Fixes
+- **Redis Ingestion Buffers** — Fixed Redis ingestion buffer handling.
+- **Experiments** — Fixed experiment alignment and a rendering issue.
+- **Risk Assessment** — Fixed a risk-assessment bug.
+- **Classifiers** — Fixed classifier issues.
+- **Alerts Styling** — Fixed alerts styling.
+- **Logging Noise** — Reduced excessive log output.
+
+### Upgrade Notes
+
+This release includes a database migration for AI-feature usage tracking; run pending migrations before starting the new version. The default evaluation model changed to gpt-5-nano — review this if you rely on a pinned evaluation model.

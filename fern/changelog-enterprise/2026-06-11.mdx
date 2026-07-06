@@ -1,0 +1,23 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.13
+
+Introduces flexible scheduling with onset, recurrence, and termination controls, extends triage to spans, threads, and test runs, adds official test runs and annotation queues, and ships several scheduling and alert fixes.
+
+### New Features
+- **Flexible Scheduling** — Custom schedule settings with configurable onset, recurrence, and termination for tasks and alerts.
+- **Triage for Spans, Threads & Test Runs** — Ticket creation and triage now extend beyond traces to spans, threads, and test runs.
+- **Official Test Runs** — Mark canonical test runs as official so scratch runs no longer pollute evaluation history.
+- **Annotation Queues** — Annotation forms now support review queues.
+
+### Fixes
+- **Bedrock ARN Parsing** — Fixed AWS Bedrock ARN parsing.
+- **Alerts Validation** — Fixed a validation error when configuring alerts.
+- **Scheduling UI** — Fixed toast and hydration issues in the scheduling UI.
+- **Project Settings UI** — Fixed rendering of the project settings page.
+
+### Upgrade Notes
+
+Run the schedule onset/recurrence/termination migration and the annotation-form response migration before starting this version.
