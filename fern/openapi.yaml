@@ -5756,7 +5756,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/WidgetQueryResponse"
               examples:
-                TimeSeries:
+                Time Series:
                   success: true
                   data:
                     type: LINE
@@ -5774,19 +5774,25 @@ paths:
                           - x: "2024-01-01T00:00:00.000Z"
                             y: 42
                   deprecated: false
-                BigNumber:
+                Dimension Breakdown:
                   success: true
                   data:
-                    type: BIG_NUMBER
+                    type: BAR
                     mode: DIMENSION_SERIES
-                    kind: BIG_NUMBER
-                    unit: COUNT
-                    values:
-                      - key: "Count"
-                        name: "Count"
+                    kind: DIMENSION
+                    unit: MILLISECONDS
+                    xAxis:
+                      type: category
+                    series:
+                      - key: "p90"
+                        name: "p90"
                         color: BLUE
                         lineId: "line-0"
-                        value: 42
+                        points:
+                          - x: "gpt-4o"
+                            y: 812
+                          - x: "gpt-4o-mini"
+                            y: 342
                   deprecated: false
 
 components:
