@@ -45,12 +45,6 @@ tabs:
     slug: changelog
     icon: fa-light fa-clock-rotate-left
     display-name: Changelog
-    changelog: ./changelog
-  enterprise-changelog:
-    slug: enterprise-changelog
-    icon: fa-light fa-rocket
-    display-name: Enterprise Releases
-    changelog: ./changelog-enterprise
 
 navigation:
   - tab: documentation
@@ -963,9 +957,23 @@ navigation:
             path: docs/pages/guides/authenticate-with-client-credentials.mdx
             icon: fa-light fa-key
   - tab: changelog
-  - tab: enterprise-changelog
+    layout:
+      - changelog: ./changelog
+        title: Cloud Platform
+        icon: fa-light fa-cloud
+        slug: cloud-platform
+      - changelog: ./changelog-enterprise
+        title: Self-Hosted
+        icon: fa-light fa-server
+        slug: self-hosted
 
 redirects:
+  - source: /docs/enterprise-changelog
+    destination: /docs/changelog/self-hosted
+    permanent: true
+  - source: /docs/enterprise-changelog/:slug*
+    destination: /docs/changelog/self-hosted/:slug*
+    permanent: true
   - source: /docs/settings/project/management/global-api-keys
     destination: /docs/settings/organization/global-api-keys
     permanent: true
