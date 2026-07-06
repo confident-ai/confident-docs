@@ -7,6 +7,7 @@
     "click": "Optional. Clicks ONE element before the screenshot to open the tab/panel you want to capture (e.g. the 'Output Parsing' tab). Match it by the element's exact visible TEXT (e.g. \"Headers\"), or by a CSS selector if the value starts with [ . or #. Pass an array to click several in sequence (e.g. tab -> dropdown -> option). A text match must be EXACT (and clicks the innermost match); if nothing matches, the shot FAILS with a clear error instead of capturing the wrong state.",
     "selector": "The element of interest. The shot waits for it to appear, and — unless full_page is true — crops the image to just this element.",
     "full_page": "true = capture the WHOLE browser window (nav + top bar + content). false/omitted = crop to 'selector'.",
+    "wait": "Optional. Extra milliseconds to wait AFTER the click/selector before capturing. Use for panels whose content streams in after opening (e.g. a drawer that fetches data on open) so the shot isn't captured mid-load.",
     "width": "Browser window width in pixels (default 1280).",
     "height": "Browser window height in pixels. For full_page shots, tune this so the content fits with no empty space at the bottom and nothing cut off."
   },
@@ -129,6 +130,7 @@
       "path": "/project/:projectId/test-runs/:testRunId/test-cases",
       "click": "[class*='dataRowsContainer']",
       "selector": "[data-docs-id='multi-generation-test-case']",
+      "wait": 5000,
       "full_page": true,
       "width": 1512,
       "height": 1000

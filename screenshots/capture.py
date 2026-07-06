@@ -38,6 +38,7 @@ class Shot:
     hide: str = ""
     width: int = 0
     height: int = 0
+    wait: int = 0
     doc: str = ""
     local_storage: tuple[tuple[str, str], ...] = ()
 
@@ -48,6 +49,7 @@ class Shot:
         values["full_page"] = bool(raw.get("full_page", False))
         values["width"] = int(raw.get("width") or 0)
         values["height"] = int(raw.get("height") or 0)
+        values["wait"] = int(raw.get("wait") or 0)
         click = raw.get("click")
         values["click"] = tuple(click) if isinstance(click, list) else (click,) if click else ()
         store = raw.get("local_storage") or {}
@@ -204,6 +206,10 @@ def _hide_js(hide: str) -> str:
 def browser_js(shot: Shot) -> str:
     clicks = "".join(_click_js(c) + _settle_js(SETTLE_MS) for c in shot.click)
     body = clicks + _wait_for_js(shot.selector) + _hide_js(shot.hide)
+    # Extra settle for panels whose content streams in after the click/selector
+    # is present (e.g. a drawer that fetches its data on open).
+    if shot.wait:
+        body += _settle_js(shot.wait)
     if not body.strip():
         return ""
     return f"(async () => {{ {body} }})()"
