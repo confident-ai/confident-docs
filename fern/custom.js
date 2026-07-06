@@ -125,6 +125,8 @@ function runOnDomUpdates(callback) {
     "experiments.createFromTestRuns": `${S3_BASE}/experiments:create-from-test-runs.png`,
     "experiments.metricsOverview": `${S3_BASE}/experiments:metrics-overview.png`,
 
+    "evaluation.multiGenerationTestCases": `${S3_BASE}/evaluation:multi-generation-test-cases.png`,
+
     "arena.promptConfig": `${S3_BASE}/arena:prompt-config.png`,
     "arena.aiConnectionConfig": `${S3_BASE}/arena:ai-connection-config.png`,
     "arena.mixedConfig": `${S3_BASE}/arena:mixed-config.png`,
@@ -184,6 +186,7 @@ function runOnDomUpdates(callback) {
     "settings.project.aiConnectionThrottling": `${S3_BASE}/ai-connection:throttling.png`,
     "settings.project.aiConnectionOutputParsing": `${S3_BASE}/ai-connection:output-parsing.png`,
     "settings.project.aiConnectionOutputTransformer": `${S3_BASE}/ai-connection:output-transformer.png`,
+    "settings.project.aiConnectionMultiGeneration": `${S3_BASE}/ai-connection:default-generations.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.annotationFormEditor": `${S3_BASE}/settings:project:annotation-form-editor.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,

@@ -3,7 +3,7 @@
     "local_storage": "TOP-LEVEL ONLY. localStorage key→value pairs seeded into the browser BEFORE the page loads, applied to every shot. Used to collapse the Getting Started panel and hide the Book-a-demo banner. ':projectId'/':aiConnectionId' are substituted from .env.",
     "s3_key": "REQUIRED. The S3 object this image overwrites. It is the ONLY link between the picture shown in the docs and this capture — the .mdx references the same key's URL.",
     "doc": "INFORMATIONAL ONLY (ignored at runtime). Which .mdx docs page displays this image, so humans can keep the manifest and docs in sync.",
-    "path": "REQUIRED. The platform URL route to open. ':projectId'/':aiConnectionId' are filled in from .env.",
+    "path": "REQUIRED. The platform URL route to open. ':projectId'/':aiConnectionId'/':annotationFormId'/':testRunId' are filled in from .env.",
     "click": "Optional. Clicks ONE element before the screenshot to open the tab/panel you want to capture (e.g. the 'Output Parsing' tab). Match it by the element's exact visible TEXT (e.g. \"Headers\"), or by a CSS selector if the value starts with [ . or #. Pass an array to click several in sequence (e.g. tab -> dropdown -> option). A text match must be EXACT (and clicks the innermost match); if nothing matches, the shot FAILS with a clear error instead of capturing the wrong state.",
     "selector": "The element of interest. The shot waits for it to appear, and — unless full_page is true — crops the image to just this element.",
     "full_page": "true = capture the WHOLE browser window (nav + top bar + content). false/omitted = crop to 'selector'.",
@@ -107,10 +107,28 @@
       "height": 1000
     },
     {
+      "s3_key": "ai-connection:default-generations.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections/multi-generation.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "click": "Throttling",
+      "selector": "[data-docs-id='ai-connection-default-generations']",
+      "width": 1512
+    },
+    {
       "s3_key": "settings:project:annotation-form-editor.png",
       "doc": "fern/docs/pages/settings/project/annotation-options.mdx",
       "path": "/project/:projectId/project-settings/annotation/:annotationFormId",
       "selector": "[data-docs-id='annotation-form-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 1000
+    },
+    {
+      "s3_key": "evaluation:multi-generation-test-cases.png",
+      "doc": "fern/docs/pages/settings/project/ai-connections/multi-generation.mdx",
+      "path": "/project/:projectId/test-runs/:testRunId/test-cases",
+      "click": "[class*='dataRowsContainer']",
+      "selector": "[data-docs-id='multi-generation-test-case']",
       "full_page": true,
       "width": 1512,
       "height": 1000

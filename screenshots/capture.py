@@ -109,6 +109,9 @@ def load_settings() -> Settings:
     annotation_form_id = os.environ.get("CONFIDENT_ANNOTATION_FORM_ID", "").strip()
     if annotation_form_id:
         tokens[":annotationFormId"] = annotation_form_id
+    test_run_id = os.environ.get("CONFIDENT_TEST_RUN_ID", "").strip()
+    if test_run_id:
+        tokens[":testRunId"] = test_run_id
 
     return Settings(
         base_url=require_env("PLATFORM_BASE_URL").rstrip("/"),

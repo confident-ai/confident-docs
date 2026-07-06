@@ -756,6 +756,9 @@ navigation:
               - page: Throttling & Retries
                 path: docs/pages/settings/project/ai-connections/throttling-retries.mdx
                 icon: fa-light fa-gauge-high
+              - page: Multi-Generation
+                path: docs/pages/settings/project/ai-connections/multi-generation.mdx
+                icon: fa-light fa-repeat
               - page: Multi-Turn State
                 path: docs/pages/settings/project/ai-connections/multiturn-state.mdx
                 icon: fa-light fa-comments
