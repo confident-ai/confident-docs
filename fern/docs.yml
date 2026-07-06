@@ -959,6 +959,9 @@ navigation:
           - page: Authenticate AI Connections with Client Credentials
             path: docs/pages/guides/authenticate-with-client-credentials.mdx
             icon: fa-light fa-key
+          - page: Set Up the Confident Agent in an Air-Gapped Environment
+            path: docs/pages/guides/confident-agent-air-gapped.mdx
+            icon: fa-light fa-shield-halved
   - tab: changelog
     layout:
       - changelog: ./changelog
