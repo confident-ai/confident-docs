@@ -825,6 +825,9 @@ navigation:
           - page: Quickstart
             path: docs/pages/settings/project/management/quickstart.mdx
             icon: fa-light fa-bolt
+          - page: Agent Skill
+            path: docs/pages/settings/project/management/agent-skill.mdx
+            icon: fa-light fa-robot
           - page: Organization
             path: docs/pages/settings/project/management/organization.mdx
             icon: fa-light fa-building

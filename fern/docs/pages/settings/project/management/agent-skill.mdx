@@ -1,0 +1,235 @@
+---
+title: Agent Skill
+subtitle: Manage Confident AI from Cursor, Claude Code, or Codex with natural-language prompts.
+slug: settings/project/management/agent-skill
+description: Install the confident-client Agent Skill in Cursor, Claude Code, or Codex to create projects, invite members, assign roles, and provision API keys using plain-English prompts.
+---
+
+## Overview
+
+The **confident-client Agent Skill** teaches your coding agent — Cursor, Claude Code, or Codex — how to drive the [Admin SDK](/docs/settings/project/management/introduction) for you. Instead of writing SDK code by hand, you describe what you want ("create a project owned by alice@example.com") and the agent writes and runs the correct call.
+
+A skill is just a `SKILL.md` file plus reference docs. It ships inside the [`confident-client`](https://github.com/confident-ai/confident-client) repository — the same repo as the Python and TypeScript SDKs — so the guidance always matches the code.
+
+<Note>
+
+This skill covers **account administration** — organizations, projects, members, roles, governance policies, and API keys. It authenticates with an **Organization API Key** (`CONFIDENT_ORG_API_KEY`), not the project key used for tracing and evaluations.
+
+</Note>
+
+Here's the flow you'll set up:
+
+<Steps>
+
+<Step title="Install the Admin SDK">
+
+The skill drives the [`confidentai`](https://github.com/confident-ai/confident-client) Admin SDK — that's the package the agent actually runs. Install it in the environment your agent executes commands in, matching the language your project uses:
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```bash
+pip install confidentai
+```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```bash
+npm install confidentai
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Install the skill">
+
+The skill lives in the [`confident-client`](https://github.com/confident-ai/confident-client) repo. Install it with the Skills CLI (recommended) or wire it up by hand.
+
+<Tabs>
+
+<Tab title="Skills CLI">
+
+One command installs the skill into any Skills-compatible assistant — Cursor, Claude Code, Codex, Windsurf, OpenCode, and [70+ others](https://skills.sh):
+
+```bash
+npx skills add confident-ai/confident-client --skill "confident-client"
+```
+
+The CLI auto-detects the coding agents you have installed and symlinks the skill into each one. A couple of handy flags:
+
+- `-g` — install globally (available across every project) instead of just the current directory.
+- `-a cursor` — target a specific agent; repeatable, e.g. `-a cursor -a claude-code`.
+
+</Tab>
+
+<Tab title="Manual">
+
+Prefer to set it up yourself? Pick your agent below.
+
+<Tabs>
+
+<Tab title="Cursor">
+
+Clone the repo and symlink the skill into your user skills directory:
+
+```bash
+git clone https://github.com/confident-ai/confident-client.git
+mkdir -p ~/.cursor/skills
+ln -s "$(pwd)/confident-client/skills/confident-client" ~/.cursor/skills/confident-client
+```
+
+Then reload Cursor (**Cmd/Ctrl+Shift+P → Developer: Reload Window**) and confirm `confident-client` appears under **Customize → Skills**.
+
+</Tab>
+
+<Tab title="Claude Code">
+
+The repo doubles as a plugin marketplace, so add it and install directly (run these inside Claude Code):
+
+```text
+/plugin marketplace add confident-ai/confident-client
+/plugin install confident-client@confident-ai-plugins
+```
+
+</Tab>
+
+<Tab title="Codex">
+
+Copy the skill into your Codex skills directory (copy rather than symlink — Codex skips symlinked `SKILL.md` files):
+
+```bash
+git clone https://github.com/confident-ai/confident-client.git
+mkdir -p ~/.codex/skills
+cp -r confident-client/skills/confident-client ~/.codex/skills/confident-client
+```
+
+Then restart Codex.
+
+</Tab>
+
+</Tabs>
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Set your Organization API Key">
+
+Every management call needs an **Organization API Key** (e.g. `confident_us_org_...`). [Retrieve yours](/docs/api-reference/authentication#organization-level-auth), then export it in the terminal your agent runs commands in:
+
+```bash
+export CONFIDENT_ORG_API_KEY="confident_us_org_..."
+```
+
+<Warning>
+
+This is **not** the same as `CONFIDENT_API_KEY`, which is a project-scoped key for tracing and evals. Keep both out of source control. The agent needs `CONFIDENT_ORG_API_KEY` in its shell session to actually create anything.
+
+</Warning>
+
+</Step>
+
+<Step title="Create your first project">
+
+Open your agent and describe the project you want. For example:
+
+```text title="Prompt"
+Create a Confident AI project called "Customer Support Bot" and make alice@example.com the owner.
+```
+
+The skill will:
+
+- Confirm which SDK language to use (Python or TypeScript) if your project isn't clearly one or the other.
+- Ask whether to assign an **owner** (the email must belong to an existing organization member).
+- Create the project and return its `id` plus a **one-time project API key** — the full secret is only shown at creation.
+
+<Tip>
+
+Because the project key is only returned once, copy it somewhere safe as soon as the agent prints it. You'll use it in the last step.
+
+</Tip>
+
+Done ✅. You just created a project without writing a line of SDK code.
+
+</Step>
+
+<Step title="Invite members and assign roles">
+
+Onboard your team the same way — with prompts:
+
+```text title="Invite members"
+Invite alice@example.com and bob@example.com to my organization.
+```
+
+The skill asks which **role** to grant invitees before sending (inviting requires a paid plan).
+
+```text title="Define and assign a role"
+Create an "Analyst" role with read-only access and assign it to bob@example.com.
+```
+
+Roles are built from policies, which are built from permissions — the skill composes them in the right order for you. You can manage governance too:
+
+```text title="Governance"
+Assign our governance policy to all of my production projects.
+```
+
+</Step>
+
+<Step title="Use your project API key">
+
+The project API key from step 3 is what your **application** uses for tracing and evaluations. Paste it into the environment where your app runs:
+
+```bash
+export CONFIDENT_API_KEY="confident_us_proj_..."
+```
+
+That's the project-scoped key (`CONFIDENT_API_KEY`) — distinct from the `CONFIDENT_ORG_API_KEY` you used for administration. With it set, `deepeval` and the tracing SDKs send data to your new project.
+
+Done ✅. Your project is live and ready to receive traces and evals.
+
+</Step>
+
+</Steps>
+
+## Next Steps
+
+You installed the SDK and skill, created a project, onboarded members, and wired up a project key — all through prompts. To go deeper:
+
+<CardGroup cols={2}>
+  <Card
+    title="Admin SDK Quickstart"
+    icon="bolt"
+    href="/docs/settings/project/management/quickstart"
+  >
+    See the underlying SDK calls the skill generates, for Python and TypeScript.
+  </Card>
+  <Card
+    title="Projects"
+    icon="folder"
+    href="/docs/settings/project/management/projects"
+  >
+    Create, update, and delete projects, including owner assignment.
+  </Card>
+  <Card
+    title="Members & Invitations"
+    icon="user-group"
+    href="/docs/settings/project/management/members-and-invitations"
+  >
+    Manage organization and project membership and roles.
+  </Card>
+  <Card
+    title="LLM Tracing Quickstart"
+    icon="diagram-project"
+    href="/docs/llm-tracing/quickstart"
+  >
+    Put your new project API key to work with tracing and evals.
+  </Card>
+</CardGroup>
