@@ -963,16 +963,16 @@ navigation:
         icon: fa-light fa-cloud
         slug: cloud-platform
       - changelog: ./changelog-enterprise
-        title: Self-Hosted
+        title: Self-Hosting
         icon: fa-light fa-server
-        slug: self-hosted
+        slug: self-hosting
 
 redirects:
   - source: /docs/enterprise-changelog
-    destination: /docs/changelog/self-hosted
+    destination: /docs/changelog/self-hosting
     permanent: true
   - source: /docs/enterprise-changelog/:slug*
-    destination: /docs/changelog/self-hosted/:slug*
+    destination: /docs/changelog/self-hosting/:slug*
     permanent: true
   - source: /docs/settings/project/management/global-api-keys
     destination: /docs/settings/organization/global-api-keys
