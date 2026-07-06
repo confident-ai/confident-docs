@@ -527,6 +527,7 @@ navigation:
                       - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - POST /v1/dashboards/{dashboardId}/widgets/{widgetId}/query
+                      - POST /v1/widgets/query
           - section: Organization data models
             skip-slug: true
             contents:
