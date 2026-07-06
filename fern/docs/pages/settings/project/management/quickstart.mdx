@@ -11,6 +11,49 @@ The Admin SDK lets you manage organizations, projects, members, roles, and API k
 
 This quickstart shows how to install the SDK, configure an Organization API Key, create a client, and list projects in your organization.
 
+## Vibe Code Your Administration
+
+Let your coding agent run your account administration for you — creating projects, inviting members, composing roles from policies and permissions, and provisioning API keys. Describe what you want in plain English and the agent writes and runs the correct Admin SDK calls. For the full walkthrough, see the [Vibe Code Your Administration](/docs/guides/vibe-code-administration) guide — or choose the install method for your agent below to get started right away.
+
+<Tabs>
+
+<Tab title="Claude Code (plugin)">
+
+Run these four commands in Claude Code:
+
+```bash
+/plugin marketplace add confident-ai/confident-client
+/plugin install confident-client@confident-ai-plugins
+/reload-plugins
+/plugins
+```
+
+The `/plugins` command should list `confident-client` under your installed plugins.
+
+</Tab>
+
+<Tab title="Cursor, Codex, Windsurf & others (Skills CLI)">
+
+Install the [`confident-client` Agent Skill](https://github.com/confident-ai/confident-client) with any [Skills](https://github.com/anthropics/skills)-compatible installer. This works with Cursor, Claude Code, Codex, Windsurf, OpenCode, and any other assistant that supports the Skills standard:
+
+```bash
+npx skills add confident-ai/confident-client --skill "confident-client"
+```
+
+The skill teaches your agent how to drive the Admin SDK — creating projects, inviting members, composing roles from policies and permissions, assigning governance policies, and provisioning API keys. It triggers automatically on prompts like the ones below.
+
+</Tab>
+
+</Tabs>
+
+Once installed, open your project and tell your agent what you need. Example prompts:
+
+- *"Create a Confident AI project called 'Customer Support Bot' and make alice@example.com the owner."*
+- *"Invite alice@example.com and bob@example.com to my organization as analysts."*
+- *"Create an 'Analyst' role with read-only access and assign it to bob@example.com."*
+
+Your agent will confirm the SDK language, run the calls in the right order (permissions → policies → roles), and hand back the IDs and one-time API keys it creates.
+
 ## Get Started
 
 <Steps>

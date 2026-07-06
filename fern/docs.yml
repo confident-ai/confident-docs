@@ -824,9 +824,6 @@ navigation:
           - page: Quickstart
             path: docs/pages/settings/project/management/quickstart.mdx
             icon: fa-light fa-bolt
-          - page: Agent Skill
-            path: docs/pages/settings/project/management/agent-skill.mdx
-            icon: fa-light fa-robot
           - page: Organization
             path: docs/pages/settings/project/management/organization.mdx
             icon: fa-light fa-building
@@ -947,6 +944,9 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
+          - page: Vibe Code Your Administration
+            path: docs/pages/guides/vibe-code-administration.mdx
+            icon: fa-light fa-robot
           - page: Provision Projects for Agents on the Fly
             path: docs/pages/guides/provision-projects-in-code.mdx
             icon: fa-light fa-layer-group
@@ -976,6 +976,10 @@ redirects:
     permanent: true
   - source: /docs/settings/project/management/global-api-keys
     destination: /docs/settings/organization/global-api-keys
+    permanent: true
+  # Agent Skill page moved to a Guide (Vibe Code Your Administration)
+  - source: /docs/settings/project/management/agent-skill
+    destination: /docs/guides/vibe-code-administration
     permanent: true
   - source: /docs/llm-tracing/features/categories
     destination: /docs/llm-tracing/features/signals
