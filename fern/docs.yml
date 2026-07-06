@@ -972,6 +972,10 @@ navigation:
         title: Self-Hosting
         icon: fa-light fa-server
         slug: self-hosting
+      - changelog: ./changelog-client
+        title: Client SDKs
+        icon: fa-light fa-code
+        slug: confident-client
 
 redirects:
   - source: /docs/enterprise-changelog
