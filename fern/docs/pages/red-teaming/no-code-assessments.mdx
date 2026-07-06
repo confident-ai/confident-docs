@@ -134,6 +134,33 @@ sequenceDiagram
 
 </Steps>
 
+## Recommended Models
+
+Red teaming generates adversarial inputs, most AI models have guardrails that prevent it from generating harmful outputs, hence we recommend *uncensored* or *neutral* models for generations. Here's a list of reliable models you can use for red teaming:
+
+| Model                                                                              |  Params | Guardrails |
+| :--------------------------------------------------------------------------------- | :-----: | :--------: |
+| `huggingface/huihui-ai/Llama-3.3-70B-Instruct-abliterated:featherless-ai`          | **70B** | Uncensored |
+| `huggingface/NousResearch/Hermes-3-Llama-3.1-70B:featherless-ai`                   | **70B** |   Neutral  |
+| `huggingface/huihui-ai/Qwen2.5-72B-Instruct-abliterated:featherless-ai`            | **72B** | Uncensored |
+| `huggingface/dphn/dolphin-2.9.2-qwen2-72b:featherless-ai`                          | **72B** | Uncensored |
+| `huggingface/dphn/dolphin-2.9-llama3-70b:featherless-ai`                           | **70B** | Uncensored |
+| `huggingface/huihui-ai/Mistral-Small-24B-Instruct-2501-abliterated:featherless-ai` | **24B** | Uncensored |
+| `huggingface/dphn/dolphin-2.9.3-mistral-nemo-12b:featherless-ai`                   | **12B** | Uncensored |
+| `huggingface/NousResearch/Hermes-3-Llama-3.1-8B:featherless-ai`                    |  **8B** |   Neutral  |
+| `huggingface/mlabonne/NeuralDaredevil-8B-abliterated:featherless-ai`               |  **8B** | Uncensored |
+| `huggingface/huihui-ai/Qwen2.5-7B-Instruct-abliterated-v3:featherless-ai`          |  **7B** | Uncensored |
+
+**Uncensored** models have their safety guardrails removed; **Neutral** models are minimally aligned with low refusal rates and the most reliable structured output.
+You can use these models by setting your **Platform Model** to Hugging Face provider along with your credentials.
+
+<Tip>
+  You can also use uncensored models from other providers — for example
+  `cognitivecomputations/dolphin-mistral-24b-venice-edition`, `sao10k/l3.3-euryale-70b` or
+  `nousresearch/hermes-3-llama-3.1-405b` from **OpenRouter** — by setting your **Platform Model**
+  to the **OpenRouter** provider.
+</Tip>
+
 ## Next steps
 
 Now that you've run your first risk assessment, dive deeper into the platform:
