@@ -1,13 +1,13 @@
 ---
-subtitle: Sample your AI app multiple times per golden for statistically rigorous test runs.
+subtitle: Sample your AI app multiple times per golden to prevent a single output from skewing your evaluation results.
 slug: settings/project/ai-connections/multi-generation
 ---
 
 ## Overview
 
-Most AI apps are non-deterministic—run the same input twice (anything with `temperature > 0`) and you'll get two different outputs. A single generation per golden only tells you how your app did *that one time*, which makes it hard to know whether one test run genuinely beat another or just got lucky on a thin sample.
+Most AI apps are non-deterministic—run the same input twice (anything with `temperature > 0`) and you'll get two different outputs. A single generation per golden only tells you how your app performed *that one time*, so a single outlier response can skew the entire result.
 
-The **multi-generation factor** on your [AI Connection](/docs/settings/project/ai-connections) fixes this. Instead of calling your endpoint once per golden, Confident AI calls it multiple times, capturing several generations for each test case. More samples means Confident AI can separate real improvements from run-to-run noise.
+The **multi-generation factor** on your [AI Connection](/docs/settings/project/ai-connections) fixes this. Instead of calling your endpoint once per golden, Confident AI calls it multiple times, capturing several generations for each test case. With several outputs to look at, you can see how your app performs *on average* instead of trusting a single sample.
 
 <Frame caption="Set Default Generations on your AI Connection">
   <img
@@ -70,15 +70,16 @@ Open any golden in a multi-generation test run and you'll see every generation s
   />
 </Frame>
 
-This unlocks **statistical significance** when comparing test runs in [Experiments](/docs/llm-evaluation/experiments):
+What matters isn't any single pass or fail—it's whether your app performs at or above each metric's threshold *on average*, so a single outlier output can't skew the result:
 
-- **Single generation** — you see one score per test case, so a difference between two runs could easily be noise.
-- **Multiple generations** — you see the *distribution* of scores per test case, so Confident AI can tell you whether one version's win is statistically significant or just sampling luck.
+- **A single output can mislead** — one passing response can mask a metric that typically fails, and one failing response can obscure a metric that typically passes.
+- **Averaging across generations reveals true performance** — the **Consistency** tab shows each metric's mean score and how much it varies, so you can tell whether a test case passes *reliably* or merely cleared the threshold once.
 
 <Tip>
-  Higher factors give tighter confidence but cost more requests and time. A
-  factor of `3`–`5` is usually enough to expose run-to-run variance without
-  blowing up your request volume.
+  More generations give a more reliable picture of your app's average behavior,
+  but each one is another request to your endpoint. A factor of `3`–`5` is
+  usually enough to surface generation-to-generation variance without
+  substantially increasing your request volume.
 </Tip>
 
 ## Next Steps
@@ -87,12 +88,12 @@ With multi-generation sampling configured, put those richer test runs to work.
 
 <CardGroup cols={2}>
   <Card
-    title="Experiments"
-    icon="fa-light fa-flask"
-    href="/docs/llm-evaluation/experiments"
+    title="Regression Testing"
+    icon="fa-light fa-arrows-split-up-and-left"
+    href="/docs/llm-evaluation/no-code-evals/single-turn-evals#regression-testing"
   >
-    Compare versions of your AI app with statistical significance across
-    multi-generation test runs.
+    Compare two test runs side by side to identify improvements and regressions
+    across versions of your AI app.
   </Card>
   <Card
     title="Throttling & Retries"
