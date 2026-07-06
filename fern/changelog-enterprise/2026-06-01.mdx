@@ -1,0 +1,39 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.8
+
+Introduces AI Governance, vulnerability trace scanning and threat detection, GitHub and Linear ticketing integrations, alert history and logs, dataset-version API support, and a unified models data model.
+
+### Highlights
+- AI Governance (initial release)
+- Vulnerability trace scanning and threat detection
+- GitHub / Linear ticketing integrations
+- Alert history and logs
+
+### New Features
+- **AI Governance** — Initial governance capabilities for policies and controls.
+- **Vulnerability Trace Scanning** — Scan ingested traces for security vulnerabilities.
+- **Trace Threat Detection** — Detect threats in ingested traces.
+- **Traces on Red Teaming Test Cases** — Red-teaming test cases now include full traces.
+- **GitHub & Linear Integrations** — Push problem traces into GitHub or Linear as tickets, with support for multiple integrations.
+- **Alert History & Logs** — Full history and logs for every alert that fires.
+- **Dataset Version API** — Manage dataset versions via the API.
+- **Bulk Export** — Bulk export of platform data.
+- **New Data Sources** — Additional knowledge-base data sources.
+- **Custom Headers for AI Connections** — Support custom headers on AI connection requests.
+
+### Improvements
+- **Unified Models Data Model** — Migrated to a consolidated models table.
+- **API Keys** — Refactored API-key handling.
+- **Experiments** — Enhancements and metric-map fixes.
+- **Graph Layout** — Refactored graph layout.
+
+### Fixes
+- **Thread Metadata** — Fixed thread-metadata filtering and merging.
+- **Thread Styling** — Fixed thread styling.
+
+### Upgrade Notes
+
+Run the models migration and the numGeneration/generationOrder migration before starting this version. The Australia (AU) server is deprecated in this release.

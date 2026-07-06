@@ -1,0 +1,30 @@
+---
+tags: ["Evals", "Observability", "Integrations", "Red Teaming"]
+---
+
+## Significant Figures
+
+TGIF! Thank god it's features, here's what we shipped this week:
+
+The headliner: **statistical significance for test runs**—so when one run edges out another, you'll know whether it's a real improvement or just the sample size playing tricks on you. But the bigger story is how much of the platform went programmatic this week. **Dashboards**, **Red Teaming**, and **Governance** all grew full APIs, **Jira** joined the ticket-slinging integrations, and **AI Connections** learned to set themselves up. A lot that actually counts this week—let's get into the _figures_.
+
+<Frame>![Changelog July 3, 2026](/assets/changelog/2026-07-03.png)</Frame>
+
+### Added
+
+- **Test Run Upgrades** - Test runs got the full works this week. Statistical significance is now baked into every comparison, so when one run beats another you'll know whether it earned the win or just got lucky on a thin sample—no more reading tea leaves in a bar chart. Each test case can carry multiple generations instead of one lonely output, so you sample the model a few times before crowning a winner. And traces now attach to test runs straight from the API. Stop shipping on vibes, start shipping on proof. _Significant_ upgrades.
+- **AI Connections Upgrades** - AI Connections picked up a stack of upgrades: query-parameter support, request logs so you can see exactly what went over the wire, and a new AI-powered flow that sets up your connection and debugs it for you when something's off. Wire it up, watch it work, let the AI fix the rest. _Connect_ the dots.
+- **Dashboards & Red Teaming APIs** - Two of the platform's biggest surfaces went fully programmatic. The new Dashboards API covers full CRUD plus data access, so you can build, update, and pull dashboards straight from code, while the Red Teaming API lets you kick off assessment runs without ever opening the UI. Automate the reporting, automate the attacks. _API_-solutely everything.
+- **Governance in the Client SDK** - Governance broke out of the console. `confident-client` now speaks fluent governance, so you can wire policies and controls straight into your own tooling and pipelines instead of clicking your way to compliance one checkbox at a time. Compliance-as-code, minus the clicking. _Govern_ by code.
+- **Jira Integration** - Spot a bad trace, ship a Jira ticket. The new Jira integration joins GitHub and Linear on the "turn problems into tickets" bench, so the tool your team already plans in gets the memo automatically—no copy-paste pilgrimage required. _Jira_ we go.
+- **Thread Exports** - Threads can now pack their bags and leave. Export full multi-turn conversations wherever the rest of your stack lives, so your production chats stop being trapped behind glass. _Thread_ lightly, export freely.
+- **Annotation Filters & Graphs** - Annotations grew saved filters and graphs, so you can slice your labeled data down to exactly what matters and watch the trends surface instead of scrolling rows until your mouse wheel gives out. Label once, spot patterns forever. _Note_-worthy at a glance.
+- **On-Prem Deployment Upgrades** - Self-hosted deployments got a batch of enterprise-grade upgrades in one go: license-based feature gating so on-prem installs light up exactly the capabilities they're entitled to, plus internal root CA support for keeping connections locked down inside your own network. Everything the big deployments need, bundled up. _License_ to ship.
+
+### Changed
+
+- **Expanded Platform Model Support on Signals** - Signals got more platform model support, now including a max tokens setting for tighter control over cost and output length when they fire. More knobs, same signal. _Token_ of appreciation.
+- **Better Dataset CSV Preview** - The CSV preview got a serious upgrade—uploading a dataset now shows you a cleaner, clearer look at your data before you commit, so you catch the column that landed one cell to the left before it becomes next week's mystery bug. Same preview, much better look. _Preview_ of coming attractions.
+- **Real-Time Activity in Histograms** - Histograms now update their activity in real time, so the bars move as the data lands instead of making you refresh to see what happened. Watch it fill in live. _Histo_-graphed as it happens.
+
+That's a monster drop for one week—see you next Friday.

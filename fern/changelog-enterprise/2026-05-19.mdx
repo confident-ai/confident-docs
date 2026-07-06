@@ -1,0 +1,28 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.6
+
+Adds evaluation rules for running online evaluations from the UI, multimodal traces, model-cost tracking, and WebSocket support, with reliability fixes.
+
+### New Features
+- **Evaluation Rules** — Configure and run online evaluations directly from the UI, without writing API calls.
+- **Multimodal Traces** — Traces support PDFs and images in inputs and outputs.
+- **Model Cost Tracking** — Track model costs across evaluations and traces.
+- **WebSocket Support** — Real-time updates delivered over WebSocket connections.
+- **Revamped Evaluation Creator** — Rebuilt the evaluation creation flow.
+
+### Improvements
+- **Online Metric Observability** — Added observability for online-metric evaluations.
+- **Arena Experiment Support** — Improved Arena support within experiments.
+- **Connection Pooling** — Dedicated worker connection pooling for stability.
+
+### Fixes
+- **Evaluation Rules** — Fixed duplicate eval-rule metrics and assorted eval-rule bugs.
+- **Observability** — Fixed a trace ingestion issue.
+- **Framework Creation** — Fixed framework creation.
+
+### Upgrade Notes
+
+Run the eval-rules and eval-rule-override migrations before starting this version.

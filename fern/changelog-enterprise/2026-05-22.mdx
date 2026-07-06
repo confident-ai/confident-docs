@@ -1,0 +1,38 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.7
+
+Adds live risk-assessment updates, annotation-queue assignment and notifications, invitation roles, dashboard and report exports, and thread metadata throughout the stack, alongside a large set of ingestion and reliability improvements.
+
+### Highlights
+- Risk assessment live updates
+- Annotation queue assignment and notifications
+- Dashboard and report PDF / image export
+- Major ingestion reliability work
+
+### New Features
+- **Risk Assessment Live Updates** — Attack methods and vulnerabilities surface live during a risk assessment.
+- **Queue Assignment & Notifications** — Annotation queues route work to specific teammates and notify the assignee.
+- **Invitation Roles** — Assign a role when inviting users to an organization.
+- **Dashboard & Report Export** — Export dashboard widgets and reports to PDF or image.
+- **Thread Metadata Everywhere** — Thread metadata flows through ingestion, data tables, filters, and dashboards.
+- **Turn Limits for Threads** — Configurable limits on conversation turns.
+- **Prompt on LLM Spans** — LLM spans now display the prompt that was used.
+
+### Improvements
+- **Ingestion Reliability** — New ingestion workers, head-of-line-blocking fixes, and I/O chunking for large payloads.
+- **Postgres Connection Pooling** — Resolved connection-pool exhaustion under load.
+- **Classification Queue** — Moved the classification queue to Python for reliability.
+- **Event Tracking** — Refactored event tracking.
+- **Cost Insights** — Revamped the cost insights page.
+
+### Fixes
+- **Two-Factor Authentication** — Restored 2FA.
+- **Metric Scoring** — Fixed metric-score-by-prompt and metric-data timeouts.
+- **Model Temperature** — Fixed temperature handling for Claude models.
+
+### Upgrade Notes
+
+Run the assignment, invitation-role, and related migrations before starting this version.
