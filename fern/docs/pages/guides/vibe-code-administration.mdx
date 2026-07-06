@@ -49,71 +49,34 @@ npm install confidentai
 
 <Step title="Install the skill">
 
-The skill lives in the [`confident-client`](https://github.com/confident-ai/confident-client) repo. Install it with the Skills CLI (recommended) or wire it up by hand.
+The skill lives in the [`confident-client`](https://github.com/confident-ai/confident-client) repo. Install it via the Claude Code plugin, or with the Skills CLI for any other agent.
 
 <Tabs>
 
-<Tab title="Skills CLI">
+<Tab title="Claude Code (plugin)">
 
-One command installs the skill into any Skills-compatible assistant — Cursor, Claude Code, Codex, Windsurf, OpenCode, and [70+ others](https://skills.sh):
+Run these four commands in Claude Code:
+
+```bash
+/plugin marketplace add confident-ai/confident-client
+/plugin install confident-client@confident-ai-plugins
+/reload-plugins
+/plugins
+```
+
+The `/plugins` command should list `confident-client` under your installed plugins.
+
+</Tab>
+
+<Tab title="Cursor, Codex, Windsurf & others (Skills CLI)">
+
+Install the [`confident-client` Agent Skill](https://github.com/confident-ai/confident-client) with any [Skills](https://github.com/anthropics/skills)-compatible installer. This works with Cursor, Claude Code, Codex, Windsurf, OpenCode, and any other assistant that supports the Skills standard:
 
 ```bash
 npx skills add confident-ai/confident-client --skill "confident-client"
 ```
 
-The CLI auto-detects the coding agents you have installed and symlinks the skill into each one. A couple of handy flags:
-
-- `-g` — install globally (available across every project) instead of just the current directory.
-- `-a cursor` — target a specific agent; repeatable, e.g. `-a cursor -a claude-code`.
-
-</Tab>
-
-<Tab title="Manual">
-
-Prefer to set it up yourself? Pick your agent below.
-
-<Tabs>
-
-<Tab title="Cursor">
-
-Clone the repo and symlink the skill into your user skills directory:
-
-```bash
-git clone https://github.com/confident-ai/confident-client.git
-mkdir -p ~/.cursor/skills
-ln -s "$(pwd)/confident-client/skills/confident-client" ~/.cursor/skills/confident-client
-```
-
-Then reload Cursor (**Cmd/Ctrl+Shift+P → Developer: Reload Window**) and confirm `confident-client` appears under **Customize → Skills**.
-
-</Tab>
-
-<Tab title="Claude Code">
-
-The repo doubles as a plugin marketplace, so add it and install directly (run these inside Claude Code):
-
-```text
-/plugin marketplace add confident-ai/confident-client
-/plugin install confident-client@confident-ai-plugins
-```
-
-</Tab>
-
-<Tab title="Codex">
-
-Copy the skill into your Codex skills directory (copy rather than symlink — Codex skips symlinked `SKILL.md` files):
-
-```bash
-git clone https://github.com/confident-ai/confident-client.git
-mkdir -p ~/.codex/skills
-cp -r confident-client/skills/confident-client ~/.codex/skills/confident-client
-```
-
-Then restart Codex.
-
-</Tab>
-
-</Tabs>
+The skill teaches your agent how to drive the Admin SDK — creating projects, inviting members, composing roles from policies and permissions, assigning governance policies, and provisioning API keys. It triggers automatically on prompts like the ones below.
 
 </Tab>
 
