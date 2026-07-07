@@ -207,7 +207,7 @@ function runOnDomUpdates(callback) {
     "tracing.workflows.datasetIngestion": `${S3_BASE}/confident-docs:dataset-ingestion.png`,
     "tracing.workflows.queueIngestion": `${S3_BASE}/confident-docs:queue-ingestion.png`,
     "tracing.workflows.evaluationRule": `${S3_BASE}/confident-docs:evaluation-rule.png`,
-    "tracing.workflows.sampleRates": `${S3_BASE}/workflows:eval-sample-rates.png`,
+    "tracing.workflows.sampleRates": `${S3_BASE}/workflows:eval-sample-rate.png`,
     "tracing.workflows.classifier": `${S3_BASE}/confident-docs:classifier.png`,
 
     "settings.project.knowledgeBase": `${S3_BASE}/knowledge-base.png`,
