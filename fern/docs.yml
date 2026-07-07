@@ -856,6 +856,9 @@ navigation:
       - page: Security & Compliance
         path: docs/pages/self-hosting/security-and-compliance.mdx
         icon: fa-light fa-shield-check
+      - page: POC Environments
+        path: docs/pages/self-hosting/poc-environments.mdx
+        icon: fa-light fa-flask
       - section: AWS Deployment
         contents:
           - page: Overview
