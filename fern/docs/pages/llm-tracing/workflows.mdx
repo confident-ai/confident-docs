@@ -48,9 +48,7 @@ To create a queue ingestion task:
 
 Each task row shows its name, target queue, data model, and how many items have been ingested so far. Toggle, edit, and delete work the same way as for dataset ingestion tasks.
 
-## Evaluations
-
-The **Evaluations** tab holds two things: the list of **evaluation rules**, and two project-wide **sample rates** that control what fraction of ingested data is automatically evaluated.
+## Evaluation Rules
 
 Evaluation rules automatically run a metric collection on incoming traces, spans, or threads at ingest time — without any code changes. They fire only when the SDK call that produced the data did not already supply a metric collection, making them a no-code complement to inline evaluation.
 
@@ -65,7 +63,7 @@ Evaluation rules automatically run a metric collection on incoming traces, spans
 To create an evaluation rule:
 
 1. Navigate to **Workflows** and select **Traces**, **Spans**, or **Threads**
-2. Click the **Evaluations** tab
+2. Click the **Evaluation Rules** tab
 3. Click **New rule**
 4. Configure the rule in the side drawer (see fields below)
 5. Click **Create Rule**
@@ -111,7 +109,7 @@ For threads, evaluation rules are the primary way to run evaluations automatical
 
 ### Sample rates
 
-The **Evaluations** tab exposes two project-wide sample rates that control what fraction of your ingested data is automatically evaluated:
+Confident AI exposes two project-wide sample rates that control what fraction of your ingested data is automatically evaluated:
 
 - **Trace Sample Rate** — the fraction of ingested traces evaluated inline, when a metric collection is supplied on the trace.
 - **Thread Sample Rate** — the fraction of threads evaluated automatically by thread evaluation rules.
@@ -125,7 +123,7 @@ Sampling is deterministic — the same trace or thread always makes the same dec
 These rates apply only to **automatic, ingest-time** evaluation. Evaluating a specific [trace](https://www.confident-ai.com/docs/api-reference/evaluate/evaluate-trace) or [thread](https://www.confident-ai.com/docs/api-reference/evaluate/evaluate-thread) on demand is possible via our public API or UI. 
 
 <Note>
-  These project-wide rates decide only *which* traces or threads are queued for evaluation — not which metrics run. Once an item is sampled in, each metric in the collection still follows its own **Sample Rate**, so the two compound. To score every metric on a sampled item, keep the per-metric sample rates at `1.0`.
+  These project-wide rates decide only *which* traces or threads are evaluated — not which metrics run. Once an item is sampled in, each metric in the collection still follows its own **Sample Rate**, so the two compound. To score every metric on a sampled item, keep the per-metric sample rates at `1.0`.
 </Note>
 
 ## Classifiers
