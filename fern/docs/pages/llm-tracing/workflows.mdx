@@ -111,10 +111,14 @@ For threads, evaluation rules are the primary way to run evaluations automatical
 
 ### Sample rates
 
-Below the rules list, the **Evaluations** tab exposes two project-wide sample rates that control what fraction of your ingested data is automatically evaluated:
+The **Evaluations** tab exposes two project-wide sample rates that control what fraction of your ingested data is automatically evaluated:
 
 - **Trace Sample Rate** — the fraction of ingested traces evaluated inline, when a metric collection is supplied on the trace.
 - **Thread Sample Rate** — the fraction of threads evaluated automatically by thread evaluation rules.
+
+<Frame caption="Trace sample rate on the Evaluations tab under Traces">
+  <img data-image="tracing.workflows.sampleRates" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
 
 Sampling is deterministic — the same trace or thread always makes the same decision, so a thread re-evaluated across many turns keeps a stable outcome. Both default to `1.0`.
 
