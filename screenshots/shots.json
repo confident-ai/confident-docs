@@ -137,6 +137,17 @@
       "full_page": true,
       "width": 1512,
       "height": 1000
+    },
+    {
+      "s3_key": "evaluating-mcp:connect-server.png",
+      "doc": "fern/docs/pages/guides/evaluating-mcp.mdx",
+      "path": "/project/:projectId/project-settings/mcp-servers",
+      "click": "[class*='toolsToggle']",
+      "selector": "[class*='mcp-servers_container']",
+      "wait": 1500,
+      "full_page": true,
+      "width": 1512,
+      "height": 620
     }
   ]
 }

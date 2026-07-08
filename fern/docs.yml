@@ -953,6 +953,9 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
+          - page: Evaluate MCP Servers
+            path: docs/pages/guides/evaluating-mcp.mdx
+            icon: fa-light fa-plug
           - page: Vibe Code Your Administration
             path: docs/pages/guides/vibe-code-administration.mdx
             icon: fa-light fa-robot
