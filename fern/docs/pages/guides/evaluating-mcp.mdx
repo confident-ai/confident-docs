@@ -14,8 +14,8 @@ graph LR
     U["User request"] --> H["Host<br/>your agent"]
     H --> S1["MCP Server A"]
     H --> S2["MCP Server B"]
-    S1 --> T1["Tools<br/>read_file · list_dir"]
-    S2 --> T2["Tools<br/>query · insert"]
+    S1 --> T1["Tools<br/>search_docs"]
+    S2 --> T2["Tools<br/>get_customer_context"]
 
     style H fill:#eef2ff,stroke:#6366f1
     style S1 fill:#eef2ff,stroke:#6366f1
@@ -30,8 +30,8 @@ Before deployment, benchmark your MCP agent against a **dataset** of goldens. Co
 
 You'll need two things set up on Confident AI first:
 
-- **A [dataset](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets) of goldens** — the inputs to test your agent on.
-- **An [AI Connection](/docs/settings/project/ai-connections)** — pointed at your deployed MCP host. Confident AI uses it to run the agent and capture the generated output, called tools, and tool arguments.
+- **A [dataset](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets) of goldens** — what you want to test your MCP agent on.
+- **An [AI Connection](/docs/settings/project/ai-connections)** — pointed at your deployed MCP host. Confident AI uses it to run the agent and capture the generated output, tool calls, and tool arguments.
 
 With both in place, set up your metrics, connect your MCP server, and run the evaluation:
 
@@ -59,7 +59,7 @@ Not sure what to add? See [Choosing Your Metrics](#choosing-your-metrics).
 
 <Step title="Connect your MCP server">
 
-In **Project Settings** > **MCP Servers**, click **Add server** and enter its name and connection details. Confident AI fetches the tool definitions for that server version — expand **Tools enabled** to confirm what was synced. MCP-aware metrics use these definitions to evaluate tool selection and arguments.
+In **Project Settings** > **MCP Servers**, click **Add server** and enter its name and connection details. Confident AI fetches the tool definitions for that server version and uses them to label matching MCP tools during evaluation.
 
 <Frame caption="Connect your MCP server in Project Settings — expand the tools list to confirm what was synced">
   <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Aconnect-server.png" />
@@ -71,17 +71,17 @@ In **Project Settings** > **MCP Servers**, click **Add server** and enter its na
 
 Navigate to **Project** > **Datasets**, open your dataset, and click **Evaluate**. Select the **metric collection** you created, choose the **AI Connection** that runs your agent, attach the server you connected under **MCP Servers**, then click **Run Evaluation**.
 
-Attaching the server links it to the test run and tags matching tool calls as **MCP tool calls**. Your metrics evaluate the output, selected tools, and arguments with the server's tool definitions.
-
 <Frame caption="Start an evaluation from your dataset — choose the AI Connection and attach the MCP server you created">
   <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Arun-evaluation.png" />
 </Frame>
 
+Like AI Connections and prompts, attached MCP servers are saved as test-run hyperparameters. Confident AI also labels matching tool calls as **MCP tools**, so you do not have to mark them manually.
+
 </Step>
 
-<Step title="Inspect the test run">
+<Step title="View your MCP eval results">
 
-Open the test run and drill into any test case. Tool calls appear under **Tools Used**, and matching calls are tagged **MCP** with their inputs and output inline. The metric scores show how the run performed.
+Open the test run and select a test case. Tool calls appear under **Tools Used**, and matching calls are tagged **MCP** with their inputs and output inline. The metric scores show how the run performed.
 
 <Frame caption="Inspect a test case — MCP tool calls are tagged and scored by your metrics">
   <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Ainspect-test-run.png" />
@@ -95,13 +95,13 @@ Done ✅. You now have a repeatable pre-deployment benchmark for your MCP agent.
 
 ## Advanced Usage
 
-Once your pre-deployment benchmark is in place, add tracing for full tool-path visibility. Traces give **test runs** the exact path behind each result and power **live production evaluations**.
+Once your pre-deployment benchmark is in place, add tracing for full tool-path visibility. Traces link **test runs** to the exact tool path behind each result and power **live production evaluations**.
 
 ### Tracing MCP
 
 <Note>
 
-Tracing is **optional for dataset evaluations**. Your AI Connection can return the generated output and `tools_called` without a trace. Add tracing when you want to [link each result back to its trace](/docs/settings/project/ai-connections/linking-traces), inspect the exact tool path behind a score, or run online evals in production.
+Tracing is **optional for dataset evaluations**. Your AI Connection can return the generated output and `tools_called` without a trace. Add tracing when you want each result to [open the trace](/docs/settings/project/ai-connections/linking-traces) behind its score, or when you want to run online evals in production.
 
 </Note>
 
@@ -117,8 +117,8 @@ graph LR
         LLM2 --> CB
     end
 
-    CA -->|"JSON-RPC · tools/call"| SA["Server A<br/>filesystem tools"]
-    CB -->|"JSON-RPC · tools/call"| SB["Server B<br/>database tools"]
+    CA -->|"JSON-RPC · tools/call"| SA["Server A<br/>docs context"]
+    CB -->|"JSON-RPC · tools/call"| SB["Server B<br/>customer context"]
 
     style CA fill:#eef2ff,stroke:#6366f1
     style CB fill:#eef2ff,stroke:#6366f1
@@ -135,14 +135,14 @@ The host and each server talk over **[JSON-RPC 2.0](https://www.jsonrpc.org/spec
   "jsonrpc": "2.0",
   "method": "tools/call",
   "params": {
-    "name": "read_file",
-    "arguments": { "path": "/data/sales.csv" }
+    "name": "search_docs",
+    "arguments": { "query": "refund policy for annual plans" }
   },
   "id": 1
 }
 ```
 
-Here `method` is the operation, `params.name` is which tool to run, and `params.arguments` are the tool inputs. The top-level `id` is only the JSON-RPC request ID — the client uses it to match a response to this request. It is **not** the trace ID.
+Here `method` is the operation, `params.name` is the tool, and `params.arguments` are the tool inputs. In this example, the host asks a docs MCP server for context before the agent answers. The top-level `id` is only the JSON-RPC request ID — it is **not** the trace ID.
 
 These messages travel over a **transport** — `stdio` for local servers or HTTP for remote ones. Either way, the host and server are usually different processes, so the server cannot automatically see the host's active trace. The host has to send trace context with the `tools/call` request.
 
@@ -180,8 +180,8 @@ That identifier is the W3C **`traceparent`** — a compact string holding the tr
   "jsonrpc": "2.0",
   "method": "tools/call",
   "params": {
-    "name": "read_file",
-    "arguments": { "path": "/data/sales.csv" },
+    "name": "search_docs",
+    "arguments": { "query": "refund policy for annual plans" },
     "_meta": {
       "traceparent": "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
     }
@@ -239,7 +239,7 @@ Once your MCP host and servers are [tracing](#tracing-mcp) to Confident AI, turn
 
 <Tip>
 
-Online evals reuse the same MCP metrics as your pre-deployment runs, so a golden that regresses offline and a bad tool call in production are measured the exact same way.
+Use the same MCP metrics for pre-deployment benchmarks and online evals. That way, you measure tool usage consistently in development, before deployment, and in production.
 
 </Tip>
 
@@ -287,7 +287,7 @@ sequenceDiagram
     participant Server as MCP Server
     participant Metrics as Metrics
 
-    Confident->>Server: Fetch available tools
+    Confident->>Server: Fetch tool definitions
     Dataset->>Confident: Golden input
     Confident->>Connection: Send input
     Connection->>Host: Run MCP agent
@@ -300,7 +300,7 @@ sequenceDiagram
 
 An MCP evaluation does not just check the final answer. It can also score how the agent interacted with the MCP server:
 
-- **Connected MCP server** provides the tool definitions Confident AI uses to identify MCP tool calls and give MCP-aware metrics server context.
+- **Connected MCP server** provides the tool definitions Confident AI uses to label matching calls as MCP tool calls.
 - **AI Connection** runs your agent and returns the generated output plus `tools_called`.
 - **Metrics** score the generated test case based on what they measure: tool selection, arguments, final output, or the full workflow.
 
@@ -312,7 +312,7 @@ A **metric collection** is the set of metrics every run is scored with. It defin
 
 Start with one referenceless, MCP-native metric and add more only when they cover a real risk:
 
-- **[MCP Use](https://deepeval.com/docs/metrics-mcp-use)** — the default. It scores tool selection and argument quality against the tools your server advertises, with no labels required.
+- **[MCP Use](https://deepeval.com/docs/metrics-mcp-use)** — the default. It scores tool selection and argument quality using the connected server's tool definitions, with no labels required.
 - **[Argument Correctness](https://deepeval.com/docs/metrics-argument-correctness)** — a sharper lens on inputs: did each call pass arguments that fit the request? Pair it with MCP Use when argument quality is your main risk.
 - **[Task Completion](/docs/metrics/single-turn/task-completion-metric)** — did the run accomplish the user's goal? Add it when your agent chains multiple calls and you need to score the outcome.
 - **[Step Efficiency](https://deepeval.com/docs/metrics-step-efficiency)** — did it get there without redundant calls or detours? Add it when cost or latency matters.
@@ -349,8 +349,8 @@ A few practices that keep MCP evaluation trustworthy as agents, tools, and serve
   </Accordion>
   <Accordion title="Can I measure tool usage without ground truth?">
     Yes. [MCP Use](https://deepeval.com/docs/metrics-mcp-use) scores tool
-    selection and argument correctness against the tools the server advertises,
-    [Argument
+    selection and argument correctness using the connected server's tool
+    definitions, [Argument
     Correctness](https://deepeval.com/docs/metrics-argument-correctness) checks
     whether each call's arguments fit the input, and Task Completion judges
     whether the agent achieved the user's goal — all three are referenceless, so
