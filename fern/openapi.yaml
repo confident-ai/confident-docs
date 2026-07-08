@@ -5702,6 +5702,99 @@ paths:
                         value: 42
                   deprecated: false
 
+  /v1/widgets/query:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Dashboards
+      summary: Query Ad-hoc Widget Data
+      operationId: queryWidgetData
+      description: Computes widget data from a widget definition supplied inline, without creating a dashboard or saving a widget. Returns the same data shape as the dashboard widget query. Scoped to the project of the API key. At most 20 lines and a `topK.limit` of 100 are allowed, and an explicit query range may not exceed 366 days.
+      requestBody:
+        description: The widget definition to compute, plus an optional query time range that overrides the widget's own time fields for this query.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WidgetQueryRequest"
+            examples:
+              Time Series:
+                widget:
+                  name: "Trace Count"
+                  type: LINE
+                  unit: COUNT
+                  mode: TIME_SERIES
+                  lines:
+                    - name: "Count"
+                      dataModel: TRACE
+                      aggregation: COUNT
+                startTime: "2024-01-01T00:00:00.000Z"
+                endTime: "2024-01-31T23:59:59.999Z"
+                granularity: day
+              Dimension Breakdown:
+                widget:
+                  name: "p90 Latency by Model"
+                  type: BAR
+                  unit: MILLISECONDS
+                  mode: DIMENSION_SERIES
+                  dimension: model
+                  topK:
+                    limit: 10
+                    orderBy: p90_latency
+                    direction: desc
+                  lines:
+                    - name: "p90"
+                      dataModel: LLM_SPAN
+                      aggregation: P90_LATENCY
+                startTime: "2024-01-01T00:00:00.000Z"
+                endTime: "2024-01-31T23:59:59.999Z"
+      responses:
+        "200":
+          description: The computed data for the supplied widget.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WidgetQueryResponse"
+              examples:
+                Time Series:
+                  success: true
+                  data:
+                    type: LINE
+                    mode: TIME_SERIES
+                    kind: TIME_SERIES
+                    unit: COUNT
+                    xAxis:
+                      type: time
+                    series:
+                      - key: "Count"
+                        name: "Count"
+                        color: BLUE
+                        lineId: "line-0"
+                        points:
+                          - x: "2024-01-01T00:00:00.000Z"
+                            y: 42
+                  deprecated: false
+                Dimension Breakdown:
+                  success: true
+                  data:
+                    type: BAR
+                    mode: DIMENSION_SERIES
+                    kind: DIMENSION
+                    unit: MILLISECONDS
+                    xAxis:
+                      type: category
+                    series:
+                      - key: "p90"
+                        name: "p90"
+                        color: BLUE
+                        lineId: "line-0"
+                        points:
+                          - x: "gpt-4o"
+                            y: 812
+                          - x: "gpt-4o-mini"
+                            y: 342
+                  deprecated: false
+
 components:
   schemas:
     Metric:
@@ -12003,6 +12096,119 @@ components:
           description: Indicates if the request was successful.
         data:
           $ref: "#/components/schemas/DashboardWidgetData"
+          description: The computed widget data.
+        deprecated:
+          type: boolean
+          description: Indicates if this endpoint is deprecated.
+      required:
+        - success
+        - data
+        - deprecated
+
+    WidgetQueryRequest:
+      type: object
+      description: An ad-hoc widget definition to compute, plus an optional query time range. `startTime` and `endTime` must be provided together and override the widget's own time fields for this query.
+      properties:
+        widget:
+          $ref: "#/components/schemas/DashboardWidgetInput"
+          description: The widget configuration to compute data for.
+        startTime:
+          type: string
+          format: date-time
+          description: ISO 8601 start time for the query range. Must be provided with `endTime`.
+        endTime:
+          type: string
+          format: date-time
+          description: ISO 8601 end time for the query range. Must be provided with `startTime`.
+        granularity:
+          $ref: "#/components/schemas/DashboardAggregateGranularity"
+          description: Optional bucket granularity override for the query.
+      required:
+        - widget
+
+    WidgetQueryData:
+      type: object
+      description: Computed data for an ad-hoc widget. The `kind` field indicates which shape-specific fields are populated.
+      properties:
+        type:
+          $ref: "#/components/schemas/DashboardWidgetType"
+          description: The widget's visualization (display) type, echoed from the request.
+        mode:
+          $ref: "#/components/schemas/DashboardWidgetMode"
+          description: The widget's aggregation mode, echoed from the request. Branch on `kind` rather than `mode` when reading the response.
+        kind:
+          type: string
+          description: >-
+            The shape of the data in this response, and the field to branch on
+            when reading it. `TIME_SERIES` and `DIMENSION` populate `series`
+            (with `xAxis.type` `time` and `category` respectively); `BIG_NUMBER`
+            populates `values`; `TABLE` populates `columns` and `rows`.
+          enum:
+            - TIME_SERIES
+            - DIMENSION
+            - BIG_NUMBER
+            - TABLE
+        unit:
+          $ref: "#/components/schemas/DashboardWidgetUnit"
+          description: Unit for the returned values, when applicable.
+        xAxis:
+          type: object
+          description: Present for TIME_SERIES and DIMENSION data.
+          properties:
+            type:
+              type: string
+              description: Axis type for the returned data.
+              enum:
+                - time
+                - category
+          required:
+            - type
+        series:
+          type: array
+          description: Present for TIME_SERIES and DIMENSION data.
+          items:
+            $ref: "#/components/schemas/DashboardSeries"
+        values:
+          type: array
+          description: Present for BIG_NUMBER data.
+          items:
+            $ref: "#/components/schemas/DashboardScalarValue"
+        columns:
+          type: array
+          description: >-
+            Column definitions for TABLE data. The first column is the dimension
+            (key `dimension`); the remaining columns are one per line, keyed by
+            the line's name.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                description: Stable column key. Read each row's value for this column as `row[key]`.
+              label:
+                type: string
+                description: Display label for the column.
+            required:
+              - key
+              - label
+        rows:
+          type: array
+          description: Present for TABLE data.
+          items:
+            type: object
+            description: A table row. Each value is keyed by its column's `key`.
+            additionalProperties: true
+      required:
+        - kind
+
+    WidgetQueryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data:
+          $ref: "#/components/schemas/WidgetQueryData"
           description: The computed widget data.
         deprecated:
           type: boolean

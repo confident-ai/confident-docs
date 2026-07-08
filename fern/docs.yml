@@ -527,6 +527,7 @@ navigation:
                       - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - POST /v1/dashboards/{dashboardId}/widgets/{widgetId}/query
+                      - POST /v1/widgets/query
           - section: Organization data models
             skip-slug: true
             contents:
@@ -976,7 +977,7 @@ navigation:
       - changelog: ./changelog
         title: Cloud Platform
         icon: fa-light fa-cloud
-        slug: cloud-platform
+        slug: ""
       - changelog: ./changelog-enterprise
         title: Self-Hosting
         icon: fa-light fa-server
@@ -992,6 +993,12 @@ redirects:
     permanent: true
   - source: /docs/enterprise-changelog/:slug*
     destination: /docs/changelog/self-hosting/:slug*
+    permanent: true
+  - source: /docs/changelog/cloud-platform
+    destination: /docs/changelog
+    permanent: true
+  - source: /docs/changelog/cloud-platform/:slug*
+    destination: /docs/changelog/:slug*
     permanent: true
   - source: /docs/settings/project/management/global-api-keys
     destination: /docs/settings/organization/global-api-keys
