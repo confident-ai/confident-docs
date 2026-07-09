@@ -977,6 +977,61 @@ paths:
                       name: "EU AI Act"
                   deprecated: false
 
+  /v1/evaluations/test-case-result:
+    post:
+      x-fern-server-name: Confident AI
+      tags:
+        - Evaluation
+      summary: Submit Long-Running Agent Result
+      operationId: submitTestCaseResult
+      description: >-
+        Submit the result for a single test case in a long-running agent
+        evaluation. Confident AI automatically evaluates the test case and
+        finalizes the test run once every result has been received.
+
+
+        Long-running mode is available for single-turn AI connection evaluations
+        only.
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitTestCaseResultRequest"
+            examples:
+              Output:
+                testCaseId: "<TEST-CASE-ID>"
+                output: "The capital of France is Paris."
+              With-Retrieval-Context:
+                testCaseId: "<TEST-CASE-ID>"
+                output: "The capital of France is Paris."
+                retrievalContext:
+                  - "France is a country in Western Europe. Its capital is Paris."
+      responses:
+        "200":
+          description: The result was accepted for evaluation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitTestCaseResultResponse"
+              example:
+                success: true
+                data:
+                  testCaseId: "<TEST-CASE-ID>"
+                  status: "accepted"
+        "400":
+          description: >-
+            Invalid request body, the test run has no metric collection, or the
+            test run is conversational (long-running mode is single-turn only).
+        "404":
+          description: No test run was found for the given testCaseId in this project.
+        "409":
+          description: The test run is no longer accepting results (already finalized).
+        "410":
+          description: >-
+            Unknown or expired testCaseId — the result window for this test case
+            has closed.
   /v1/traces:
     post:
       x-fern-server-name: Confident AI
@@ -7480,6 +7535,63 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/TraceAttachment"
           description: Map of attachment ids to payloads for all `[DEEPEVAL:IMAGE:…]` and `[DEEPEVAL:PDF:…]` markers in this trace. Define attachments at the trace level with same ids for same instances.
+
+    SubmitTestCaseResultRequest:
+      type: object
+      properties:
+        testCaseId:
+          type: string
+          description: The test case id Confident AI sent to your AI connection as `confident.testCaseId`.
+        output:
+          type: string
+          description: The actual output produced by your agent.
+        retrievalContext:
+          type: array
+          items:
+            type: string
+          description: The retrieval context your agent used, if any.
+        toolsCalled:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          description: The tools your agent called while producing the output.
+        expectedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallData"
+          description: The tools you expected to be called for this test case.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional additional metadata to attach to the test case.
+      required:
+        - testCaseId
+
+    SubmitTestCaseResultResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: A boolean indicating the success or failure of the API call.
+        data:
+          type: object
+          description: The recorded test case id and its status.
+          properties:
+            testCaseId:
+              type: string
+              description: The test case id the result was recorded for.
+            status:
+              type: string
+              enum:
+                - accepted
+                - already_received
+              description: "`accepted` when queued for evaluation; `already_received` on an idempotent retry."
+          required:
+            - testCaseId
+            - status
+      required:
+        - success
+        - data
 
     CreateTraceResponse:
       type: object
