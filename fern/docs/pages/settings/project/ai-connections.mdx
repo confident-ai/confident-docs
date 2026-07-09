@@ -142,13 +142,13 @@ Available `golden` attributes when `golden` is a `ConversationalGolden`:
 
 Additional parameters:
 
-| Parameter         | Description                                                                                 | Type                       |
-| ----------------- | ------------------------------------------------------------------------------------------- | -------------------------- |
-| `prompts`         | A dictionary of prompts                                                                     | `Optional[Dict[str, str]]` |
-| `hyperparameters` | A dictionary of hyperparameter key-value pairs                                              | `Optional[Dict[str, str]]` |
-| `testCaseId`      | Unique identifier for linking traces to test cases                                          | `Optional[str]`            |
-| `turnId`          | Unique identifier for linking traces to individual turns in multi-turn evals                | `Optional[str]`            |
-| `state`           | An object to keep state for multi-turn simulations                                          | `Optional[Any]`            |
+| Parameter         | Description                                                                  | Type                       |
+| ----------------- | ---------------------------------------------------------------------------- | -------------------------- |
+| `prompts`         | A dictionary of prompts                                                      | `Optional[Dict[str, str]]` |
+| `hyperparameters` | A dictionary of hyperparameter key-value pairs                               | `Optional[Dict[str, str]]` |
+| `testCaseId`      | Unique identifier for linking traces to test cases                           | `Optional[str]`            |
+| `turnId`          | Unique identifier for linking traces to individual turns in multi-turn evals | `Optional[str]`            |
+| `state`           | An object to keep state for multi-turn simulations                           | `Optional[Any]`            |
 
 ```python
 from deepeval import Golden, ConversationalGolden
@@ -362,6 +362,14 @@ Now that your AI connection is set up, dive into the pieces that make it product
     href="/docs/settings/project/ai-connections/throttling-retries"
   >
     Tune request concurrency, timeouts, and retries for endpoint requests.
+  </Card>
+  <Card
+    title="Multi-Generation"
+    icon="fa-light fa-repeat"
+    href="/docs/settings/project/ai-connections/multi-generation"
+  >
+    Sample your app multiple times per golden for statistically rigorous test
+    runs.
   </Card>
   <Card
     title="Multi-Turn State"

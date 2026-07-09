@@ -455,6 +455,9 @@ navigation:
                   - GET /v1/test-runs
                   - POST /v1/test-runs
                   - GET /v1/test-runs/{testRunId}
+              - section: AI Connections
+                contents:
+                  - GET /v1/ai-connections
               - section: Risk Assessments
                 contents:
                   - GET /v1/risk-assessments/frameworks
@@ -524,6 +527,7 @@ navigation:
                       - PUT /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - DELETE /v1/dashboards/{dashboardId}/widgets/{widgetId}
                       - POST /v1/dashboards/{dashboardId}/widgets/{widgetId}/query
+                      - POST /v1/widgets/query
           - section: Organization data models
             skip-slug: true
             contents:
@@ -756,6 +760,9 @@ navigation:
               - page: Throttling & Retries
                 path: docs/pages/settings/project/ai-connections/throttling-retries.mdx
                 icon: fa-light fa-gauge-high
+              - page: Multi-Generation
+                path: docs/pages/settings/project/ai-connections/multi-generation.mdx
+                icon: fa-light fa-repeat
               - page: Multi-Turn State
                 path: docs/pages/settings/project/ai-connections/multiturn-state.mdx
                 icon: fa-light fa-comments
@@ -819,6 +826,9 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+          - page: Onboarding Skill
+            path: docs/pages/settings/organization/onboarding-skill.mdx
+            icon: fa-light fa-sparkles
       - section: Admin SDK
         contents:
           - page: Introduction
@@ -853,6 +863,9 @@ navigation:
       - page: Security & Compliance
         path: docs/pages/self-hosting/security-and-compliance.mdx
         icon: fa-light fa-shield-check
+      - page: POC Environments
+        path: docs/pages/self-hosting/poc-environments.mdx
+        icon: fa-light fa-flask
       - section: AWS Deployment
         contents:
           - page: Overview
@@ -947,28 +960,48 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
-          - page: Vibe Code Your Administration
-            path: docs/pages/guides/vibe-code-administration.mdx
-            icon: fa-light fa-robot
-          - page: Provision Projects for Agents on the Fly
-            path: docs/pages/guides/provision-projects-in-code.mdx
-            icon: fa-light fa-layer-group
+          - page: Compare Models on One Agent
+            path: docs/pages/guides/compare-models-observability.mdx
+            icon: fa-light fa-chart-line
+          - page: Evaluate MCP Servers
+            path: docs/pages/guides/evaluating-mcp.mdx
+            icon: fa-light fa-plug
+      - section: AI Connections
+        contents:
+          - page: Air-Gapped Confident Agent
+            path: docs/pages/guides/confident-agent-air-gapped.mdx
+            icon: fa-light fa-shield-halved
+          - page: Authenticate with Client Credentials
+            path: docs/pages/guides/authenticate-with-client-credentials.mdx
+            icon: fa-light fa-key
+      - section: Administration
+        contents:
           - page: Assign Projects to Governance Policies on the Fly
             path: docs/pages/guides/assign-projects-to-policies-in-code.mdx
             icon: fa-light fa-shield-halved
-          - page: Authenticate AI Connections with Client Credentials
-            path: docs/pages/guides/authenticate-with-client-credentials.mdx
-            icon: fa-light fa-key
+          - page: Provision Projects for Agents on the Fly
+            path: docs/pages/guides/provision-projects-in-code.mdx
+            icon: fa-light fa-layer-group
+          - page: Vibe Code Your Administration
+            path: docs/pages/guides/vibe-code-administration.mdx
+            icon: fa-light fa-robot
+          - page: Standardize Coding Agent Onboarding with Custom Agent Skills
+            path: docs/pages/guides/agent-skills-git-endpoint.mdx
+            icon: fa-light fa-sparkles
   - tab: changelog
     layout:
       - changelog: ./changelog
         title: Cloud Platform
         icon: fa-light fa-cloud
-        slug: cloud-platform
+        slug: ""
       - changelog: ./changelog-enterprise
         title: Self-Hosting
         icon: fa-light fa-server
         slug: self-hosting
+      - changelog: ./changelog-client
+        title: Client SDKs
+        icon: fa-light fa-code
+        slug: confident-client
 
 redirects:
   - source: /docs/enterprise-changelog
@@ -976,6 +1009,12 @@ redirects:
     permanent: true
   - source: /docs/enterprise-changelog/:slug*
     destination: /docs/changelog/self-hosting/:slug*
+    permanent: true
+  - source: /docs/changelog/cloud-platform
+    destination: /docs/changelog
+    permanent: true
+  - source: /docs/changelog/cloud-platform/:slug*
+    destination: /docs/changelog/:slug*
     permanent: true
   - source: /docs/settings/project/management/global-api-keys
     destination: /docs/settings/organization/global-api-keys

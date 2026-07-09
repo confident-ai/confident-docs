@@ -1,0 +1,406 @@
+---
+title: Evaluate MCP Servers
+subtitle: Evaluate whether your MCP agent picks the right tools before you ship.
+slug: guides/evaluating-mcp
+description: Benchmark MCP tool usage with metric collections before deployment, then add tracing for test runs and production evaluations.
+---
+
+## Overview
+
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/) is an open standard for connecting AI models to external tools, data sources, and services. An MCP setup has a **host** (your agent) that orchestrates calls to one or more **MCP servers**, each exposing a set of tools.
+
+```mermaid
+graph LR
+    U["User request"] --> H["Host<br/>your agent"]
+    H --> S1["MCP Server A"]
+    H --> S2["MCP Server B"]
+    S1 --> T1["Tools<br/>search_docs"]
+    S2 --> T2["Tools<br/>get_customer_context"]
+
+    style H fill:#eef2ff,stroke:#6366f1
+    style S1 fill:#eef2ff,stroke:#6366f1
+    style S2 fill:#eef2ff,stroke:#6366f1
+```
+
+Evaluating MCP comes down to one question: **did your agent call the right tools, with the right inputs, to produce a good result?** This guide walks through benchmarking your agent before you ship, then adding tracing for test runs and production evaluations.
+
+## Evaluating MCP
+
+Before deployment, benchmark your MCP agent against a **dataset** of goldens. Confident AI sends each input to your AI Connection, captures the generated output and MCP tool interactions, then scores the run with your metric collection.
+
+You'll need two things set up on Confident AI first:
+
+- **A [dataset](/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets) of goldens** — what you want to test your MCP agent on.
+- **An [AI Connection](/docs/settings/project/ai-connections)** — pointed at your deployed MCP host. Confident AI uses it to run the agent and capture the generated output, tool calls, and tool arguments.
+
+With both in place, set up your metrics, connect your MCP server, and run the evaluation:
+
+<Steps>
+
+<Step title="Create your metric collection">
+
+Under **Project** > **Metrics** > **Collections**, create a **[metric collection](/docs/metrics/metric-collections)** — the set of metrics for the run. Start with MCP Use or Argument Correctness, then add an output-quality metric if final-answer quality matters.
+
+<Frame caption="Create a metric collection for your MCP evaluation" background="subtle">
+
+<video
+  autoPlay
+  loop
+  muted
+  data-video="metrics.createCollection"
+  type="video/mp4"
+/>
+
+</Frame>
+
+Not sure what to add? See [Choosing Your Metrics](#choosing-your-metrics).
+
+</Step>
+
+<Step title="Connect your MCP server">
+
+In **Project Settings** > **MCP Servers**, click **Add server** and enter its name and connection details. Confident AI fetches the tool definitions for that server version and uses them to label matching MCP tools during evaluation.
+
+<Frame caption="Connect your MCP server in Project Settings — expand the tools list to confirm what was synced">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Aconnect-server.png" />
+</Frame>
+
+</Step>
+
+<Step title="Run the evaluation from your dataset">
+
+Navigate to **Project** > **Datasets**, open your dataset, and click **Evaluate**. Select the **metric collection** you created, choose the **AI Connection** that runs your agent, attach the server you connected under **MCP Servers**, then click **Run Evaluation**.
+
+<Frame caption="Start an evaluation from your dataset — choose the AI Connection and attach the MCP server you created">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Arun-evaluation.png" />
+</Frame>
+
+Like AI Connections and prompts, attached MCP servers are saved as test-run hyperparameters. Confident AI also labels matching tool calls as **MCP tools**, so you do not have to mark them manually.
+
+</Step>
+
+<Step title="View your MCP eval results">
+
+Open the test run and select a test case. Tool calls appear under **Tools Used**, and matching calls are tagged **MCP** with their inputs and output inline. The metric scores show how the run performed.
+
+<Frame caption="Inspect a test case — MCP tool calls are tagged and scored by your metrics">
+  <img src="https://confident-docs.s3.us-east-1.amazonaws.com/evaluating-mcp%3Ainspect-test-run.png" />
+</Frame>
+
+Done ✅. You now have a repeatable pre-deployment benchmark for your MCP agent.
+
+</Step>
+
+</Steps>
+
+## Advanced Usage
+
+Once your pre-deployment benchmark is in place, add tracing for full tool-path visibility. Traces link **test runs** to the exact tool path behind each result and power **live production evaluations**.
+
+### Tracing MCP
+
+<Note>
+
+Tracing is **optional for dataset evaluations**. Your AI Connection can return the generated output and `tools_called` without a trace. Add tracing when you want each result to [open the trace](/docs/settings/project/ai-connections/linking-traces) behind its score, or when you want to run online evals in production.
+
+</Note>
+
+Your host calls MCP servers through MCP clients. In most deployments, each server runs in a separate process:
+
+```mermaid
+graph LR
+    subgraph Host["Host · your agent process"]
+        LLM2["LLM<br/>decides what to call"]
+        CA["MCP client A<br/>calls one server"]
+        CB["MCP client B<br/>calls one server"]
+        LLM2 --> CA
+        LLM2 --> CB
+    end
+
+    CA -->|"JSON-RPC · tools/call"| SA["Server A<br/>docs context"]
+    CB -->|"JSON-RPC · tools/call"| SB["Server B<br/>customer context"]
+
+    style CA fill:#eef2ff,stroke:#6366f1
+    style CB fill:#eef2ff,stroke:#6366f1
+    style SA fill:#eef2ff,stroke:#6366f1
+    style SB fill:#eef2ff,stroke:#6366f1
+```
+
+For tracing, that client/server boundary matters: the host owns the active trace, while each server needs the trace context passed to it explicitly.
+
+The host and each server talk over **[JSON-RPC 2.0](https://www.jsonrpc.org/specification)** — a lightweight "call a named method with some params, get a result back" protocol. Calling a tool is a JSON-RPC request with the method `tools/call`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "search_docs",
+    "arguments": { "query": "refund policy for annual plans" }
+  },
+  "id": 1
+}
+```
+
+Here `method` is the operation, `params.name` is the tool, and `params.arguments` are the tool inputs. In this example, the host asks a docs MCP server for context before the agent answers. The top-level `id` is only the JSON-RPC request ID — it is **not** the trace ID.
+
+These messages travel over a **transport** — `stdio` for local servers or HTTP for remote ones. Either way, the host and server are usually different processes, so the server cannot automatically see the host's active trace. The host has to send trace context with the `tools/call` request.
+
+To see every tool call from a single request unified under one trace, you need [distributed tracing](/docs/integrations/opentelemetry/distributed-tracing), which carries trace context across those process boundaries.
+
+At a high level, the host injects W3C trace context into each MCP call's metadata, each server extracts it to create child spans, and all processes export to Confident AI using the **same `CONFIDENT_API_KEY`**.
+
+<Steps>
+
+<Step title="Configure the OTLP exporter">
+
+Set these environment variables on your host **and** every MCP server so all spans export to the same project:
+
+```bash
+export CONFIDENT_API_KEY="your-project-api-key"
+export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.confident-ai.com"
+```
+
+<Warning>
+
+Every process must share the **same `CONFIDENT_API_KEY`**. If servers use different keys, their spans land in different projects and the distributed trace won't unify.
+
+</Warning>
+
+</Step>
+
+<Step title="Propagate trace context through MCP calls">
+
+Because each MCP server runs in its own process, it would otherwise start a new trace for every call. To attach server spans to the host trace, the host has to tell the server _which trace this call belongs to_.
+
+That identifier is the W3C **`traceparent`** — a compact string holding the trace ID plus the host's current span ID. MCP passes `_meta` through to the server untouched, so the host can put the `traceparent` there:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "search_docs",
+    "arguments": { "query": "refund policy for annual plans" },
+    "_meta": {
+      "traceparent": "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+    }
+  },
+  "id": 1
+}
+```
+
+On the other end, the MCP server reads `_meta.traceparent` and adopts it as the parent — so its tool span nests under the host's trace instead of starting a fresh one.
+
+<Info>
+
+You don't hand-build that `traceparent` string — injecting it on the host and extracting it on the server is standard OpenTelemetry context propagation. The [Distributed Tracing](/docs/integrations/opentelemetry/distributed-tracing#mcp-model-context-protocol-example) section walks through the inject/extract code on both ends, with a complete runnable MCP example (a Python host plus TypeScript and Python servers).
+
+</Info>
+
+</Step>
+
+<Step title="Record each tool call as a tool span">
+
+This happens **on the host**, where every tool call flows through your MCP client's `call_tool`. Wrap that call in a `tool` span so the tool name, arguments, and result land in the trace. Then inject the trace context before sending the request:
+
+```python title="mcp_host/main.py"
+async def call_tool_with_tracing(session, tool_name: str, arguments: dict):
+    with tracer.start_as_current_span(f"mcp-tool-{tool_name}") as span:
+        span.set_attribute("confident.span.type", "tool")
+        span.set_attribute("confident.tool.name", tool_name)
+        span.set_attribute("confident.span.input", json.dumps(arguments))
+
+        # Inject trace context so the MCP server joins this trace
+        trace_meta = {}
+        propagator.inject(trace_meta)
+
+        result = await session.call_tool(tool_name, arguments=arguments, _meta=trace_meta)
+
+        span.set_attribute("confident.span.output", json.dumps(result.content))
+        return result
+```
+
+Here `session` is the MCP client for one server, and `propagator.inject(trace_meta)` fills the dict with the active span's `traceparent` — you never build that ID by hand.
+
+Done ✅. Your MCP host and servers now emit a unified trace for every request.
+
+</Step>
+
+</Steps>
+
+Once your host and servers emit unified traces, [link them to your AI Connection](/docs/settings/project/ai-connections/linking-traces). During an evaluation, each generated test case can include a link to the trace that produced it, so you can inspect the exact tool path behind the score.
+
+### Evaluate MCP in Production
+
+Pre-deployment benchmarks catch regressions before you ship, but real users send inputs you never tested. [Online evaluations](/docs/llm-tracing/online-evals) close that loop by scoring MCP traces as Confident AI ingests them, so tool-usage quality is monitored continuously in production.
+
+Once your MCP host and servers are [tracing](#tracing-mcp) to Confident AI, turn on metrics like MCP Use for tool spans and Task Completion for the whole trace. Every production run is scored automatically — no dataset required — and thresholds can alert you when tool-selection quality drops.
+
+<Tip>
+
+Use the same MCP metrics for pre-deployment benchmarks and online evals. That way, you measure tool usage consistently in development, before deployment, and in production.
+
+</Tip>
+
+## Concepts
+
+The workflow above is enough to run an evaluation. This section explains why MCP evaluation matters, how a run works end to end, which metrics to choose, and the practices that keep it reliable.
+
+### Why Evaluate MCP?
+
+MCP turns your agent into a tool-using system. The model still writes the final answer, but answer quality depends on the path it took: which tool it chose, what arguments it passed, and whether it used the returned data correctly.
+
+```mermaid
+graph LR
+    Req["User request"] --> Sel["Agent picks<br/>a tool + arguments"]
+    Sel --> Run["MCP tool runs"]
+    Run --> Ans["Agent reasons<br/>& answers"]
+
+    Sel -.-> TC["<b>Tool calling</b><br/>Tool Correctness"]
+    Sel -.-> TU["<b>Tool usage</b><br/>Argument Correctness · MCP Use"]
+    Ans -.-> WF["<b>Workflow</b><br/>Task Completion · Step Efficiency"]
+
+    style TC fill:#eef2ff,stroke:#6366f1
+    style TU fill:#eef2ff,stroke:#6366f1
+    style WF fill:#eef2ff,stroke:#6366f1
+```
+
+MCP evaluation has to look beyond "was the final answer good?" What you measure depends on how much work your MCP agent does — from one tool call to a multi-step workflow:
+
+- **Tool calling** — did the agent call the right tool? [Tool Correctness](/docs/metrics/single-turn/tool-correctness-metric) compares the tools called against the ones you expected. Best when your MCP is essentially a tool-calling interface.
+- **Tool usage** — how well the LLM uses those tools. [Argument Correctness](https://deepeval.com/docs/metrics-argument-correctness) checks whether each call's inputs fit the request, and [MCP Use](https://deepeval.com/docs/metrics-mcp-use) scores tool selection and argument quality together — no labels needed. Most MCP agents start here.
+- **Workflow** — for MCPs that do more than wrap a tool call, like summarizers or multi-step agents. [Task Completion](/docs/metrics/single-turn/task-completion-metric) checks whether the run met the user's goal, and [Step Efficiency](https://deepeval.com/docs/metrics-step-efficiency) whether it got there without detours.
+
+That's the _what_ — see [Choosing Your Metrics](#choosing-your-metrics) to turn these categories into a metric collection.
+
+### How It Works
+
+When you start a dataset run, Confident AI does the following:
+
+```mermaid
+sequenceDiagram
+    participant Dataset as Dataset
+    participant Confident as Confident AI
+    participant Connection as AI Connection
+    participant Host as MCP Host
+    participant Server as MCP Server
+    participant Metrics as Metrics
+
+    Confident->>Server: Fetch tool definitions
+    Dataset->>Confident: Golden input
+    Confident->>Connection: Send input
+    Connection->>Host: Run MCP agent
+    Host->>Server: tools/call
+    Server-->>Host: Tool result
+    Host-->>Connection: Output + tools_called
+    Connection-->>Confident: Generated test case
+    Confident->>Metrics: Score generated test case
+```
+
+An MCP evaluation does not just check the final answer. It can also score how the agent interacted with the MCP server:
+
+- **Connected MCP server** provides the tool definitions Confident AI uses to label matching calls as MCP tool calls.
+- **AI Connection** runs your agent and returns the generated output plus `tools_called`.
+- **Metrics** score the generated test case based on what they measure: tool selection, arguments, final output, or the full workflow.
+
+For referenceless MCP metrics, you do not label `expected_tools` for every golden. The dataset provides inputs, the AI Connection generates outputs and tool interactions, and the connected server provides MCP tool definitions.
+
+### Choosing Your Metrics
+
+A **metric collection** is the set of metrics every run is scored with. It defines what "good" means for your MCP agent. The [Why Evaluate MCP?](#why-evaluate-mcp) section grouped metrics by _what_ they measure; here's how to choose what belongs in the collection.
+
+Start with one referenceless, MCP-native metric and add more only when they cover a real risk:
+
+- **[MCP Use](https://deepeval.com/docs/metrics-mcp-use)** — the default. It scores tool selection and argument quality using the connected server's tool definitions, with no labels required.
+- **[Argument Correctness](https://deepeval.com/docs/metrics-argument-correctness)** — a sharper lens on inputs: did each call pass arguments that fit the request? Pair it with MCP Use when argument quality is your main risk.
+- **[Task Completion](/docs/metrics/single-turn/task-completion-metric)** — did the run accomplish the user's goal? Add it when your agent chains multiple calls and you need to score the outcome.
+- **[Step Efficiency](https://deepeval.com/docs/metrics-step-efficiency)** — did it get there without redundant calls or detours? Add it when cost or latency matters.
+- An output-quality metric like **[Answer Relevancy](/docs/metrics/single-turn/answer-relevancy-metric)** — useful when the final response matters as much as the tool path.
+
+Have labeled data? Add **[Tool Correctness](/docs/metrics/single-turn/tool-correctness-metric)**. It compares the tools called against a per-golden `expected_tools` list. Everything above is referenceless, so most teams start there and layer Tool Correctness on top once they have labels.
+
+<Tip>
+
+Not sure where to start? Add **MCP Use**, run once, and read the reasoning behind each score. It will show whether the weak spot is tool selection, arguments, or the final answer.
+
+</Tip>
+
+### Best Practices
+
+A few practices that keep MCP evaluation trustworthy as agents, tools, and servers evolve:
+
+- **Isolate evals from real side effects.** MCP tools take real actions — writing to databases, sending emails, moving money. Point evaluation runs at sandboxed servers, mock tools, or read-only credentials so benchmarking never mutates production systems.
+- **Pin server versions and re-baseline on every upgrade.** A new MCP server release can rename tools or change schemas. Evaluate against a fixed version, and treat a server upgrade like a code change: re-run your benchmark before it reaches production.
+- **Seed your dataset from production traces.** Hand-written goldens miss how users actually behave. Promote real edge cases and past failures from traces into the dataset so fixed regressions stay fixed.
+- **Sample each input multiple times.** Agents take different tool paths on identical inputs. Use [multi-generation](/docs/settings/project/ai-connections/multi-generation) and judge on pass rates, not a single lucky — or unlucky — run.
+- **Gate releases on your benchmark.** Attach thresholds to your metrics and run the benchmark in CI so a drop in tool-selection quality blocks the deploy.
+- **Track cost and latency, not just correctness.** An agent that reaches the right answer through twenty redundant tool calls is still a production problem. Watch step count and latency alongside quality.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need distributed tracing if my host and MCP server run in the same process?">
+    If everything runs in one process, standard
+    [tracing](/docs/llm-tracing/quickstart) captures your tool spans without any
+    context propagation. Distributed tracing matters the moment a tool call
+    crosses a process or network boundary — the common MCP setup, where servers
+    run separately from the host.
+  </Accordion>
+  <Accordion title="Can I measure tool usage without ground truth?">
+    Yes. [MCP Use](https://deepeval.com/docs/metrics-mcp-use) scores tool
+    selection and argument correctness using the connected server's tool
+    definitions, [Argument
+    Correctness](https://deepeval.com/docs/metrics-argument-correctness) checks
+    whether each call's arguments fit the input, and Task Completion judges
+    whether the agent achieved the user's goal — all three are referenceless, so
+    none needs a labeled `expected_tools` list. Only Tool Correctness requires
+    that ground truth.
+  </Accordion>
+  <Accordion title="How do tools_called get captured automatically?">
+    Some [integrations](/docs/integrations/opentelemetry) capture MCP tool spans
+    for you. For example, the [OpenAI
+    Agents](/docs/integrations/third-party/openai-agents) integration records
+    MCP tool calls automatically. Otherwise, set `tools_called` yourself on the
+    trace or return it from your AI Connection response.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+You benchmarked your MCP agent before deployment, then saw how to trace it for test runs and production evals. To go deeper:
+
+<CardGroup cols={2}>
+  <Card
+    title="Distributed Tracing"
+    icon="globe"
+    href="/docs/integrations/opentelemetry/distributed-tracing#mcp-model-context-protocol-example"
+  >
+    See the complete, runnable MCP tracing example across a host and multiple
+    servers.
+  </Card>
+  <Card
+    title="Datasets"
+    icon="database"
+    href="/docs/llm-evaluation/core-concepts/test-cases-goldens-datasets"
+  >
+    Build goldens that Confident AI can run against your MCP-powered endpoint
+    before deployment.
+  </Card>
+  <Card
+    title="MCP Metrics"
+    icon="wrench"
+    href="https://deepeval.com/docs/metrics-mcp-use"
+  >
+    Score MCP tool selection and argument correctness with DeepEval's MCP-native
+    metrics.
+  </Card>
+  <Card
+    title="AI Connections"
+    icon="plug"
+    href="/docs/settings/project/ai-connections"
+  >
+    Connect a deployed endpoint so Confident AI can generate outputs during
+    evaluation.
+  </Card>
+</CardGroup>

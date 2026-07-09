@@ -125,6 +125,8 @@ function runOnDomUpdates(callback) {
     "experiments.createFromTestRuns": `${S3_BASE}/experiments:create-from-test-runs.png`,
     "experiments.metricsOverview": `${S3_BASE}/experiments:metrics-overview.png`,
 
+    "evaluation.multiGenerationTestCases": `${S3_BASE}/evaluation:multi-generation-test-cases.png`,
+
     "arena.promptConfig": `${S3_BASE}/arena:prompt-config.png`,
     "arena.aiConnectionConfig": `${S3_BASE}/arena:ai-connection-config.png`,
     "arena.mixedConfig": `${S3_BASE}/arena:mixed-config.png`,
@@ -168,6 +170,7 @@ function runOnDomUpdates(callback) {
     "settings.organization.rolesPermissions": `${S3_BASE}/settings:org:roles-n-permissions.png`,
     "settings.organization.dataRetention": `${S3_BASE}/settings:org:data-retention.png`,
     "settings.organization.auditLogs": `${S3_BASE}/settings:org:audit-logs.png`,
+    "settings.organization.onboardingSkill": `${S3_BASE}/settings:org:onboarding-skill.png`,
 
     "settings.project.rolesPermissions": `${S3_BASE}/settings:project:roles-n-permissions.png`,
     "settings.project.apiKeys": `${S3_BASE}/settings:project:api-keys.png`,
@@ -184,6 +187,7 @@ function runOnDomUpdates(callback) {
     "settings.project.aiConnectionThrottling": `${S3_BASE}/ai-connection:throttling.png`,
     "settings.project.aiConnectionOutputParsing": `${S3_BASE}/ai-connection:output-parsing.png`,
     "settings.project.aiConnectionOutputTransformer": `${S3_BASE}/ai-connection:output-transformer.png`,
+    "settings.project.aiConnectionMultiGeneration": `${S3_BASE}/ai-connection:default-generations.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.annotationFormEditor": `${S3_BASE}/settings:project:annotation-form-editor.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,
@@ -204,6 +208,7 @@ function runOnDomUpdates(callback) {
     "tracing.workflows.datasetIngestion": `${S3_BASE}/confident-docs:dataset-ingestion.png`,
     "tracing.workflows.queueIngestion": `${S3_BASE}/confident-docs:queue-ingestion.png`,
     "tracing.workflows.evaluationRule": `${S3_BASE}/confident-docs:evaluation-rule.png`,
+    "tracing.workflows.sampleRates": `${S3_BASE}/workflows:eval-sample-rate.png`,
     "tracing.workflows.classifier": `${S3_BASE}/confident-docs:classifier.png`,
 
     "settings.project.knowledgeBase": `${S3_BASE}/knowledge-base.png`,
@@ -359,6 +364,12 @@ function runOnDomUpdates(callback) {
       subtitle: "Find safety gaps before users, auditors, or attackers do",
       action: "Book security briefing",
     },
+    "ai-governance": {
+      title: "Standardizing AI governance across teams?",
+      subtitle:
+        "Enforce one quality bar across every project, with audit-ready policies and controls",
+      action: "Book a demo",
+    },
     "framework-policies": {
       title: "Building a custom security framework?",
       subtitle:
@@ -488,6 +499,7 @@ function runOnDomUpdates(callback) {
   ];
 
   const INLINE_CTA_SLUGS = new Set([
+    "ai-governance/introduction",
     "api-reference/introduction",
     "human-in-the-loop/annotation-queues",
     "integrations",
