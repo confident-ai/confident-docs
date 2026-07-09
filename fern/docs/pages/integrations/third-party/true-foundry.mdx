@@ -5,24 +5,29 @@ subtitle: Trace LLM Gateway traffic from TrueFoundry AI Gateway using OpenTeleme
 
 ## Overview
 
-[TrueFoundry AI Gateway](https://www.truefoundry.com/ai-gateway) is the proxy layer that connects you to multiple LLM providers and MCP servers.
+[TrueFoundry AI Gateway](https://www.truefoundry.com/ai-gateway) is a proxy that sits between your applications and 1000+ LLM providers, giving you a single interface with built-in observability and governance.
 
-Confident AI integrates with TrueFoundry AI to trace your LLM calls across every model and provider you route through the gateway using OpenTelemetry.
+Confident AI integrates with TrueFoundry over OpenTelemetry: the gateway exports OTLP traces directly to Confident AI's endpoint, so every LLM call you route through it shows up in the **Observatory** without instrumenting each application separately.
+
+Before you start, make sure your TrueFoundry AI Gateway is set up and routing traffic, and that you have access to your project in Confident AI.
 
 ## Tracing Quickstart
 
 <Steps>
 
     <Step title="Create a Confident AI API key">
-        Log in to your [Confident AI](https://app.confident.ai) dashboard, open your project, and go to **Settings → API Keys**. Create a new API key and store it securely, you'll use it as the `x-confident-api-key` header when configuring TrueFoundry.
+        Log in to [Confident AI](https://app.confident.ai), open your project, and go to **Settings → API Keys** to create a new key. Store it securely, you'll pass it as the `x-confident-api-key` header when configuring TrueFoundry.
+
+        <Note>
+          This key is scoped to your project, so every trace TrueFoundry sends will land there.
+        </Note>
     </Step>
 
     <Step title="Configure OTEL export in TrueFoundry">
-        In the TrueFoundry dashboard, go to **AI Gateway → Controls → Settings**, scroll to **OTEL Config**, and click the edit (pencil) control.
+        In the TrueFoundry dashboard, go to **AI Gateway → Controls → Settings**, open **OTEL Config** via the edit (pencil) icon, and turn on **Otel Traces Exporter Configuration**.
 
-        - Enable **Otel Traces Exporter Configuration**.
-        - Select **HTTP Configuration**.
-        - Set **Endpoint** to your Confident AI OTLP traces URL:
+        - Choose **HTTP Configuration**.
+        - Set **Endpoint** to Confident AI's OTLP traces URL:
 
         ```bash
         https://otel.confident-ai.com/v1/traces
@@ -37,33 +42,69 @@ Confident AI integrates with TrueFoundry AI to trace your LLM calls across every
         </Tip>
 
         - Set **Encoding** to `Json`.
+
+        <Frame caption="TrueFoundry AI Gateway OTEL Config">
+            <img
+                data-image="integrations.trueFoundry"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            />
+        </Frame>
     </Step>
 
     <Step title="Configure headers and save">
 
-        Enable **Headers** and add the following:
+        Turn on **Headers** and add:
 
         | Header                | Value                      |
         | --------------------- | -------------------------- |
         | `Content-Type`        | `application/json`         |
         | `x-confident-api-key` | `<your-confident-api-key>` |
 
-        Replace `<your-confident-api-key>` with the key from step 1, then click **Save**.
+        Swap in the key from step 1, then click **Save**.
 
     <Tip>
-        Leave **Exclude Request Data** unchecked if you want Confident AI to receive LLM request and response payloads via the `tfy.input` and `tfy.output` span attributes. Confident AI accepts OTLP over HTTP only, gRPC is not supported.
+        Keep **Exclude Request Data** unchecked if you want request and response payloads captured via the `tfy.input` and `tfy.output` span attributes. Confident AI only accepts OTLP over HTTP, gRPC is not supported.
     </Tip>
 
     </Step>
 
     <Step title="Verify traces in the Observatory">
 
-        Send a few requests through your TrueFoundry AI Gateway, then confirm gateway traffic is flowing in TrueFoundry's **Monitor** page. In Confident AI, go to **Observability → Traces** to confirm new traces appear with latency, environment, and status details for your gateway requests.
+        Send a few requests through the gateway, then check TrueFoundry's **Monitor** page to confirm traffic is flowing. Back in Confident AI, open **Observability → Traces** — you should see new traces with latency, environment, and status for each request.
 
     </Step>
 
 </Steps>
 
+From here you can search traces by UUID, filter by environment, inspect cost and latency, and run evals on incoming traffic.
+
 <Note>
-  This integration uses OpenTelemetry (OTEL). TrueFoundry sends traces over OTLP/HTTP to Confident AI, so no application code changes are required once the gateway exporter is configured. The TrueFoundry OTEL Config export only sends traces for the AI Gateway, it does not export OTEL metrics.
+  This is a config-only integration, TrueFoundry ships traces over OTLP/HTTP so nothing changes in your application code. The OTEL Config export only covers AI Gateway traces, not metrics.
 </Note>
+
+## Configuration reference
+
+| **Setting**                      | **Value**                                       |
+| -------------------------------- | ----------------------------------------------- |
+| **Traces endpoint (US/default)** | `https://otel.confident-ai.com/v1/traces`       |
+| **Traces endpoint (EU)**         | `https://eu.otel.confident-ai.com/v1/traces`    |
+| **Protocol**                     | HTTP (OTLP)                                     |
+| **Encoding**                     | JSON                                            |
+| **Authentication Header**        | `x-confident-api-key: <your-confident-api-key>` |
+| **Content-Type**                 | `application/json`                              |
+
+
+## Advanced Usage
+
+### Online evals
+
+Once TrueFoundry traces are landing in Confident AI, you can run [online evals](/docs/llm-tracing/online-evals) against them directly from the Observatory, no extra configuration on the TrueFoundry side is needed.
+
+### Distributed tracing
+
+If your own services also emit OpenTelemetry spans, you can correlate them with the gateway-level traces from TrueFoundry for a full picture end to end. See the [OpenTelemetry integration guide](/docs/integrations/opentelemetry) for attribute references and multi-service setup.
+
+## Related links
+
+- [TrueFoundry AI Gateway](https://www.truefoundry.com/ai-gateway)
+- [TrueFoundry × Confident AI integration guide](https://docs.truefoundry.com/docs/ai-gateway/confident-ai)

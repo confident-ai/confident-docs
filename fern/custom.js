@@ -221,6 +221,8 @@ function runOnDomUpdates(callback) {
     "reports.overview": `${S3_BASE}/reports:overview.png`,
     "reports.fullDocument": `${S3_BASE}/reports:full-document.png`,
 
+    "integrations.trueFoundry": `${S3_BASE}/integrations:true-foundry.png`,
+
     "queues.exportCsv": `${S3_BASE}/queues:export-csv.png`,
     "queues.ingestionTasks": `${S3_BASE}/queues:ingestion-tasks.png`,
     "queues.ingestionTaskCreate": `${S3_BASE}/queues:ingestion-task-create.png`,
