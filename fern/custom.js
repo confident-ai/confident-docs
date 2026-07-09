@@ -170,6 +170,7 @@ function runOnDomUpdates(callback) {
     "settings.organization.rolesPermissions": `${S3_BASE}/settings:org:roles-n-permissions.png`,
     "settings.organization.dataRetention": `${S3_BASE}/settings:org:data-retention.png`,
     "settings.organization.auditLogs": `${S3_BASE}/settings:org:audit-logs.png`,
+    "settings.organization.onboardingSkill": `${S3_BASE}/settings:org:onboarding-skill.png`,
 
     "settings.project.rolesPermissions": `${S3_BASE}/settings:project:roles-n-permissions.png`,
     "settings.project.apiKeys": `${S3_BASE}/settings:project:api-keys.png`,
@@ -361,6 +362,12 @@ function runOnDomUpdates(callback) {
       subtitle: "Find safety gaps before users, auditors, or attackers do",
       action: "Book security briefing",
     },
+    "ai-governance": {
+      title: "Standardizing AI governance across teams?",
+      subtitle:
+        "Enforce one quality bar across every project, with audit-ready policies and controls",
+      action: "Book a demo",
+    },
     "framework-policies": {
       title: "Building a custom security framework?",
       subtitle:
@@ -490,6 +497,7 @@ function runOnDomUpdates(callback) {
   ];
 
   const INLINE_CTA_SLUGS = new Set([
+    "ai-governance/introduction",
     "api-reference/introduction",
     "human-in-the-loop/annotation-queues",
     "integrations",

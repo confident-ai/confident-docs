@@ -823,6 +823,9 @@ navigation:
           - page: Feature Access
             path: docs/pages/settings/organization/feature-access.mdx
             icon: fa-light fa-toggle-on
+          - page: Onboarding Skill
+            path: docs/pages/settings/organization/onboarding-skill.mdx
+            icon: fa-light fa-sparkles
       - section: Admin SDK
         contents:
           - page: Introduction
@@ -979,6 +982,9 @@ navigation:
           - page: Vibe Code Your Administration
             path: docs/pages/guides/vibe-code-administration.mdx
             icon: fa-light fa-robot
+          - page: Standardize Coding Agent Onboarding with Custom Agent Skills
+            path: docs/pages/guides/agent-skills-git-endpoint.mdx
+            icon: fa-light fa-sparkles
   - tab: changelog
     layout:
       - changelog: ./changelog

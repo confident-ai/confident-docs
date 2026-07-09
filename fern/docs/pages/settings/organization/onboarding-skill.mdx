@@ -1,0 +1,68 @@
+---
+subtitle: Define the default Custom Agent Skill that helps coding agents onboard to projects in your organization.
+slug: settings/organization/onboarding-skill
+description: Configure your organization's onboarding Custom Agent Skill for Claude Code, Codex, Cursor, and other coding agents.
+---
+
+The **Onboarding Skill** lets organization admins define the default Custom Agent Skill that coding agents receive when they install skills from Confident AI.
+
+Use it to standardize how product teams onboard with tools like Claude Code, Codex, Cursor, Windsurf, and other agents that support the Agent Skills standard. The skill can include repository conventions, setup commands, test and eval workflows, tracing expectations, and team-specific instructions.
+
+<Frame caption="Organization Onboarding Skill">
+  <img
+    data-image="settings.organization.onboardingSkill"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Configure the onboarding skill
+
+To configure the organization onboarding skill:
+
+1. Navigate to **Organization Settings** → **Onboarding Skill**
+2. Review the **Install skills repo** command
+3. Enter a **Description** that summarizes how the skill should guide coding agents
+4. Add the full markdown content in **Skill Body**
+5. Click **Save**
+
+The **Description** becomes the skill frontmatter description in `SKILL.md`. The **Skill Body** becomes the markdown body that coding agents read and follow.
+
+## Install the skill
+
+The Onboarding Skill page shows the install command for your organization's skills repository:
+
+```bash
+npx skills add "https://apikey:PROJECT_API_KEY@<host>/skills.git" --skill onboarding
+```
+
+Replace `PROJECT_API_KEY` with the Project API Key for the project the product team is working in.
+
+The `--skill onboarding` flag is required so the Skills CLI installs the onboarding skill from the repository.
+
+<Tip>
+  The Project API Key determines which project-specific skills are served. If a project does not have its own onboarding skill, Confident AI falls back to the organization onboarding skill configured on this page.
+</Tip>
+
+## What to include
+
+Good onboarding skills give coding agents enough context to make useful changes without asking every team the same setup questions. Include instructions such as:
+
+- required setup and dependency installation commands
+- how to run tests, evals, linters, and type checks
+- repository conventions and code ownership expectations
+- how to instrument traces and send results to Confident AI
+- which files or workflows require extra care
+- examples of prompts product teams should use with their coding agent
+
+Keep the organization-level onboarding skill broad enough to apply across teams. Use project-specific onboarding skills only when a project has special commands, architecture, or release requirements.
+
+## Related guides
+
+<CardGroup cols={2}>
+  <Card title="Custom Agent Skills Guide" icon="sparkles" href="/docs/guides/agent-skills-git-endpoint">
+    Serve project-specific onboarding and governance instructions from Confident AI.
+  </Card>
+  <Card title="Organization Projects" icon="folder" href="/docs/settings/organization/projects">
+    Manage the projects that use Project API Keys to resolve their skills.
+  </Card>
+</CardGroup>
