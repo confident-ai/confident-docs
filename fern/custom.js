@@ -222,6 +222,8 @@ function runOnDomUpdates(callback) {
     "dashboards.timeSeriesEditor": `${S3_BASE}/dashboards:time-series-editor.png`,
     "dashboards.categoricalEditor": `${S3_BASE}/dashboards:categorical-editor.png`,
     "dashboards.widgetExport": `${S3_BASE}/dashboards:widget-export.png`,
+    "dashboards.createDashboard": `${S3_BASE}/dashboards:create-dashboard.png`,
+    "dashboards.dashboardPreview": `${S3_BASE}/dashboards:preview-dashboard.png`,
 
     "reports.overview": `${S3_BASE}/reports:overview.png`,
     "reports.fullDocument": `${S3_BASE}/reports:full-document.png`,
