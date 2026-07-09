@@ -962,23 +962,23 @@ navigation:
             icon: fa-light fa-plug
       - section: AI Connections
         contents:
-          - page: Authenticate with Client Credentials
-            path: docs/pages/guides/authenticate-with-client-credentials.mdx
-            icon: fa-light fa-key
           - page: Air-Gapped Confident Agent
             path: docs/pages/guides/confident-agent-air-gapped.mdx
             icon: fa-light fa-shield-halved
+          - page: Authenticate with Client Credentials
+            path: docs/pages/guides/authenticate-with-client-credentials.mdx
+            icon: fa-light fa-key
       - section: Administration
         contents:
-          - page: Vibe Code Your Administration
-            path: docs/pages/guides/vibe-code-administration.mdx
-            icon: fa-light fa-robot
-          - page: Provision Projects for Agents on the Fly
-            path: docs/pages/guides/provision-projects-in-code.mdx
-            icon: fa-light fa-layer-group
           - page: Assign Projects to Governance Policies on the Fly
             path: docs/pages/guides/assign-projects-to-policies-in-code.mdx
             icon: fa-light fa-shield-halved
+          - page: Provision Projects for Agents on the Fly
+            path: docs/pages/guides/provision-projects-in-code.mdx
+            icon: fa-light fa-layer-group
+          - page: Vibe Code Your Administration
+            path: docs/pages/guides/vibe-code-administration.mdx
+            icon: fa-light fa-robot
   - tab: changelog
     layout:
       - changelog: ./changelog
