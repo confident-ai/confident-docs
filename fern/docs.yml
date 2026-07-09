@@ -954,9 +954,22 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
+          - page: Compare Models on One Agent
+            path: docs/pages/guides/compare-models-observability.mdx
+            icon: fa-light fa-chart-line
           - page: Evaluate MCP Servers
             path: docs/pages/guides/evaluating-mcp.mdx
             icon: fa-light fa-plug
+      - section: AI Connections
+        contents:
+          - page: Authenticate with Client Credentials
+            path: docs/pages/guides/authenticate-with-client-credentials.mdx
+            icon: fa-light fa-key
+          - page: Air-Gapped Confident Agent
+            path: docs/pages/guides/confident-agent-air-gapped.mdx
+            icon: fa-light fa-shield-halved
+      - section: Administration
+        contents:
           - page: Vibe Code Your Administration
             path: docs/pages/guides/vibe-code-administration.mdx
             icon: fa-light fa-robot
@@ -965,12 +978,6 @@ navigation:
             icon: fa-light fa-layer-group
           - page: Assign Projects to Governance Policies on the Fly
             path: docs/pages/guides/assign-projects-to-policies-in-code.mdx
-            icon: fa-light fa-shield-halved
-          - page: Authenticate AI Connections with Client Credentials
-            path: docs/pages/guides/authenticate-with-client-credentials.mdx
-            icon: fa-light fa-key
-          - page: Set Up the Confident Agent in an Air-Gapped Environment
-            path: docs/pages/guides/confident-agent-air-gapped.mdx
             icon: fa-light fa-shield-halved
   - tab: changelog
     layout:
