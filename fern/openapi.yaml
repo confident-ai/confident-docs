@@ -977,12 +977,12 @@ paths:
                       name: "EU AI Act"
                   deprecated: false
 
-  /v1/evaluations/test-case-result:
+  /v1/test-runs/evaluate/{testCaseId}:
     post:
       x-fern-server-name: Confident AI
       tags:
         - Evaluation
-      summary: Submit Long-Running Agent Result
+      summary: Submit Test Case Result
       operationId: submitTestCaseResult
       description: >-
         Submit the result for a single test case in a long-running agent
@@ -999,15 +999,8 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SubmitTestCaseResultRequest"
-            examples:
-              Output:
-                testCaseId: "<TEST-CASE-ID>"
-                output: "The capital of France is Paris."
-              With-Retrieval-Context:
-                testCaseId: "<TEST-CASE-ID>"
-                output: "The capital of France is Paris."
-                retrievalContext:
-                  - "France is a country in Western Europe. Its capital is Paris."
+            example:
+              actualOutput: "The capital of France is Paris."
       responses:
         "200":
           description: The result was accepted for evaluation.
@@ -7539,10 +7532,7 @@ components:
     SubmitTestCaseResultRequest:
       type: object
       properties:
-        testCaseId:
-          type: string
-          description: The test case id Confident AI sent to your AI connection as `confident.testCaseId`.
-        output:
+        actualOutput:
           type: string
           description: The actual output produced by your agent.
         retrievalContext:
@@ -7564,8 +7554,6 @@ components:
           type: object
           additionalProperties: true
           description: Optional additional metadata to attach to the test case.
-      required:
-        - testCaseId
 
     SubmitTestCaseResultResponse:
       type: object
