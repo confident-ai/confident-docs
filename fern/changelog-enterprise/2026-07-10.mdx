@@ -1,0 +1,45 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.18
+
+Release v2.0.18 adds new Helm chart packaging, MCP OAuth/auth configuration support, and expanded widget-query endpoints for project and organization scopes. It also includes entitlements route gating updates, risk assessment and sampling enhancements, and several operator-facing fixes.
+
+### Highlights
+- New Helm chart scaffold and deployment templates are included for self-hosted installs.
+- MCP server authentication now supports OAuth client-credentials and headers-based auth with schema and UI updates.
+- Widget queries were expanded to dedicated project and organization endpoints, with backend routing changes.
+- New sampling, email, and risk-assessment updates were added across workflows and evaluations.
+
+### New Features
+- **Helm Chart** — A new Helm chart scaffold was added with deployment templates, external-secrets integration, Redis and ClickHouse resources, ingress, and backup jobs.
+- **MCP OAuth Auth** — MCP server auth now supports OAuth client-credentials and headers-based configurations, including backend persistence, redaction, and editor support.
+- **Widget Query Endpoints** — New widget-query APIs were added for project and organization scopes, with backend support for building and serving aggregate queries.
+- **Sampling Controls** — Thread and trace sample-rate support was added, along with workflow sampling inputs and queue sampling for evals.
+- **Email Reporting** — Email configuration and report-email delivery logic were added, including support for email report bodies.
+- **Code Execution Support** — A GCP Cloud Functions executor was added to the backend and evals.
+
+### Improvements
+- **Entitlements Gating** — Evals and observability client routes were consolidated under single-source path-based feature gating.
+- **Widget Query Routing** — Dashboard and aggregate fetchers were routed through the widget endpoint, with memoized caching added for fetchers.
+- **Risk Assessment** — Risk assessment now starts via ID and includes fallback error handling.
+- **MCP Connect Feedback** — MCP connect now returns a failure reason that is surfaced in the frontend.
+
+### Fixes
+- **Widget Query Stability** — Widget query failures are now logged per query, and abort behavior in NONE cache mode was corrected.
+- **Widget Query Validation** — Org widget queries now honor per-query projectId filters, enforce batch and nested time-range bounds, and reject unsupported data models.
+- **Evaluation Reload** — The evaluate UI now reloads correctly for spans, traces, and threads.
+- **Preserve Annotator Buckets** — Annotator buckets are preserved for removed users.
+
+<Warning>
+**Breaking changes**
+
+- **Widget Query API Split** — Widget queries now use dedicated project and organization endpoints instead of the previous shared route. _Migration:_ Update clients to call POST /project/:projectId/widgets/query or POST /organizations/:organizationId/widgets/query instead of the old widget query path.
+- **MCP Auth Schema Changes** — MCP server auth was migrated to authConfig with new auth-type support and fields for OAuth client-credentials and headers. _Migration:_ Run the MCP auth migrations and update any API clients or automation that create or update MCP servers to send the new authConfig payload.
+- **Risk Assessment Start Parameter** — Risk assessments now start via ID rather than the previous input path. _Migration:_ Update any integrations that initiate risk assessments to pass the assessment ID.
+</Warning>
+
+### Upgrade Notes
+
+Apply the new database migrations for widget-query and MCP auth changes before restarting application components. If you manage MCP servers or widget-query clients directly, update request payloads and endpoint paths to match the new APIs.
