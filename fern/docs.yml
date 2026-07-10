@@ -982,7 +982,7 @@ navigation:
           - page: Vibe Code Your Administration
             path: docs/pages/guides/vibe-code-administration.mdx
             icon: fa-light fa-robot
-          - page: Standardize Coding Agent Onboarding with Custom Agent Skills
+          - page: Standardize Onboarding with Custom Agent Skills
             path: docs/pages/guides/agent-skills-git-endpoint.mdx
             icon: fa-light fa-sparkles
   - tab: changelog
