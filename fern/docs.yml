@@ -1007,10 +1007,10 @@ redirects:
   - source: /docs/enterprise-changelog/:slug*
     destination: /docs/changelog/self-hosting/:slug*
     permanent: true
-  - source: /docs/changelog/cloud-platform
+  - source: /docs/changelogs
     destination: /docs/changelog
     permanent: true
-  - source: /docs/changelog/cloud-platform/:slug*
+  - source: /docs/changelogs/:slug*
     destination: /docs/changelog/:slug*
     permanent: true
   - source: /docs/settings/project/management/global-api-keys
