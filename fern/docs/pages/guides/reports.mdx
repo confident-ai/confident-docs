@@ -32,7 +32,7 @@ On Confident AI you do that with an **Executive Report**: an AI-written summary 
   entitlement — Reports won't appear until then.
 </Note>
 
-Reports read straight from your project's existing data — traces, test runs, metrics, and annotations — so the more you've logged, the richer they get. This guide focuses on **Executive Reports**, since that's the stakeholder workflow. Red-team [Risk Assessment Reports](#risk-assessment-reports) are covered briefly at the end.
+Reports read straight from your project's existing data — traces, test runs, metrics, and annotations — so the more you've logged, the richer they get.
 
 ## Planning the Report
 
@@ -354,12 +354,9 @@ Each report's toolbar has two actions for manual sharing:
 
 ### Selecting the Generation Model
 
-Reports are written by your project's **platform model** — the same configured [evaluation model](/docs/settings/project/evaluation-models) used across the platform.
+Reports are written by your project's **platform model** — the model that powers Confident AI's own AI features, like classification, summaries, and report generation. This is a **separate setting** from the [evaluation model](/docs/settings/project/evaluation-models) that scores your LLM-as-a-judge metrics, so changing one never touches the other.
 
-- When your provider is **OpenAI-compatible** (`OpenAI`, or Confident's pooled OpenAI-backed default), reports use it directly.
-- For any other provider — Anthropic, Bedrock, Vertex, and friends — reports fall back to Confident AI's standard generation model so quality stays consistent.
-
-Change the active model in **Project Settings** → **[Evaluation Models](/docs/settings/project/evaluation-models)**.
+Set or change it in **Project Settings** → **Platform Model**. If you haven't set a project-specific one, reports use your organization's default platform model.
 
 ### Optimizing Report Content
 
@@ -372,12 +369,6 @@ When a prompt can't be mapped onto data the project actually has, the section co
 - The prompt is too abstract to turn into a query.
 
 Go back to your **plan** — tighten the section to name the data type, metric, and window — and the next run produces a real report.
-
-### Risk Assessment Reports
-
-The other kind of report comes out of [Red Teaming](/docs/red-teaming/introduction). When you run a [risk assessment](/docs/red-teaming/risk-profile), you can generate a formal, audit-ready **Risk Assessment Report** — a self-contained security document with a fixed structure you don't curate. It bundles a cover page (customer, framework, test-case count, duration, cost), a table of contents, an executive summary, remediation priorities, per-category risk breakdowns, production impact, recommendations, and a conclusion.
-
-To get one, open a completed assessment under **Red Teaming** → **Risk Profile** and choose **Download Report**. Confident AI generates it (if it hasn't already) and downloads a print-ready PDF — ideal for security and compliance stakeholders.
 
 ## Next Steps
 
@@ -413,7 +404,7 @@ You can now plan a report, build it with a custom template, and automate deliver
     icon="brain"
     href="/docs/settings/project/evaluation-models"
   >
-    Configure which model and credentials power your reports, including the
-    `gpt-5` verification note.
+    Configure the model and credentials behind your LLM-as-a-judge metric
+    scoring, including the `gpt-5` verification note.
   </Card>
 </CardGroup>
