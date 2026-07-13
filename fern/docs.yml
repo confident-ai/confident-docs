@@ -736,9 +736,13 @@ navigation:
           - page: Transformers
             path: docs/pages/settings/project/transformers.mdx
             icon: fa-light fa-wand-magic-sparkles
-          - page: Integrations
+          - section: Integrations
             path: docs/pages/settings/project/integrations.mdx
             icon: fa-light fa-puzzle-piece
+            contents:
+              - page: PR Eval Gate
+                path: docs/pages/settings/project/integrations/pr-eval-gate.mdx
+                icon: fa-light fa-code-pull-request
 
           - section: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
