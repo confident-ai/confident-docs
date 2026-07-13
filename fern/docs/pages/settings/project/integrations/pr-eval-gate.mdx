@@ -1,0 +1,120 @@
+---
+subtitle: Gate pull requests on evaluation regressions — set up with AI, a deterministic PR, or by hand.
+slug: settings/project/integrations/pr-eval-gate
+description: Set up the Confident PR Eval Gate
+---
+
+The **PR Eval Gate** runs your LLM app over a pinned dataset on every pull request, scores the outputs with a metric collection, and posts a GitHub check-run that **passes, fails, or is neutral** depending on whether your metric scores regressed against your base branch (within your configured tolerance).
+
+It needs two things in your repository:
+
+1. **`.github/workflows/confident-eval-gate.yml`** — a workflow that sets up your app (Python + dependencies) and runs Confident's published runner Action.
+2. **`confident_eval.py`** — a `run(input)` function that calls your app and returns its output as a string. Confident calls this once per golden in your dataset.
+
+<Note>
+  The GitHub App is required either way — it posts the check-run on every pull request. The setup options below differ only in **how those two files get added** to your repo.
+</Note>
+
+## Configure the gate
+
+<Steps>
+  <Step title="Connect GitHub and configure">
+    Go to **Settings → Integrations → PR Eval Gate**, install the Confident GitHub App on your repository, then choose the **repository**, **dataset**, **metric collection**, and **regression tolerance** (the maximum average score drop per metric before the gate fails). Click **Save**.
+  </Step>
+  <Step title="Open the setup pull request">
+    Click **Open setup pull request** and pick a setup method (below). Saving only stores your configuration; this step is what wires the two files into your repo.
+  </Step>
+</Steps>
+
+## Setup methods
+
+<CardGroup cols={3}>
+  <Card title="AI-assisted" icon="fa-light fa-robot">
+    An agent reads your repository to tailor `confident_eval.py` and the workflow to your app, then opens the setup pull request. Fastest.
+  </Card>
+  <Card title="Manual (deterministic)" icon="fa-light fa-file-code">
+    Confident opens a pull request with **template files** — no AI reads your code. You fill in `run()` and adjust the workflow before merging.
+  </Card>
+  <Card title="Fully manual" icon="fa-light fa-pen">
+    Add the two files yourself. Confident never opens a PR for you — the App only posts check-runs. Follow the steps below.
+  </Card>
+</CardGroup>
+
+## Set it up yourself
+
+If you'd rather Confident never open a PR for you, add both files by hand. This is the most locked-down option; you also add the API key secret yourself.
+
+<Steps>
+  <Step title="Add the CI workflow">
+    Create `.github/workflows/confident-eval-gate.yml`. Set up your app's runtime (Python + dependencies) in earlier steps, then invoke the runner Action — keep the final `Confident PR Eval Gate` step's `uses:` ref and its four `with:` inputs.
+
+    ```yaml title=".github/workflows/confident-eval-gate.yml"
+    name: Confident PR Eval Gate
+
+    on:
+      pull_request:
+      push:
+        branches: ["<your-default-branch>"]
+
+    permissions:
+      contents: read
+
+    jobs:
+      eval-gate:
+        runs-on: ubuntu-latest
+        env:
+          # Any runtime secrets your app needs to run, referencing repo secrets, e.g.:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-python@v5
+            with:
+              python-version: "3.12" # match the version your app targets
+          - name: Install dependencies
+            run: pip install -r requirements.txt # match your project (poetry/uv/etc.)
+          - name: Confident PR Eval Gate
+            uses: confident-ai/deepeval-tracer/actions/eval-gate@v1
+            with:
+              base_url: "<your-region-api-base-url>"
+              dataset_alias: "<your-dataset-alias>"
+              dataset_version: "latest"
+              confident_api_key: ${{ secrets.CONFIDENT_API_KEY }}
+    ```
+
+    <Note>
+      `base_url` is region-specific: use `https://api.confident-ai.com` for US and `https://eu.api.confident-ai.com` for EU. Set `dataset_alias` (and optionally `dataset_version`) to the dataset you configured the gate against.
+    </Note>
+  </Step>
+
+  <Step title="Add the eval callback">
+    Create `confident_eval.py` at the repository root. `run(input)` receives one dataset input, calls your app, and returns its output — Confident runs it for every golden in your dataset and scores the results.
+
+    ```python title="confident_eval.py"
+    def run(input):
+        """Return your LLM app's output for a single dataset input."""
+        from my_app import agent  # import your application
+
+        return agent(input)  # return the output as a string
+    ```
+  </Step>
+
+  <Step title="Add the repository secrets">
+    Create a **project API key** in [Settings → API Keys](https://www.confident-ai.com/docs/settings/project/api-keys), then add it as a repository secret named `CONFIDENT_API_KEY` (**Settings → Secrets and variables → Actions** in GitHub). Add any runtime secrets your app needs (for example `OPENAI_API_KEY`) the same way.
+  </Step>
+</Steps>
+
+Once the workflow and `confident_eval.py` are on your default branch, every future pull request runs the gate and posts the **Confident PR Eval Gate** check-run with the score comparison against your base branch.
+
+## Troubleshooting
+
+Most misconfigurations fail loudly — the runner reports the reason on the **Confident PR Eval Gate** check-run and in the workflow's Actions logs. A few fail silently; those are called out below.
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Gate never runs on a PR (silent) | The `on:` triggers were changed, or the workflow was moved out of `.github/workflows/` | Keep the `pull_request` trigger and leave the file in `.github/workflows/` |
+| Scores look meaningless — everything compared against "None" (silent) | `run()` returned `None` or a non-string value | Return your app's output **as a string** from `run()` |
+| `could not import confident_eval.run` | `confident_eval.py` isn't at the repo root, or the function isn't named `run` | Keep the file at the repository root and the function named `run` |
+| `app raised while producing outputs` | `run()` doesn't take a single `input` argument, or an app runtime secret is missing | Match the `run(input)` signature; add your app's secrets (e.g. `OPENAI_API_KEY`) to the workflow `env:` |
+| `could not pull dataset` | `CONFIDENT_API_KEY` is missing/rotated/revoked, or the dataset alias, version, or `base_url` is wrong | Re-add the secret and verify the dataset alias, version, and region `base_url` |
+| No check appears at all (silent) | The GitHub App was uninstalled, Actions is disabled, or the install step failed before the runner ran | Reinstall the App / enable Actions, and check the workflow logs for an install failure |
+| Errors on some or all rows | The dataset contains multi-turn goldens | v1 supports single-turn datasets — point the gate at a single-turn dataset |
