@@ -179,23 +179,11 @@ This is configured on the AI connection itself: turn on **Async Responses** in t
 4. Confident AI evaluates each test case as its result arrives, and finalizes the test run once every result has been received.
 
 <Note>
-  Your payload **must** include `confident.testCaseId` — it's how results are
-  matched back to the run. In **JSON** payload mode, map `confident.testCaseId`
-  into your payload template (the default payload includes it automatically). In
-  **code** payload mode, return it from your `generate_payload` function (it's
-  passed in as the `testCaseId` argument). Confident AI enforces this when you
-  test the connection: verifying an async connection whose payload omits the
-  `testCaseId` fails with a clear error.
+  Your payload **must** include `confident.testCaseId` — this is the field you'll be using to post your result back for evaluations.
 </Note>
 
 <Tip>
-  Have your endpoint return a quick `2xx` acknowledgement (e.g. `202 Accepted`)
-  as soon as it receives the request, then do the slow work in the
-  background. This is the standard asynchronous request-reply pattern, and
-  Confident AI uses that ack to confirm the request was received (and to verify
-  the connection). If your endpoint instead holds the connection open without
-  acknowledging, verification will time out even though real evaluations may
-  still work.
+  It is recommended to have your endpoint return a quick `2xx` acknowledgement (e.g. `202 Accepted`) as soon as it receives the request, then do the slow work in the background. If your endpoint instead holds the connection open without acknowledging, verification will time out but real evaluations may still work.
 </Tip>
 
 ```mermaid
