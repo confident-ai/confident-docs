@@ -133,6 +133,9 @@ You'll need an existing AI connection for this to work. If you haven't already, 
 
       </Tab>
     </Tabs>
+<Tip>
+If your agent takes a long time to respond, enable [**Long-Running Agent**](#long-running-agents) mode so Confident AI doesn't hold a connection open waiting for each output.
+</Tip>
 
   </Step>
 
@@ -156,6 +159,65 @@ You'll need an existing AI connection for this to work. If you haven't already, 
 
   </Step>
 </Steps>
+
+## Long-Running Agents
+
+Some agents might have a long response time, for such agents, Confident AI supports **Long-Running Agent** mode. Instead of holding the connection open until your agent responds, Confident AI sends each golden to your AI connection, immediately closes the connection, and waits for your agent to post its result back when it's ready.
+
+<Note>
+  Long-running mode is available for **single-turn** evaluations that generate
+  outputs via an **AI Connection**.
+</Note>
+
+### How it works
+
+1. Enable **Long-Running Agent** in the evaluate dialog (shown when generating outputs via an AI Connection).
+2. For each golden, Confident AI sends the payload to your endpoint with a unique `testCaseId`, then closes the connection — it does **not** wait for a response.
+3. Once your agent finishes, you can post the result to the [`POST /v1/test-runs/evaluate/{testCaseId}`](/docs/api-reference/test-runs/submit-test-case-result) endpoint with that same `testCaseId` and the actual output.
+4. Confident AI evaluates each test case as its result arrives, and finalizes the test run once every result has been received.
+
+```mermaid
+sequenceDiagram
+    participant User as You
+    participant Platform as Confident AI
+    participant AI as Your Agent
+
+    User->>Platform: Start Evaluation (Long-Running Agent)
+
+    loop For each golden in dataset
+        Platform->>AI: Send input + confident.testCaseId
+        Platform-->>Platform: Close connection (no wait)
+    end
+
+    loop When each agent finishes (minutes later)
+        AI->>Platform: POST /v1/test-runs/evaluate/{testCaseId}
+        Platform->>Platform: Evaluate test case
+    end
+
+    Platform-->>User: Test Run finalized once all results arrive
+    Note over User,Platform: View results on Dashboard
+```
+
+### Posting results back
+
+Read `confident.testCaseId` from the payload Confident AI sends to your endpoint, put it in the URL, then post your result back with your project API key:
+
+```bash
+curl -X POST https://api.confident-ai.com/v1/test-runs/evaluate/<TEST-CASE-ID> \
+  -H "Content-Type: application/json" \
+  -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
+  -d '{
+    "actualOutput": "The capital of France is Paris."
+  }'
+```
+
+You can send any single-turn test case field alongside `actualOutput` — for example `retrievalContext`, `toolsCalled`, or `expectedTools`. See the [API reference](/docs/api-reference/test-runs/submit-test-case-result) for the full schema.
+
+<Note>
+  Each test case's result window stays open for a few hours after the
+  evaluation starts. Post results within that window — a `testCaseId` that has
+  expired returns `410 Gone`.
+</Note>
 
 ## Regression Testing
 

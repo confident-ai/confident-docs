@@ -455,6 +455,7 @@ navigation:
                   - GET /v1/test-runs
                   - POST /v1/test-runs
                   - GET /v1/test-runs/{testRunId}
+                  - POST /v1/test-runs/evaluate/{testCaseId}
               - section: AI Connections
                 contents:
                   - GET /v1/ai-connections
