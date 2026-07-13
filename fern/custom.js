@@ -225,6 +225,15 @@ function runOnDomUpdates(callback) {
 
     "reports.overview": `${S3_BASE}/reports:overview.png`,
     "reports.fullDocument": `${S3_BASE}/reports:full-document.png`,
+    "reports.statCards": `${S3_BASE}/reports:stat-cards.png`,
+    "reports.graph": `${S3_BASE}/reports:graph.png`,
+    "reports.table": `${S3_BASE}/reports:table.png`,
+    "reports.content": `${S3_BASE}/reports:content.png`,
+    "reports.admonition": `${S3_BASE}/reports:admonition.png`,
+    "reports.costReport": `${S3_BASE}/reports:cost-report.png`,
+    "reports.generateFromPrompt": `${S3_BASE}/reports:generate-from-prompt.png`,
+    "reports.customTemplateBuilder": `${S3_BASE}/reports:custom-template-builder.png`,
+    "reports.emailIntegration": `${S3_BASE}/reports:email-integration.png`,
 
     "queues.exportCsv": `${S3_BASE}/queues:export-csv.png`,
     "queues.ingestionTasks": `${S3_BASE}/queues:ingestion-tasks.png`,
@@ -541,7 +550,7 @@ function runOnDomUpdates(callback) {
 
   function findBottomCta(slug) {
     const sorted = BOTTOM_CTAS.slice().sort(
-      (a, b) => b.match.length - a.match.length
+      (a, b) => b.match.length - a.match.length,
     );
     for (const cta of sorted) {
       if (cta.match === "") return cta;
@@ -599,7 +608,7 @@ function runOnDomUpdates(callback) {
           observer.disconnect();
         });
       },
-      { threshold: IMPRESSION_THRESHOLD }
+      { threshold: IMPRESSION_THRESHOLD },
     );
     observer.observe(el);
   }

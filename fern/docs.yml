@@ -957,12 +957,15 @@ navigation:
         icon: fa-light fa-compass
       - section: End-to-End
         contents:
-          - page: Compare Models on One Agent
+          - page: Compare Models in Production
             path: docs/pages/guides/compare-models-observability.mdx
             icon: fa-light fa-chart-line
           - page: Evaluate MCP Servers
             path: docs/pages/guides/evaluating-mcp.mdx
             icon: fa-light fa-plug
+          - page: Generating Reports for Stakeholders
+            path: docs/pages/guides/reports.mdx
+            icon: fa-light fa-file-lines
       - section: AI Connections
         contents:
           - page: Air-Gapped Confident Agent
