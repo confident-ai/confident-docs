@@ -441,7 +441,7 @@ paths:
             `confident.testCaseId` when it dispatched this golden.
           schema:
             type: string
-          example: "<TEST-CASE-ID>"
+          example: "TEST-CASE-ID"
         - in: header
           name: CONFIDENT_API_KEY
           required: true

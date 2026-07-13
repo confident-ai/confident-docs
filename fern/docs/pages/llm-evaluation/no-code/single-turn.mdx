@@ -134,7 +134,7 @@ You'll need an existing AI connection for this to work. If you haven't already, 
       </Tab>
     </Tabs>
 <Tip>
-If your agent takes a long time to respond, enable [**Long-Running Agent**](#long-running-agents) mode so Confident AI doesn't hold a connection open waiting for each output.
+If your agent takes a long time to respond, turn on [**Async Responses**](#async-responses) on the AI connection so Confident AI doesn't hold a connection open waiting for each output.
 </Tip>
 
   </Step>
@@ -160,21 +160,43 @@ If your agent takes a long time to respond, enable [**Long-Running Agent**](#lon
   </Step>
 </Steps>
 
-## Long-Running Agents
+## Async Responses
 
-Some agents might have a long response time, for such agents, Confident AI supports **Long-Running Agent** mode. Instead of holding the connection open until your agent responds, Confident AI sends each golden to your AI connection, immediately closes the connection, and waits for your agent to post its result back when it's ready.
+Some agents might have a long response time, for such agents, Confident AI supports **async responses**. Instead of holding the connection open until your agent responds, Confident AI sends each golden to your AI connection, immediately closes the connection, and waits for your agent to post its result back when it's ready.
+
+This is configured on the AI connection itself: turn on **Async Responses** in the connection's **General** tab (in [project settings](/docs/settings/project/ai-connections)). Every evaluation that generates outputs through that connection then uses the async flow — there's no per-run toggle.
 
 <Note>
-  Long-running mode is available for **single-turn** evaluations that generate
-  outputs via an **AI Connection**.
+  Async responses are available for **single-turn** evaluations and require the
+  connection's **HTTP Response** mode (streaming modes are not supported).
 </Note>
 
 ### How it works
 
-1. Enable **Long-Running Agent** in the evaluate dialog (shown when generating outputs via an AI Connection).
-2. For each golden, Confident AI sends the payload to your endpoint with a unique `testCaseId`, then closes the connection — it does **not** wait for a response.
+1. Turn on **Async Responses** on the AI connection (General tab in project settings).
+2. For each golden, Confident AI sends the payload to your endpoint with a unique `confident.testCaseId`, then closes the connection — it does **not** wait for a response.
 3. Once your agent finishes, you can post the result to the [`POST /v1/test-runs/evaluate/{testCaseId}`](/docs/api-reference/test-runs/submit-test-case-result) endpoint with that same `testCaseId` and the actual output.
 4. Confident AI evaluates each test case as its result arrives, and finalizes the test run once every result has been received.
+
+<Note>
+  Your payload **must** include `confident.testCaseId` — it's how results are
+  matched back to the run. In **JSON** payload mode, map `confident.testCaseId`
+  into your payload template (the default payload includes it automatically). In
+  **code** payload mode, return it from your `generate_payload` function (it's
+  passed in as the `testCaseId` argument). Confident AI enforces this when you
+  test the connection: verifying an async connection whose payload omits the
+  `testCaseId` fails with a clear error.
+</Note>
+
+<Tip>
+  Have your endpoint return a quick `2xx` acknowledgement (e.g. `202 Accepted`)
+  as soon as it receives the request, then do the slow work in the
+  background. This is the standard asynchronous request-reply pattern, and
+  Confident AI uses that ack to confirm the request was received (and to verify
+  the connection). If your endpoint instead holds the connection open without
+  acknowledging, verification will time out even though real evaluations may
+  still work.
+</Tip>
 
 ```mermaid
 sequenceDiagram
@@ -182,7 +204,7 @@ sequenceDiagram
     participant Platform as Confident AI
     participant AI as Your Agent
 
-    User->>Platform: Start Evaluation (Long-Running Agent)
+    User->>Platform: Start Evaluation (Async Responses connection)
 
     loop For each golden in dataset
         Platform->>AI: Send input + confident.testCaseId
