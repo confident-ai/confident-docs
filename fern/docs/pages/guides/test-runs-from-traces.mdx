@@ -1,6 +1,6 @@
 ---
 title: Build Test Runs from Traces
-subtitle: Open a test run, stream your app's traces into it as test cases, and let Confident AI evaluates each one at the trace and component level.
+subtitle: Open a test run, stream your app's traces into it as test cases, and let Confident AI evaluate each one at the trace and component level.
 slug: guides/test-runs-from-traces
 description: Turn traces into a Confident AI test run so you can benchmark quality before you ship. Open a test run over the API, send traces tagged with a test run and a metric collection as test cases, and evaluate them at the trace and component level over REST or OpenTelemetry.
 ---
@@ -29,7 +29,7 @@ In this guide, you will:
 - **Open a test run** and capture your traces as test cases inside this run.
 - **Send traces** with the run id and a metric collection to evaluate them on cloud and automatically convert them to test cases.
 - **Evaluate the steps inside each trace** — the retriever, the LLM call — not just the final answer with component level evals.
-- **Send test cases over OpenTelemetry** with span attributes, for users who already have an instrumentation in place.
+- **Send test cases over OpenTelemetry** with span attributes, for users who already have instrumentation in place.
 
 By the end, you'll have a repeatable way to benchmark quality before every release, built entirely from your app's traces.
 
@@ -43,7 +43,7 @@ Trace-based test runs are **single-turn** — one input, one output per test cas
 
 Two things need to exist before your first test case lands:
 
-- **A Project API Key** — `CONFIDENT_API_KEY` (e.g. `confident_us_proj_...`). [Grab yours here](/docs/api-reference/authentication).
+- **A Project API Key** — `CONFIDENT_API_KEY` (e.g. `confident_us_proj_...`). [Retrieve yours here](/docs/api-reference/authentication).
 - **A single-turn [metric collection](/docs/metrics/metric-collections)** in your project. This is what "good" means for your test cases — pass rates, quality thresholds, the metrics you'd gate a release on. You'll refer to it by name, so note the exact name.
 
 ## Send Traces via the API
@@ -58,7 +58,7 @@ Start by opening an empty run. Confident AI hands back an `id`, and the run stay
 
 <EndpointRequestSnippet endpoint="POST /v1/test-runs" />
 
-Both fields are optional. `identifier` is a label so you can find the run again later; `metricCollection` sets a **default** that evaluates every case you don't point at a collection of its own. You get back the `id` and a `link` to the run on the platform:
+Both fields are optional. `identifier` is a label so you can find the run again later; `metricCollection` sets a **default** collection for any case that doesn't name its own. You get back the run's `id` and a `link` to it on the platform:
 
 <EndpointResponseSnippet endpoint="POST /v1/test-runs" />
 
@@ -92,7 +92,7 @@ Its `input` and `output` are what the trace-level metrics evaluate — what your
 
 A trace-level score tells you the final answer was good. It doesn't tell you *why* — or, when the answer is wrong, which step let you down. Was it the retriever that pulled the wrong context, or the model that ignored the right one?
 
-To answer that, you can evaluate your **spans**, give each one its own `metricCollection`. Each span is a component, evaluated on its own and can be seen in the observatory or the test case's trace view.
+To answer that, you can evaluate your **spans** by giving each one its own `metricCollection`. Each span is a component, evaluated on its own and can be seen in the Observatory or the test case's trace view.
 
 <EndpointRequestSnippet endpoint="POST /v1/traces" example="Test-Run-Component-Level" />
 
@@ -122,22 +122,22 @@ Done ✅. The response gives you the run's overall `metricsScores` and a `testCa
 
 ## Send Traces over OpenTelemetry
 
-If your app already emits [OpenTelemetry](/docs/integrations/opentelemetry) spans, you can easily carry the same fields as span **attributes**, export the spans to Confident AI's otel endpoint.
+If your app already emits [OpenTelemetry](/docs/integrations/opentelemetry) spans, you can easily carry the same fields as span **attributes** and export the spans to Confident AI's OTel endpoint.
 
-The moves are identical to the walkthrough above. You still [open the run over the API](#open-a-test-run) to get a `testRunId`; from there, everything travels as attributes on the spans you already emit. Point your OTLP/HTTP exporter at Confident AI:
+The moves are identical to the walkthrough above. You still [open the run over the API](#open-a-test-run) to get a `testRunId`; from there, everything rides on the spans you already emit. Point your OTLP/HTTP exporter at Confident AI's OpenTelemetry endpoint, authenticated with the `x-confident-api-key` header:
 
 ```bash
 https://otel.confident-ai.com/v1/traces
 ```
 
-authenticate with the `x-confident-api-key` header, and set two groups of attributes:
+Then set two groups of attributes:
 
 - On the **root span** — the test case itself: `confident.trace.test_run_id`, `confident.trace.metric_collection`, `confident.trace.input`, `confident.trace.output`, and `confident.trace.name`.
 - On each **child span** — a component: `confident.span.type`, `confident.span.name`, `confident.span.input`, `confident.span.output`, and `confident.span.metric_collection`.
 
 Attribute values are strings, so JSON-encode anything structured — a list of retrieved chunks, for instance.
 
-OpenTelemetry is language agnostic, so you can always send the traces from your app natively and still get the same test runs as the API or regular SDK users. Here's a few examples in different languages:
+OpenTelemetry is language agnostic, so you can always send the traces from your app natively and still get the same test runs as the API or regular SDK users. Here are a few examples in different languages:
 
 <Tabs>
 
@@ -319,7 +319,7 @@ sequenceDiagram
     Note over Run: Closes on its own once<br/>every case is scored
 ```
 
-With both present, Confident AI derives a test case from the trace's `input` and `output`, evaluates it with the collection you named, and files the result under the run. Everything else about the trace — its spans, its timings, its metadata — is kept intact, so opening a test case shows you the exact run behind its score.
+With both present, Confident AI derives a test case from the trace's `input` and `output`, evaluates it with the collection you named, and files the result under the run. Everything else about the trace — its spans, its timings, its metadata — is kept intact, so opening a test case shows you the exact trace behind its score.
 
 ### Evaluating the whole vs. the parts
 
@@ -334,7 +334,7 @@ Trace-level scores tell you *whether* a case failed. Component-level scores tell
 
 There's no "done" call. A run stays open and keeps accepting test cases for as long as they keep arriving — which is what lets you stream cases in over the life of a test suite.
 
-Confident AI closes the run automatically once it has been **idle for 4 hours** — four hours with no new or updated test case. At that point it computes the run's pass and fail totals and marks it complete - which means it no longer accepts new test cases. Each case you send resets the idle clock, so an active run never closes mid-suite; when your suite stops, the run settles on its own about four hours after the last case lands.
+Confident AI closes the run automatically once it has been **idle for 4 hours** — four hours with no new or updated test case. At that point it computes the run's pass and fail totals and marks it complete — which means it no longer accepts new test cases. Each case you send resets the idle clock, so an active run never closes mid-suite; when your suite stops, the run settles on its own about four hours after the last case lands.
 
 ## Best Practices
 
