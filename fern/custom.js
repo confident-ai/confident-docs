@@ -179,6 +179,7 @@ function runOnDomUpdates(callback) {
     "settings.project.team": `${S3_BASE}/settings:project:team.png`,
     "settings.project.aiConnection": `${S3_BASE}/settings:project:ai-connection.png`,
     "settings.project.aiConnectionSetup": `${S3_BASE}/ai-connection:setup.png`,
+    "settings.project.aiConnectionAsyncResponses": `${S3_BASE}/ai-connection:async-responses.png`,
     "settings.project.aiConnectionPayloadJson": `${S3_BASE}/ai-connection:payload-json.png`,
     "settings.project.aiConnectionPayloadCode": `${S3_BASE}/ai-connection:payload-code.png`,
     "settings.project.aiConnectionHeaders": `${S3_BASE}/ai-connection:headers.png`,

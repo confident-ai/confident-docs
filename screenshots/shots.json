@@ -28,6 +28,15 @@
       "height": 760
     },
     {
+      "s3_key": "ai-connection:async-responses.png",
+      "doc": "fern/docs/pages/guides/long-running-ai-connections.mdx",
+      "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",
+      "selector": "[data-docs-id='ai-connection-editor']",
+      "full_page": true,
+      "width": 1512,
+      "height": 950
+    },
+    {
       "s3_key": "ai-connection:output-parsing.png",
       "doc": "fern/docs/pages/settings/project/ai-connections.mdx",
       "path": "/project/:projectId/project-settings/ai-connections/:aiConnectionId",

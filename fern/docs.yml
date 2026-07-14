@@ -982,6 +982,9 @@ navigation:
           - page: Authenticate with Client Credentials
             path: docs/pages/guides/authenticate-with-client-credentials.mdx
             icon: fa-light fa-key
+          - page: Set Up Long-Running AI Connections
+            path: docs/pages/guides/long-running-ai-connections.mdx
+            icon: fa-light fa-hourglass-half
       - section: Administration
         contents:
           - page: Assign Projects to Governance Policies on the Fly
