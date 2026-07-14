@@ -1085,6 +1085,34 @@ paths:
                     output: "Let me look that up for you."
                     startTime: "2025-01-15T10:30:00Z"
                     endTime: "2025-01-15T10:30:02Z"
+              Test-Run-Component-Level:
+                uuid: "<TRACE-UUID>"
+                input: "What is the capital of France?"
+                output: "The capital of France is Paris."
+                startTime: "2025-01-15T10:30:00Z"
+                endTime: "2025-01-15T10:30:05Z"
+                testRunId: "<TEST-RUN-ID>"
+                metricCollection: "Collection Name"
+                retrieverSpans:
+                  - uuid: "<RETRIEVER-SPAN-UUID>"
+                    name: "retrieve_context"
+                    embedder: "text-embedding-3-small"
+                    input: "capital of France"
+                    retrievalContext:
+                      - "Paris is the capital and most populous city of France."
+                    startTime: "2025-01-15T10:30:00Z"
+                    endTime: "2025-01-15T10:30:01Z"
+                    metricCollection: "Retriever Collection Name"
+                llmSpans:
+                  - uuid: "<LLM-SPAN-UUID>"
+                    parentUuid: "<RETRIEVER-SPAN-UUID>"
+                    name: "generate_answer"
+                    model: "gpt-4o"
+                    input: "Answer using the retrieved context."
+                    output: "The capital of France is Paris."
+                    startTime: "2025-01-15T10:30:01Z"
+                    endTime: "2025-01-15T10:30:05Z"
+                    metricCollection: "LLM Collection Name"
               Thread-Id:
                 uuid: "<TRACE-UUID>"
                 input: "What is the capital of France?"
@@ -2466,6 +2494,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateTestRun"
+            example:
+              identifier: "my-test-run"
+              metricCollection: "Agent Quality"
       responses:
         "200":
           description: The created test run id.
@@ -2473,6 +2504,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateTestRunResponse"
+              example:
+                success: true
+                data:
+                  id: "<TEST-RUN-ID>"
+                link: "https://app.confident-ai.com/project/<PROJECT-ID>/test-runs/<TEST-RUN-ID>"
+                deprecated: false
     get:
       x-fern-server-name: Confident AI
       tags:
@@ -7639,6 +7676,12 @@ components:
         - data
         - deprecated
         - link
+      example:
+        success: true
+        data:
+          id: "<TEST-RUN-ID>"
+        link: "https://app.confident-ai.com/project/<PROJECT_ID>/test-runs/<TEST-RUN-ID>/test-cases"
+        deprecated: false
 
     UpdateTrace:
       type: object
