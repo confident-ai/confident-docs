@@ -971,6 +971,9 @@ navigation:
           - page: Generating Reports for Stakeholders
             path: docs/pages/guides/reports.mdx
             icon: fa-light fa-file-lines
+          - page: Build Test Runs from Traces
+            path: docs/pages/guides/test-runs-from-traces.mdx
+            icon: fa-light fa-flask
       - section: AI Connections
         contents:
           - page: Air-Gapped Confident Agent
