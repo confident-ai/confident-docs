@@ -258,6 +258,32 @@ The module block above provisions both. The [Deploy page](/self-hosting/aws/depl
 Prefer a simpler footprint? Set both to `false` to hold secrets in a Kubernetes Secret and run Redis in the cluster. See [Simpler option](/self-hosting/aws/deploy#simpler-option-in-cluster-redis-and-a-kubernetes-secret) on the Deploy page.
 </Note>
 
+## Inputs reference
+
+The variables you are most likely to set. For the complete, always-current list, see the [module inputs on the Terraform Registry](https://registry.terraform.io/modules/confident-ai/confident-ai/aws/latest?tab=inputs).
+
+**Required**
+
+| Variable | Description |
+| --- | --- |
+| `confident_vpc_id` | Existing VPC to deploy into. |
+| `confident_private_subnet_ids` | Two or more existing private subnets in different availability zones (EKS and RDS). |
+
+**Commonly set** (optional, with production defaults)
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `confident_environment` / `confident_environment_code` | `stage` / `s` | Naming convention stamped on resources (use `prod` / `p`). |
+| `confident_public_eks` | `false` | Expose the cluster API endpoint. |
+| `confident_eks_admin_arn` | `""` | Extra IAM principal granted cluster-admin. |
+| `confident_node_instance_types` / `confident_node_group_desired_size` | `["m6i.2xlarge"]` / `4` | Node group sizing. |
+| `confident_code_executor_enabled` / `confident_code_executor_lambda_image_uri` | `true` / `""` | Code executor Lambda and its ECR image URI. |
+| `confident_create_secrets_manager` | `false` | Secrets Manager secret and ESO Pod Identity. |
+| `confident_managed_redis_enabled` / `confident_database_ingress_cidrs` | `false` / `[]` | ElastiCache, and the CIDRs allowed to reach it. |
+| `confident_rds_deletion_protection` / `confident_rds_multi_az` | `false` / `true` | RDS durability options. |
+
+The region comes from your AWS provider, there is no region variable.
+
 ## Next step
 
 <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/aws/deploy">

@@ -203,6 +203,31 @@ The module block above provisions both. The [Deploy page](/self-hosting/azure/de
 Prefer a simpler footprint? Set both to `false` to hold secrets in a Kubernetes Secret and run Redis in the cluster. See [Simpler option](/self-hosting/azure/deploy#simpler-option-in-cluster-redis-and-a-kubernetes-secret) on the Deploy page.
 </Note>
 
+## Inputs reference
+
+The variables you are most likely to set. For the complete, always-current list, see the [module inputs on the Terraform Registry](https://registry.terraform.io/modules/confident-ai/confident-ai/azurerm/latest?tab=inputs).
+
+**Required**
+
+| Variable | Description |
+| --- | --- |
+| `confident_resource_group_name` | Existing resource group. |
+| `confident_virtual_network_id` | Existing VNet id (for the PostgreSQL private DNS link). |
+| `confident_aks_subnet_id` | Existing subnet for the AKS nodes. |
+| `confident_database_subnet_id` | Existing subnet delegated to `Microsoft.DBforPostgreSQL/flexibleServers`. |
+
+**Commonly set** (optional, with production defaults)
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `confident_azure_region` | `centralus` | Region for the cluster and data plane. |
+| `confident_environment` / `confident_environment_code` | `stage` / `s` | Naming convention stamped on resources (use `prod` / `p`). |
+| `confident_public_aks` | `false` | Expose the cluster API endpoint. |
+| `confident_node_vm_size` / `confident_node_group_desired_size` | `Standard_D8s_v5` / `4` | Node pool sizing. |
+| `confident_code_executor_enabled` / `confident_acr_login_server` | `true` / `""` | Code executor Function and the ACR login server holding its image. |
+| `confident_create_key_vault` | `false` | Key Vault and a managed identity for ESO. |
+| `confident_managed_redis_enabled` / `confident_redis_private_endpoint_subnet_id` | `false` / `""` | Azure Managed Redis and its private-endpoint subnet. |
+
 ## Next step
 
 <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/azure/deploy">
