@@ -1,0 +1,171 @@
+---
+slug: self-hosting/configuration
+description: Reference for the confident-ai Helm chart values
+---
+
+The `confident-ai` Helm chart is configured through a values file. This page explains the settings you will actually touch, grouped by concern. Each cloud's Deploy page ([AWS](/self-hosting/aws/deploy), [GCP](/self-hosting/gcp/deploy), [Azure](/self-hosting/azure/deploy)) gives a complete, working values file; this is the reference for what each block means. For the long tail (fine-grained resource tuning, operator internals), read the chart's `values.yaml` directly.
+
+<Warning>
+Keep `fullnameOverride: confident` (the chart default) and do not set `nameOverride`. The frontend resolves the backend and other services by their chart-prefixed names, so renaming them breaks the app with `ENOTFOUND confident-backend`.
+</Warning>
+
+## Images and registry
+
+The first-party images resolve as `<registry>/<repositoryPrefix>/<image>:<tag>`.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `image.registry` | Confident AI's ECR | Registry to pull from. Override to use a mirror. |
+| `image.repositoryPrefix` | `confidentai` | Repository prefix under the registry. |
+| `image.tag` | chart `appVersion` | The release to run. Pin this explicitly. |
+| `image.pullPolicy` | `IfNotPresent` | Standard Kubernetes pull policy. |
+
+## Pulling the images
+
+The images live in Confident AI's private registry. The chart can mint and refresh the pull secret for you, since ECR tokens expire about every 12 hours.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `imagePullSecrets` | `[]` | Pull secrets referenced by every workload, for example `[{name: ecr-registry-credentials}]`. |
+| `imagePullSecretRefresh.enabled` | `false` | Create and refresh the ECR pull secret on a schedule. |
+| `imagePullSecretRefresh.region` | `""` | AWS region of the registry (required when enabled). |
+| `imagePullSecretRefresh.awsAccessKeyId` / `awsSecretAccessKey` | `""` | ECR credentials from Confident AI, rendered into the refresher Secret. |
+| `imagePullSecretRefresh.awsCredentialsSecret` | `""` | Use an existing Secret with the AWS keys instead of inlining them. |
+| `imagePullSecretRefresh.schedule` | `0 */6 * * *` | Refresh cadence. |
+
+## Application config
+
+Non-secret settings, rendered into a ConfigMap every workload reads.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `config.cloudProvider` | `AWS` | `AWS`, `GCP`, or `AZURE`. Selects the storage backend. |
+| `config.frontendUrl` | `""` | Public dashboard URL, for example `https://app.acme.com`. Drives the `app.` ingress host. |
+| `config.backendUrl` | `""` | Public API URL, for example `https://api.acme.com`. Drives the `api.` ingress host. |
+| `config.subdomain` | `""` | Cookie domain shared by the frontend and backend, for example `acme.com`. |
+| `config.isAzureEnvironment` | `false` | Set `true` on Azure. |
+| `config.disableNonSsoLogin` | `false` | Require SSO and turn off email and password login. |
+| `config.region` | `US` | Data region label. |
+| `config.betterAuthTrustedOrigins` | `""` | Extra comma-separated trusted origins for auth. |
+| `config.poc` | `false` | Marks the environment as a proof of concept. |
+| `config.extraEnv` | `{}` | Extra key and value pairs appended to the ConfigMap. |
+
+## Identity
+
+How the app authenticates to your cloud. The details differ per cloud.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `serviceAccount.create` | `true` | Create the ServiceAccount all workloads share. |
+| `serviceAccount.name` | `""` | Reuse a pre-provisioned ServiceAccount instead. |
+| `serviceAccount.annotations` | `{}` | Cloud workload-identity binding (see below). |
+| `podLabels` | `{}` | Extra pod labels. Azure Workload Identity requires `azure.workload.identity/use: "true"`. |
+
+The annotation per cloud:
+
+- **AWS**: none. EKS Pod Identity binds the role out of band, so the ServiceAccount carries no annotation.
+- **GCP**: `iam.gke.io/gcp-service-account: <gsa-email>`.
+- **Azure**: none for Blob (a connection string is used); Workload Identity is only needed for the External Secrets Operator.
+
+## Object storage
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `storage.testCasesBucket` / `storage.payloadsBucket` | `""` | Bucket names (AWS, GCP) or container names (Azure). |
+| `storage.aws.region` | `us-east-1` | Region for S3. |
+| `storage.gcp.projectId` / `storage.gcp.region` | `""` | Project and region for GCS. |
+| `storage.azure.storageAccountName` | `""` | Storage account for Blob. The connection string goes in secrets. |
+
+## Secrets
+
+Application secrets reach the workloads one of two ways. Pick one.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `secrets.create` | `true` | Render a Kubernetes Secret from `secrets.data`. |
+| `secrets.existingSecret` | `""` | Use a Secret you created yourself (Vault, SealedSecrets, and so on). |
+| `secrets.data.DATABASE_URL` | `""` | PostgreSQL connection string. |
+| `secrets.data.BETTER_AUTH_SECRET` | `""` | Auth token signing secret (`openssl rand -hex 32`). |
+| `secrets.data.OPENAI_API_KEY` | `""` | Optional, backs the built-in Confident AI evaluation provider. |
+| `secrets.data.CONFIDENT_LICENSE_KEY` | `""` | Your signed Enterprise license key. |
+| `secrets.data.GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | `""` | Optional Google OAuth. |
+| `secrets.data.AZURE_STORAGE_CONNECTION_STRING` | `""` | Blob credential (Azure only). |
+
+To pull from a cloud secret store instead, enable the External Secrets Operator. When `externalSecrets.enabled` is `true`, `secrets.data` is ignored and the operator owns the app Secret.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `secrets.externalSecrets.enabled` | `false` | Sync secrets from a cloud store through ESO. |
+| `secrets.externalSecrets.provider` | `aws` | `aws` (Secrets Manager), `gcpsm` (Secret Manager), or `azurekv` (Key Vault). |
+| `secrets.externalSecrets.createStore` | `false` | Also render the (Cluster)SecretStore for the provider. |
+| `secrets.externalSecrets.remoteKey` | `""` | Name of the one JSON secret (aws, gcpsm). Key Vault pulls all secrets instead. |
+| `secrets.externalSecrets.serviceAccountRef.name` | `external-secrets-sa` | ServiceAccount ESO authenticates as. |
+| `secrets.externalSecrets.aws.region` / `gcp.*` / `azure.vaultUrl` | `""` | Provider-specific location. |
+
+## Code executor
+
+Required for code-based and transformer metrics. The provider selects which block is used; an empty provider disables it.
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `codeExecutor.provider` | `""` | `AWS_LAMBDA`, `GCP_CLOUD_FUNCTIONS`, or `AZURE_FUNCTIONS`. |
+| `codeExecutor.aws.lambdaFunctionName` / `lambdaRegion` | `""` | Lambda target. |
+| `codeExecutor.gcp.functionUrl` | `""` | Cloud Run service URL. |
+| `codeExecutor.azure.functionUrl` | `""` | Function URL (append `/api/execute`). |
+
+## ClickHouse
+
+Runs in the cluster by default, replicated for high availability. See [Scaling](/self-hosting/scaling) and [Disaster Recovery](/self-hosting/disaster-recovery).
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `clickhouse.internal` | `true` | Run the bundled cluster. Set `false` and `externalHost` to use your own. |
+| `clickhouse.password` | `""` | Admin password, also exposed to the app as `CLICKHOUSE_PASSWORD`. |
+| `clickhouse.clusterType` | `replicated` | Replication across replicas via Keeper. |
+| `clickhouse.replicas` / `clickhouse.shards` | `2` / `1` | Cluster size. |
+| `clickhouse.storage` / `clickhouse.storageClass` | `256Gi` / `""` | Data volume. Size for growth. |
+| `clickhouse.keeper.replicas` / `keeper.storage` | `3` / `20Gi` | Keeper quorum. Keep at 3. |
+| `clickhouse.backup.enabled` | `false` | Nightly backup to object storage (see Disaster Recovery). |
+| `clickhouse.extraConfig` | IPv4 listen | Pins the pods to listen on `0.0.0.0`. Leave as is unless you run dual-stack. |
+
+## Redis
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `redis.internal` | `true` | Run the bundled Redis. Set `false` to use managed Redis. |
+| `redis.externalUrl` | `""` | Managed Redis URL when `internal: false`. |
+| `redis.storage` / `redis.storageClass` | `1Gi` / `""` | Volume for the in-cluster Redis. |
+
+## Workloads and scaling
+
+Each service (`backend`, `frontend`, `evals`, `evalsWorker`, `ingestionWorker`, `worker`, `otel`) has the same shape. See [Scaling](/self-hosting/scaling) for how to tune them.
+
+| Value | Description |
+| --- | --- |
+| `<service>.replicas` | Fixed replica count when autoscaling is off. |
+| `<service>.autoscaling.enabled` | Turn HPA on or off (on by default for most). |
+| `<service>.autoscaling.minReplicas` / `maxReplicas` / `targetCPU` | HPA bounds and target. |
+| `<service>.resources` | CPU and memory requests and limits. |
+| `<service>.readinessProbe` | HTTP readiness path (drives the cloud load balancer health check). |
+| `backend.migrations.enabled` | Run the database migration job on install and upgrade (leave on). |
+
+## Ingress
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `ingress.enabled` | `false` | Create the Ingress. |
+| `ingress.className` | `alb` | Ingress class (`alb`, `nginx`, `webapprouting.kubernetes.io`, or empty for GKE's annotation-driven controller). |
+| `ingress.annotations` | `{}` | Cloud-specific annotations, see the Deploy pages. |
+| `ingress.hosts.evals` / `ingress.hosts.otel` | `""` | The `evals.` and `otel.` hostnames. `app.` and `api.` come from `config`. |
+| `ingress.tls` | `[]` | TLS blocks (host list plus secret name). |
+
+## Observability
+
+| Value | Default | Description |
+| --- | --- | --- |
+| `datadog.enabled` | `false` | Emit Datadog APM and metrics. |
+| `datadog.env` / `datadog.version` | `prod` / appVersion | Tags on the emitted telemetry. |
+
+## The full list
+
+This page covers the settings most deployments set. The chart's `values.yaml` is the source of truth and carries inline comments for every option, including operator internals, per-service resource defaults, and the ClickHouse backup providers. When in doubt, read it there.
