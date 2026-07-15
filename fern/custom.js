@@ -126,6 +126,8 @@ function runOnDomUpdates(callback) {
     "experiments.metricsOverview": `${S3_BASE}/experiments:metrics-overview.png`,
 
     "evaluation.multiGenerationTestCases": `${S3_BASE}/evaluation:multi-generation-test-cases.png`,
+    
+    "metrics.sampleRate": `${S3_BASE}/metric-collection:sample-rate.png`,
 
     "arena.promptConfig": `${S3_BASE}/arena:prompt-config.png`,
     "arena.aiConnectionConfig": `${S3_BASE}/arena:ai-connection-config.png`,

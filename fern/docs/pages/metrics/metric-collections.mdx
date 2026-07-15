@@ -85,6 +85,23 @@ You can use metric collections for any remote evals in Confident AI:
 - Running [single](/docs/llm-evaluation/single-turn/end-to-end#run-e2e-tests-remotely) or [multi-turn E2E testing](/docs/llm-evaluation/multi-turn/end-to-end#run-e2e-tests-remotely) via Evals API
 - Running single or mult-turn [online/offline evals](/docs/llm-tracing/online-evals) during LLM tracing
 
+## Sample Rate
+
+The **Sample Rate** is the probability (`0`–`1`) that an evaluation runs during automatic, ingest-time (online) evaluation. It's set at two levels on the **Metrics** → **Collections** page:
+
+- **Collection row** — samples the entire collection at once for each item, and defaults to `1` (every trace, thread, or span the collection is applied to is evaluated). This decision is deterministic, so the same trace, thread, or span always makes the same choice.
+- **Metric row** — samples that individual metric within the collection.
+
+The two compound: a given metric runs at **collection rate × metric rate**. For example, a collection at `0.5` with a metric at `0.4` evaluates that metric on roughly 20% of items. To score every metric on every sampled item, leave the rates at `1`.
+
+<Frame caption="Sample Rate on the Metrics collections page">
+  <img data-image="metrics.sampleRate" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+<Note>
+  Sample rate governs online, ingest-time evaluation of traces, threads, and spans. It doesn't apply to on-demand evaluations, which run regardless.
+</Note>
+
 ## Understanding Metric Collections
 
 Metric collections and metrics are connected in-directly via **metric settings**, which specifies the specific threshold, strictness, etc. of each metric in different collections.

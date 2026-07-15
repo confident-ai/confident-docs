@@ -79,7 +79,7 @@ To create an evaluation rule:
 | Span Type | Span rules only | Restrict to a specific span type: **LLM**, **Agent**, **Tool**, **Retriever**, or **Custom**. Leave as **Any** to match all spans. |
 | Metric Collection | Yes | The metric collection to run. Trace and span rules require a single-turn collection; thread rules require a multi-turn collection. |
 | Filters | No | Scope the rule to a subset of data (e.g. specific environments, tags, or metadata values). Leave empty to match every entity. |
-| Sample Rate | No | Fraction of matching entities the rule fires on (`0.0`–`1.0`). Sampling is deterministic — the same item always makes the same decision for a given rule. Defaults to `1.0`. |
+| Sample Rate | No | Fraction of matching entities the rule fires on (`0.0`–`1.0`). Sampling is deterministic — the same item always makes the same decision for a given rule. Defaults to `1.0`. See [Sample Rate](/docs/metrics/metric-collections#sample-rate) for how collection and per-metric rates compound. |
 | Time Limit | Thread rules only | Seconds of inactivity before a thread is eligible for evaluation. The thread evaluates once no new traces have arrived for this period. Defaults to `300`. |
 | Overwrite Evaluations | Thread rules only | When **on**, each idle cycle replaces the thread's prior evaluations. When **off** (default), each cycle appends a new set of metric rows, preserving the full history. |
 
@@ -105,25 +105,6 @@ For threads, evaluation rules are the primary way to run evaluations automatical
 
 <Note>
   Only one enabled thread rule can target a given metric collection at a time. Enabling a rule that would conflict with another active thread rule targeting the same collection is blocked until the conflicting rule is disabled.
-</Note>
-
-### Sample rates
-
-Confident AI exposes two project-wide sample rates that control what fraction of your ingested data is automatically evaluated:
-
-- **Trace Sample Rate** — the fraction of ingested traces evaluated inline, when a metric collection is supplied on the trace.
-- **Thread Sample Rate** — the fraction of threads evaluated automatically by thread evaluation rules.
-
-<Frame caption="Trace sample rate on the Evaluations tab under Traces">
-  <img data-image="tracing.workflows.sampleRates" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-</Frame>
-
-Sampling is deterministic — the same trace or thread always makes the same decision, so a thread updated with new traces stays the same as previous.
-
-These rates apply only to **automatic, ingest-time** evaluation. Evaluating a specific [trace](https://www.confident-ai.com/docs/api-reference/evaluate/evaluate-trace) or [thread](https://www.confident-ai.com/docs/api-reference/evaluate/evaluate-thread) on demand is possible via our public API or UI. 
-
-<Note>
-  These project-wide rates decide only *which* traces or threads are evaluated — not which metrics run. Once an item is sampled in, each metric in the collection still follows its own **Sample Rate**, so the two compound. To score every metric on a sampled item, keep the per-metric sample rates at `1.0`.
 </Note>
 
 ## Classifiers
