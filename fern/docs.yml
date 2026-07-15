@@ -63,14 +63,14 @@ navigation:
             path: docs/pages/llm-evaluation/introduction.mdx
             icon: fa-light fa-circle-info
           - section: Code-Driven Evals
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-code
             contents:
               - page: Quickstart
                 path: docs/pages/llm-evaluation/code-driven/quickstart.mdx
                 icon: fa-light fa-bolt
               - section: Single-Turn Evals
-                collapsed: false
+                collapsed: true
                 icon: fa-light fa-arrow-turn-down-right
                 contents:
                   - page: End-to-End
@@ -86,7 +86,7 @@ navigation:
                 path: docs/pages/llm-evaluation/code-driven/unit-testing-in-cicd.mdx
                 icon: fa-light fa-gear-complex
           - section: No-Code Evals
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-browser
             contents:
               - page: Quickstart
@@ -105,14 +105,14 @@ navigation:
             path: docs/pages/llm-evaluation/experiments.mdx
             icon: fa-light fa-flask
           - section: Datasets
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-database
             contents:
               - page: Manage Datasets
                 path: docs/pages/llm-evaluation/dataset-management/manage-datasets.mdx
                 icon: fa-light fa-file-pen
               - section: Synthetic Data Generation
-                collapsed: false
+                collapsed: true
                 icon: fa-light fa-wand-magic-sparkles
                 contents:
                   - page: Introduction
@@ -122,7 +122,7 @@ navigation:
                     path: docs/pages/llm-evaluation/dataset-management/synthetic-data/data-source-connectors.mdx
                     icon: fa-light fa-plug
               - section: Datasets in Code
-                collapsed: false
+                collapsed: true
                 icon: fa-light fa-code
                 contents:
                   - page: Automate Dataset Management
@@ -132,14 +132,14 @@ navigation:
                     path: docs/pages/llm-evaluation/dataset-management/using-datasets.mdx
                     icon: fa-light fa-arrow-down-to-bracket
           - section: Prompts
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-sliders
             contents:
               - page: Version Prompts
                 path: docs/pages/llm-evaluation/prompts/version-prompts.mdx
                 icon: fa-light fa-code-branch
               - section: Prompts in Code
-                collapsed: false
+                collapsed: true
                 icon: fa-light fa-code
                 contents:
                   - page: Automate Prompt Management
@@ -171,7 +171,7 @@ navigation:
             icon: fa-light fa-bucket
           - section: Custom Metrics
             path: docs/pages/metrics/custom-metrics.mdx
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-gauge-high
             contents:
               - page: G-Eval
@@ -181,12 +181,12 @@ navigation:
                 path: docs/pages/metrics/custom-metrics/code-eval.mdx
                 icon: fa-light fa-code
           - section: All Metrics
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-list
             contents:
               - section: Single-Turn
                 icon: fa-light fa-arrow-turn-down-right
-                collapsed: false
+                collapsed: true
                 contents:
                   - page: Answer Relevancy
                     path: docs/pages/metrics/all-metrics/single-turn/answer-relevancy.mdx
@@ -211,7 +211,7 @@ navigation:
                   - page: Toxicity
                     path: docs/pages/metrics/all-metrics/single-turn/toxicity.mdx
               - section: Multi-Turn
-                collapsed: false
+                collapsed: true
                 icon: fa-light fa-comments
                 contents:
                   - page: Conversation Completeness
@@ -228,7 +228,7 @@ navigation:
             path: docs/pages/llm-tracing/introduction.mdx
             icon: fa-light fa-info-circle
           - section: Instrument Your App
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-code
             contents:
               - page: Quickstart
@@ -250,7 +250,7 @@ navigation:
                 path: docs/pages/llm-tracing/features/threads.mdx
                 icon: fa-light fa-message-dots
           - section: Online Evaluations
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-toggle-on
             contents:
               - page: Evaluate Traces & Spans
@@ -260,7 +260,7 @@ navigation:
                 path: docs/pages/llm-tracing/features/evaluate-threads.mdx
                 icon: fa-light fa-comments
           - section: Customize Traces
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-pen-to-square
             contents:
               - page: Name
@@ -276,7 +276,7 @@ navigation:
                 path: docs/pages/llm-tracing/features/users.mdx
                 icon: fa-light fa-user
           - section: Trace Management
-            collapsed: false
+            collapsed: true
             icon: fa-light fa-sliders
             contents:
               - page: Projects
@@ -305,7 +305,7 @@ navigation:
             icon: fa-light fa-wrench
           - section: Others
             icon: fa-light fa-signal-stream
-            collapsed: false
+            collapsed: true
             contents:
               - page: Triage
                 path: docs/pages/llm-tracing/features/triage.mdx
@@ -329,7 +329,7 @@ navigation:
             icon: fa-light fa-user-check
           - section: Annotation Queues
             icon: fa-light fa-list-check
-            collapsed: false
+            collapsed: true
             contents:
               - page: Overview
                 path: docs/pages/human-in-the-loop/annotation-queues.mdx
@@ -654,7 +654,7 @@ navigation:
           - section: OpenTelemetry
             path: docs/pages/integrations/opentelemetry.mdx
             icon: fa-light fa-satellite-dish
-            collapsed: false
+            collapsed: true
             contents:
               - page: Distributed Tracing
                 path: docs/pages/integrations/opentelemetry/distributed-tracing.mdx
@@ -704,7 +704,7 @@ navigation:
             path: docs/pages/integrations/third-party/openinference.mdx
             icon: fa-light fa-telescope
       - section: LLM Gateways
-        collapsed: false
+        collapsed: true
         contents:
           - page: LiteLLM
             path: docs/pages/integrations/third-party/litellm.mdx
@@ -740,6 +740,7 @@ navigation:
           - section: Integrations
             path: docs/pages/settings/project/integrations.mdx
             icon: fa-light fa-puzzle-piece
+            collapsed: true
             contents:
               - page: PR Eval Gate
                 path: docs/pages/settings/project/integrations/pr-eval-gate.mdx
@@ -748,7 +749,7 @@ navigation:
           - section: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
             icon: fa-light fa-globe
-            collapsed: false
+            collapsed: true
             contents:
               - page: Prompts & Hyperparameters
                 path: docs/pages/settings/project/ai-connections/prompts-hyperparameters.mdx
