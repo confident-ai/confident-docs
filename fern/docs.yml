@@ -756,6 +756,9 @@ navigation:
               - page: Streaming
                 path: docs/pages/settings/project/ai-connections/streaming.mdx
                 icon: fa-light fa-signal-stream
+              - page: Async Responses
+                path: docs/pages/settings/project/ai-connections/async-responses.mdx
+                icon: fa-light fa-hourglass-half
               - page: Authorization
                 path: docs/pages/settings/project/ai-connections/authorization.mdx
                 icon: fa-light fa-lock-keyhole
