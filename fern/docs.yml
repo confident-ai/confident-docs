@@ -868,6 +868,21 @@ navigation:
       - page: POC Environments
         path: docs/pages/self-hosting/poc-environments.mdx
         icon: fa-light fa-flask
+      - page: Configuration Reference
+        path: docs/pages/self-hosting/configuration.mdx
+        icon: fa-light fa-sliders
+      - page: Scaling
+        path: docs/pages/self-hosting/scaling.mdx
+        icon: fa-light fa-arrow-up-right-dots
+      - page: Disaster Recovery
+        path: docs/pages/self-hosting/disaster-recovery.mdx
+        icon: fa-light fa-shield-heart
+      - page: Troubleshooting
+        path: docs/pages/self-hosting/troubleshooting.mdx
+        icon: fa-light fa-bug
+      - page: FAQ
+        path: docs/pages/self-hosting/faq.mdx
+        icon: fa-light fa-circle-question
       - section: AWS Deployment
         contents:
           - page: Overview
@@ -901,21 +916,6 @@ navigation:
           - page: Deploy with Helm
             path: docs/pages/self-hosting/azure/deploy.mdx
             icon: fa-light fa-rocket
-      - page: Configuration Reference
-        path: docs/pages/self-hosting/configuration.mdx
-        icon: fa-light fa-sliders
-      - page: Scaling
-        path: docs/pages/self-hosting/scaling.mdx
-        icon: fa-light fa-arrow-up-right-dots
-      - page: Disaster Recovery
-        path: docs/pages/self-hosting/disaster-recovery.mdx
-        icon: fa-light fa-shield-heart
-      - page: Troubleshooting
-        path: docs/pages/self-hosting/troubleshooting.mdx
-        icon: fa-light fa-bug
-      - page: FAQ
-        path: docs/pages/self-hosting/faq.mdx
-        icon: fa-light fa-circle-question
   - tab: guides
     layout:
       - page: Guides
