@@ -1,0 +1,214 @@
+---
+slug: self-hosting/gcp/infrastructure
+description: Provision GKE, Cloud SQL, and GCS for Confident AI with Terraform
+---
+
+This provisions the cloud infrastructure Confident AI runs on: a GKE cluster, a Cloud SQL PostgreSQL database, GCS buckets, and the keyless identity wiring. When it finishes you will have a running cluster and a set of outputs to feed into the Helm chart on the next page.
+
+Set your project and region once, and enable the APIs the module uses:
+
+```bash
+export PROJECT=my-gcp-project
+export REGION=us-central1
+gcloud config set project $PROJECT
+
+gcloud services enable \
+  container.googleapis.com sqladmin.googleapis.com \
+  servicenetworking.googleapis.com compute.googleapis.com \
+  artifactregistry.googleapis.com run.googleapis.com
+```
+
+<Steps>
+
+<Step title="Create the network (optional)">
+
+<Note>
+Skip this if you already have a VPC network with a subnet that has two secondary ranges (pods and services) and Cloud NAT for its private nodes. Use your existing names in the next step.
+</Note>
+
+GKE needs one subnet with two secondary ranges, one for pods and one for services, plus Cloud NAT so the private nodes can pull images. Run the blocks in order.
+
+Create the VPC network in custom subnet mode so you define the subnet yourself:
+
+```bash
+gcloud compute networks create confident-prod-vpc --subnet-mode=custom
+```
+
+Create the subnet with the two secondary ranges GKE needs:
+
+```bash
+gcloud compute networks subnets create confident-prod-subnet \
+  --network=confident-prod-vpc --region=$REGION \
+  --range=10.30.0.0/20 \
+  --secondary-range confident-pods=10.30.32.0/19,confident-services=10.30.16.0/20
+```
+
+<Note>
+ClickHouse runs cleanly on the IPv4-only GKE cluster this module builds: the chart pins the operator's pods to listen on IPv4 (`0.0.0.0`), so there is no address-family error and no dual-stack setup is required. A dual-stack subnet alone would not change this, the nodes stay IPv4-only unless the cluster itself is created dual-stack.
+</Note>
+
+Add a Cloud Router and NAT so the private nodes reach the internet for outbound pulls, with no inbound exposure:
+
+```bash
+gcloud compute routers create confident-prod-router \
+  --network=confident-prod-vpc --region=$REGION
+gcloud compute routers nats create confident-prod-nat \
+  --router=confident-prod-router --region=$REGION \
+  --nat-all-subnet-ip-ranges --auto-allocate-nat-external-ips
+```
+
+</Step>
+
+<Step title="Mirror the code sandbox image (required)">
+
+Code-based and transformer metrics run in a sandboxed Cloud Run service, which runs the `confident-code-sandbox-gcp` image. It must live in your own Artifact Registry before Terraform creates the service, so mirror the public image.
+
+Create an Artifact Registry repository and let Docker authenticate to it:
+
+```bash
+gcloud artifacts repositories create confident \
+  --repository-format=docker --location=$REGION
+gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+```
+
+Pull the public image and push it to your repository:
+
+```bash
+docker pull confidentai/confident-code-sandbox-gcp:latest
+docker tag confidentai/confident-code-sandbox-gcp:latest \
+  $REGION-docker.pkg.dev/$PROJECT/confident/confident-code-sandbox-gcp:latest
+docker push $REGION-docker.pkg.dev/$PROJECT/confident/confident-code-sandbox-gcp:latest
+```
+
+</Step>
+
+<Step title="Write the Terraform config">
+
+Create a `main.tf` that references the published module, then fill in your project and the network names from the earlier steps. What each variable does:
+
+- **Project and network**: `confident_gcp_project_id`, `confident_gcp_region`, and the network names from the network step.
+- **Naming**: `confident_environment` and `confident_environment_code` stamp the `prod` naming convention onto every resource.
+- **Access**: `confident_public_gke` exposes the cluster API to your machine; set it `false` for a private-only endpoint.
+- **Database**: `confident_psql_password` sets your own PostgreSQL password; omit it to auto-generate one.
+- **Managed services**: `confident_create_secret_manager` and `confident_managed_redis_enabled` turn on the recommended secret store and Redis.
+- **Code executor**: `confident_ar_repository_name` is the Artifact Registry repo holding the image you just mirrored.
+
+```hcl
+provider "google" {
+  project = "my-gcp-project"
+  region  = "us-central1"
+}
+
+module "confident_ai" {
+  source  = "confident-ai/confident-ai/google"
+  version = "~> 0.1"
+
+  confident_gcp_project_id = "my-gcp-project"
+  confident_gcp_region     = "us-central1"
+
+  confident_network_name      = "confident-prod-vpc"
+  confident_network_id        = "projects/my-gcp-project/global/networks/confident-prod-vpc"
+  confident_subnetwork_name   = "confident-prod-subnet"
+  confident_ip_range_pods     = "confident-pods"
+  confident_ip_range_services = "confident-services"
+
+  confident_environment      = "prod"
+  confident_environment_code = "p"
+
+  confident_public_gke = true
+
+  confident_psql_password = "choose-a-strong-password"
+
+  confident_create_secret_manager = true
+  confident_managed_redis_enabled = true
+
+  confident_code_executor_enabled = true
+  confident_ar_repository_name    = "confident"
+}
+
+output "helm_values" {
+  value     = module.confident_ai.helm_values
+  sensitive = true
+}
+```
+
+<Note>
+Prefer to work inside the repo? Clone [`terraform-google-confident-ai`](https://github.com/confident-ai/terraform-google-confident-ai) and put the same variables in a `terraform.tfvars` file instead of a `module` block.
+</Note>
+
+</Step>
+
+<Step title="Configure remote state (optional)">
+
+<Note>
+Skip this to use local state. For a team or a real environment, keep state in a GCS bucket.
+</Note>
+
+Create a `backend.tf`:
+
+```hcl
+terraform {
+  backend "gcs" {
+    bucket = "confident-tfstate"
+    prefix = "confident-ai/gcp"
+  }
+}
+```
+
+</Step>
+
+<Step title="Apply">
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Creating the GKE cluster and Cloud SQL takes roughly 15 to 20 minutes.
+
+</Step>
+
+<Step title="Connect to the cluster">
+
+```bash
+eval "$(terraform output -raw configure_kubectl)"
+kubectl get nodes
+```
+
+GKE has a default storage class (`standard-rwo`), so the in-cluster ClickHouse and Redis disks work out of the box.
+
+</Step>
+
+<Step title="Read the outputs">
+
+The Helm chart on the next page needs these values. `terraform output helm_values` prints a ready-to-paste snippet, or read them individually. The comment on each line is the Helm value it feeds:
+
+```bash
+terraform output -raw database_url                # secrets.data.DATABASE_URL
+terraform output test_cases_bucket                # storage.testCasesBucket
+terraform output payloads_bucket                  # storage.payloadsBucket
+terraform output -raw app_service_account_email   # serviceAccount annotation
+terraform output -raw code_executor_function_url  # codeExecutor.gcp.functionUrl
+```
+
+</Step>
+
+</Steps>
+
+## Managed secrets and Redis (recommended)
+
+The module block above provisions both. The [Deploy page](/self-hosting/gcp/deploy) installs the External Secrets Operator and wires them into the chart:
+
+- **Secret Manager + External Secrets Operator** (`confident_create_secret_manager = true`): Terraform creates the secret and a Workload-Identity-bound service account for ESO.
+- **Memorystore for Redis** (`confident_managed_redis_enabled = true`): managed Redis instead of the in-cluster one. `terraform output -raw redis_url` gives the value for `redis.externalUrl`.
+
+<Note>
+Prefer a simpler footprint? Set both to `false` to hold secrets in a Kubernetes Secret and run Redis in the cluster. See [Simpler option](/self-hosting/gcp/deploy#simpler-option-in-cluster-redis-and-a-kubernetes-secret) on the Deploy page.
+</Note>
+
+## Next step
+
+<Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/gcp/deploy">
+  Install the app with the Terraform outputs and expose it over HTTPS.
+</Card>

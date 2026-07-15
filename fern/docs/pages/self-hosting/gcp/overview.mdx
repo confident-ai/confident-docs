@@ -1,59 +1,106 @@
 ---
 slug: self-hosting/gcp/overview
-description: Deploy Confident AI on Google Cloud Platform (GCP)
+description: Deploy Confident AI on Google Cloud with GKE, Cloud SQL, and GCS
 ---
 
-Deploy Confident AI on your GCP infrastructure for complete control over your evaluation and observability platform.
+Run the full Confident AI platform on Google Cloud, inside your own project and region. A published Terraform module stands up a GKE cluster, a managed Cloud SQL database, and GCS object storage, and the `confident-ai` Helm chart deploys the application on top. The app reaches GCS through GKE Workload Identity, so there are no service-account keys anywhere.
 
-## Architecture
+You run it in two steps: [Infrastructure](/self-hosting/gcp/infrastructure) provisions the cloud resources with Terraform, then [Deploy with Helm](/self-hosting/gcp/deploy) installs the app and exposes it over HTTPS. Plan for roughly 15 to 20 minutes of Terraform time plus a few minutes for the chart to come up, and up to an hour more for a Google-managed certificate to go active.
 
-The GCP deployment uses Terraform to provision a production-ready infrastructure with the following components:
-
-<Frame caption="GCP Self-Hosting Reference Architecture">
+<Frame caption="GCP reference architecture">
     <img data-image="selfHosting.gcp.architecture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
-## Core components
+## What Terraform provisions
+
+The module deploys into a VPC network you already have. It never creates one.
 
 <CardGroup cols={3}>
-  <Card title="VPC & Networking" icon="fa-light fa-network-wired">
-    GKE/database/public/private-service-connect subnets with Cloud NAT, VPC
-    firewall rules, and Cloud DNS private zone.
-  </Card>
-  <Card title="GKE Cluster" icon="fa-light fa-dharmachakra">
-    Managed Kubernetes with a system node pool and autoscaling worker node pool,
-    Workload Identity, and VPC-native networking.
+  <Card title="GKE" icon="fa-light fa-dharmachakra">
+    A regional, private cluster with an autoscaling node pool and Workload Identity enabled.
   </Card>
   <Card title="Cloud SQL for PostgreSQL" icon="fa-light fa-database">
-    Managed database with Private Service Access in a VPC peering, regional HA,
-    automated backups, and private DNS resolution.
-  </Card>
-  <Card title="NGINX Ingress + Cloud LB" icon="fa-light fa-scale-balanced">
-    NGINX Ingress Controller backed by a GCP TCP/UDP Network Load Balancer with
-    cert-manager for TLS.
-  </Card>
-  <Card title="ArgoCD" icon="fa-light fa-arrows-rotate">
-    GitOps tool for managing Kubernetes deployments.
+    The app's primary database, on a private IP over Private Service Access, with automated backups.
   </Card>
   <Card title="Cloud Storage" icon="fa-light fa-bucket">
-    GCS buckets with uniform access and Private Google Access for test cases,
-    payloads, and ClickHouse backups.
+    Two GCS buckets, one for test cases and one for payloads, private and encrypted at rest.
+  </Card>
+  <Card title="Workload Identity" icon="fa-light fa-fingerprint">
+    A Google service account bound to the app's Kubernetes ServiceAccount, scoped to the buckets and the sandbox, keyless.
+  </Card>
+  <Card title="Cloud Run code executor" icon="fa-light fa-code">
+    Required for code-based and transformer metrics: a sandbox that runs the mirrored image.
+  </Card>
+  <Card title="Secret Manager + Memorystore" icon="fa-light fa-key">
+    Recommended: a cloud secret store for the External Secrets Operator, and managed Redis.
   </Card>
 </CardGroup>
 
+ClickHouse runs inside the cluster (the Helm chart installs it). The recommended setup keeps secrets in Secret Manager and runs Redis on Memorystore; in-cluster Redis and a Kubernetes Secret remain available as a simpler option. Cluster add-ons such as an ingress controller or the External Secrets Operator are your choice and are not installed by Terraform.
+
+## How it fits together
+
+- **Identity is keyless.** The app pods run as a Kubernetes ServiceAccount bound to a Google service account through Workload Identity. That service account has least-privilege access to the two buckets and permission to invoke the Cloud Run sandbox. Nothing stores a static key.
+- **The data plane is private.** GKE nodes sit in private subnets and reach the internet only through Cloud NAT. Cloud SQL is on a private IP. You choose whether the cluster API endpoint is public (handy for `kubectl` and `helm` from your laptop) or private-only.
+- **Traffic flows one way in.** Your applications send traces to `confident-otel`, which writes them to ClickHouse. The dashboard and API read from Cloud SQL and ClickHouse. Evaluations run in `confident-evals` and its workers, calling your model provider and the Cloud Run sandbox for code and transformer metrics. Datasets and payloads live in GCS.
+
 ## Deployed services
 
-The Kubernetes cluster runs the following services:
+The Helm chart installs these workloads into the `confident-ai` namespace:
 
-| Service                 | Namespace                  | Description                                            |
-| ----------------------- | -------------------------- | ------------------------------------------------------ |
-| **confident-backend**   | confident-ai               | Express.js API service handling core platform logic    |
-| **confident-frontend**  | confident-ai               | Next.js web application for the Confident AI dashboard |
-| **confident-evals**     | confident-ai               | FastAPI service for running LLM evaluations            |
-| **confident-otel**      | confident-ai               | OpenTelemetry collector for trace ingestion            |
-| **redis**               | confident-ai               | In-memory cache for session and queue management       |
-| **ArgoCD**              | argocd                     | GitOps continuous delivery                             |
-| **ClickHouse Operator** | clickhouse-operator-system | Manages the analytics database                         |
-| **NGINX Ingress**       | ingress-nginx              | Routes external traffic to services via Cloud LB       |
-| **External Secrets**    | confident-ai               | Syncs credentials from Google Secret Manager           |
-| **cert-manager**        | cert-manager               | Automates TLS certificate issuance and renewal         |
+| Service | Role |
+| --- | --- |
+| `confident-backend` | Core API |
+| `confident-frontend` | The dashboard |
+| `confident-evals` | Evaluation service |
+| `confident-evals-worker` | Async evaluation jobs |
+| `confident-ingestion-worker` | Trace ingestion |
+| `confident-worker` | Background jobs |
+| `confident-otel` | OTLP and trace collector |
+| ClickHouse and Keeper | Trace and span store |
+| Redis | Cache and queues (in-cluster unless you use Memorystore) |
+
+See [Scaling](/self-hosting/scaling) for how each of these grows with load.
+
+## Defaults
+
+| Component | Default |
+| --- | --- |
+| Node pool | 4 x `n2-standard-8`, autoscaling |
+| Region | `us-central1` |
+| Cluster endpoint | Private (`confident_public_gke = true` to reach it from your machine) |
+| Cloud SQL | Private IP, high availability |
+| Storage class | `standard-rwo` (in-cluster ClickHouse and Redis disks) |
+
+Everything above is overridable in the Terraform module. See the module inputs for the full list.
+
+## The module
+
+The module is published to the Terraform Registry and its source lives on GitHub.
+
+<CardGroup cols={2}>
+  <Card title="Terraform Registry" icon="fa-light fa-cube" href="https://registry.terraform.io/modules/confident-ai/confident-ai/google/latest">
+    `confident-ai/confident-ai/google`
+  </Card>
+  <Card title="Source on GitHub" icon="fa-brands fa-github" href="https://github.com/confident-ai/terraform-google-confident-ai">
+    `terraform-google-confident-ai`
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+- `terraform` (≥ 1.5), the `gcloud` CLI with `gke-gcloud-auth-plugin`, `kubectl`, `helm` (≥ 3.8), and `docker` (to mirror the code sandbox image).
+- `gcloud auth login` and `gcloud auth application-default login`.
+- The APIs the Infrastructure page enables: `container`, `sqladmin`, `servicenetworking`, `compute`, `artifactregistry`, and `run`.
+- From Confident AI: image pull credentials and a `CONFIDENT_LICENSE_KEY` (see [Deploy with Helm](/self-hosting/gcp/deploy)).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Infrastructure" icon="fa-light fa-layer-group" href="/self-hosting/gcp/infrastructure">
+    Provision GKE, Cloud SQL, and GCS with Terraform.
+  </Card>
+  <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/gcp/deploy">
+    Install the app and expose it over HTTPS.
+  </Card>
+</CardGroup>

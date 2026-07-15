@@ -1,19 +1,30 @@
 ---
 slug: self-hosting
-description: Deploy Confident AI in your own infrastructure with self-hosted deployment options
+description: Run Confident AI entirely inside your own cloud account
 ---
 
-Self-hosted (on-prem) deployment allows you to run Confident AI entirely within your own infrastructure, giving you complete control over your data and security posture.
+Self-hosting runs the entire Confident AI platform inside your own cloud account. Your traces, datasets, prompts, and evaluation results stay in your network, and you control the region, networking, and security posture. Nothing is sent to Confident AI's systems.
 
 <Tip>
-
-On-premise deployments are only available for customers with Enterprise lisences. [Talk to us](https://www.confident-ai.com/book-a-demo) to inquire about one.
-
+Self-hosting is available on Enterprise plans. [Talk to the platform team](https://www.confident-ai.com/book-a-demo) to get a license key and access to the container images.
 </Tip>
 
-## Overview
+## How a deployment works
 
-Confident AI supports self-hosted deployments on major cloud providers:
+A self-hosted deployment has two parts, and you run them in order:
+
+<Steps>
+<Step title="Provision infrastructure with Terraform">
+A published Terraform module creates the Kubernetes cluster, the PostgreSQL database, object storage, and the keyless identity wiring the app needs. It deploys into a VPC or VNet you already have, it never creates one for you.
+</Step>
+<Step title="Deploy the application with Helm">
+The `confident-ai` Helm chart installs the app (backend, frontend, evaluation service, and workers) along with in-cluster ClickHouse and Redis. You feed it the outputs from the Terraform step.
+</Step>
+</Steps>
+
+Terraform owns the cloud resources. Helm owns everything that runs inside the cluster. Keeping them separate means you can manage infrastructure and application lifecycles independently, and you can bring your own cluster if you already run one.
+
+## Pick your cloud
 
 <CardGroup cols={3}>
   <Card
@@ -36,83 +47,54 @@ Confident AI supports self-hosted deployments on major cloud providers:
     }
     href="/self-hosting/aws/overview"
   >
-    Deploy on Amazon Web Services using EKS, EC2, or other AWS services.
-  </Card>
-  <Card
-    title="Azure"
-    icon={<img src="../../assets/icons/azure.svg" alt="Azure logo" />}
-    href="/self-hosting/azure/overview"
-  >
-    Deploy on Microsoft Azure using AKS or other Azure services.
+    EKS, RDS PostgreSQL, and S3, with EKS Pod Identity for keyless access.
   </Card>
   <Card
     title="GCP"
     icon={<img src="../../assets/icons/gcp.svg" alt="GCP logo" />}
     href="/self-hosting/gcp/overview"
   >
-    Deploy on Google Cloud Platform using GKE or other GCP services.
+    GKE, Cloud SQL, and GCS, with Workload Identity for keyless access.
+  </Card>
+  <Card
+    title="Azure"
+    icon={<img src="../../assets/icons/azure.svg" alt="Azure logo" />}
+    href="/self-hosting/azure/overview"
+  >
+    AKS, PostgreSQL Flexible Server, and Blob storage.
   </Card>
 </CardGroup>
 
-## Why self-host?
+## What runs where
 
-Self-hosting is beneficial mainly from a security and data standpoint:
+Terraform provisions the managed cloud services. Helm installs the workloads inside the cluster.
 
-- **Data sovereignty** — All data stays within your infrastructure and chosen region. No data is ever sent to Confident AI systems.
-- **Compliance requirements** — Meet regulatory requirements (SOC 2, HIPAA, GDPR, FedRAMP) by keeping sensitive data in your controlled environment.
-- **Network isolation** — Run entirely within your private network with no public internet exposure.
-- **Custom integrations** — Connect to internal systems, self-hosted LLMs, and existing infrastructure without leaving your network.
+| Provisioned by Terraform (managed services) | Installed by Helm (in-cluster) |
+| --- | --- |
+| Kubernetes cluster (EKS / GKE / AKS) | `confident-backend`: core API |
+| PostgreSQL (RDS / Cloud SQL / Flexible Server) | `confident-frontend`: the dashboard |
+| Object storage (S3 / GCS / Blob) | `confident-evals`: evaluation service |
+| Keyless workload identity | `confident-evals-worker` and background workers |
+| Code executor, managed Redis, and secret store (all optional) | `confident-otel`: trace ingestion collector |
+| | ClickHouse and Redis (unless you point at managed services) |
 
-<div data-cta="self-hosting" />
+By default ClickHouse and Redis run in the cluster, so a base deployment needs only the cluster, PostgreSQL, and object storage. Managed Redis and a cloud secret store are opt-in.
 
-## Network security
+## What you get from Confident AI
 
-All self-hosted deployments follow a **fully private model** with no inbound internet access:
-
-- All services run in private subnets with no direct internet exposure
-- Load balancer is internal-only, accessible via VPN or network peering to your corporate network
-- **Authentication is entirely internal**—user credentials and sessions never leave your network (except for SSO providers like Okta or Azure AD if configured)
-- Outbound internet access is limited to:
-  - Pulling container images from your cloud provider's container registry
-  - LLM API calls for evaluations (depends on your setup)
-  - Email/Slack notifications (optional)
-
-| Layer          | Method                                         |
-| -------------- | ---------------------------------------------- |
-| **In transit** | TLS 1.2+ for all internal and external traffic |
-| **At rest**    | Cloud-native encryption (KMS or equivalent)    |
-| **Secrets**    | Cloud secrets manager with encryption          |
+Two things come with your Enterprise license. Both are covered on each cloud's Deploy page.
 
 <Note>
-  For fully air-gapped deployments without any outbound access, contact
-  Confident AI for offline image delivery and self-hosted LLM evaluation
-  options.
+- **Image pull credentials** (`imagePullSecrets`): the first-party images are hosted in Confident AI's private registry. You get credentials to pull them into your cluster.
+- **License key** (`CONFIDENT_LICENSE_KEY`): a signed key that enables the features your plan includes. Without it, the app starts with all features off.
 </Note>
-
-## Deployment timeline
-
-Typical enterprise deployment takes **2-4 weeks** end-to-end:
-
-| Phase                           | Duration | Notes                                                             |
-| ------------------------------- | -------- | ----------------------------------------------------------------- |
-| **Security & Access Review**    | 3-7 days | Approvals for IAM roles, service accounts, and network access     |
-| **DNS & Certificate Setup**     | 2-5 days | Domain delegation, certificate requests, DNS team coordination    |
-| **Infrastructure Provisioning** | 1-2 days | Terraform apply, troubleshooting quota limits or naming conflicts |
-| **Kubernetes Deployment**       | 1-2 days | Secrets configuration, image pull access, ingress setup           |
-| **Testing & Validation**        | 2-3 days | End-to-end testing, security scans, load testing                  |
-| **Go-Live & Handoff**           | 1-2 days | Documentation, runbook review, on-call setup                      |
-
-<Warning>
-  Common delays: permission requests stuck in approval queues, DNS changes
-  requiring change tickets, security reviews for VPC peering or firewall rules.
-</Warning>
 
 ## Next steps
 
-Self-hosted deployments are **only available for Enterprise customers** and are not self-served. To get started:
+<CardGroup cols={3}>
+  <Card title="Deploy on AWS" icon="fa-brands fa-aws" href="/self-hosting/aws/overview" />
+  <Card title="Deploy on GCP" icon="fa-brands fa-google" href="/self-hosting/gcp/overview" />
+  <Card title="Deploy on Azure" icon="fa-brands fa-microsoft" href="/self-hosting/azure/overview" />
+</CardGroup>
 
-1. Contact Confident AI [here](https://www.confident-ai.com/book-a-demo) or, for existing users in your private support channel, to discuss your requirements and obtain an Enterprise license
-2. Once approved, we will provide container images for your chosen cloud provider's registry (AWS ECR, Azure ACR, or GCP Artifact Registry)
-3. Follow the deployment guide for your cloud provider above
-
-Our team will work with you throughout the deployment process to ensure a successful rollout.
+<div data-cta="self-hosting" />

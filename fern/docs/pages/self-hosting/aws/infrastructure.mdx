@@ -1,0 +1,265 @@
+---
+slug: self-hosting/aws/infrastructure
+description: Provision EKS, RDS, and S3 for Confident AI with Terraform
+---
+
+This provisions the cloud infrastructure Confident AI runs on: an EKS cluster, an RDS PostgreSQL database, S3 buckets, and the keyless IAM wiring (EKS Pod Identity). When it finishes you will have a running cluster and a set of outputs to feed into the Helm chart on the next page.
+
+The region comes from your AWS provider and profile, there is no region variable. Set the region and two availability zones once:
+
+```bash
+export AWS_REGION=us-east-1
+export AWS_AZ_1=${AWS_REGION}a
+export AWS_AZ_2=${AWS_REGION}b
+```
+
+<Steps>
+
+<Step title="Create the network (optional)">
+
+<Note>
+Skip this if you already have a VPC with two private subnets in different AZs that reach the internet through a NAT gateway. Use your existing IDs in the next step.
+</Note>
+
+This builds a VPC with two public and two private subnets across two availability zones, plus a NAT gateway. EKS and RDS run in the private subnets; the public subnets carry the NAT gateway and any internet-facing load balancer. Run the blocks in order, each one feeds IDs into the next.
+
+Create the VPC and turn on DNS so the cluster and database can resolve private hostnames:
+
+```bash
+VPC_ID=$(aws ec2 create-vpc --cidr-block 10.20.0.0/16 \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=confident-prod-vpc}]' \
+  --query Vpc.VpcId --output text)
+aws ec2 modify-vpc-attribute --vpc-id $VPC_ID --enable-dns-hostnames
+aws ec2 modify-vpc-attribute --vpc-id $VPC_ID --enable-dns-support
+```
+
+Attach an internet gateway. The public subnets route to it for internet access:
+
+```bash
+INTERNET_GATEWAY_ID=$(aws ec2 create-internet-gateway --query InternetGateway.InternetGatewayId --output text)
+aws ec2 attach-internet-gateway --internet-gateway-id $INTERNET_GATEWAY_ID --vpc-id $VPC_ID
+```
+
+Create two public and two private subnets, one of each per availability zone:
+
+```bash
+PUBLIC_SUBNET_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.20.0.0/20  --availability-zone $AWS_AZ_1 --query Subnet.SubnetId --output text)
+PUBLIC_SUBNET_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.20.16.0/20 --availability-zone $AWS_AZ_2 --query Subnet.SubnetId --output text)
+PRIVATE_SUBNET_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.20.128.0/20 --availability-zone $AWS_AZ_1 --query Subnet.SubnetId --output text)
+PRIVATE_SUBNET_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.20.144.0/20 --availability-zone $AWS_AZ_2 --query Subnet.SubnetId --output text)
+```
+
+<Note>
+ClickHouse runs cleanly on the IPv4-only EKS cluster this module builds: the chart pins the operator's pods to listen on IPv4 (`0.0.0.0`), so there is no address-family error and no dual-stack setup is required. A dual-stack VPC alone would not change this, the nodes stay IPv4-only unless the cluster itself is created dual-stack.
+</Note>
+
+Tag the subnets so a load balancer controller can discover them later:
+
+```bash
+aws ec2 create-tags --resources $PUBLIC_SUBNET_1 $PUBLIC_SUBNET_2   --tags Key=kubernetes.io/role/elb,Value=1
+aws ec2 create-tags --resources $PRIVATE_SUBNET_1 $PRIVATE_SUBNET_2 --tags Key=kubernetes.io/role/internal-elb,Value=1
+```
+
+Create a NAT gateway in the first public subnet. The private nodes reach the internet through it for outbound pulls, with no inbound exposure:
+
+```bash
+NAT_EIP_ALLOCATION_ID=$(aws ec2 allocate-address --domain vpc --query AllocationId --output text)
+NAT_GATEWAY_ID=$(aws ec2 create-nat-gateway --subnet-id $PUBLIC_SUBNET_1 --allocation-id $NAT_EIP_ALLOCATION_ID --query NatGateway.NatGatewayId --output text)
+aws ec2 wait nat-gateway-available --nat-gateway-ids $NAT_GATEWAY_ID
+```
+
+Route the public subnets to the internet gateway:
+
+```bash
+PUBLIC_ROUTE_TABLE_ID=$(aws ec2 create-route-table --vpc-id $VPC_ID --query RouteTable.RouteTableId --output text)
+aws ec2 create-route --route-table-id $PUBLIC_ROUTE_TABLE_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $INTERNET_GATEWAY_ID
+aws ec2 associate-route-table --route-table-id $PUBLIC_ROUTE_TABLE_ID --subnet-id $PUBLIC_SUBNET_1
+aws ec2 associate-route-table --route-table-id $PUBLIC_ROUTE_TABLE_ID --subnet-id $PUBLIC_SUBNET_2
+```
+
+Route the private subnets through the NAT gateway:
+
+```bash
+PRIVATE_ROUTE_TABLE_ID=$(aws ec2 create-route-table --vpc-id $VPC_ID --query RouteTable.RouteTableId --output text)
+aws ec2 create-route --route-table-id $PRIVATE_ROUTE_TABLE_ID --destination-cidr-block 0.0.0.0/0 --nat-gateway-id $NAT_GATEWAY_ID
+aws ec2 associate-route-table --route-table-id $PRIVATE_ROUTE_TABLE_ID --subnet-id $PRIVATE_SUBNET_1
+aws ec2 associate-route-table --route-table-id $PRIVATE_ROUTE_TABLE_ID --subnet-id $PRIVATE_SUBNET_2
+```
+
+Print the VPC and private subnet IDs to paste into the Terraform config:
+
+```bash
+echo "confident_vpc_id             = \"$VPC_ID\""
+echo "confident_private_subnet_ids = [\"$PRIVATE_SUBNET_1\", \"$PRIVATE_SUBNET_2\"]"
+```
+
+</Step>
+
+<Step title="Mirror the code sandbox image (required)">
+
+Code-based and transformer metrics run in a sandboxed Lambda, which runs the `confident-code-sandbox-aws` image. Lambda only runs container images from an ECR in the same account, so mirror the public image into your own ECR.
+
+Create the ECR repository and log Docker in to it:
+
+```bash
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+ECR_REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+aws ecr create-repository --repository-name confident-code-sandbox-aws --region $AWS_REGION
+aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+```
+
+Pull the public image and push it to your ECR. The last line prints the image URI for the Terraform config:
+
+```bash
+docker pull confidentai/confident-code-sandbox-aws:latest
+docker tag confidentai/confident-code-sandbox-aws:latest $ECR_REGISTRY/confident-code-sandbox-aws:latest
+docker push $ECR_REGISTRY/confident-code-sandbox-aws:latest
+
+echo "confident_code_executor_lambda_image_uri = \"$ECR_REGISTRY/confident-code-sandbox-aws:latest\""
+```
+
+</Step>
+
+<Step title="Write the Terraform config">
+
+Create a `main.tf` that references the published module, then fill in the values from the previous two steps. What each variable does:
+
+- **Network**: `confident_vpc_id` and `confident_private_subnet_ids` come from the network step (or use your own VPC).
+- **Naming**: `confident_environment` and `confident_environment_code` stamp the `prod` naming convention onto every resource.
+- **Access**: `confident_public_eks` exposes the cluster API to your machine; set it `false` for a private-only endpoint.
+- **Durability**: `confident_rds_deletion_protection` guards the database against accidental deletion.
+- **Managed services**: `confident_create_secrets_manager` and `confident_managed_redis_enabled` turn on the recommended secret store and Redis, and `confident_database_ingress_cidrs` lets the nodes reach Redis (use your VPC CIDR).
+- **Code executor**: `confident_code_executor_lambda_image_uri` is the ECR image URI printed by the mirror step.
+
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+
+module "confident_ai" {
+  source  = "confident-ai/confident-ai/aws"
+  version = "~> 0.1"
+
+  confident_vpc_id             = "vpc-xxxxxxxx"
+  confident_private_subnet_ids = ["subnet-aaaa", "subnet-bbbb"]
+
+  confident_environment      = "prod"
+  confident_environment_code = "p"
+
+  confident_public_eks = true
+
+  confident_rds_deletion_protection = true
+
+  confident_create_secrets_manager = true
+  confident_managed_redis_enabled  = true
+  confident_database_ingress_cidrs = ["10.20.0.0/16"]
+
+  confident_code_executor_enabled          = true
+  confident_code_executor_lambda_image_uri = "<ECR image URI from the mirror step>"
+}
+
+output "helm_values" {
+  value     = module.confident_ai.helm_values
+  sensitive = true
+}
+```
+
+<Note>
+Prefer to work inside the repo? Clone [`terraform-aws-confident-ai`](https://github.com/confident-ai/terraform-aws-confident-ai) and put the same variables in a `terraform.tfvars` file instead of a `module` block.
+</Note>
+
+</Step>
+
+<Step title="Configure remote state (optional)">
+
+<Note>
+Skip this to use local state. For a team or a real environment, keep state in an S3 bucket.
+</Note>
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "confident-tfstate"
+    key    = "confident-ai/aws/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+```
+
+</Step>
+
+<Step title="Apply">
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Creating the EKS cluster and RDS takes roughly 15 to 20 minutes.
+
+</Step>
+
+<Step title="Connect to the cluster">
+
+```bash
+eval "$(terraform output -raw configure_kubectl)"
+kubectl get nodes
+```
+
+EKS ships no default storage class, and ClickHouse and Redis need disks. Create a gp3 default once:
+
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  type: gp3
+  encrypted: "true"
+allowVolumeExpansion: true
+EOF
+```
+
+</Step>
+
+<Step title="Read the outputs">
+
+The Helm chart on the next page needs these values. `terraform output helm_values` prints a ready-to-paste snippet, or read them individually. The comment on each line is the Helm value it feeds:
+
+```bash
+terraform output -raw database_url            # secrets.data.DATABASE_URL
+terraform output test_cases_bucket            # storage.testCasesBucket
+terraform output payloads_bucket              # storage.payloadsBucket
+terraform output -raw region                  # storage.aws.region
+terraform output code_executor_function_name  # codeExecutor.aws.lambdaFunctionName
+```
+
+Because the app uses EKS Pod Identity, its ServiceAccount needs no annotation, Terraform already linked the IAM role to it.
+
+</Step>
+
+</Steps>
+
+## Managed secrets and Redis (recommended)
+
+The module block above provisions both. The [Deploy page](/self-hosting/aws/deploy) installs the External Secrets Operator and wires them into the chart:
+
+- **Secrets Manager + External Secrets Operator** (`confident_create_secrets_manager = true`): Terraform creates an empty secret and grants ESO read access through Pod Identity.
+- **ElastiCache for Redis** (`confident_managed_redis_enabled = true`): managed Redis instead of the in-cluster one. `confident_database_ingress_cidrs` opens port 6379 to your VPC so the nodes can reach it. `terraform output -raw redis_url` gives the value for `redis.externalUrl`.
+
+<Note>
+Prefer a simpler footprint? Set both to `false` to hold secrets in a Kubernetes Secret and run Redis in the cluster. See [Simpler option](/self-hosting/aws/deploy#simpler-option-in-cluster-redis-and-a-kubernetes-secret) on the Deploy page.
+</Note>
+
+## Next step
+
+<Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/aws/deploy">
+  Install the app with the Terraform outputs and expose it over HTTPS.
+</Card>

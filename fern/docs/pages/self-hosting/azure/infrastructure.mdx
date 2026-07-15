@@ -1,0 +1,210 @@
+---
+slug: self-hosting/azure/infrastructure
+description: Provision AKS, PostgreSQL, and Blob storage for Confident AI with Terraform
+---
+
+This provisions the cloud infrastructure Confident AI runs on: a private AKS cluster, a PostgreSQL Flexible Server, a Storage account with two Blob containers, and the private networking that ties them together. When it finishes you will have a running cluster and a set of outputs to feed into the Helm chart on the next page.
+
+The `azurerm` provider needs the subscription set explicitly. Set it and your region once:
+
+```bash
+az account set --subscription "<your-subscription>"
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+export LOCATION=centralus
+```
+
+<Steps>
+
+<Step title="Create the resource group and network (optional)">
+
+<Note>
+Skip this if you already have a resource group and VNet with a subnet for AKS and a separate subnet delegated to `Microsoft.DBforPostgreSQL/flexibleServers`. Use your existing IDs in the next step.
+</Note>
+
+AKS needs a subnet of its own, and PostgreSQL Flexible Server needs a separate subnet delegated to it. Run the blocks in order.
+
+Create the resource group:
+
+```bash
+az group create --name confident-prod-rg --location $LOCATION
+```
+
+Create the VNet with the AKS subnet:
+
+```bash
+az network vnet create \
+  --resource-group confident-prod-rg --name confident-prod-vnet \
+  --address-prefixes 10.40.0.0/16 \
+  --subnet-name aks --subnet-prefixes 10.40.0.0/20
+```
+
+<Note>
+ClickHouse runs cleanly on the IPv4-only AKS cluster this module builds: the chart pins the operator's pods to listen on IPv4 (`0.0.0.0`), so there is no address-family error and no dual-stack setup is required. A dual-stack VNet alone would not change this, the nodes stay IPv4-only unless the cluster itself is created dual-stack.
+</Note>
+
+Add a second subnet delegated to PostgreSQL Flexible Server. It must hold nothing else:
+
+```bash
+az network vnet subnet create \
+  --resource-group confident-prod-rg --vnet-name confident-prod-vnet \
+  --name postgres --address-prefixes 10.40.16.0/28 \
+  --delegations Microsoft.DBforPostgreSQL/flexibleServers
+```
+
+Print the network IDs to paste into the Terraform config:
+
+```bash
+echo "confident_virtual_network_id = \"$(az network vnet show -g confident-prod-rg -n confident-prod-vnet --query id -o tsv)\""
+echo "confident_aks_subnet_id      = \"$(az network vnet subnet show -g confident-prod-rg --vnet-name confident-prod-vnet -n aks --query id -o tsv)\""
+echo "confident_database_subnet_id = \"$(az network vnet subnet show -g confident-prod-rg --vnet-name confident-prod-vnet -n postgres --query id -o tsv)\""
+```
+
+</Step>
+
+<Step title="Mirror the code sandbox image (required)">
+
+Code-based and transformer metrics run in a sandboxed Azure Function, which pulls the `confident-code-sandbox-azure` image from an Azure Container Registry you own. Mirror the public image into your ACR. The module expects the repository name `confident-code-sandbox`, so tag it that way.
+
+Create the ACR and log Docker in to it (the name must be globally unique and lowercase):
+
+```bash
+az acr create --resource-group confident-prod-rg --name <youracr> --sku Basic
+az acr login --name <youracr>
+```
+
+Pull the public image and push it to your ACR:
+
+```bash
+docker pull confidentai/confident-code-sandbox-azure:latest
+docker tag confidentai/confident-code-sandbox-azure:latest <youracr>.azurecr.io/confident-code-sandbox:latest
+docker push <youracr>.azurecr.io/confident-code-sandbox:latest
+```
+
+</Step>
+
+<Step title="Write the Terraform config">
+
+Create a `main.tf` that references the published module, then fill in the IDs from the earlier steps. What each variable does:
+
+- **Resource group and network**: `confident_resource_group_name`, `confident_azure_region`, and the network IDs from the network step.
+- **Naming**: `confident_environment` and `confident_environment_code` stamp the `prod` naming convention onto every resource.
+- **Access**: `confident_public_aks` exposes the cluster API to your machine; set it `false` for a private-only endpoint.
+- **Managed services**: `confident_create_key_vault` and `confident_managed_redis_enabled` turn on the recommended secret store and Redis, and `confident_redis_private_endpoint_subnet_id` places Redis's private endpoint (the `aks` subnet works).
+- **Code executor**: `confident_acr_login_server` is the ACR holding the image you mirrored. If the Function cannot pull from a private ACR, also set `confident_acr_admin_username` and `confident_acr_admin_password`.
+
+```hcl
+provider "azurerm" {
+  features {}
+}
+
+module "confident_ai" {
+  source  = "confident-ai/confident-ai/azurerm"
+  version = "~> 0.1"
+
+  confident_resource_group_name = "confident-prod-rg"
+  confident_azure_region        = "centralus"
+
+  confident_virtual_network_id = "/subscriptions/.../virtualNetworks/confident-prod-vnet"
+  confident_aks_subnet_id      = "/subscriptions/.../subnets/aks"
+  confident_database_subnet_id = "/subscriptions/.../subnets/postgres"
+
+  confident_environment      = "prod"
+  confident_environment_code = "p"
+
+  confident_public_aks = true
+
+  confident_create_key_vault                 = true
+  confident_managed_redis_enabled            = true
+  confident_redis_private_endpoint_subnet_id = "/subscriptions/.../subnets/aks"
+
+  confident_code_executor_enabled = true
+  confident_acr_login_server      = "<youracr>.azurecr.io"
+}
+
+output "helm_values" {
+  value     = module.confident_ai.helm_values
+  sensitive = true
+}
+```
+
+<Note>
+Prefer to work inside the repo? Clone [`terraform-azurerm-confident-ai`](https://github.com/confident-ai/terraform-azurerm-confident-ai) and put the same variables in a `terraform.tfvars` file instead of a `module` block.
+</Note>
+
+</Step>
+
+<Step title="Configure remote state (optional)">
+
+<Note>
+Skip this to use local state. For a team or a real environment, keep state in a Storage account.
+</Note>
+
+```hcl
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "confident-prod-rg"
+    storage_account_name = "confidenttfstate"
+    container_name       = "tfstate"
+    key                  = "confident-ai/azure.tfstate"
+  }
+}
+```
+
+</Step>
+
+<Step title="Apply">
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Creating the AKS cluster and Flexible Server takes roughly 15 to 20 minutes.
+
+</Step>
+
+<Step title="Connect to the cluster">
+
+```bash
+eval "$(terraform output -raw configure_kubectl)"
+kubectl get nodes
+```
+
+AKS has a default storage class (`managed-csi`), so the in-cluster ClickHouse and Redis disks work out of the box.
+
+</Step>
+
+<Step title="Read the outputs">
+
+The Helm chart on the next page needs these values. `terraform output helm_values` prints a ready-to-paste snippet, or read them individually. The comment on each line is the Helm value it feeds:
+
+```bash
+terraform output -raw database_url                 # secrets.data.DATABASE_URL
+terraform output -raw storage_connection_string    # secrets.data.AZURE_STORAGE_CONNECTION_STRING
+terraform output storage_account_name              # storage.azure.storageAccountName
+terraform output test_cases_container              # storage.testCasesBucket
+terraform output payloads_container                # storage.payloadsBucket
+terraform output -raw code_executor_function_url   # codeExecutor.azure.functionUrl (append /api/execute)
+```
+
+</Step>
+
+</Steps>
+
+## Managed secrets and Redis (recommended)
+
+The module block above provisions both. The [Deploy page](/self-hosting/azure/deploy) installs the External Secrets Operator, completes the one federated-credential step, and wires them into the chart:
+
+- **Key Vault + External Secrets Operator** (`confident_create_key_vault = true`): Terraform creates the vault and a managed identity for ESO.
+- **Azure Managed Redis** (`confident_managed_redis_enabled = true`): managed Redis instead of the in-cluster one, reached over a private endpoint in the subnet you name. `terraform output -raw redis_url` gives the value for `redis.externalUrl`.
+
+<Note>
+Prefer a simpler footprint? Set both to `false` to hold secrets in a Kubernetes Secret and run Redis in the cluster. See [Simpler option](/self-hosting/azure/deploy#simpler-option-in-cluster-redis-and-a-kubernetes-secret) on the Deploy page.
+</Note>
+
+## Next step
+
+<Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/azure/deploy">
+  Install the app with the Terraform outputs and expose it over HTTPS.
+</Card>

@@ -1,0 +1,45 @@
+---
+slug: self-hosting/troubleshooting
+description: Diagnose and fix common issues in a self-hosted Confident AI deployment
+---
+
+This page covers issues common to every cloud, at the chart and application level. For load balancer, ingress, and certificate problems specific to your platform, see the Troubleshooting section on that cloud's Deploy page: [AWS](/self-hosting/aws/deploy#troubleshooting), [GCP](/self-hosting/gcp/deploy#troubleshooting), or [Azure](/self-hosting/azure/deploy#troubleshooting).
+
+## Where to look first
+
+Start with the pod list, then read the events and logs of anything that is not `Running` and `Ready`:
+
+```bash
+kubectl get pods -n confident-ai
+kubectl describe pod <pod> -n confident-ai        # events at the bottom
+kubectl logs <pod> -n confident-ai                # add -p for a crashed previous container
+```
+
+The startup order is: the ClickHouse operator, then ClickHouse and Keeper, then the migrations job, then the app pods. A failure early in that chain often shows up as later pods waiting.
+
+## Common issues
+
+| Symptom | Cause and fix |
+| --- | --- |
+| Migrations job fails or crash-loops | It cannot reach PostgreSQL or ClickHouse, or the credentials are wrong. Check `DATABASE_URL` and that a ClickHouse password is set (`clickhouse.password`). Read the job logs: `kubectl logs job/confident-migrations -n confident-ai`. |
+| App pods sit in `CreateContainerConfigError` | The app Secret is not present yet, usually because the External Secrets Operator has not synced it. It self-heals once `kubectl get externalsecret -n confident-ai` shows `SecretSynced`. |
+| `ExternalSecret` never reaches `SecretSynced` | ESO cannot read the cloud secret store. Confirm the secret-store flag was enabled in Terraform, and that the `external-secrets-sa` service account is bound to the right cloud identity (see the cloud's Deploy page). |
+| `ImagePullBackOff` on the app images | The pull secret is missing or expired. Confirm `imagePullSecretRefresh.enabled` and that the ECR credentials from Confident AI are correct. |
+| Frontend returns 500 with `ENOTFOUND confident-backend` | The frontend resolves backend services by their chart-prefixed names. Keep `fullnameOverride: confident` (the chart default); do not change it. |
+| ClickHouse Keeper logs `Not authenticated` | Stale PersistentVolumeClaims from a previous failed install. `helm uninstall`, `kubectl delete pvc -n confident-ai --all` (only if the data is disposable), then reinstall. |
+| ClickHouse crash-loops with `Listen [::]... Address family not supported` | The nodes are IPv4-only. The chart already pins ClickHouse to listen on `0.0.0.0`, so this only appears if you overrode `clickhouse.extraConfig`. |
+| Pods stuck `Pending`, PVCs unbound | No default StorageClass (common on fresh EKS). Create one and set `storageClass` on `clickhouse` and `redis`. See the AWS Infrastructure page. |
+| The domain shows 502 or a gateway error | The cloud load balancer's health checks are failing. This is platform-specific, see the Troubleshooting section on your cloud's Deploy page. |
+
+## Checking the pieces individually
+
+```bash
+kubectl get externalsecret -n confident-ai        # secret sync status
+kubectl get chi,chk -n confident-ai               # ClickHouse installation + Keeper
+kubectl get ingress -n confident-ai               # ingress address and backends
+kubectl exec -it deploy/confident-backend -n confident-ai -- env | grep -E 'DATABASE_URL|CLICKHOUSE'
+```
+
+## Still stuck
+
+Collect the failing pod's `describe` output and logs, and talk to the platform team. Include the chart version (`image.tag`) and which cloud you are on.

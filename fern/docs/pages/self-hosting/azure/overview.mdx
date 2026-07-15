@@ -1,59 +1,105 @@
 ---
 slug: self-hosting/azure/overview
-description: Deploy Confident AI on Microsoft Azure
+description: Deploy Confident AI on Azure with AKS, PostgreSQL Flexible Server, and Blob storage
 ---
 
-Deploy Confident AI on your Azure infrastructure for complete control over your evaluation and observability platform.
+Run the full Confident AI platform on Azure, inside your own subscription and region. A published Terraform module stands up an AKS cluster, a managed PostgreSQL Flexible Server, and a Storage account with Blob containers, and the `confident-ai` Helm chart deploys the application on top. On Azure the app reaches Blob storage through a connection string held as a secret.
 
-## Architecture
+You run it in two steps: [Infrastructure](/self-hosting/azure/infrastructure) provisions the cloud resources with Terraform, then [Deploy with Helm](/self-hosting/azure/deploy) installs the app and exposes it over HTTPS. Plan for roughly 15 to 20 minutes of Terraform time plus a few minutes for the chart to come up.
 
-The Azure deployment uses Terraform to provision a production-ready infrastructure with the following components:
-
-<Frame caption="Azure Self-Hosting Reference Architecture">
+<Frame caption="Azure reference architecture">
     <img data-image="selfHosting.azure.architecture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
-## Core components
+## What Terraform provisions
+
+The module deploys into a resource group and VNet you already have. It never creates them.
 
 <CardGroup cols={3}>
-  <Card title="VNet & Networking" icon="fa-light fa-network-wired">
-    AKS/database/public/private-endpoint subnets with NAT Gateway, NSG, and
-    Private DNS Zone.
-  </Card>
-  <Card title="AKS Cluster" icon="fa-light fa-dharmachakra">
-    Managed Kubernetes with a system node pool and autoscaling worker node pool,
-    Workload Identity, and Azure CNI networking.
+  <Card title="AKS" icon="fa-light fa-dharmachakra">
+    A private cluster with a worker node pool, OIDC issuer and Workload Identity enabled.
   </Card>
   <Card title="PostgreSQL Flexible Server" icon="fa-light fa-database">
-    Managed database in a delegated subnet with zone-redundant HA, automated
-    backups, and private DNS resolution.
+    The app's primary database, VNet-integrated and private, with high availability.
   </Card>
-  <Card title="NGINX Ingress + Azure LB" icon="fa-light fa-scale-balanced">
-    NGINX Ingress Controller backed by an Azure Standard Load Balancer with
-    cert-manager for TLS.
+  <Card title="Azure Storage" icon="fa-light fa-bucket">
+    A Storage account with two Blob containers, one for test cases and one for payloads.
   </Card>
-  <Card title="ArgoCD" icon="fa-light fa-arrows-rotate">
-    GitOps tool for managing Kubernetes deployments.
+  <Card title="Connection-string access" icon="fa-light fa-key">
+    The app reaches Blob storage with a connection string held as a secret.
   </Card>
-  <Card title="Azure Blob Storage" icon="fa-light fa-bucket">
-    Storage Account with private endpoint and blob containers for test cases,
-    payloads, and ClickHouse backups.
+  <Card title="Azure Function code executor" icon="fa-light fa-code">
+    Required for code-based and transformer metrics: a Function that runs the mirrored image.
+  </Card>
+  <Card title="Key Vault + Managed Redis" icon="fa-light fa-lock">
+    Recommended: a vault for the External Secrets Operator, and managed Redis.
   </Card>
 </CardGroup>
 
+ClickHouse runs inside the cluster (the Helm chart installs it). The recommended setup keeps secrets in Key Vault and runs Redis on Azure Managed Redis; in-cluster Redis and a Kubernetes Secret remain available as a simpler option. Cluster add-ons such as an ingress controller or the External Secrets Operator are your choice and are not installed by Terraform.
+
+## How it fits together
+
+- **Blob uses a connection string; the rest is keyless.** The app reaches Blob storage with `AZURE_STORAGE_CONNECTION_STRING`, held as a secret. AKS still has Workload Identity enabled, which the External Secrets Operator uses to read Key Vault through a federated credential.
+- **The data plane is private.** AKS nodes and the Flexible Server sit in the VNet, with the database on a delegated subnet and a private DNS zone. You choose whether the cluster API endpoint is public (handy for `kubectl` and `helm` from your laptop) or private-only.
+- **Traffic flows one way in.** Your applications send traces to `confident-otel`, which writes them to ClickHouse. The dashboard and API read from the Flexible Server and ClickHouse. Evaluations run in `confident-evals` and its workers, calling your model provider and the Azure Function sandbox for code and transformer metrics. Datasets and payloads live in Blob storage.
+
 ## Deployed services
 
-The Kubernetes cluster runs the following services:
+The Helm chart installs these workloads into the `confident-ai` namespace:
 
-| Service                 | Namespace                  | Description                                            |
-| ----------------------- | -------------------------- | ------------------------------------------------------ |
-| **confident-backend**   | confident-ai               | Express.js API service handling core platform logic    |
-| **confident-frontend**  | confident-ai               | Next.js web application for the Confident AI dashboard |
-| **confident-evals**     | confident-ai               | FastAPI service for running LLM evaluations            |
-| **confident-otel**      | confident-ai               | OpenTelemetry collector for trace ingestion            |
-| **redis**               | confident-ai               | In-memory cache for session and queue management       |
-| **ArgoCD**              | argocd                     | GitOps continuous delivery                             |
-| **ClickHouse Operator** | clickhouse-operator-system | Manages the analytics database                         |
-| **NGINX Ingress**       | ingress-nginx              | Routes external traffic to services via Azure LB       |
-| **External Secrets**    | confident-ai               | Syncs credentials from Azure Key Vault                 |
-| **cert-manager**        | cert-manager               | Automates TLS certificate issuance and renewal         |
+| Service | Role |
+| --- | --- |
+| `confident-backend` | Core API |
+| `confident-frontend` | The dashboard |
+| `confident-evals` | Evaluation service |
+| `confident-evals-worker` | Async evaluation jobs |
+| `confident-ingestion-worker` | Trace ingestion |
+| `confident-worker` | Background jobs |
+| `confident-otel` | OTLP and trace collector |
+| ClickHouse and Keeper | Trace and span store |
+| Redis | Cache and queues (in-cluster unless you use Azure Managed Redis) |
+
+See [Scaling](/self-hosting/scaling) for how each of these grows with load.
+
+## Defaults
+
+| Component | Default |
+| --- | --- |
+| Node pool | 4 x `Standard_D8s_v5` |
+| Region | `centralus` |
+| Cluster endpoint | Private (`confident_public_aks = true` to reach it from your machine) |
+| PostgreSQL | `GP_Standard_D4s_v3`, private, high availability |
+| Storage class | `managed-csi` (in-cluster ClickHouse and Redis disks) |
+
+Everything above is overridable in the Terraform module. See the module inputs for the full list.
+
+## The module
+
+The module is published to the Terraform Registry and its source lives on GitHub.
+
+<CardGroup cols={2}>
+  <Card title="Terraform Registry" icon="fa-light fa-cube" href="https://registry.terraform.io/modules/confident-ai/confident-ai/azurerm/latest">
+    `confident-ai/confident-ai/azurerm`
+  </Card>
+  <Card title="Source on GitHub" icon="fa-brands fa-github" href="https://github.com/confident-ai/terraform-azurerm-confident-ai">
+    `terraform-azurerm-confident-ai`
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+- `terraform` (≥ 1.5), the `az` CLI, `kubectl`, `helm` (≥ 3.8), and `docker` (to mirror the code sandbox image).
+- `az login`, with the subscription set for the provider: `export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)`.
+- From Confident AI: image pull credentials and a `CONFIDENT_LICENSE_KEY` (see [Deploy with Helm](/self-hosting/azure/deploy)).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Infrastructure" icon="fa-light fa-layer-group" href="/self-hosting/azure/infrastructure">
+    Provision AKS, PostgreSQL, and Blob storage with Terraform.
+  </Card>
+  <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/azure/deploy">
+    Install the app and expose it over HTTPS.
+  </Card>
+</CardGroup>

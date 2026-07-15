@@ -1,0 +1,102 @@
+---
+slug: self-hosting/faq
+description: Common questions about running Confident AI in your own cloud
+---
+
+Answers to the questions teams ask most often before and during a self-hosted rollout. For hands-on help, see [Troubleshooting](/self-hosting/troubleshooting) and [Scaling](/self-hosting/scaling), or talk to the platform team.
+
+## Access and licensing
+
+<AccordionGroup>
+
+<Accordion title="Do I need an Enterprise license to self-host?">
+Yes. Self-hosting is an Enterprise capability. Your license comes with a signed `CONFIDENT_LICENSE_KEY` and credentials to pull the container images. [Talk to the platform team](https://www.confident-ai.com/book-a-demo) to get set up.
+</Accordion>
+
+<Accordion title="How do I get the container images and the license key?">
+Confident AI provides both with your Enterprise plan: an AWS access key ID and secret to pull the first-party images from our registry, and the `CONFIDENT_LICENSE_KEY`. The chart uses the credentials to mint and refresh the image pull secret for you.
+</Accordion>
+
+<Accordion title="What happens without a license key?">
+The app starts, but every feature is gated off until a valid `CONFIDENT_LICENSE_KEY` is present. The key is verified inside your cluster, with no call out to a license server, so it also works in air-gapped environments.
+</Accordion>
+
+</AccordionGroup>
+
+## Data and security
+
+<AccordionGroup>
+
+<Accordion title="Does any of my data leave my network?">
+No. All application data (traces, datasets, prompts, evaluation results) lives in the cloud services Terraform provisions in your account. Confident AI has no access to it and receives no telemetry. See [Security & Compliance](/self-hosting/security-and-compliance).
+</Accordion>
+
+<Accordion title="Is `OPENAI_API_KEY` required?">
+No. It backs the built-in Confident AI evaluation provider, which runs on OpenAI. It is optional: omit it and connect your own model provider or an LLM gateway per project from AI Connections in the app.
+</Accordion>
+
+<Accordion title="Can I run fully air-gapped?">
+Yes. Confident AI provides offline image delivery and self-hosted LLM options for evaluations, and the license key is verified locally. Talk to the platform team for an air-gapped rollout.
+</Accordion>
+
+<Accordion title="How do I authenticate users?">
+Email and password, Google OAuth, or your SSO provider over SAML or OIDC. Set `config.disableNonSsoLogin: true` to require SSO and turn off password login.
+</Accordion>
+
+</AccordionGroup>
+
+## Architecture and infrastructure
+
+<AccordionGroup>
+
+<Accordion title="Can I bring my own Kubernetes cluster?">
+Yes. The Terraform module is a convenience for standing up a cluster, database, and storage. If you already run a conformant cluster, skip Terraform and install the Helm chart directly, pointing it at your own PostgreSQL, object storage, and identity.
+</Accordion>
+
+<Accordion title="Can I use my own PostgreSQL or Redis?">
+Yes. Point `secrets.data.DATABASE_URL` (or your secret store) at any reachable PostgreSQL, and set `redis.internal: false` with `redis.externalUrl` to use managed or existing Redis. ClickHouse is deployed in-cluster by the chart.
+</Accordion>
+
+<Accordion title="Do I have to use a cloud secret store and managed Redis?">
+They are the recommended production setup, and each cloud guide enables them. You can instead hold secrets in a Kubernetes Secret and run Redis in-cluster, see the "Simpler option" on each Deploy page.
+</Accordion>
+
+<Accordion title="Do I need the code executor?">
+Yes, if you use code-based or transformer metrics. Those run in a sandboxed function (Lambda, Cloud Run, or Azure Function) built from an image you mirror into your own registry. It is set up in the Infrastructure step of each cloud guide.
+</Accordion>
+
+<Accordion title="Which clouds are supported?">
+AWS (EKS), GCP (GKE), and Azure (AKS), each with a published Terraform module. For a quick trial on one machine, use the [POC environment](/self-hosting/poc-environments) with Docker Compose.
+</Accordion>
+
+</AccordionGroup>
+
+## Operations
+
+<AccordionGroup>
+
+<Accordion title="How do I upgrade to a new version?">
+Set `image.tag` to the new version and run `helm upgrade` with your values file. Images are version-pinned, so nothing changes until you do. Review the release notes for any migration steps.
+</Accordion>
+
+<Accordion title="How do I rotate a secret?">
+With a cloud secret store, write a new version to the store and the External Secrets Operator re-syncs it into the cluster on its own. With a Kubernetes Secret, update the value and run `helm upgrade`.
+
+The app reads secrets as environment variables at startup, so a changed Secret does not reach a running pod until it restarts. Restart the deployed pods to pick up the new value:
+
+```bash
+kubectl rollout restart deployment -n confident-ai
+```
+
+A `helm upgrade` that changes a chart-managed Secret already rolls the pods for you. A cloud secret-store rotation happens out of band, so run the restart yourself.
+</Accordion>
+
+<Accordion title="How are backups handled?">
+The managed database takes automated backups and supports high availability. Object storage carries provider-level durability. ClickHouse runs on persistent volumes with an optional nightly backup to object storage. Redis holds cache and queue state, so it is safe to lose. See [Disaster Recovery](/self-hosting/disaster-recovery) for the full picture.
+</Accordion>
+
+<Accordion title="How do I scale the deployment?">
+Each layer scales independently: application workloads through the chart's HPA settings, ClickHouse through storage and shards, the database and managed Redis through their cloud instance size, and the cluster through its node pool. See [Scaling](/self-hosting/scaling).
+</Accordion>
+
+</AccordionGroup>

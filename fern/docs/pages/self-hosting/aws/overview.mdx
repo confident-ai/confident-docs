@@ -1,57 +1,105 @@
 ---
 slug: self-hosting/aws/overview
-description: Deploy Confident AI on Amazon Web Services (AWS)
+description: Deploy Confident AI on AWS with EKS, RDS, and S3
 ---
 
-Deploy Confident AI on your AWS infrastructure for complete control over your evaluation and observability platform.
+Run the full Confident AI platform on AWS, inside your own account and region. A published Terraform module stands up an EKS cluster, a managed RDS PostgreSQL database, and S3 object storage, and the `confident-ai` Helm chart deploys the application on top. The app reaches S3 through EKS Pod Identity, so there are no access keys, and no IRSA or OIDC wiring to manage.
 
-## Architecture
+You run it in two steps: [Infrastructure](/self-hosting/aws/infrastructure) provisions the cloud resources with Terraform, then [Deploy with Helm](/self-hosting/aws/deploy) installs the app and exposes it over HTTPS. Plan for roughly 15 to 20 minutes of Terraform time plus a few minutes for the chart to come up.
 
-The AWS deployment uses Terraform to provision a production-ready infrastructure with the following components:
-
-<Frame caption="AWS Self-Hosting Reference Architecture">
+<Frame caption="AWS reference architecture">
     <img data-image="selfHosting.aws.architecture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
 </Frame>
 
-## Core components
+## What Terraform provisions
+
+The module deploys into a VPC you already have. It never creates one.
 
 <CardGroup cols={3}>
-  <Card title="VPC & Networking" icon="fa-light fa-network-wired">
-    Public/private/database subnets with NAT Gateway, Internet Gateway, and S3
-    VPC Endpoint.
+  <Card title="Amazon EKS" icon="fa-light fa-dharmachakra">
+    A cluster with a managed node group and the EBS CSI and Pod Identity add-ons.
   </Card>
-  <Card title="EKS Cluster" icon="fa-light fa-dharmachakra">
-    Managed Kubernetes with autoscaling node groups and EBS CSI driver.
+  <Card title="Amazon RDS for PostgreSQL" icon="fa-light fa-database">
+    The app's primary database, private in your subnets, Multi-AZ with automated backups.
   </Card>
-  <Card title="RDS PostgreSQL" icon="fa-light fa-database">
-    Managed database in isolated subnets with automated backups, encryption, and
-    password rotation.
+  <Card title="Amazon S3" icon="fa-light fa-bucket">
+    Two buckets, one for test cases and one for payloads, private and encrypted at rest.
   </Card>
-  <Card title="ALB" icon="fa-light fa-scale-balanced">
-    HTTPS load balancer managed by ALB Controller with ACM certificates.
+  <Card title="EKS Pod Identity" icon="fa-light fa-fingerprint">
+    An IAM role bound to the app's Kubernetes ServiceAccount, scoped to the buckets and the sandbox. No access keys, no IRSA.
   </Card>
-  <Card title="ArgoCD" icon="fa-light fa-arrows-rotate">
-    GitOps tool for managing Kubernetes deployments.
+  <Card title="Lambda code executor" icon="fa-light fa-code">
+    Required for code-based and transformer metrics: a sandboxed Lambda that runs the mirrored image.
   </Card>
-  <Card title="S3 Storage" icon="fa-light fa-bucket">
-    Private buckets for test cases, payloads, and ClickHouse backups with VPC endpoint access.
+  <Card title="Secrets Manager + ElastiCache" icon="fa-light fa-key">
+    Recommended: a secret for the External Secrets Operator, and managed Redis.
   </Card>
 </CardGroup>
 
-<div data-cta="self-hosting-aws" />
+ClickHouse runs inside the cluster (the Helm chart installs it). The recommended setup keeps secrets in Secrets Manager and runs Redis on ElastiCache; in-cluster Redis and a Kubernetes Secret remain available as a simpler option. Cluster add-ons such as an ingress controller or the External Secrets Operator are your choice and are not installed by Terraform.
+
+## How it fits together
+
+- **Identity is keyless.** The app pods run as a Kubernetes ServiceAccount tied to an IAM role through an EKS Pod Identity association. That role has least-privilege access to the two buckets and permission to invoke the Lambda sandbox. There is nothing static to store or rotate, and the ServiceAccount needs no annotation.
+- **The data plane is private.** Nodes and RDS sit in private subnets and reach the internet only through a NAT gateway. You choose whether the cluster API endpoint is public (handy for `kubectl` and `helm` from your laptop) or private-only.
+- **Traffic flows one way in.** Your applications send traces to `confident-otel`, which writes them to ClickHouse. The dashboard and API read from RDS and ClickHouse. Evaluations run in `confident-evals` and its workers, calling your model provider and the Lambda sandbox for code and transformer metrics. Datasets and payloads live in S3.
 
 ## Deployed services
 
-The Kubernetes cluster runs the following services:
+The Helm chart installs these workloads into the `confident-ai` namespace:
 
-| Service                 | Namespace           | Description                                            |
-| ----------------------- | ------------------- | ------------------------------------------------------ |
-| **confident-backend**   | confident-ai        | Express.js API service handling core platform logic    |
-| **confident-frontend**  | confident-ai        | Next.js web application for the Confident AI dashboard |
-| **confident-evals**     | confident-ai        | FastAPI service for running LLM evaluations            |
-| **confident-otel**      | confident-ai        | OpenTelemetry collector for trace ingestion            |
-| **redis**               | confident-ai        | In-memory cache for session and queue management       |
-| **ArgoCD**              | argocd              | GitOps continuous delivery                             |
-| **ClickHouse Operator** | clickhouse-operator | Manages the analytics database                         |
-| **ALB Controller**      | kube-system         | Creates ALBs from Kubernetes Ingress resources         |
-| **External Secrets**    | confident-ai        | Syncs credentials from AWS Secrets Manager             |
+| Service | Role |
+| --- | --- |
+| `confident-backend` | Core API |
+| `confident-frontend` | The dashboard |
+| `confident-evals` | Evaluation service |
+| `confident-evals-worker` | Async evaluation jobs |
+| `confident-ingestion-worker` | Trace ingestion |
+| `confident-worker` | Background jobs |
+| `confident-otel` | OTLP and trace collector |
+| ClickHouse and Keeper | Trace and span store |
+| Redis | Cache and queues (in-cluster unless you use ElastiCache) |
+
+See [Scaling](/self-hosting/scaling) for how each of these grows with load.
+
+## Defaults
+
+| Component | Default |
+| --- | --- |
+| Node group | 4 x `m6i.2xlarge` |
+| Region | From your AWS provider and profile (no region variable) |
+| Cluster endpoint | Private (`confident_public_eks = true` to reach it from your machine) |
+| RDS | Multi-AZ, private, deletion protection available |
+| Storage class | None by default, you create a gp3 default on the Infrastructure page |
+
+Everything above is overridable in the Terraform module. See the module inputs for the full list.
+
+## The module
+
+The module is published to the Terraform Registry and its source lives on GitHub.
+
+<CardGroup cols={2}>
+  <Card title="Terraform Registry" icon="fa-light fa-cube" href="https://registry.terraform.io/modules/confident-ai/confident-ai/aws/latest">
+    `confident-ai/confident-ai/aws`
+  </Card>
+  <Card title="Source on GitHub" icon="fa-brands fa-github" href="https://github.com/confident-ai/terraform-aws-confident-ai">
+    `terraform-aws-confident-ai`
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+- `terraform` (≥ 1.5), the `aws` CLI, `kubectl`, `helm` (≥ 3.8), and `docker` (to mirror the code sandbox image).
+- AWS credentials (`aws configure` or SSO) allowed to create EKS, RDS, S3, and IAM.
+- From Confident AI: image pull credentials and a `CONFIDENT_LICENSE_KEY` (see [Deploy with Helm](/self-hosting/aws/deploy)).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Infrastructure" icon="fa-light fa-layer-group" href="/self-hosting/aws/infrastructure">
+    Provision EKS, RDS, and S3 with Terraform.
+  </Card>
+  <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/self-hosting/aws/deploy">
+    Install the app and expose it over HTTPS.
+  </Card>
+</CardGroup>
