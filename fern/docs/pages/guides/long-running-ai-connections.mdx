@@ -122,14 +122,7 @@ The test run is created immediately and stays **in progress** while it waits for
 
 When your agent finishes a test case, post its result to the results endpoint using the `testCaseId` from that request's payload, authenticated with your **Project API Key**:
 
-```bash
-curl -X POST https://api.confident-ai.com/v1/test-runs/evaluate/<TEST-CASE-ID> \
-  -H "Content-Type: application/json" \
-  -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-  -d '{
-    "actualOutput": "The capital of France is Paris."
-  }'
-```
+<EndpointRequestSnippet endpoint="POST /v1/test-runs/evaluate/{testCaseId}" />
 
 All fields are optional — anything you leave out falls back to the value from the golden:
 
