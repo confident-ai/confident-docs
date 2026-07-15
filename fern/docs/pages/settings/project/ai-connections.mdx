@@ -39,7 +39,7 @@ Choose a response mode based on how your endpoint responds:
 - **HTTP Streaming**: returns a stream of newline-delimited chunks.
 - **SSE Streaming**: returns a stream of Server-Sent Events.
 
-For streaming endpoints, see [Streaming](/docs/settings/project/ai-connections/streaming) to configure chunk formats, SSE event names, and accumulate mode.
+For streaming endpoints, see [Streaming](/docs/settings/project/ai-connections/streaming) to configure chunk formats, SSE event names, and accumulate mode. For agents that take minutes or hours to respond, see [Async Responses](/docs/settings/project/ai-connections/async-responses) to acknowledge each request immediately and post results back later.
 
 ## Payload
 
@@ -348,6 +348,14 @@ Now that your AI connection is set up, dive into the pieces that make it product
   >
     Stream output over HTTP Streaming or SSE, with event names and accumulate
     mode.
+  </Card>
+  <Card
+    title="Async Responses"
+    icon="fa-light fa-hourglass-half"
+    href="/docs/settings/project/ai-connections/async-responses"
+  >
+    Evaluate long-running agents by acknowledging each request and posting
+    results back later.
   </Card>
   <Card
     title="Authorization"
