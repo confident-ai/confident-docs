@@ -1,0 +1,102 @@
+---
+slug: self-hosting/scaling
+description: Scale a self-hosted Confident AI deployment across its application, data, and cluster layers
+---
+
+The chart ships production defaults that run comfortably for most teams. As load grows, scale each layer on its own: the application workloads, ClickHouse, Redis, PostgreSQL, and the cluster underneath them. This page maps the knobs to the layer they control.
+
+## Application workloads
+
+Each service is a separate Deployment with its own replica count, autoscaler, and resources. Horizontal Pod Autoscaling is on by default at 70% CPU:
+
+| Workload | Default replicas | Autoscaling (min to max) | Scales with |
+| --- | --- | --- | --- |
+| `backend` | 2 | 2 to 6 | API and dashboard traffic |
+| `frontend` | 1 | fixed | Dashboard traffic (stateless) |
+| `evals` | 2 | 2 to 6 | Synchronous evaluation requests |
+| `evals-worker` | 2 | 2 to 10 | Async evaluation throughput |
+| `ingestion-worker` | 2 | 2 to 4 | Trace ingestion volume |
+| `worker` | 2 | 2 to 4 | Background jobs |
+| `otel` | 2 | 2 to 6 | Trace and OTLP ingest rate |
+
+`evals-worker` and `otel` are the two to watch under heavy evaluation and tracing load. Raise their ceilings first.
+
+Tune the autoscaler, or pin a fixed size, per workload:
+
+```yaml
+evalsWorker:
+  autoscaling:
+    enabled: true
+    minReplicas: 4
+    maxReplicas: 20
+    targetCPU: 70
+
+# Or pin a fixed count instead of autoscaling:
+backend:
+  autoscaling:
+    enabled: false
+  replicas: 4
+```
+
+## Resources
+
+Right-size CPU and memory per workload with `<workload>.resources`. The evaluation services (`evals`, `evals-worker`) do the heaviest work, since they orchestrate model calls, so give them the most memory headroom:
+
+```yaml
+evals:
+  resources:
+    requests: { cpu: "1", memory: 2Gi }
+    limits:   { cpu: "2", memory: 4Gi }
+```
+
+## ClickHouse (traces and spans)
+
+ClickHouse stores all trace and span data, so it grows with retention and ingest volume. Defaults: 2 replicas, 1 shard, 256Gi of storage, and a 3-node Keeper quorum.
+
+```yaml
+clickhouse:
+  replicas: 2          # read availability
+  shards: 1            # raise only for very high ingest
+  storage: 512Gi       # grow for longer retention
+  keeper:
+    replicas: 3        # keep at 3 for quorum
+    storage: 20Gi
+```
+
+Size storage for growth from the start: expanding a volume is straightforward, shrinking it is not. Add shards only when a single shard can no longer keep up with ingest, since sharding adds operational overhead. Keep Keeper at 3 replicas for a healthy quorum.
+
+## Redis
+
+The in-cluster Redis is fine for small and medium deployments. For higher throughput and managed durability, use the cloud's managed Redis (the recommended setup on each cloud), which scales without consuming cluster capacity:
+
+```yaml
+redis:
+  internal: false
+  externalUrl: <redis_url>
+```
+
+## PostgreSQL
+
+The database is a managed service (RDS, Cloud SQL, or Flexible Server). Scale it through Terraform rather than the chart: increase the instance size and keep high availability on. The defaults already run HA. Storage grows with your cloud's autogrow settings.
+
+## Cluster capacity
+
+Application autoscaling only helps if the cluster has room to schedule the new pods. Size the node pool in Terraform:
+
+| Cloud | Default node pool |
+| --- | --- |
+| AWS | 4 x `m6i.2xlarge` |
+| GCP | 4 x `n2-standard-8` |
+| Azure | 4 x `Standard_D8s_v5` |
+
+Raise the node count or instance size for more headroom, and enable your cloud's cluster autoscaler so nodes are added as HPA scales workloads out.
+
+## Object storage
+
+S3, GCS, and Blob scale automatically. There is nothing to tune.
+
+## Starting points
+
+- **Trial or small team**: set app replicas to 1, `autoscaling.enabled: false`, and a smaller `clickhouse.storage`. This is close to the [POC](/self-hosting/poc-environments) footprint but on a real cluster.
+- **Production**: begin with the shipped defaults, which serve low to moderate traffic comfortably.
+- **High volume**: raise `evals-worker` and `otel` autoscaling ceilings, grow `clickhouse.storage` (and add a shard if ingest is very high), move to managed Redis, and add nodes or a cluster autoscaler.

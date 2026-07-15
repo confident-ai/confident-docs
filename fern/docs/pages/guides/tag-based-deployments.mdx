@@ -1,0 +1,183 @@
+---
+title: Set Up Automated Enterprise Tag-Based Deployments
+subtitle: Roll out a new image automatically whenever a version tag is published.
+slug: guides/tag-based-deployments
+description: Wire a self-hosted Confident AI deployment to update its image automatically when a new semver tag (x.y.z) is published, using CI, GitOps, or an in-cluster poller.
+---
+
+## Overview
+
+Confident AI ships each release as a semver-tagged container image (`vX.Y.Z`), and a self-hosted deployment pins that tag in its Helm values (`image.tag`). Tag-based deployment automates the step in between: when a new tag is published, your tooling bumps `image.tag` and rolls the release, so you are never hand-editing a values file to ship a version.
+
+This guide is for Enterprise customers already running the [self-hosted Helm chart](/docs/self-hosting/introduction). It covers three ways to wire this up, from a single CI job to full GitOps, and the guardrails that keep an automated rollout safe.
+
+<Note>
+Every install and upgrade runs a database migration job, so a tag bump is a real release, not a hot image swap. Roll it out in staging first, and read [Disaster Recovery](/docs/self-hosting/disaster-recovery) before you let production update on its own.
+</Note>
+
+## How Versioning Works
+
+The first-party images are addressed as `<registry>/confidentai/confident-<service>:<tag>`, and every service in a release shares the same tag. The chart resolves them from a single knob:
+
+```yaml
+image:
+  tag: "v2.0.18"   # pin explicitly; defaults to the chart's appVersion when empty
+```
+
+All you automate is that one value. Pin it explicitly rather than floating on a mutable tag, so a rollout is always a deliberate, reviewable change.
+
+## Choose an Approach
+
+<Note>
+These three approaches are illustrative starting points, not prescriptions. The best setup is the delivery pipeline your team already runs and trusts. If you have a battle-tested CI or GitOps workflow, fold `image.tag` into it rather than adopting new tooling from this guide.
+</Note>
+
+| Approach | What triggers the update | Best for |
+| --- | --- | --- |
+| CI pipeline on tag push | You push a `vX.Y.Z` git tag in your ops repo, and CI runs `helm upgrade` | Teams with existing CI and no GitOps |
+| GitOps image automation | A controller watches the registry and commits the new tag to git | Teams already running Argo CD or Flux |
+| In-cluster poller (Keel) | Keel watches the registry and patches the workloads directly | The quickest path, when git-backed history is not required |
+
+For an auditable, declarative setup, GitOps is the strongest fit for enterprise. A CI pipeline is the simplest path that still gives you review and rollback through git.
+
+## Option A: CI Pipeline on Tag Push
+
+Keep your Helm values in an ops repo. Cutting a release is then pushing a git tag whose name is the image tag you want live. The example below uses GitHub Actions:
+
+```yaml
+name: deploy-confident-ai
+on:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # federate into your cloud, no long-lived keys
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get cluster credentials
+        run: |
+          # AWS:   aws eks update-kubeconfig --name <cluster> --region <region>
+          # GCP:   gcloud container clusters get-credentials <cluster> --region <region>
+          # Azure: az aks get-credentials --resource-group <rg> --name <cluster>
+
+      - name: Deploy the tag
+        run: |
+          helm upgrade confident-ai \
+            oci://ghcr.io/confident-ai/charts/confident-ai --version 0.1.0 \
+            -n confident-ai -f values.yaml \
+            --set image.tag=${GITHUB_REF_NAME} \
+            --wait --timeout 15m
+```
+
+The image tag comes from the git tag (`GITHUB_REF_NAME`), and `--wait` holds the job open until the rollout is healthy so a bad release fails the pipeline. Give the runner cluster access through your cloud's OIDC federation rather than a stored kubeconfig, and keep application secrets in the cloud secret store the deployment already uses, never in the repo.
+
+To promote safely, point the tag push at staging first, then gate production behind a manual approval (a GitHub Environment) that deploys the same tag.
+
+## Option B: GitOps Image Automation
+
+If you run GitOps, declare the release in git and let a controller bump the tag for you.
+
+<Tabs>
+
+<Tab title="Argo CD">
+
+Argo CD Image Updater watches the registry and writes the new tag back to your git manifests, and Argo CD syncs the change. Annotate the Application:
+
+```yaml
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: confident=<registry>/confidentai/confident-backend
+    argocd-image-updater.argoproj.io/confident.update-strategy: semver
+    argocd-image-updater.argoproj.io/confident.allow-tags: regexp:^v\d+\.\d+\.\d+$
+    argocd-image-updater.argoproj.io/confident.helm.image-tag: image.tag
+    argocd-image-updater.argoproj.io/write-back-method: git
+```
+
+`confident-backend` is the version reference for the whole release, since every service shares the tag. Image Updater needs pull and list access to the registry, so give it the same credentials your deployment uses.
+
+</Tab>
+
+<Tab title="Flux">
+
+Flux scans tags with an `ImagePolicy`, and `ImageUpdateAutomation` commits the new tag into your `HelmRelease`:
+
+```yaml
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: confident
+spec:
+  image: <registry>/confidentai/confident-backend
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: confident
+spec:
+  imageRepositoryRef:
+    name: confident
+  policy:
+    semver:
+      range: ">=2.0.0"
+```
+
+Mark the tag in your `HelmRelease` with the `# {"$imagepolicy": "flux-system:confident:tag"}` comment so the automation knows where to write it.
+
+</Tab>
+
+</Tabs>
+
+Because the tag lands in git, every rollout is a commit you can review, and a rollback is a `git revert`.
+
+## Option C: In-Cluster Poller
+
+[Keel](https://keel.sh) watches the registry and updates the workloads directly, with no git in the loop. Set a policy on the release so it only tracks the tags you want:
+
+```yaml
+# in your Helm values, applied to the app workloads
+podAnnotations:
+  keel.sh/policy: patch          # patch | minor | major, or a semver range
+  keel.sh/trigger: poll
+  keel.sh/pollSchedule: "@every 5m"
+```
+
+This is the fastest to stand up, and a good fit for a staging cluster that should always run the newest release. For production, prefer Option A or B, where the change is recorded and reversible.
+
+## Guardrails
+
+The mechanics are easy. These are the practices that keep an automated rollout from becoming an automated outage:
+
+- **Pin, and constrain the policy.** Never float on a mutable tag. Let patch releases (`~> 2.0.x`) update automatically for low risk, and hold minor and major bumps behind manual approval.
+- **Migrations run on every upgrade.** A tag bump runs the database migration job. Take a database snapshot beforehand in production, and always let staging update first.
+- **Promote, do not double-deploy.** Deploy a tag to staging, then promote the exact same tag to production. Never let two environments resolve a floating tag independently.
+- **Let health gate the rollout.** The chart's readiness probes hold a rolling update until the new pods are healthy. Keep `--wait` (CI) or sync health checks (GitOps) on, so a failed release stops rather than replaces a working one.
+- **Know your rollback.** `helm rollback confident-ai` returns to the previous release; under GitOps, revert the commit. Rehearse it once so it is muscle memory.
+- **Give the automation registry access.** Whatever watches for new tags needs list and pull access to the registry, so reuse the credentials your deployment already holds.
+
+## Verify
+
+Publish a tag to your staging path and watch it land:
+
+```bash
+kubectl rollout status deployment/confident-backend -n confident-ai
+kubectl get pods -n confident-ai -o jsonpath='{.items[*].spec.containers[*].image}' | tr ' ' '\n' | sort -u
+```
+
+The image line should show your new tag, and the rollout should report success. Under Argo CD or Flux, confirm the tag was committed to git and the application is `Synced` and `Healthy`.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Deploy with Helm" icon="fa-light fa-rocket" href="/docs/self-hosting/gcp/deploy">
+    The base install these deployments build on.
+  </Card>
+  <Card title="Disaster Recovery" icon="fa-light fa-shield-heart" href="/docs/self-hosting/disaster-recovery">
+    Back up before you automate migrations in production.
+  </Card>
+</CardGroup>

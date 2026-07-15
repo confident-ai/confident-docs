@@ -1,0 +1,49 @@
+---
+slug: self-hosting/disaster-recovery
+description: What a self-hosted Confident AI deployment survives by default, and how to recover each layer
+---
+
+A self-hosted deployment is built to ride out everyday failures (a pod, a node, a zone) without intervention, and to recover from larger ones using durable copies you control. This page covers what is resilient by default and how to recover each layer.
+
+## ClickHouse (traces and spans)
+
+- **Replicated and highly available by default.** The chart runs a replicated ClickHouse cluster (`clusterType: replicated`) with 2 replicas, coordinated by a 3-node Keeper quorum. If a replica pod or its node fails, the other replica keeps serving and the recovered replica resyncs through Keeper on its own.
+- **Data survives pod and node loss.** Each replica and each Keeper node stores data on a persistent volume (EBS on AWS, Persistent Disk on GCP, managed disk on Azure). The volume is independent of the pod: when a pod is rescheduled, Kubernetes reattaches the same volume, so a restart or node failure loses no data.
+- **Scheduled backups to object storage.** For recovery from accidental deletion or total cluster loss, enable the nightly backup CronJob, which runs `BACKUP DATABASE` to a bucket Terraform provisions:
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: s3            # s3 | gcs | azure
+    schedule: "0 2 * * *"   # nightly at 02:00
+    s3:
+      bucket: <clickhouse_backup_bucket>
+      region: <region>
+```
+
+Provision the bucket with `confident_clickhouse_backup_bucket_enabled = true` in Terraform and read its name from `terraform output clickhouse_backup_bucket`. On AWS the backup pod authenticates with Pod Identity (no keys in the job); GCS uses HMAC keys and Azure uses the storage connection string, supplied through `credentialsSecret`.
+
+- **Recovery.** A lost replica rebuilds from the healthy one automatically. For a full restore, run `RESTORE DATABASE` from the latest backup in the bucket.
+
+## Kubernetes
+
+- **Managed control plane.** EKS, GKE, and AKS run the control plane with the cloud provider's own HA and backups. You never manage etcd.
+- **Self-healing workloads.** Every application service runs two or more replicas with autoscaling, spread across nodes and across availability zones (AWS uses a two-AZ node group, GCP a regional cluster). A failed pod is rescheduled, and a failed node's pods move to a healthy one.
+- **The platform is reproducible.** Everything is declarative: Terraform for the infrastructure, Helm for the app. If a cluster is lost entirely, `terraform apply` rebuilds it and `helm install` redeploys the app, and the data layers below reconnect. Keep your Terraform state in the remote backend and your values file in version control so a rebuild is a matter of minutes, not archaeology.
+
+## PostgreSQL
+
+- **Managed with automatic failover.** The database is RDS (Multi-AZ), Cloud SQL (regional HA), or Flexible Server (zone-redundant HA). A zone or instance failure fails over to the standby without a config change.
+- **Automated backups and point-in-time recovery.** Each cloud takes scheduled backups and lets you restore to any point in the retention window. Keep deletion protection on in production (`confident_rds_deletion_protection = true` on AWS).
+- **Recovery.** Restore to a point in time or from a snapshot in the cloud console, then update `DATABASE_URL` if the endpoint changed.
+
+## Object storage (datasets and payloads)
+
+- **Durable and replicated by the cloud.** S3, GCS, and Blob store objects redundantly across a region, so hardware failure is handled for you.
+- **Enable versioning for accidental deletes.** Turn on bucket versioning or soft delete so an overwritten or deleted object can be restored. For a stronger posture, enable cross-region replication.
+- **Recovery.** Restore a previous object version, or fail over to the replica bucket if cross-region replication is on.
+
+## Run the drill
+
+Before you depend on any of this, exercise it once: enable ClickHouse backups and confirm an object lands in the bucket, take a database snapshot and restore it to a scratch instance, and delete a ClickHouse replica pod to watch it resync. A recovery path you have run is the only one you can trust.

@@ -1,276 +1,196 @@
 ---
 slug: self-hosting/security-and-compliance
-description: Security, compliance, and data handling for self-hosted Confident AI deployments
+description: The full security model of a self-hosted Confident AI deployment, written for a security review
 ---
 
-## Overview
+Self-hosting exists for one reason: your data and the keys that protect it never leave your control. Everything runs inside your own cloud account, in the region you choose, on infrastructure your team already governs. Confident AI operates none of it and has no path to it.
 
-This page provides detailed security information for your security team's review. It covers:
+This page is written for a security review. It covers what data exists and where it lives, how it is encrypted, how the app authenticates to your cloud, how the network is isolated, what leaves your network and what does not, and how the deployment fits your compliance program.
 
-- Network architecture and traffic flow
-- Integration points with your existing infrastructure
-- Authentication and access control
-- Data retention and storage
-- Encryption at rest and in transit
-- Logging and audit capabilities
+## The short version
 
-All self-hosted deployments—regardless of cloud provider—follow these security principles. Provider-specific implementation details are covered in the respective deployment guides.
+<CardGroup cols={2}>
+  <Card title="Your account, your data" icon="fa-light fa-building-shield">
+    All application data lives in cloud services provisioned inside your project. Confident AI has no access and receives nothing.
+  </Card>
+  <Card title="No static credentials" icon="fa-light fa-key">
+    The app reaches your cloud through the platform's own workload identity. There are no access keys or service-account files to store or leak.
+  </Card>
+  <Card title="Private by default" icon="fa-light fa-network-wired">
+    The database and cache sit on private IPs. You decide whether anything is reachable from the internet.
+  </Card>
+  <Card title="You control upgrades" icon="fa-light fa-code-branch">
+    Images are version-pinned and you choose when to upgrade. Nothing changes underneath you.
+  </Card>
+</CardGroup>
 
-## Networking
+## Ownership and data residency
 
-All traffic flows through your private network. There is no public internet ingress by default—users access Confident AI through your existing VPN, network peering, or private connectivity setup. The only outbound traffic is to LLM providers for evaluations (if using external models) and optional notification services.
+The Terraform module provisions the database, object storage, and cluster in your account and your chosen region. Because the data plane is yours:
 
-```mermaid
-flowchart TD
-    subgraph corp["Your Corporate Network"]
-        Users
-        SSO
-        CICD["CI/CD"]
-        Apps
-    end
+- Data stays inside the geographic boundary you deploy to, which is what most data-sovereignty and GDPR requirements ask for.
+- Confident AI cannot read, copy, or export your data. There is no shared control plane and no phone-home for application data.
+- Deleting a deployment deletes the data with it. You own the lifecycle end to end.
 
-    subgraph vpn["VPN / Private Connectivity"]
-    end
+## What data exists and where it lives
 
-    subgraph cloud["Your Cloud Environment (Private)"]
-        LB["Internal Load Balancer (HTTPS)"]
-        Frontend
-        Backend
-        Evals
-        DB["Database (Private)"]
-    end
+Every store is a service Terraform created in your account. Nothing is stored outside it.
 
-    LLM["LLM APIs (Outbound)"]
-
-    Users --> vpn
-    SSO --> vpn
-    CICD --> vpn
-    Apps --> vpn
-    vpn --> LB
-    LB --> Frontend
-    LB --> Backend
-    LB --> Evals
-    Backend --> DB
-    Evals --> LLM
-```
-
-### Network isolation
-
-| Component                | Network placement                            | Access                      |
-| ------------------------ | -------------------------------------------- | --------------------------- |
-| **Load balancer**        | Private subnet (or public with restrictions) | Your corporate network only |
-| **Application services** | Private subnet                               | No direct internet access   |
-| **Database**             | Private/isolated subnet                      | Application services only   |
-| **Object storage**       | Private endpoint                             | Application services only   |
-
-<Note>
-  **Internet-facing option:** For organizations that prefer public access (with
-  authentication), the load balancer can be configured as internet-facing. This
-  increases attack surface but simplifies access for distributed teams without
-  VPN.
-</Note>
-
-## Integration points
-
-The deployment supports several integration points with your existing infrastructure. All inbound connections come through your private network; outbound connections go through NAT/gateway with optional private endpoint support.
-
-| Integration              | Direction     | Protocol   | Purpose                                                                |
-| ------------------------ | ------------- | ---------- | ---------------------------------------------------------------------- |
-| **Corporate SSO**        | Inbound       | SAML/OIDC  | User authentication via your identity provider                         |
-| **LLM providers**        | Outbound      | HTTPS      | OpenAI, Azure OpenAI, Anthropic, or self-hosted models for evaluations |
-| **Private connectivity** | Bidirectional | Private    | Connect to your existing cloud infrastructure                          |
-| **Slack / Email**        | Outbound      | HTTPS/SMTP | Alert notifications and evaluation reports                             |
-| **OTEL collectors**      | Inbound       | gRPC/HTTP  | Receive traces from your LLM applications                              |
-| **CI/CD pipelines**      | Inbound       | HTTPS      | Trigger evaluations from GitHub Actions, Jenkins, etc.                 |
-
-<Note>
-  **Private endpoints:** All major cloud providers offer private endpoint
-  services (AWS PrivateLink, Azure Private Link, GCP Private Service Connect)
-  that allow integration traffic to stay within your cloud network, eliminating
-  public internet exposure.
-</Note>
-
-<Warning>
-**Outbound access to LLM providers is required for evaluations.** If your organization restricts outbound traffic, ensure the following are allowlisted:
-- `api.openai.com` (OpenAI)
-- `*.openai.azure.com` (Azure OpenAI)
-- `api.anthropic.com` (Anthropic)
-
-Alternatively, use self-hosted or on-premise LLM models that don't require external network access.
-
-</Warning>
-
-## Authentication
-
-Confident AI does not maintain its own user database for self-hosted deployments. All user authentication is handled through your corporate identity provider via SAML or OIDC. This means user credentials never touch Confident AI systems—authentication tokens are validated against your IdP directly.
-
-| Method               | Description                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| **SSO (SAML/OIDC)**  | Primary authentication method via your identity provider (Okta, Azure AD, Google Workspace, etc.) |
-| **Google OAuth**     | Optional OAuth authentication for organizations using Google Workspace                            |
-| **API keys**         | Scoped per project for programmatic access (SDK, CI/CD, integrations)                             |
-| **Service accounts** | Cloud-native IAM for service-to-service authentication (EKS Pod Identity, Workload Identity, etc.) |
-
-<Warning>
-  **Local accounts are not supported.** All human users must authenticate via
-  SSO. This ensures: - Centralized access control through your IdP - Automatic
-  deprovisioning when employees leave - Consistent MFA enforcement - Audit trail
-  in your identity system
-</Warning>
-
-### API key security
-
-API keys are used for programmatic access and have the following security properties:
-
-- **Project-scoped:** Each API key is tied to a specific project and cannot access other projects
-- **Revocable:** Keys can be revoked instantly from the dashboard or API
-- **Audited:** All API key usage is logged with request details
-- **No user impersonation:** API keys cannot perform user-level actions like changing settings
-
-<Note>
-  **Rotate API keys regularly.** We recommend rotating API keys every 90 days or
-  immediately if you suspect compromise. The dashboard shows last-used
-  timestamps to help identify unused keys.
-</Note>
-
-## Data storage and residency
-
-All application data is stored within your cloud account in the region you choose. Confident AI (the company) has no access to your data—everything remains in your infrastructure.
-
-| Data type              | Storage                              | Purpose                               |
-| ---------------------- | ------------------------------------ | ------------------------------------- |
-| **User data**          | PostgreSQL database                  | Projects, settings, user preferences  |
-| **Traces & spans**     | PostgreSQL database                  | LLM application telemetry             |
-| **Evaluation results** | PostgreSQL database                  | Metric scores, test runs, experiments |
-| **Datasets**           | PostgreSQL database + Object storage | Golden datasets, uploaded files       |
-| **Audit logs**         | Cloud logging service                | Security and compliance auditing      |
-
-<Note>
-  **Data residency:** Your data never leaves the region you deploy to. This is
-  critical for organizations with GDPR, data sovereignty, or regulatory
-  requirements that mandate data stay within specific geographic boundaries.
-</Note>
-
-## Data retention
-
-Retention periods are configurable per data type, allowing you to meet compliance requirements while managing storage costs. Data deletion is handled automatically based on your configured policies.
-
-| Data type              | Default retention           | Configurable |
-| ---------------------- | --------------------------- | ------------ |
-| **Traces & spans**     | 90 days                     | Yes          |
-| **Evaluation results** | Indefinite                  | Yes          |
-| **Uploaded files**     | 30 days                     | Yes          |
-| **Audit logs**         | Per cloud provider defaults | Yes          |
-| **Application logs**   | 14 days                     | Yes          |
-
-<Warning>
-  **Deletion is permanent.** Once data exceeds its retention period, it's
-  automatically deleted and cannot be recovered. Ensure your retention settings
-  align with your compliance and business requirements before deployment.
-</Warning>
-
-<Note>
-  Retention periods are fully configurable. Contact your Confident AI
-  representative to adjust based on your compliance requirements or modify
-  settings in the application configuration.
-</Note>
+| Data | Store | Notes |
+| --- | --- | --- |
+| Projects, users, settings, evaluation results | PostgreSQL (RDS / Cloud SQL / Flexible Server) | Private IP, managed backups |
+| Traces and spans | ClickHouse, in-cluster | Backed by encrypted volumes; optional backup bucket |
+| Datasets and uploaded files | Object storage (S3 / GCS / Blob) | Private, encrypted at rest |
+| Cache, queues, sessions | Redis, in-cluster or managed | Transient working data, not a system of record |
+| Secrets | Cloud secret store or Kubernetes Secret | See [Secrets management](#secrets-management) |
 
 ## Encryption
 
-All data is encrypted both in transit and at rest using cloud-native encryption services. Encryption keys are managed within your cloud account—Confident AI does not have access to your encryption keys.
+Data is encrypted in transit and at rest using the cloud provider's native services. The encryption keys live in your account, and Confident AI never holds them.
 
-| Layer                  | Method                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------ |
-| **In transit**         | TLS 1.2+ for all internal and external traffic                                                   |
-| **At rest (database)** | Cloud-managed encryption (AWS KMS, Azure Key Vault, GCP Cloud KMS)                               |
-| **At rest (storage)**  | Cloud-managed encryption with bucket/container policies                                          |
-| **Secrets**            | Cloud secrets manager with encryption (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) |
+| Layer | Mechanism |
+| --- | --- |
+| In transit (external) | TLS 1.2+ terminated at your ingress, on a certificate you control |
+| In transit (internal) | Traffic stays inside the cluster network and your VPC or VNet |
+| At rest (database) | Cloud-managed encryption: AWS KMS, GCP Cloud KMS, or Azure platform keys |
+| At rest (object storage) | Provider default encryption on every bucket or container |
+| At rest (volumes) | Encrypted persistent disks for ClickHouse and Redis (for example gp3 with `encrypted: true` on AWS) |
+| Secrets | Encrypted in the cloud secret store, or in a Kubernetes Secret backed by your cluster's encryption |
 
-### Encryption key management
+### Key management
 
-| Option                          | Description                                            | Recommended for                                        |
-| ------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| **Cloud-managed keys**          | Default encryption using cloud provider's managed keys | Most deployments                                       |
-| **Customer-managed keys (CMK)** | You create and control the encryption keys             | Regulated industries, specific compliance requirements |
-| **BYOK (Bring Your Own Key)**   | Import keys from your HSM                              | Maximum control, on-premise HSM integration            |
+| Option | What it means | Good for |
+| --- | --- | --- |
+| Cloud-managed keys | The provider creates and rotates the keys | Most deployments |
+| Customer-managed keys | You create and control the KMS keys the services use | Regulated workloads with key-custody requirements |
 
-<Note>
-  **Default is secure.** Cloud-managed encryption meets most security
-  requirements. Customer-managed keys add operational complexity but provide
-  additional control for organizations that require it.
-</Note>
+Cloud-managed keys satisfy most requirements out of the box. Customer-managed keys add operational overhead but give you full custody and revocation.
 
-## Logging and audit
+## Identity and access
 
-Comprehensive logging is enabled by default for security monitoring and compliance. All logs are stored within your cloud account using native logging services.
+The app authenticates to your cloud through the platform's own identity system, so there is nothing static to rotate or lose:
 
-| Log type             | Contents                                       | Retention                   |
-| -------------------- | ---------------------------------------------- | --------------------------- |
-| **Application logs** | Service logs, errors, request traces           | Configurable                |
-| **Access logs**      | Load balancer access, API requests             | Configurable                |
-| **Audit trail**      | Cloud API calls, IAM actions, resource changes | Per compliance requirements |
-| **Database logs**    | Connection logs, slow queries (optional)       | Configurable                |
+| Cloud | Mechanism | Result |
+| --- | --- | --- |
+| AWS | EKS Pod Identity | An IAM role is bound to the app's Kubernetes ServiceAccount. No access keys, no IRSA or OIDC wiring. |
+| GCP | GKE Workload Identity | A Google service account is bound to the ServiceAccount. No JSON key files. |
+| Azure | Connection string for Blob, Workload Identity for add-ons | Blob access uses a connection string held as a secret; AKS keeps Workload Identity available for the External Secrets Operator and Key Vault. |
 
-### What's logged
+The permissions each role holds are scoped to exactly what the app needs (its own database, its own buckets, and the optional code executor). They are defined in the Terraform module, so you can read them before you apply and adjust them if your policy is stricter.
 
-**User actions:**
+### Image pull credentials
 
-- Login/logout events (via SSO)
-- Project creation, modification, deletion
-- Dataset uploads and modifications
-- Evaluation runs and results access
-- API key creation and usage
+The one credential involved is the one that pulls the first-party container images from Confident AI's registry. The chart uses it only for image pulls, refreshes it on a schedule so it never goes stale, and it grants no access to your data or cloud APIs. For fully offline environments, images can be mirrored into your own registry so no external pull is needed.
 
-**System events:**
+## Authentication and authorization
 
-- Service health and errors
-- Database connections and queries
-- External API calls (LLM providers)
-- Resource scaling events
+Users can sign in with email and password, Google OAuth, or your SSO provider over SAML or OIDC. Access controls:
+
+- **Require SSO**: set `config.disableNonSsoLogin: true` to turn off password login and route every human user through your identity provider, which gives you centralized access control, MFA enforcement, and deprovisioning when someone leaves.
+- **API keys**: programmatic access uses project-scoped keys. Each key is tied to a single project, is revocable at any time, and cannot change settings or act as a user.
+- **Roles**: access is organized by project so teams only see the projects they are members of.
+- **Audit logs**: user and administrative actions are recorded and viewable in the app, in addition to your cloud provider's own audit trail.
+
+## Secrets management
+
+You have two supported ways to hold application secrets (the database URL, the auth signing secret, the LLM key, and the license key):
+
+1. **Cloud secret store with the External Secrets Operator (recommended for production)**: secrets live in AWS Secrets Manager, GCP Secret Manager, or Azure Key Vault, and ESO syncs them into the cluster using the same keyless workload identity described above. Rotating a value is a single write to the secret store, and ESO re-syncs on its own.
+2. **Kubernetes Secret**: the chart renders a Secret from the values you provide. Suitable for smaller or air-gapped setups where a cloud secret store is not in play.
+
+The ClickHouse password is a separate in-cluster secret in both cases. Secrets are never written to logs.
+
+## Network architecture
+
+The module deploys into a VPC or VNet you already own, and the sensitive components sit on private IPs inside it:
+
+| Component | Placement | Reachable by |
+| --- | --- | --- |
+| Application pods | Private subnets | Your ingress only |
+| PostgreSQL | Private IP inside your network | The cluster only |
+| Managed Redis (optional) | Private IP or private endpoint | The cluster only |
+| Object storage | Provider-private with default encryption | The app's workload identity |
+| Cluster API endpoint | Public or private, your choice | You (public) or a bastion or VPN (private) |
+| Ingress | Internal or internet-facing, your choice | Your users |
+
+- Nodes run in private subnets and reach the internet only through a NAT gateway.
+- You choose a **public** cluster API endpoint (convenient for running `kubectl` and `helm` from your laptop) or a **private-only** endpoint reached through a bastion or VPN.
+- You choose an **internal** ingress load balancer for a fully private deployment, or an **internet-facing** one with TLS for a normal web-facing setup. Neither is forced on you.
+
+## What leaves your network
+
+Outbound traffic is limited and predictable:
+
+| Destination | Purpose | Required |
+| --- | --- | --- |
+| Your LLM provider | Running evaluations with a hosted model | Only if you use a hosted model |
+| Confident AI registry | Pulling the container images | Only at install and upgrade; can be mirrored |
+| Slack or email | Alerts and reports | Optional |
+
+If your egress is locked down, allowlist only the LLM endpoints you use (for example `api.openai.com`, `*.openai.azure.com`, or `api.anthropic.com`), or point evaluations at a self-hosted model so no external call is made at all. There is no telemetry or usage data sent to Confident AI.
+
+### Fully air-gapped deployments
+
+For environments with no outbound internet access, Confident AI provides offline image delivery and self-hosted LLM options for evaluations, and the license key is validated inside your cluster with no license-server call-out. [Talk to the platform team](https://www.confident-ai.com/book-a-demo) for an air-gapped rollout.
+
+## Software supply chain
+
+- **First-party images**: every workload runs an image built and published by Confident AI, pulled from a single known registry.
+- **Version pinning**: you pin `image.tag` to a specific release. Nothing updates on its own, and upgrades happen only when you run `helm upgrade` with a new tag.
+- **License key**: features are gated by a signed license key that is verified inside your cluster. It does not call out to a license server, and it cannot be used to reach your data.
+
+## Backups and durability
+
+- **Database**: the managed PostgreSQL service takes automated backups and supports high availability (Multi-AZ on RDS, regional HA on Cloud SQL, zone-redundant HA on Flexible Server). Deletion protection is available and recommended for production.
+- **Object storage**: S3, GCS, and Blob provide provider-level durability and versioning options.
+- **ClickHouse**: runs on persistent volumes, with an optional backup bucket for exports.
+- **Redis**: holds cache and queue state, not a source of truth, so it is safe to lose.
+
+## Auditing and logging
+
+- **Cloud-native audit**: every action Terraform and the app take against your cloud is recorded by your provider's audit service (AWS CloudTrail, GCP Cloud Audit Logs, Azure Monitor), inside your account.
+- **Application audit logs**: user and administrative actions are captured in the app.
+- **Workload logs**: pod logs flow to your cluster logging and can be shipped to your existing log platform.
 
 <Warning>
-  **PII in logs:** Application logs may contain user-provided data (prompts,
-  responses) depending on your tracing configuration. Review your logging
-  settings and apply masking rules if needed to prevent sensitive data in logs.
+Application logs can contain user-provided content (prompts and responses) depending on how you configure tracing. Review your logging and masking rules before sending logs off-cluster.
 </Warning>
 
-## Compliance considerations
+## Compliance
 
-Self-hosted Confident AI supports various compliance frameworks by design:
+Because the deployment lives inside your account and region, it fits into your existing compliance program rather than introducing a new processor to assess.
 
-| Framework            | How self-hosting helps                                                  |
-| -------------------- | ----------------------------------------------------------------------- |
-| **GDPR**             | Data stays in your chosen EU region, you control retention and deletion |
-| **SOC 2**            | Deploy within your existing SOC 2 boundary, inherit your controls       |
-| **HIPAA**            | Keep PHI in your compliant environment, sign BAAs with cloud provider   |
-| **FedRAMP**          | Deploy in FedRAMP-authorized regions with your ATO                      |
-| **Data sovereignty** | Data never leaves your geographic boundary                              |
+| Framework | How self-hosting helps |
+| --- | --- |
+| SOC 2 | Runs inside your existing SOC 2 boundary and inherits your controls |
+| HIPAA | PHI stays in your compliant environment under your cloud provider's BAA |
+| GDPR | Data stays in your chosen region; you control retention and deletion |
+| FedRAMP | Deploy in an authorized region under your ATO |
+| Data sovereignty | Data never crosses the geographic boundary you deploy to |
 
-<Note>
-  **Your compliance, your controls.** Self-hosting means Confident AI inherits
-  your organization's compliance posture. Work with your compliance team to
-  ensure the deployment meets your specific requirements.
-</Note>
+Retention and deletion are under your control: you decide how long traces, datasets, and logs are kept, and removing data is a direct operation against services you own.
 
-## Security checklist for your team
+## Security review checklist
 
-Before approving deployment, your security team should verify:
+Before you approve a deployment, your security team can confirm each of these against the Infrastructure and Deploy guides:
 
-- [ ] Network architecture reviewed and approved
-- [ ] VPN/private connectivity plan confirmed
-- [ ] SSO integration method selected (SAML/OIDC)
-- [ ] Data retention policies defined
-- [ ] Encryption key management approach decided
-- [ ] Logging and monitoring integration planned
-- [ ] Outbound access rules for LLM providers approved
-- [ ] Incident response procedures updated to include Confident AI
+- [ ] Cluster API endpoint set to public or private per your policy
+- [ ] Ingress set to internal or internet-facing per your policy, with TLS on a certificate you control
+- [ ] Database, cache, and object storage confirmed private
+- [ ] Encryption keys reviewed (cloud-managed or customer-managed)
+- [ ] Workload identity permissions reviewed in the Terraform module
+- [ ] Secret store chosen (cloud secret store with ESO, or Kubernetes Secret) and rotation understood
+- [ ] Authentication method chosen (SSO required, or email and OAuth allowed)
+- [ ] Outbound allowlist approved for your LLM provider, or a self-hosted model selected
+- [ ] Backup and retention settings match your requirements
+- [ ] Audit log shipping wired into your existing platform
 
 <div data-cta="self-hosting-security" />
 
 ## Next steps
 
-Once your security team has reviewed this information, proceed to the deployment guide for your chosen cloud provider:
-
-- [AWS Deployment](/self-hosting/aws/overview)
-- [Azure Deployment](/self-hosting/azure/overview)
-- [GCP Deployment](/self-hosting/gcp/overview) (coming soon)
+<CardGroup cols={3}>
+  <Card title="Deploy on AWS" icon="fa-brands fa-aws" href="/self-hosting/aws/overview" />
+  <Card title="Deploy on GCP" icon="fa-brands fa-google" href="/self-hosting/gcp/overview" />
+  <Card title="Deploy on Azure" icon="fa-brands fa-microsoft" href="/self-hosting/azure/overview" />
+</CardGroup>

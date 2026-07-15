@@ -1,0 +1,244 @@
+---
+slug: self-hosting/gcp/deploy
+description: Install the Confident AI Helm chart on GKE and expose it over HTTPS
+---
+
+With the [infrastructure](/self-hosting/gcp/infrastructure) in place, install the `confident-ai` Helm chart using the Terraform outputs, then expose it over HTTPS with a Google-managed certificate. The chart pulls its images from Confident AI's registry and installs the app plus in-cluster ClickHouse.
+
+The recommended setup keeps app secrets in **Google Secret Manager** (synced by the External Secrets Operator) and runs Redis on **Memorystore**. Both are provisioned by the Terraform module. In-cluster Redis and a Kubernetes Secret are supported as a simpler alternative, see [Simpler option](#simpler-option-in-cluster-redis-and-a-kubernetes-secret).
+
+<Note>
+Two things come from Confident AI with your Enterprise license:
+
+- **Image pull credentials**: an AWS access key ID and secret that let the cluster pull the first-party images. The chart uses them to mint and refresh the pull secret automatically.
+- **License key** (`CONFIDENT_LICENSE_KEY`): the signed key that enables your plan's features.
+</Note>
+
+<Note>
+**About `OPENAI_API_KEY`**: it backs the built-in Confident AI evaluation provider, which runs on OpenAI. It is optional. Omit it and connect your own model provider or an LLM gateway per project from AI Connections in the app instead.
+</Note>
+
+Set your domain once. You will expose four subdomains on it: `app.` and `api.` for the dashboard and API, and `evals.` and `otel.` for the evaluation and trace-ingestion endpoints:
+
+```bash
+export DOMAIN=yourdomain.com
+```
+
+<Steps>
+
+<Step title="Reserve a static IP and point DNS">
+
+```bash
+gcloud compute addresses create confident-ip --global
+gcloud compute addresses describe confident-ip --global --format='value(address)'
+```
+
+At your DNS provider, create `A` records for `app.$DOMAIN`, `api.$DOMAIN`, `evals.$DOMAIN`, and `otel.$DOMAIN`, all pointing at that IP. The managed certificate only goes `Active` once these resolve, so set them all now.
+
+</Step>
+
+<Step title="Create the namespace and managed certificate">
+
+```bash
+kubectl create namespace confident-ai
+
+kubectl apply -f - <<EOF
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: confident-cert
+  namespace: confident-ai
+spec:
+  domains:
+    - app.$DOMAIN
+    - api.$DOMAIN
+    - evals.$DOMAIN
+    - otel.$DOMAIN
+EOF
+```
+
+</Step>
+
+<Step title="Put the secrets in Secret Manager">
+
+`DATABASE_URL` comes straight from Terraform. Each key in this JSON object becomes an app secret:
+
+```bash
+printf '{"DATABASE_URL":"%s","BETTER_AUTH_SECRET":"%s","OPENAI_API_KEY":"sk-...","CONFIDENT_LICENSE_KEY":"..."}' \
+  "$(terraform output -raw database_url)" "$(openssl rand -hex 32)" \
+  | gcloud secrets versions add "$(terraform output -raw secret_manager_secret_id)" --data-file=-
+```
+
+<Note>
+This uses the secret Terraform created with `confident_create_secret_manager = true`. If you did not enable it, either turn it on and re-apply, or use the [simpler option](#simpler-option-in-cluster-redis-and-a-kubernetes-secret).
+</Note>
+
+</Step>
+
+<Step title="Install the External Secrets Operator">
+
+Terraform already Workload-Identity-bound the ESO service account to `confident-ai/external-secrets-sa`:
+
+```bash
+helm repo add external-secrets https://charts.external-secrets.io && helm repo update
+helm install external-secrets external-secrets/external-secrets \
+  -n external-secrets --create-namespace --set installCRDs=true
+
+kubectl create serviceaccount external-secrets-sa -n confident-ai
+kubectl annotate serviceaccount external-secrets-sa -n confident-ai \
+  iam.gke.io/gcp-service-account=$(terraform output -raw eso_service_account_email)
+```
+
+</Step>
+
+<Step title="Write the values file">
+
+Save this as `values.gcp.yaml`. Fill the bracketed values from your Terraform outputs and the credentials Confident AI gave you. The `image.tag` is pinned to the chart's current app version.
+
+```yaml
+image:
+  tag: "v2.0.18"   # use the version Confident AI gives you
+
+# The chart mints and refreshes the ECR pull secret from these credentials.
+imagePullSecrets:
+  - name: ecr-registry-credentials
+imagePullSecretRefresh:
+  enabled: true
+  region: us-east-1
+  awsAccessKeyId: "<from Confident AI>"
+  awsSecretAccessKey: "<from Confident AI>"
+
+config:
+  cloudProvider: GCP
+  frontendUrl: https://app.yourdomain.com
+  backendUrl: https://api.yourdomain.com
+  subdomain: yourdomain.com
+
+serviceAccount:
+  create: true
+  annotations:
+    iam.gke.io/gcp-service-account: <app_service_account_email>
+
+storage:
+  testCasesBucket: <test_cases_bucket>
+  payloadsBucket: <payloads_bucket>
+  gcp:
+    projectId: <your-gcp-project>
+    region: us-central1
+
+# Recommended: app secrets come from Google Secret Manager via ESO.
+secrets:
+  externalSecrets:
+    enabled: true
+    provider: gcpsm
+    createStore: true
+    remoteKey: <secret_manager_secret_id>
+    serviceAccountRef:
+      name: external-secrets-sa
+    gcp:
+      projectId: <your-gcp-project>
+      clusterLocation: us-central1
+      clusterName: <cluster_name>
+
+clickhouse:
+  internal: true
+  password: "<choose-a-password>"
+
+# Recommended: managed Redis (Memorystore) from Terraform.
+redis:
+  internal: false
+  externalUrl: "<redis_url>"
+
+# Required for code-based and transformer metrics (Cloud Run sandbox from Terraform).
+codeExecutor:
+  provider: GCP_CLOUD_FUNCTIONS
+  gcp:
+    functionUrl: <code_executor_function_url>
+
+ingress:
+  enabled: true
+  # GKE's L7 controller claims Ingresses via the ingress.class annotation, not
+  # ingressClassName (this cluster has no "gce" IngressClass). Leave className
+  # empty, or the Ingress is ignored and never gets an ADDRESS.
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: confident-ip
+    networking.gke.io/managed-certificates: confident-cert
+  hosts:
+    evals: evals.yourdomain.com
+    otel: otel.yourdomain.com
+```
+
+</Step>
+
+<Step title="Install the chart">
+
+The chart is published to GHCR as an OCI artifact:
+
+```bash
+helm install confident-ai \
+  oci://ghcr.io/confident-ai/charts/confident-ai \
+  --version 0.1.0 \
+  -n confident-ai \
+  -f values.gcp.yaml
+
+kubectl get pods -n confident-ai -w
+```
+
+The ClickHouse operator starts first, then a migrations job runs, then the app pods come up. This takes a few minutes.
+
+</Step>
+
+<Step title="Wait for the certificate, then verify">
+
+The Google-managed certificate takes 15 to 60 minutes to provision after DNS resolves:
+
+```bash
+kubectl get managedcertificate -n confident-ai   # STATUS moves Provisioning -> Active
+kubectl get ingress -n confident-ai              # ADDRESS should match your static IP
+kubectl get externalsecret -n confident-ai       # STATUS should be SecretSynced
+```
+
+Once the certificate is `Active`, open `https://app.$DOMAIN` and sign in. The cookie is set on `.$DOMAIN`, so all subdomains share it.
+
+</Step>
+
+</Steps>
+
+## Simpler option: in-cluster Redis and a Kubernetes Secret
+
+If you would rather not run a cloud secret store or managed Redis, the chart can hold secrets in a Kubernetes Secret and run Redis in the cluster. This is less production-hardened (secrets live in the cluster, Redis has no managed backups), but it removes the ESO and Memorystore steps. Skip steps 3 and 4 above, and replace the `secrets` and `redis` blocks in the values file with:
+
+```yaml
+secrets:
+  data:
+    DATABASE_URL: "<database_url>"
+    BETTER_AUTH_SECRET: "<openssl rand -hex 32>"
+    OPENAI_API_KEY: "sk-..."
+    CONFIDENT_LICENSE_KEY: "<your license key>"
+
+redis:
+  internal: true
+```
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+| --- | --- |
+| `externalsecret` never reaches `SecretSynced` | ESO cannot read Secret Manager. Recheck the `external-secrets-sa` annotation and that `confident_create_secret_manager = true`. `kubectl describe externalsecret -n confident-ai`. |
+| App pods briefly `CreateContainerConfigError` | ESO has not synced the secret yet. It self-heals once `externalsecret` shows `SecretSynced`. |
+| Ingress never gets an `ADDRESS` | GKE's L7 controller claims Ingresses through the `kubernetes.io/ingress.class: gce` annotation, not `ingressClassName`. Keep `className: ""` as shown. |
+| Certificate stuck `Provisioning` | DNS is not resolving to the static IP yet, or the load balancer is not serving. Confirm the `A` records and that `kubectl get ingress` shows the static IP. |
+| Backends `UNHEALTHY`, browser shows 502 | GKE health-checks each Service. On a fresh install the chart's readiness probes set the health-check paths automatically, give it a few minutes. If you added probes to an already-built load balancer, GKE does not re-derive the path, update it with `gcloud compute health-checks update http <name> --request-path=/health`. |
+| ClickHouse pod crashes with `Listen [::]... Address family not supported` | GKE nodes are IPv4-only. The chart sets ClickHouse to listen on `0.0.0.0`; only relevant if you overrode `clickhouse.extraConfig`. |
+| ClickHouse Keeper logs `Not authenticated` | Stale PersistentVolumeClaims from a previous failed install. `helm uninstall`, `kubectl delete pvc -n confident-ai --all`, then reinstall. |
+| Frontend returns 500 with `ENOTFOUND confident-backend` | The frontend resolves backend services by their chart-prefixed names. Keep `fullnameOverride: confident` (the chart default); do not change it. |
+| Code metric fails with 403 | The app service account lacks `run.invoker` on the Cloud Run sandbox. Confirm the `iam.gke.io/gcp-service-account` annotation and that Terraform granted the invoker binding. |
+
+## Updating and tearing down
+
+- **Change the app**: edit `values.gcp.yaml`, then `helm upgrade confident-ai oci://ghcr.io/confident-ai/charts/confident-ai --version 0.1.0 -n confident-ai -f values.gcp.yaml`.
+- **Rotate a secret**: write a new version to Secret Manager. ESO re-syncs it, then restart the pods to pick up the change (they hold secrets as env vars until they restart): `kubectl rollout restart deployment -n confident-ai`.
+- **Change infrastructure**: edit the Terraform config and `terraform apply`.
+- **Remove everything**: `helm uninstall confident-ai -n confident-ai`, `helm uninstall external-secrets -n external-secrets`, then `terraform destroy`, then delete the static IP and (if Terraform did not own it) the network from the Infrastructure page.
