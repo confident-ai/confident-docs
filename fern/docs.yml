@@ -957,6 +957,11 @@ navigation:
           - page: Standardize Onboarding with Custom Agent Skills
             path: docs/pages/guides/agent-skills-git-endpoint.mdx
             icon: fa-light fa-sparkles
+      - section: Self-Hosting
+        contents:
+          - page: Automated Tag-Based Deployments
+            path: docs/pages/guides/tag-based-deployments.mdx
+            icon: fa-light fa-tag
   - tab: changelog
     layout:
       - changelog: ./changelog
