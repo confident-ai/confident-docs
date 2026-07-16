@@ -189,6 +189,7 @@ function runOnDomUpdates(callback) {
     "settings.project.aiConnectionOutputParsing": `${S3_BASE}/ai-connection:output-parsing.png`,
     "settings.project.aiConnectionOutputTransformer": `${S3_BASE}/ai-connection:output-transformer.png`,
     "settings.project.aiConnectionMultiGeneration": `${S3_BASE}/ai-connection:default-generations.png`,
+    "settings.project.mcpServers": `${S3_BASE}/settings:project:mcp-servers.png`,
     "settings.project.annotationOptions": `${S3_BASE}/settings:project:annotation-options.png`,
     "settings.project.annotationFormEditor": `${S3_BASE}/settings:project:annotation-form-editor.png`,
     "settings.project.dataRetention": `${S3_BASE}/settings:project:data-retention.png`,

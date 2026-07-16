@@ -157,17 +157,6 @@
       "full_page": true,
       "width": 1512,
       "height": 620
-    },
-    {
-      "s3_key": "settings:project:mcp-servers.png",
-      "doc": "fern/docs/pages/settings/project/mcp-servers.mdx",
-      "path": "/project/:projectId/project-settings/mcp-servers",
-      "click": "[class*='toolsToggle']",
-      "selector": "[class*='mcp-servers_container']",
-      "wait": 1500,
-      "full_page": true,
-      "width": 1512,
-      "height": 620
     }
   ]
 }
