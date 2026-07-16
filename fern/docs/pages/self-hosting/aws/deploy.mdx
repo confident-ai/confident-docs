@@ -200,6 +200,22 @@ redis:
   storageClass: gp3
 ```
 
+## Back up ClickHouse (recommended)
+
+For production, enable the nightly ClickHouse backup to S3. Provision the backup bucket (`confident_clickhouse_backup_bucket_enabled = true`); the backup pod writes with Pod Identity, so set `serviceAccountName` to a service account whose role can write to that bucket. Full detail is on the [Disaster Recovery](/self-hosting/disaster-recovery) page. Add this under your existing `clickhouse:` block and `helm upgrade`:
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: s3
+    schedule: "0 2 * * *"          # nightly at 02:00 UTC
+    serviceAccountName: confident
+    s3:
+      bucket: <clickhouse_backup_bucket>
+      region: <region>
+```
+
 ## Troubleshooting
 
 | Symptom | Cause and fix |

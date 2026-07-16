@@ -222,6 +222,21 @@ redis:
   internal: true
 ```
 
+## Back up ClickHouse (recommended)
+
+For production, enable the nightly ClickHouse backup to GCS. It needs the backup bucket and a Secret with GCS HMAC keys; that one-time setup is on the [Disaster Recovery](/self-hosting/disaster-recovery) page. Once they exist, add this under your existing `clickhouse:` block and `helm upgrade`:
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: gcs
+    schedule: "0 2 * * *"          # nightly at 02:00 UTC
+    gcs:
+      bucket: <clickhouse_backup_bucket>
+    credentialsSecret: clickhouse-backup-creds
+```
+
 ## Troubleshooting
 
 | Symptom | Cause and fix |

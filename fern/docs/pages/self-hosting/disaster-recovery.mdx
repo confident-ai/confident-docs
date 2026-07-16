@@ -9,22 +9,73 @@ A self-hosted deployment is built to ride out everyday failures (a pod, a node, 
 
 - **Replicated and highly available by default.** The chart runs a replicated ClickHouse cluster (`clusterType: replicated`) with 2 replicas, coordinated by a 3-node Keeper quorum. If a replica pod or its node fails, the other replica keeps serving and the recovered replica resyncs through Keeper on its own.
 - **Data survives pod and node loss.** Each replica and each Keeper node stores data on a persistent volume (EBS on AWS, Persistent Disk on GCP, managed disk on Azure). The volume is independent of the pod: when a pod is rescheduled, Kubernetes reattaches the same volume, so a restart or node failure loses no data.
-- **Scheduled backups to object storage.** For recovery from accidental deletion or total cluster loss, enable the nightly backup CronJob, which runs `BACKUP DATABASE` to a bucket Terraform provisions:
+**Scheduled backups to object storage (recommended for production).** For recovery from accidental deletion or total cluster loss, enable the nightly backup CronJob. It runs `BACKUP DATABASE` to a bucket Terraform provisions: set `confident_clickhouse_backup_bucket_enabled = true`, apply, and read the name from `terraform output clickhouse_backup_bucket`. Configure it per cloud:
+
+<Tabs>
+
+<Tab title="AWS (S3)">
+The backup pod writes to S3 with Pod Identity, no keys in the job. Point `serviceAccountName` at a service account whose IAM role can write to the backup bucket (the app service account `confident`, if its role covers that bucket).
 
 ```yaml
 clickhouse:
   backup:
     enabled: true
-    provider: s3            # s3 | gcs | azure
-    schedule: "0 2 * * *"   # nightly at 02:00
+    provider: s3
+    schedule: "0 2 * * *"      # nightly at 02:00 UTC
+    serviceAccountName: confident
     s3:
       bucket: <clickhouse_backup_bucket>
       region: <region>
 ```
+</Tab>
 
-Provision the bucket with `confident_clickhouse_backup_bucket_enabled = true` in Terraform and read its name from `terraform output clickhouse_backup_bucket`. On AWS the backup pod authenticates with Pod Identity (no keys in the job); GCS uses HMAC keys and Azure uses the storage connection string, supplied through `credentialsSecret`.
+<Tab title="GCP (GCS)">
+GCS is reached over its S3-compatible endpoint, so the job needs HMAC keys. Create them for a service account with write access to the bucket, then store them in a Secret:
 
-- **Recovery.** A lost replica rebuilds from the healthy one automatically. For a full restore, run `RESTORE DATABASE` from the latest backup in the bucket.
+```bash
+BUCKET=$(terraform output -raw clickhouse_backup_bucket)
+SA=<app-service-account-email>
+
+gcloud storage buckets add-iam-policy-binding gs://$BUCKET \
+  --member="serviceAccount:$SA" --role=roles/storage.objectAdmin
+gcloud storage hmac create "$SA"      # prints accessId + secret
+
+kubectl create secret generic clickhouse-backup-creds -n confident-ai \
+  --from-literal=GCS_HMAC_KEY='<accessId>' \
+  --from-literal=GCS_HMAC_SECRET='<secret>'
+```
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: gcs
+    schedule: "0 2 * * *"
+    gcs:
+      bucket: <clickhouse_backup_bucket>
+    credentialsSecret: clickhouse-backup-creds
+```
+</Tab>
+
+<Tab title="Azure (Blob)">
+The job authenticates with the storage connection string. It defaults to the app secret, so if `AZURE_STORAGE_CONNECTION_STRING` already lives there it is reused; otherwise point `credentialsSecret` at a Secret that holds that key.
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: azure
+    schedule: "0 2 * * *"
+    azure:
+      container: <clickhouse_backup_container>
+```
+</Tab>
+
+</Tabs>
+
+Each run writes to `backups/<timestamp>` and does not prune old copies, so set a bucket lifecycle rule (for example, expire objects after 30 days) to bound retention. To trigger one immediately instead of waiting for the schedule: `kubectl create job --from=cronjob/confident-clickhouse-backup ch-backup-now -n confident-ai`.
+
+**Recovery.** A lost replica rebuilds from the healthy one automatically. For a full restore, run `RESTORE DATABASE` from the latest backup in the bucket.
 
 ## Kubernetes
 
