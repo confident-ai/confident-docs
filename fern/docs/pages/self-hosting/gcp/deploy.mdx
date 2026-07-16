@@ -250,6 +250,7 @@ clickhouse:
 | ClickHouse Keeper logs `Not authenticated` | Stale PersistentVolumeClaims from a previous failed install. `helm uninstall`, `kubectl delete pvc -n confident-ai --all`, then reinstall. |
 | Frontend returns 500 with `ENOTFOUND confident-backend` | The frontend resolves backend services by their chart-prefixed names. Keep `fullnameOverride: confident` (the chart default); do not change it. |
 | Code metric fails with 403 | The app service account lacks `run.invoker` on the Cloud Run sandbox. Confirm the `iam.gke.io/gcp-service-account` annotation and that Terraform granted the invoker binding. |
+| Opening dataset goldens returns 500 with `iam.serviceAccounts.signBlob` denied | The app signs GCS URLs, which under Workload Identity calls the IAM Credentials API. The app service account needs `roles/iam.serviceAccountTokenCreator` on itself and the `iamcredentials.googleapis.com` API enabled. The Terraform module grants this; if you provisioned before that change, add it manually with `gcloud iam service-accounts add-iam-policy-binding`. |
 
 ## Updating and tearing down
 
