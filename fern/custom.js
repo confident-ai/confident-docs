@@ -241,6 +241,8 @@ function runOnDomUpdates(callback) {
     "reports.customTemplateBuilder": `${S3_BASE}/reports:custom-template-builder.png`,
     "reports.emailIntegration": `${S3_BASE}/reports:email-integration.png`,
 
+    "integrations.trueFoundry": `${S3_BASE}/integrations:true-foundry.png`,
+
     "queues.exportCsv": `${S3_BASE}/queues:export-csv.png`,
     "queues.ingestionTasks": `${S3_BASE}/queues:ingestion-tasks.png`,
     "queues.ingestionTaskCreate": `${S3_BASE}/queues:ingestion-task-create.png`,
