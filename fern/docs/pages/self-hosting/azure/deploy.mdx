@@ -231,6 +231,20 @@ The Azure Function sandbox is protected by a function key, which you read from t
 - **Key Vault (recommended)**: `az keyvault secret set --vault-name "$KV_NAME" --name CODE-EXECUTOR-AZURE-FUNCTION-KEY --value "<function key>"`
 - **Simpler option**: add `CODE_EXECUTOR_AZURE_FUNCTION_KEY: "<function key>"` to `secrets.data`.
 
+## Back up ClickHouse (recommended)
+
+For production, enable the nightly ClickHouse backup to Blob storage, authenticated with the storage connection string. Provision the backup container and see the [Disaster Recovery](/self-hosting/disaster-recovery) page for the credential detail. Add this under your existing `clickhouse:` block and `helm upgrade`:
+
+```yaml
+clickhouse:
+  backup:
+    enabled: true
+    provider: azure
+    schedule: "0 2 * * *"          # nightly at 02:00 UTC
+    azure:
+      container: <clickhouse_backup_container>
+```
+
 ## Troubleshooting
 
 | Symptom | Cause and fix |
