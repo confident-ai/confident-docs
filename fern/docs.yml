@@ -775,6 +775,9 @@ navigation:
               - page: Confident Agent
                 path: docs/pages/settings/project/confident-agent.mdx
                 icon: fa-light fa-plug
+          - page: MCP Servers
+            path: docs/pages/settings/project/mcp-servers.mdx
+            icon: fa-light fa-server
           - page: Model Costs
             path: docs/pages/settings/project/model-costs.mdx
             icon: fa-light fa-dollar-sign
