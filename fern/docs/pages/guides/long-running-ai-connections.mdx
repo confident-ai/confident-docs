@@ -118,18 +118,45 @@ The test run is created immediately and stays **in progress** while it waits for
 
 </Step>
 
-<Step title="Post results back through the endpoint">
+<Step title="Post results back for evaluation">
 
-When your agent finishes a test case, post its result to the results endpoint using the `testCaseId` from that request's payload, authenticated with your **Project API Key**:
+When your agent finishes a test case, post its result to the results endpoint using the `testCaseId` from that request's payload, authenticated with your **Project API Key**. The SDKs read your key from `CONFIDENT_API_KEY` (set it via `deepeval login` or the environment).
 
-```bash
-curl -X POST https://api.confident-ai.com/v1/test-runs/evaluate/<TEST-CASE-ID> \
-  -H "Content-Type: application/json" \
-  -H "CONFIDENT_API_KEY: <PROJECT-API-KEY>" \
-  -d '{
-    "actualOutput": "The capital of France is Paris."
-  }'
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python
+from deepeval import send_test_case_response
+
+send_test_case_response(
+    test_case_id="<TEST-CASE-ID>",
+    actual_output="The capital of France is Paris.",
+)
 ```
+
+</Tab>
+
+<Tab title="TypeScript" language="typescript">
+
+```typescript
+import { sendTestCaseResponse } from "deepeval";
+
+await sendTestCaseResponse({
+  testCaseId: "<TEST-CASE-ID>",
+  actualOutput: "The capital of France is Paris.",
+});
+```
+
+</Tab>
+
+<Tab title="curL" language="curL">
+
+<EndpointRequestSnippet endpoint="POST /v1/test-runs/evaluate/{testCaseId}" />
+
+</Tab>
+
+</Tabs>
 
 All fields are optional — anything you leave out falls back to the value from the golden:
 

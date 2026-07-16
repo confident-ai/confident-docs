@@ -1,0 +1,92 @@
+---
+subtitle: Evaluate agents that take minutes or hours by acknowledging each request immediately and posting results back later.
+slug: settings/project/ai-connections/async-responses
+---
+
+## Overview
+
+By default an [AI Connection](/docs/settings/project/ai-connections) is **synchronous** — Confident AI holds the connection open until your endpoint responds and parses the actual output from that response. For agents that take **minutes or hours** to produce an output (deep research agents, multi-step pipelines, queued work), that connection times out.
+
+**Async Responses** splits the exchange in two:
+
+1. Confident AI sends each golden to your endpoint with a unique `testCaseId`, then closes the connection without waiting for an output.
+2. Your endpoint acknowledges with a quick `2xx` and does the real work in the background.
+3. When your agent finishes, it posts the result back to the [`POST /v1/test-runs/evaluate/{testCaseId}`](/docs/api-reference/test-runs/submit-test-case-result) endpoint.
+
+<Note>
+  Async Responses are available for **single-turn** evaluations only, and
+  require the **HTTP Response** mode — the toggle is disabled while a streaming
+  response mode is selected.
+</Note>
+
+## Enabling Async Responses
+
+Navigate to **Project Settings** → **AI Connections**, open your connection, and switch on **Async Responses** in the **General** tab.
+
+<Frame caption="The Async Responses toggle on the AI connection's General tab">
+  <img data-image="settings.project.aiConnectionAsyncResponses" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</Frame>
+
+Once enabled, Confident AI closes the connection after dispatching each request instead of waiting for an output, and no longer requires an **Actual Output Key Path** — the output is collected from the results endpoint, not parsed from your endpoint's response.
+
+## Including the testCaseId
+
+Your payload **must** include `testCaseId` — your agent echoes it back when posting results, and it's how each result is matched to its test case. In JSON payload mode, map the `testCaseId` variable into your request body:
+
+```json
+{
+  "input": golden.input,
+  "testCaseId": testCaseId
+}
+```
+
+In Code mode, `generate_payload` receives `testCaseId` as a parameter — include it in the returned dictionary.
+
+## Acknowledging Requests
+
+Your endpoint should return a `2xx` immediately and hand the work off to a background job. Confident AI treats the acknowledgement as "request received" — nothing in the response body is parsed.
+
+```python
+...
+
+@app.post("/generate")
+def generate(request: dict):
+    background_tasks.add_task(
+      run_agent, 
+      request["input"], 
+      request["testCaseId"]
+    )
+
+    return {"status": "accepted"}
+```
+
+## Verifying the Connection
+
+Click **Ping Endpoint** on the connection to verify it. For async connections the ping is **acknowledgement-only** — it confirms your endpoint accepts the request and returns a `2xx`, without inspecting any output.
+
+## Posting Results Back
+
+When your agent finishes a test case, post its result to the results endpoint using the `testCaseId` from that request, authenticated with your **Project API Key**:
+
+<EndpointRequestSnippet endpoint="POST /v1/test-runs/evaluate/{testCaseId}" />
+
+See the [Set Up Long-Running AI Connections](/docs/guides/long-running-ai-connections) guide for the end-to-end walkthrough, and the [API reference](/docs/api-reference/test-runs/submit-test-case-result) for the full request and response schema.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Long-Running AI Connections"
+    icon="fa-light fa-hourglass-half"
+    href="/docs/guides/long-running-ai-connections"
+  >
+    Full end-to-end guide for evaluating agents that respond asynchronously.
+  </Card>
+  <Card
+    title="Single-Turn Evals Without Code"
+    icon="fa-light fa-bolt"
+    href="/docs/llm-evaluation/no-code/single-turn"
+  >
+    Run dataset evaluations on the platform against your async connection.
+  </Card>
+</CardGroup>
