@@ -1,0 +1,51 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.17
+
+This release adds new AI connection logging and configuration capabilities, expands dashboards and reports, and introduces several trace, test run, and DeepTeam workflow updates. It also includes database migrations and UI route renames that operators should account for during upgrade.
+
+### Highlights
+- AI connection logs and log tables were added, along with new AI connection configuration options.
+- Dashboards and reports gained new public endpoints, widget endpoints, and annotation graph support.
+- Trace and test run workflows received require-review, export, persistence, and performance updates.
+- Several migrations and route changes were introduced, including AI connection query params and /setup to /connect renaming.
+
+### New Features
+- **AI Connection Logs** — AI connection logs and a dedicated AI connection log table were added.
+- **GitHub App Connection** — GitHub App connection support was added, including routes and a connection page.
+- **Dashboard Public APIs** — Dashboard public endpoints and widget get endpoints were added.
+- **Risk Assessment Endpoints** — Public endpoints for the risk assessment framework were added.
+- **Thread Exports** — Thread export support was added.
+- **Release Notes in AI Connection** — AI connection now supports release notes and array output.
+
+### Improvements
+- **Reports And Navigation Rename** — Insights was renamed to reports, and the setup route was refactored to /connect.
+- **AI Connection Configuration** — AI connection configuration now supports save-all behavior, draft state, query params, and AI feature config.
+- **Dashboard and Annotation UX** — Status pills, collapsible sections, clickable URLs, and improved annotation filter presentation were added.
+- **Trace And Test Run Performance** — Trace and test run processing gained persistence in Redis, merge helper reuse, and thread aggregate speed improvements.
+- **Token Handling** — The platform model page now exposes input and output token settings, and signal handling now supports max_input_tokens without trace truncation.
+- **DeepTeam Workflow Updates** — DeepTeam gained bot comment methods and workflow fixes for empty repositories.
+
+### Fixes
+- **Annotator And User Redirects** — Annotator selection and user page redirects were fixed to preserve filters and resolve names via the global user table.
+- **Histogram And Statistics UI** — Histogram bars and statistics tab pill rendering were fixed.
+- **Multi-Gen Test Cases** — Multi-gen test cases no longer disappear and test case group loading was improved.
+- **DeepTeam Validation** — DeepTeam zod validation was fixed.
+- **Report Template Bugs** — Report template bugs were fixed.
+- **OpenAI Fetch Handling** — OpenAI now uses the native Node.js fetch implementation instead of node-fetch.
+- **API Keys Reveal Query** — The API keys endpoint now supports a reveal query parameter.
+
+<Warning>
+**Breaking changes**
+
+- **AI Connection Query Params** — AI connection persistence now includes query params. _Migration:_ Run the new AI connection query-params migration before upgrading dependent components.
+- **AI Connection Logs Schema** — The AI connection logs table was added with a dedicated migration. _Migration:_ Apply the ai_connection_logs migration during the upgrade.
+- **GitHub App Connection Schema** — The GitHub App connection table was added with a dedicated migration. _Migration:_ Apply the github_app_connection migration during the upgrade.
+- **Trace Review Requirement** — Traces now include a requireReview column. _Migration:_ Apply the trace schema migration and update any code that writes or reads trace records.
+</Warning>
+
+### Upgrade Notes
+
+Apply the new database migrations for GitHub App connections, AI connection logs, AI connection query params, and trace requireReview support before rolling out the new build. If you expose the app externally, update routes and documentation to account for the /setup to /connect rename and the insights to reports rename.
