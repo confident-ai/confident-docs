@@ -2,7 +2,7 @@
 tags: ["Enterprise", "Self-Hosting"]
 ---
 
-## v2.0.17-dev
+## v2.0.17
 
 This release adds new AI connection logging and configuration capabilities, expands dashboards and reports, and introduces several trace, test run, and DeepTeam workflow updates. It also includes database migrations and UI route renames that operators should account for during upgrade.
 
@@ -40,8 +40,6 @@ This release adds new AI connection logging and configuration capabilities, expa
 <Warning>
 **Breaking changes**
 
-- **Route Rename** — The setup route was renamed to /connect. _Migration:_ Update any bookmarked links, reverse proxies, and automation that target /setup to use /connect.
-- **Insights Renamed To Reports** — The user-facing insights area was renamed to reports. _Migration:_ Update any saved links, labels, or references that still use the insights name.
 - **AI Connection Query Params** — AI connection persistence now includes query params. _Migration:_ Run the new AI connection query-params migration before upgrading dependent components.
 - **AI Connection Logs Schema** — The AI connection logs table was added with a dedicated migration. _Migration:_ Apply the ai_connection_logs migration during the upgrade.
 - **GitHub App Connection Schema** — The GitHub App connection table was added with a dedicated migration. _Migration:_ Apply the github_app_connection migration during the upgrade.
