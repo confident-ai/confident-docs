@@ -1,0 +1,35 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.19
+
+Release v2.0.19 adds span sampling support, GitHub App support for DeepEval, and a new classifications data path with ClickHouse storage, buffered inserts, dual-write, and backfill migration work. It also includes database migration work for AI connections and usage features.
+
+### Highlights
+- Added span sample rate support.
+- Added DeepEval support for GitHub Apps.
+- Introduced classifications storage, buffering, dual-write, and backfill changes.
+- Included new database migrations for AI connection, usage, and classifications features.
+
+### New Features
+- **Span Sample Rate** — Added support for configuring a span sample rate.
+- **DeepEval GitHub Apps** — Added DeepEval support for GitHub Apps.
+- **Classifications Table** — Added a classifications ClickHouse table with schema, types, and migrations.
+- **AI Connection and Usage Migrations** — Added migration 34 for AI connection and label generation usage features.
+
+### Improvements
+- **Classifications Buffering** — Added a buffered insert service for classifications.
+- **Classifications Dual Write** — Enabled dual-write of classifications alongside the existing trace/thread labels map.
+- **Classifications Backfill** — Added a backfill script for classifications data.
+
+<Warning>
+**Breaking changes**
+
+- **Classifications Entity Time** — The classifications entity now uses createdAt as the entity-time column.
+- **Classifications Reference Invariant** — Classification entity-reference validation was tightened via a discriminated union.
+</Warning>
+
+### Upgrade Notes
+
+This release includes new database migrations, including migration 34 and migration 35 for classifications; operators should run the full upgrade and data-migration steps before enabling the new classifications path.
