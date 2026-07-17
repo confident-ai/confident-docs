@@ -1,0 +1,44 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.20
+
+Release v2.0.20 adds classification polarity, export streaming/compression, async AI responses, and cost/billing updates. It also includes operator-facing migration and deployment changes for schema, Helm, and multi-architecture builds.
+
+### Highlights
+- Classification labels now support polarity and tone across label creation, signal findings, and trends.
+- Exports can now stream and upload gzipped files to supported object stores, with a higher manual export cap for streamed uploads.
+- AI connections now support async response mode and the UI/API wording has been updated accordingly.
+- Cost insights and billing logic were updated to use per-organization grouping and new price IDs, with backfill support.
+
+### New Features
+- **Classification Polarity** — Classifier labels now carry a polarity value that is exposed in label, finding, and label-generation flows.
+- **Async AI Responses** — AI connections now support async response mode, and the endpoints and UI were updated to use the new naming.
+- **Streaming Exports** — Trace and thread exports now stream uploads to S3, MinIO, GCS, and Azure Blob Storage, with gzipped export support.
+- **Cost Insights** — Cost insights now include updated cost tiles, tabs, and funding-source breakdowns in the frontend.
+
+### Improvements
+- **Multi-Architecture Builds** — The build pipeline now produces multi-architecture images.
+- **Export Reliability** — Export workers now enforce a byte ceiling, clean up failed uploads, and destroy gzip streams on upload failure.
+- **Classification Storage** — Signals, traces, and threads now read classifier data from the classifications table instead of the labels map.
+- **Annotation Filtering** — Annotations now support date filtering and a created-versus-updated toggle.
+
+### Fixes
+- **Report PDF Layout** — Report generation now respects start-on-new-page settings and updates risk assessment title and table-of-contents styling.
+- **Trial Free-Plan Guard** — Expired trials can no longer access the Free plan server-side and the Free option is hidden in the UI.
+- **Signal and Thread UI** — Signal findings, label rows, and thread chat views now render polarity, tone, and last-message information correctly.
+- **Pricing Instrumentation** — Pricing events now carry measurable plan and selection data, and blank pricing events are filtered out.
+
+<Warning>
+**Breaking changes**
+
+- **Label Storage Migration** — The labels map has been removed from traces and threads in favor of classifications, with migration 36 dropping the map columns and indexes. _Migration:_ Run the database migration that adds migration 36 before upgrading application code that depends on traces or threads labels.
+- **Signal Polarity Schema** — Classifier labels and related APIs now include a polarity field and new enum types. _Migration:_ Apply the signal-polarity migrations and backfill sentiment label polarity during upgrade.
+- **Cost and Billing Cutover** — Billing now groups meter events per organization and changes price IDs for updated plans. _Migration:_ Review the new price IDs and ensure the billing cutover aligns with the cycle start for your organizations.
+- **Deployment Artifacts** — The release adds CRDs, Helm release manifests, and multi-architecture build output. _Migration:_ Update your deployment pipeline and Helm workflows to consume the new artifacts.
+</Warning>
+
+### Upgrade Notes
+
+Apply the database migrations for classification labels, signal polarity, and code-scan-run before starting the new release. Review updated Helm/deployment artifacts, new price IDs, and the per-organization billing cutover behavior before upgrading.
