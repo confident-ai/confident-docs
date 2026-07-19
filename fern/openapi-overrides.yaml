@@ -960,6 +960,7 @@ paths:
           example: "PROMPT-ALIAS"
         - name: name
           in: path
+          x-fern-parameter-name: branchName
           required: true
           schema:
             type: string
@@ -983,6 +984,7 @@ paths:
           example: "PROMPT-ALIAS"
         - name: name
           in: path
+          x-fern-parameter-name: branchName
           required: true
           schema:
             type: string

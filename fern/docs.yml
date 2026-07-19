@@ -16,6 +16,13 @@ layout:
 css: assets/styles.css
 js: ./custom.js
 
+# GA4: same stream as www.confident-ai.com (property 407590778). The docs are
+# served under the main domain, so tagging here closes the /docs half of the
+# untagged-pages list with no cross-domain setup.
+analytics:
+  ga4:
+    measurement-id: G-VXJWZ42WWM
+
 tabs:
   api-reference:
     slug: api-reference
