@@ -1,0 +1,277 @@
+---
+slug: integrations/third-party/mastra
+subtitle: Trace and evaluate Mastra agents and workflows on typescript
+---
+
+[Mastra](https://mastra.ai) is a TypeScript framework for building AI agents and workflows. Confident AI traces and evaluates Mastra applications through a single observability exporter, with no changes to your agent code.
+
+Mastra emits structured spans for every agent run, model call, tool call, and workflow step. The `DeepEvalExporter` turns those spans into Confident AI traces and sends them to the [Observatory](https://app.confident.ai).
+
+## Tracing Quickstart
+
+<Steps>
+  <Step title="Install Dependencies">
+    Add the `deepeval` package to your Mastra project:
+
+    ```bash
+    npm install deepeval
+    ```
+
+  </Step>
+  <Step title="Set your API key">
+    Set your Confident AI API key as an environment variable. Your region (US/EU) is detected automatically from the key, so no endpoint configuration is needed.
+
+    ```bash
+    export CONFIDENT_API_KEY="your-confident-api-key"
+    ```
+
+  </Step>
+  <Step title="Register the exporter">
+    Import `DeepEvalExporter` from `deepeval/integrations/mastra` and add it to your Mastra observability config:
+
+    ```typescript
+    import { Mastra } from "@mastra/core";
+    import { Observability } from "@mastra/observability";
+    import { DeepEvalExporter } from "deepeval/integrations/mastra";
+
+    export const mastra = new Mastra({
+      observability: new Observability({
+        configs: {
+          deepeval: {
+            serviceName: "my-service",
+            exporters: [new DeepEvalExporter()],
+          },
+        },
+      }),
+    });
+    ```
+
+    You can also pass credentials directly instead of using environment variables:
+
+    ```typescript
+    new DeepEvalExporter({
+      apiKey: "your-confident-api-key",
+      environment: "production",
+    });
+    ```
+
+  </Step>
+  <Step title="Run your agent">
+    Run any agent or workflow from your configured Mastra instance. Traces appear on [Confident AI](https://app.confident.ai)'s traces page inside the Observatory.
+
+    ```typescript
+    const agent = mastra.getAgent("myAgent");
+    await agent.generate("How do I make the best coffee?");
+    ```
+
+  </Step>
+</Steps>
+
+## Span type mapping
+
+Mastra produces many span types. The exporter maps each one to a Confident AI [span type](/docs/llm-tracing/span-types), defaulting to `Custom`:
+
+| Mastra span type | Confident AI span type |
+| --------------------------------------------------------------------- | ---------------------- |
+| `agent_run`, `workflow_run` | Agent |
+| `model_generation` | LLM |
+| `tool_call`, `mcp_tool_call`, `provider_tool_call`, `client_tool_call` | Tool |
+| `rag_embedding`, `rag_vector_operation` | Retriever |
+| All others | Custom |
+
+Each span carries its input, output, and metadata. LLM spans also capture the model name and token counts, and tool spans are collected into the trace's tool calls. Streaming event spans (for example `model_chunk`) are dropped to keep traces readable.
+
+## Advanced Usage
+
+### Configuration options
+
+`DeepEvalExporter` accepts an optional options object to control tracing behavior:
+
+```typescript
+import { DeepEvalExporter } from "deepeval/integrations/mastra";
+
+new DeepEvalExporter({
+  apiKey: "your-confident-api-key",      // defaults to CONFIDENT_API_KEY env var
+  environment: "production",             // defaults to "development"
+  name: "my-agent",                      // optional default trace name
+  metricCollection: "my-metrics",        // optional metric collection for all traces
+  debug: false,                          // set true to enable verbose logging
+});
+```
+
+<Accordion title="View DeepEvalExporter Options">
+<ParamField path="apiKey" type="string" required={false}>
+  Your Confident AI API key. Defaults to the `CONFIDENT_API_KEY` environment variable. The exporter disables itself with a warning when no key is found.
+</ParamField>
+
+<ParamField path="environment" type="string" required={false}>
+  The deployment environment label attached to all traces (e.g. `"production"`, `"staging"`). Defaults to `"development"`. Can also be set via the `CONFIDENT_TRACE_ENVIRONMENT` environment variable.
+</ParamField>
+
+<ParamField path="name" type="string" required={false}>
+  A default name applied to every trace. Defaults to the Mastra `serviceName`. [Learn more](/docs/llm-tracing/features/name).
+</ParamField>
+
+<ParamField path="tags" type="string[]" required={false}>
+  Tags applied to every trace. [Learn more](/docs/llm-tracing/features/tags).
+</ParamField>
+
+<ParamField path="metadata" type="Record<string, any>" required={false}>
+  Metadata applied to every trace. [Learn more](/docs/llm-tracing/features/metadata).
+</ParamField>
+
+<ParamField path="threadId" type="string" required={false}>
+  Thread or conversation ID applied to every trace, used to view and evaluate conversations. [Learn more](/docs/llm-tracing/features/threads).
+</ParamField>
+
+<ParamField path="userId" type="string" required={false}>
+  User ID applied to every trace to enable user analytics. [Learn more](/docs/llm-tracing/features/users).
+</ParamField>
+
+<ParamField path="testCaseId" type="string" required={false}>
+  Links traces to an existing test case on Confident AI for offline evaluation workflows.
+</ParamField>
+
+<ParamField path="turnId" type="string" required={false}>
+  Identifies a specific turn within a multi-turn conversation thread. Used together with `threadId`.
+</ParamField>
+
+<ParamField path="metricCollection" type="string" required={false}>
+  A [metric collection](/docs/metrics/metric-collections) applied to the whole trace for online evaluation.
+</ParamField>
+
+<ParamField path="traceMetricCollection" type="string" required={false}>
+  A trace-level metric collection. Takes precedence over `metricCollection`.
+</ParamField>
+
+<ParamField path="llmMetricCollection" type="string" required={false}>
+  A metric collection applied to LLM spans.
+</ParamField>
+
+<ParamField path="agentMetricCollection" type="string" required={false}>
+  A metric collection applied to agent spans.
+</ParamField>
+
+<ParamField path="toolMetricCollectionMap" type="Record<string, string>" required={false}>
+  A map of tool name to metric collection, applied to matching tool spans.
+</ParamField>
+
+<ParamField path="prompt" type="Prompt" required={false}>
+  A Confident AI `Prompt` object linked to LLM spans. See [Logging prompts](#logging-prompts).
+</ParamField>
+
+<ParamField path="debug" type="boolean" required={false}>
+  When `true`, logs configuration details and errors to the console. Defaults to `false`.
+</ParamField>
+</Accordion>
+
+### Setting trace attributes
+
+Confident AI's tracing features let you attach attributes such as `threadId`, `userId`, `tags`, and `metadata` to your traces. `threadId` and `userId` group related traces together, which is useful for chat apps, agents, and multi-turn interactions. You can learn more about [threads](/docs/llm-tracing/features/threads) here.
+
+Attributes can be set at two levels. Exporter-level options apply to **every** trace as defaults:
+
+```typescript
+import { DeepEvalExporter } from "deepeval/integrations/mastra";
+
+new DeepEvalExporter({
+  name: "support-agent",
+  tags: ["production", "support"],
+  metadata: { version: "1.2.0" },
+});
+```
+
+Per-request attributes are set on each `generate` / `stream` call via Mastra's `tracingOptions` (and `memory` for thread and user identity), and **override** the exporter defaults for that trace:
+
+```typescript
+await agent.generate("What's the weather in Tokyo?", {
+  // thread + user identity (also sets the span's conversationId)
+  memory: { thread: "thread-123", resource: "user-456" },
+  tracingOptions: {
+    metadata: {
+      userId: "user-456", // maps to the trace's user
+      threadId: "thread-123", // maps to the trace's thread
+      testCaseId: "tc-1", // optional: link to a Confident AI test case
+      turnId: "turn-1", // optional: identify a conversation turn
+      team: "growth", // any other keys land in trace metadata
+    },
+    tags: ["beta"],
+  },
+});
+```
+
+The exporter reads these from the root span: `tracingOptions.metadata` keys `userId`, `threadId` (or `sessionId`), `testCaseId`, `turnId`, and `traceName` map to the matching trace fields; any other keys go to trace metadata; `tracingOptions.tags` become trace tags; and `memory.thread` / `memory.resource` populate the thread and user identity.
+
+<Info>
+  Each attribute is **optional**. Per-request values take precedence over the exporter defaults, and everything works the same way as the [native tracing features](/docs/llm-tracing/introduction) on Confident AI.
+</Info>
+
+### Logging prompts
+
+If you are [managing prompts](/docs/llm-evaluation/prompt-management/version-prompts) on Confident AI and wish to log them, pass your `Prompt` object to the exporter. It's linked to every LLM span the exporter produces:
+
+```typescript
+import { Prompt } from "deepeval";
+import { DeepEvalExporter } from "deepeval/integrations/mastra";
+
+const prompt = new Prompt({ alias: "PROMPT_ALIAS" });
+await prompt.pull();
+
+new DeepEvalExporter({ prompt });
+```
+
+<Note>
+  Be sure to **pull the prompt** before logging it, otherwise the prompt will not be visible on Confident AI.
+</Note>
+
+## Evals Usage
+
+### Online evals
+
+You can run [online evals](/docs/llm-tracing/online-evals) on your Mastra application by setting a `metricCollection`, which evaluates all incoming traces on Confident AI's servers. This approach is recommended if your agent is in production.
+
+<Steps>
+  <Step title="Create metric collection">
+    Create a metric collection on [Confident AI](https://app.confident.ai) with the metrics you wish to use to evaluate your Mastra application.
+    <Frame caption="Create metric collection">
+      <video
+        autoPlay
+        loop
+        muted
+        data-video="metrics.createCollection"
+        type="video/mp4"
+      />
+    </Frame>
+    <Warning>
+      A trace-level metric collection must only contain metrics that evaluate the input and actual output of your application.
+    </Warning>
+  </Step>
+  <Step title="Run evals">
+    You can run evals at both the trace and span level. We recommend creating separate [metric collections](/docs/metrics/metric-collections) for each component, since each requires its own evaluation criteria and metrics.
+
+    Pass the metric collections to the exporter. `metricCollection` applies to the entire trace, while `llmMetricCollection`, `agentMetricCollection`, and `toolMetricCollectionMap` apply to individual spans by type.
+
+    ```typescript
+    import { DeepEvalExporter } from "deepeval/integrations/mastra";
+
+    new DeepEvalExporter({
+      metricCollection: "trace-metric-collection-name",
+      llmMetricCollection: "llm-metric-collection-name",
+      agentMetricCollection: "agent-metric-collection-name",
+      toolMetricCollectionMap: {
+        search: "tool-metric-collection-name",
+      },
+    });
+    ```
+
+  </Step>
+  <Success>
+    All incoming traces will now be evaluated using metrics from your metric collection.
+  </Success>
+</Steps>
+
+You can view evals on [Confident AI](https://app.confident.ai) by visiting the traces pages inside the Observatory.
+
+<Frame>
+  <video data-video="evaluation.singleTurnE2E" controls autoPlay playsInline />
+</Frame>
