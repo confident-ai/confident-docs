@@ -710,6 +710,9 @@ navigation:
           - page: Open Inference
             path: docs/pages/integrations/third-party/openinference.mdx
             icon: fa-light fa-telescope
+          - page: Mastra
+            path: docs/pages/integrations/third-party/mastra.mdx
+            icon: fa-light fa-diagram-project
       - section: LLM Gateways
         collapsed: true
         contents:
