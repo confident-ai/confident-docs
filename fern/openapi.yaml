@@ -573,7 +573,8 @@ paths:
                     id: "DATASET-ID"
                     version: "00.00.01"
                     goldens:
-                      - input: "How's the weather like in NYC?"
+                      - id: "GOLDEN-ID"
+                        input: "How's the weather like in NYC?"
                         expectedOutput: "No idea"
                 Multi-Turn:
                   success: true
@@ -581,7 +582,8 @@ paths:
                     id: "DATASET-ID"
                     version: "00.00.01"
                     conversationalGoldens:
-                      - scenario: "Booking a hotel"
+                      - id: "GOLDEN-ID"
+                        scenario: "Booking a hotel"
                         expectedOutcome: "Successfully booked"
                         userDescription: "Finds hotels in NYC"
 
@@ -740,6 +742,71 @@ paths:
                 $ref: "#/components/schemas/QueueDatasetGoldensResponse"
               example:
                 link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+
+  /v1/datasets/{alias}/goldens/{goldenId}:
+    put:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Update Golden
+      operationId: updateGolden
+      description: |
+        Updates a single golden in a dataset, identified by the `goldenId` returned when the dataset is pulled. The golden's fields are replaced with the values you send; `tags` and custom columns are left unchanged unless you include them.
+
+        Provide the fields for a single-turn golden, or a multi-turn golden, matching the dataset type.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/Golden"
+                - $ref: "#/components/schemas/ConversationalGolden"
+            examples:
+              Single-Turn:
+                input: "How is the weather like in NYC?"
+                expectedOutput: "Sunny with a chance of rain."
+                finalized: true
+              Multi-Turn:
+                scenario: "Booking a hotel"
+                expectedOutcome: "Successfully booked"
+                userDescription: "Finds hotels in NYC"
+                finalized: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateGoldenResponse"
+              example:
+                success: true
+                data:
+                  id: "golden-id"
+                link: "https://app.confident-ai.com/project/<PROJECT-ID>/datasets/<DATASET-ID>"
+                deprecated: false
+    delete:
+      x-fern-server-name: Confident AI
+      tags:
+        - Datasets
+      summary: Delete Golden
+      operationId: deleteGolden
+      description: |
+        Permanently deletes a single golden from a dataset, identified by the `goldenId` returned when the dataset is pulled. Only the specified golden is removed; the rest of the dataset is unchanged.
+
+        **Warning:** This action cannot be undone.
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteGoldenResponse"
+              example:
+                success: true
+                data:
+                  id: "golden-id"
+                deprecated: false
 
   /v1/evaluate:
     post:
@@ -6506,6 +6573,10 @@ components:
     Golden:
       type: object
       properties:
+        id:
+          type: string
+          readOnly: true
+          description: "Server-assigned identifier, returned when the dataset is pulled. Use it to update or delete this golden. Not accepted when pushing."
         input:
           type: string
           description: "This is the input to your LLM application."
@@ -6558,6 +6629,10 @@ components:
     ConversationalGolden:
       type: object
       properties:
+        id:
+          type: string
+          readOnly: true
+          description: "Server-assigned identifier, returned when the dataset is pulled. Use it to update or delete this golden. Not accepted when pushing."
         scenario:
           type: string
           description: "This is a description of the conversation context."
@@ -6802,6 +6877,49 @@ components:
       required:
         - success
         - data
+
+    UpdateGoldenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the golden was successfully updated."
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "This is the ID of the updated golden."
+        link:
+          type: string
+          description: "A link to the dataset the golden belongs to."
+        deprecated:
+          type: boolean
+          description: "This is true if this datasets endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
+
+    DeleteGoldenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "This is true if the golden was successfully deleted."
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: "This is the ID of the deleted golden."
+        deprecated:
+          type: boolean
+          description: "This is true if this datasets endpoint is deprecated."
+      required:
+        - success
+        - data
+        - deprecated
 
     DatasetVersion:
       type: object
