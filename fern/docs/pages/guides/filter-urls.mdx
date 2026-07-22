@@ -1,0 +1,555 @@
+---
+title: Build Filtered Views from a URL
+subtitle: Write filters directly into a Confident AI page URL to open any list — test runs, test cases, traces, and more — already filtered.
+slug: guides/filter-urls
+description: The Confident AI filters URL format — how to express filters as JSON in a page URL, and the exact properties, conditions, and values you can filter on across test runs, test cases, traces, spans, threads, and more.
+---
+
+## Overview
+
+Confident AI allows you to filter your traces, test runs, test cases and any other lists, these filters are applied in your URL parameters and can be shared with anyone. You can also build these filters manually in JSON and convert them to URLs.
+
+This guide shows how to write that JSON, combine multiple filters, and encode the link in your language of choice — followed by a reference of everything you can filter on.
+
+## Build a filter
+
+<Steps>
+
+<Step title="Start from a page URL">
+
+Start with the URL of the page you want to filter. It's the same shape on every list:
+
+```
+https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs
+https://app.confident-ai.com/project/YOUR_PROJECT_ID/observatory/traces
+```
+
+You'll add two query parameters:
+
+- **`filters`** — your filters as JSON, compressed (step 3 shows how).
+- **`operator`** — `AND` or `OR`, describing how multiple filter groups combine.
+
+</Step>
+
+<Step title="Write your filters as JSON">
+
+Filters are organized into **groups**. Each group has an `operator` and a list of **conditions**, and each condition is a single filter containing a `category` (what you're filtering on), a `condition`, and a `value`:
+
+```json
+[
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Metadata", "key": "environment", "condition": "Is", "value": "production" }
+    ]
+  }
+]
+```
+
+- Conditions **inside a group** combine using that group's `operator`.
+- **Groups** combine using the top-level `operator` query parameter.
+
+<Note>
+
+Set `key` to the same text as `category` for every filter — **except** Metadata, Hyperparameter, Metric, Criteria, and Classifier filters, where `key` is the specific name you're filtering on (a metadata key, a hyperparameter, metric, criteria, or classifier name).
+
+</Note>
+
+The [filter reference](#filter-reference) below lists the exact `category`, `condition`, and `value` for every property, on each page.
+
+</Step>
+
+<Step title="Encode it and add to the URL">
+
+Confident AI stores the `filters` value as a compressed string using the [`lz-string`](https://github.com/pieroxy/lz-string) library. Compress your JSON with `compressToEncodedURIComponent`, then append the result as `filters` (it's already URL-safe) and set `operator`:
+
+```
+https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=COMPRESSED_STRING&operator=AND
+```
+
+<Tabs>
+
+<Tab title="JavaScript" language="javascript">
+
+```bash
+npm install lz-string
+```
+
+```javascript
+import LZString from "lz-string";
+
+const filters = [
+  {
+    operator: "AND",
+    filters: [
+      { category: "Metadata", key: "environment", condition: "Is", value: "production" },
+    ],
+  },
+];
+
+const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(filters));
+const url = `https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=${encoded}&operator=AND`;
+```
+
+</Tab>
+
+<Tab title="Python" language="python">
+
+```bash
+pip install lzstring
+```
+
+```python
+import json
+import lzstring
+
+filters = [
+    {
+        "operator": "AND",
+        "filters": [
+            {"category": "Metadata", "key": "environment", "condition": "Is", "value": "production"},
+        ],
+    },
+]
+
+encoded = lzstring.LZString().compressToEncodedURIComponent(json.dumps(filters))
+url = f"https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters={encoded}&operator=AND"
+```
+
+</Tab>
+
+<Tab title="Rust" language="rust">
+
+Use the [`lz-str`](https://crates.io/crates/lz-str) crate:
+
+```rust
+let json = r#"[{"operator":"AND","filters":[{"category":"Metadata","key":"environment","condition":"Is","value":"production"}]}]"#;
+let encoded = lz_str::compress_to_encoded_uri_component(json);
+let url = format!("https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters={encoded}&operator=AND");
+```
+
+</Tab>
+
+<Tab title="Ruby" language="ruby">
+
+Use a community port such as [lz_string](https://github.com/Altivi/lz_string):
+
+```ruby
+json = '[{"operator":"AND","filters":[{"category":"Metadata","key":"environment","condition":"Is","value":"production"}]}]'
+encoded = LZString.compress_to_encoded_uri_component(json)
+url = "https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=#{encoded}&operator=AND"
+```
+
+</Tab>
+
+<Tab title="Elixir" language="elixir">
+
+Use a community port such as [elixir-lz-string](https://github.com/koudelka/elixir-lz-string):
+
+```elixir
+json = ~s([{"operator":"AND","filters":[{"category":"Metadata","key":"environment","condition":"Is","value":"production"}]}])
+encoded = LzString.compress_to_encoded_uri_component(json)
+url = "https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=#{encoded}&operator=AND"
+```
+
+</Tab>
+
+<Tab title="Java" language="java">
+
+Use a community port such as [lz-string4java](https://github.com/rufushuang/lz-string4java):
+
+```java
+String json = "[{\"operator\":\"AND\",\"filters\":[{\"category\":\"Metadata\",\"key\":\"environment\",\"condition\":\"Is\",\"value\":\"production\"}]}]";
+String encoded = LZString.compressToEncodedURIComponent(json);
+String url = "https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=" + encoded + "&operator=AND";
+```
+
+</Tab>
+
+<Tab title="C#" language="csharp">
+
+Use a community port such as [lz-string-csharp](https://github.com/jawa-the-hutt/lz-string-csharp):
+
+```csharp
+string json = "[{\"operator\":\"AND\",\"filters\":[{\"category\":\"Metadata\",\"key\":\"environment\",\"condition\":\"Is\",\"value\":\"production\"}]}]";
+string encoded = LZString.compressToEncodedURIComponent(json);
+string url = $"https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters={encoded}&operator=AND";
+```
+
+</Tab>
+
+<Tab title="PHP" language="php">
+
+Use a community port such as [lz-string-php](https://github.com/nullpunkt/lz-string-php):
+
+```php
+$json = json_encode([
+    ["operator" => "AND", "filters" => [
+        ["category" => "Metadata", "key" => "environment", "condition" => "Is", "value" => "production"],
+    ]],
+]);
+$encoded = LZString::compressToEncodedURIComponent($json);
+$url = "https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters={$encoded}&operator=AND";
+```
+
+</Tab>
+
+<Tab title="Go" language="go">
+
+Use a community port such as [go-lz-string](https://github.com/daku10/go-lz-string):
+
+```go
+input := `[{"operator":"AND","filters":[{"category":"Metadata","key":"environment","condition":"Is","value":"production"}]}]`
+encoded, _ := golzstring.CompressToEncodedURIComponent(input)
+url := "https://app.confident-ai.com/project/YOUR_PROJECT_ID/test-runs?filters=" + encoded + "&operator=AND"
+```
+
+</Tab>
+
+</Tabs>
+
+<Note>
+
+JavaScript's [`lz-string`](https://github.com/pieroxy/lz-string) is the reference implementation; the others are community ports that mirror it. Install steps and method names vary a little — check the linked repo for your language.
+
+</Note>
+
+Done ✅. Opening the link loads the page with the filter applied.
+
+</Step>
+
+</Steps>
+
+## Filter reference
+
+<Warning>
+
+Copy each filter's `category`, `condition`, and `value` exactly as they appear below — anything that doesn't match a real property or value won't take effect.
+
+</Warning>
+
+The properties you can filter on depend on the page — each page's full set is below. Two shorthands used in the tables:
+
+- **Numeric conditions** — `Is less than`, `Is equal or less than`, `Is greater than`, `Is equal or greater than`, `Is equal to`, `Does not equal`.
+- **Tag conditions** — `Contains`, `Does not contain`.
+
+Everything else uses `Is` / `Is not` unless a row says otherwise.
+
+Most properties use their `category` as the `key`. A few take a **custom `key`** — the name you're filtering on: **Metadata** (a metadata key), **Hyperparameter** (a hyperparameter name), **Metric Status** / **Metric Score** (a metric name), **Criteria** (a criteria name), and **Classifier** (a signal name).
+
+<AccordionGroup>
+
+<Accordion title="Test runs">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Test run ID | `Test Run ID` | `Is`, `Is not` | the test run's ID |
+| Identifier | `Identifier` | `Is`, `Is not` | the run identifier |
+| Test file | `Test File` | `Is`, `Is not` | the test file name |
+| Dataset | `Dataset` | `Is`, `Is not` | the dataset alias |
+| Status | `Status` | `Is`, `Is not` | `COMPLETED`, `IN_PROGRESS`, `ERRORED`, or `CANCELLED` |
+| Official | `Official` | `Is`, `Is not` | `Official` or `Not official` |
+| Evals mode | `Evals Mode` | `Is`, `Is not` | `End-to-End` or `Component-Level` |
+| Tests passed | `Tests Passed` | numeric conditions | a whole number |
+| Tests failed | `Tests Failed` | numeric conditions | a whole number |
+| Pass rate | `Pass Rate` | numeric conditions | a percentage, e.g. `90` |
+| Fail rate | `Fail Rate` | numeric conditions | a percentage, e.g. `10` |
+| Tags | `Tags` | tag conditions | one or more tags, e.g. `["prod", "smoke"]` |
+| Trace attached | `Trace` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotations attached | `Annotations` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotation name | `Annotation Name` | `Is`, `Is not` | the annotation's name |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+| Hyperparameter *(key: hyperparameter name)* | `Hyperparameter` | `Is`, `Is not` | the hyperparameter value |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Test cases">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Test case ID | `Test Case ID` | `Is`, `Is not` | the test case's ID |
+| Name | `Name` | `Is`, `Is not` | the test case name |
+| Tags | `Tags` | tag conditions | one or more tags, e.g. `["billing"]` |
+| Trace attached | `Trace` | `Is`, `Is not` | `Set` or `Not Set` |
+| Trace ID | `Trace Uuid` | `Is`, `Is not` | the trace ID |
+| Trace name | `Trace Name` | `Is`, `Is not` | the trace name |
+| Trace status | `Trace Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Trace tags | `Trace Tags` | tag conditions | one or more tags |
+| Span name | `Span Name` | `Is`, `Is not` | the span name |
+| Span type | `Span Type` | `Is`, `Is not` | `LLM`, `AGENT`, `RETRIEVER`, `TOOL`, or `SPAN` |
+| Span status | `Span Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Model | `Model` | `Is`, `Is not` | the model name |
+| Embedder | `Embedder` | `Is`, `Is not` | the embedder name |
+| Chunk size | `Chunk Size` | `Is`, `Is not` | a number |
+| Top-K | `Top-K` | `Is`, `Is not` | a number |
+| Annotation name | `Annotation Name` | `Is`, `Is not` | the annotation's name |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Traces">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Trace ID | `Trace Uuid` | `Is`, `Is not` | a trace ID |
+| Name (trace name) | `Name` | `Is`, `Is not` | a trace name |
+| Thread ID | `Thread Id` | `Is`, `Is not` | a thread ID |
+| User ID | `User Id` | `Is`, `Is not` | an end-user ID |
+| Tags | `Tags` | `Contains`, `Contains only`, `Does not contain` | one or more tags |
+| Tools called | `Tools Called` | tag conditions | one or more tool names |
+| Metrics status (overall) | `Metrics Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Error status | `Error Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Environment | `Environment` | `Is`, `Is not` | `production`, `development`, `staging`, or `testing` |
+| Metric name (which metrics ran) | `Metric Name` | `Contains`, `Contains only`, `Does not contain` | one or more metric names |
+| Review flag | `Review flag` | `Is`, `Is not` | `Flagged` or `Not flagged` |
+| Annotation name | `Annotation Name` | `Is`, `Is not` | an annotation name |
+| Annotator | `Annotator` | `Is`, `Is not` | an annotator (by email) |
+| End user | `End User` | `Is`, `Is not` | an end-user ID |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotation date | `Annotation Date` | `Is between` | a date range |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+| Classifier *(key: signal name)* | `Classifier` | `Is`, `Is not` | the classifier value |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Spans">
+
+Some properties apply only to a specific span type (noted in the row).
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Span ID | `Span Uuid` | `Is`, `Is not` | a span ID |
+| Name (span name) | `Name` | `Is`, `Is not` | a span name |
+| Trace ID | `Trace Uuid` | `Is`, `Is not` | a trace ID |
+| Integration | `Integration` | `Is`, `Is not` | an integration |
+| Metrics status (overall) | `Metrics Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Error status | `Error Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Model (LLM spans) | `Model` | `Is`, `Is not` | a model name |
+| Provider (LLM spans) | `Provider` | `Is`, `Is not` | a provider |
+| Prompt alias (LLM spans) | `Prompt Alias` | `Is`, `Is not` | a prompt alias |
+| Prompt version (LLM spans) | `Prompt Version` | `Is`, `Is not` | a prompt version |
+| Prompt label (LLM spans) | `Prompt Label` | `Is`, `Is not` | a prompt label |
+| Prompt commit hash (LLM spans) | `Prompt Commit Hash` | `Is`, `Is not` | a commit hash |
+| Embedder (retriever spans) | `Embedder` | `Is`, `Is not` | an embedder |
+| Chunk size (retriever spans) | `Chunk Size` | `Is`, `Is not` | a number |
+| Top-K (retriever spans) | `Top-K` | `Is`, `Is not` | a number |
+| Environment | `Environment` | `Is`, `Is not` | `production`, `development`, `staging`, or `testing` |
+| Metric name (which metrics ran) | `Metric Name` | `Contains`, `Contains only`, `Does not contain` | one or more metric names |
+| Annotation name | `Annotation Name` | `Is`, `Is not` | an annotation name |
+| Annotator | `Annotator` | `Is`, `Is not` | an annotator (by email) |
+| End user | `End User` | `Is`, `Is not` | an end-user ID |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotation date | `Annotation Date` | `Is between` | a date range |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Threads">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Thread ID | `Thread Id` | `Is`, `Is not` | a thread ID |
+| User ID | `User Id` | `Is`, `Is not` | an end-user ID |
+| Metrics status (overall) | `Metrics Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Tags | `Tags` | `Contains`, `Contains only`, `Does not contain` | one or more tags |
+| Environment | `Environment` | `Is`, `Is not` | `production`, `development`, `staging`, or `testing` |
+| Metric name (which metrics ran) | `Metric Name` | `Contains`, `Contains only`, `Does not contain` | one or more metric names |
+| Trace count | `Trace Count` | numeric conditions | a number |
+| Annotation name | `Annotation Name` | `Is`, `Is not` | an annotation name |
+| Annotator | `Annotator` | `Is`, `Is not` | an annotator (by email) |
+| End user | `End User` | `Is`, `Is not` | an end-user ID |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected outcome | `Expected Outcome` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotation date | `Annotation Date` | `Is between` | a date range |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+| Classifier *(key: signal name)* | `Classifier` | `Is`, `Is not` | the classifier value |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Users">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Thread ID | `Thread Id` | `Is`, `Is not` | a thread ID |
+| Tags | `Tags` | tag conditions | one or more tags |
+| Model | `Model` | `Is`, `Is not` | a model name |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Metric status *(key: metric name)* | `Metric Status` | `Is`, `Is not` | `Passing` or `Failing` |
+| Metric score *(key: metric name)* | `Metric Score` | numeric conditions | a number `0`–`1` |
+| Metadata *(key: metadata key)* | `Metadata` | `Is`, `Is not` | the metadata value |
+
+</Accordion>
+
+<Accordion title="Datasets">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Golden ID | `Golden ID` | `Is`, `Is not` | a golden ID |
+| Ingestion task | `Ingestion Task` | `Is`, `Is not` | an ingestion-task name |
+| Finalized | `Finalized` | `Is`, `Is not` | `True` or `False` |
+| Tags | `Tags` | tag conditions | one or more tags |
+| Assigned to | `Assigned to` | `Is`, `Is not` | a project member (by email) |
+| Requested review from | `Requested review from` | `Is`, `Is not` | a project member (by email) |
+
+</Accordion>
+
+<Accordion title="Human annotation">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Annotation type | `Annotation Type` | `Is`, `Is not` | `Thumbs Up/Down` or `Star Rating` |
+| Annotator | `Annotator` | `Is`, `Is not` | an annotator (by name / email) |
+| End user | `End User` | `Is`, `Is not` | an end-user ID |
+| Explanation | `Explanation` | `Is`, `Is not` | `Set` or `Not Set` |
+| Expected output | `Expected Output` | `Is`, `Is not` | `Set` or `Not Set` |
+| Annotation date | `Annotation Date` | `Is between` | a date range |
+| Star rating | `Star Rating` | `Is`, `Is not` | a number `1`–`5` |
+| Thumbs rating | `Thumbs Rating` | `Is`, `Is not` | `1` (up) or `0` (down) |
+| Criteria *(key: criteria name)* | `Criteria` | `Is`, `Is not` | a star rating `1`–`5`, or thumbs `1`/`0` |
+
+</Accordion>
+
+<Accordion title="Risk profile">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Assessment ID | `Assessment ID` | `Is`, `Is not` | an assessment ID |
+| Identifier | `Identifier` | `Is`, `Is not` | an identifier |
+| Framework | `Framework` | `Is`, `Is not` | a framework name |
+| Status | `Status` | `Is`, `Is not` | `COMPLETED`, `IN_PROGRESS`, `ERRORED`, or `CANCELLED` |
+| Official | `Official` | `Is`, `Is not` | `Official` or `Not official` |
+| Risk category | `Risk Category` | `Is`, `Is not` | a risk category |
+| Attack method | `Attack Method` | `Is`, `Is not` | an attack method |
+| Tests passed | `Tests Passed` | numeric conditions | a whole number |
+| Tests failed | `Tests Failed` | numeric conditions | a whole number |
+| Pass rate | `Pass Rate` | numeric conditions | a percentage |
+| Fail rate | `Fail Rate` | numeric conditions | a percentage |
+| Vulnerability | `Vulnerability` | `Is`, `Is not` | a vulnerability |
+| Vulnerability type | `Vulnerability Type` | `Is`, `Is not` | a vulnerability type |
+
+</Accordion>
+
+<Accordion title="Red-teaming test cases">
+
+| Property | `category` | Conditions | `value` |
+| --- | --- | --- | --- |
+| Test case ID | `Test Case ID` | `Is`, `Is not` | a test-case ID |
+| Vulnerability | `Vulnerability` | `Is`, `Is not` | a vulnerability |
+| Vulnerability type | `Vulnerability Type` | `Is`, `Is not` | a vulnerability type |
+| Attack method | `Attack Method` | `Is`, `Is not` | an attack method |
+| Risk category | `Risk Category` | `Is`, `Is not` | a risk category |
+| Status | `Status` | `Is`, `Is not` | `Passing`, `Failing`, or `Errored` |
+
+</Accordion>
+
+</AccordionGroup>
+
+## Examples
+
+Each example below is the `filters` JSON — compress it (step 3) and add it to the URL.
+
+**Filter by a metadata value.** Test runs whose test cases carry `environment: production`:
+
+```json
+[
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Metadata", "key": "environment", "condition": "Is", "value": "production" }
+    ]
+  }
+]
+```
+
+**Filter by a hyperparameter.** Test runs that used the `gpt-4o` value for a `model` hyperparameter — just the name and value, no ID:
+
+```json
+[
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Hyperparameter", "key": "model", "condition": "Is", "value": "gpt-4o" }
+    ]
+  }
+]
+```
+
+**Combine conditions in one group.** Completed runs whose test cases carry `environment: production` — both must hold, so the group's `operator` is `AND`:
+
+```json
+[
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Metadata", "key": "environment", "condition": "Is", "value": "production" },
+      { "category": "Status", "key": "Status", "condition": "Is", "value": "COMPLETED" }
+    ]
+  }
+]
+```
+
+**Combine groups with OR.** Runs that are either official *or* have a passing `Answer Relevancy` metric — two groups joined by the top-level `operator=OR`:
+
+```json
+[
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Official", "key": "Official", "condition": "Is", "value": "Official" }
+    ]
+  },
+  {
+    "operator": "AND",
+    "filters": [
+      { "category": "Metric Status", "key": "Answer Relevancy", "condition": "Is", "value": "Passing" }
+    ]
+  }
+]
+```
+
+## Next Steps
+
+Filtered links pair well with the workflows that produce the runs you're filtering.
+
+<CardGroup cols={2}>
+  <Card title="Build Test Runs from Traces" icon="flask" href="/docs/guides/test-runs-from-traces">
+    Stream your app's traces into a test run as evaluated test cases — the runs you'll filter and share with these links.
+  </Card>
+  <Card title="Generating Reports for Stakeholders" icon="file-lines" href="/docs/guides/reports">
+    Turn a filtered view into a recurring, curated report that reaches your stakeholders on a schedule.
+  </Card>
+</CardGroup>
