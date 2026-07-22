@@ -73,7 +73,7 @@ If you'd rather Confident never open a PR for you, add both files by hand. This 
           - name: Install dependencies
             run: pip install -r requirements.txt # match your project (poetry/uv/etc.)
           - name: Confident PR Eval Gate
-            uses: confident-ai/deepeval-tracer/actions/eval-gate@v1
+            uses: confident-ai/deepeval-actions/actions/eval-gate@v1
             with:
               base_url: "<your-region-api-base-url>"
               dataset_alias: "<your-dataset-alias>"
