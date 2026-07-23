@@ -955,6 +955,9 @@ navigation:
           - page: Build Test Runs from Traces
             path: docs/pages/guides/test-runs-from-traces.mdx
             icon: fa-light fa-flask
+          - page: Build Filtered Views from a URL
+            path: docs/pages/guides/filter-urls.mdx
+            icon: fa-light fa-filter
       - section: AI Connections
         contents:
           - page: Air-Gapped Confident Agent
