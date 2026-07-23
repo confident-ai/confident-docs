@@ -1,0 +1,104 @@
+---
+subtitle: Gate merge requests on evaluation regressions — set up with a ready-made merge request or by hand.
+slug: settings/project/integrations/mr-eval-gate
+description: Set up the Confident MR Eval Gate for GitLab
+---
+
+The **MR Eval Gate** runs your LLM app over a pinned dataset on every merge request, scores the outputs with a metric collection, and posts a GitLab **commit status** (plus a note on the merge request) that **passes, fails, or is neutral** depending on whether your metric scores regressed against your target branch (within your configured tolerance).
+
+It needs two things in your project:
+
+1. **`.gitlab-ci.yml`** — includes Confident's published CI/CD component, which sets up your app (Python + dependencies) and runs the gate on every merge request.
+2. **`confident_eval.py`** — a `run(input)` function that calls your app and returns its output as a string. Confident calls this once per golden in your dataset.
+
+<Note>
+  A connected GitLab account is required either way — it posts the commit status and MR note on every merge request. The setup options below differ only in **how those two files get added** to your project.
+</Note>
+
+## Configure the gate
+
+<Steps>
+  <Step title="Connect GitLab and configure">
+    Go to **Settings → Integrations → MR Eval Gate**, connect GitLab, then choose the **project**, **dataset**, **metric collection**, and **regression tolerance** (the maximum average score drop per metric before the gate fails). Click **Save**.
+
+    <Note>
+      **Connecting on Confident Cloud vs. self-hosted.** On Confident Cloud you connect with one click via GitLab OAuth — you're redirected to GitLab to grant the `api` scope, then pick a project. On a **self-hosted Confident deployment**, where OAuth isn't available, you instead paste a GitLab **personal access token** with the **`api`** scope. Either way you must be a **Maintainer** on the project (managing CI/CD variables requires it), and only projects where you have Maintainer access appear in the picker.
+    </Note>
+  </Step>
+  <Step title="Open the setup merge request">
+    Click **Open setup merge request**. Saving only stores your configuration; this step is what wires the two files into your project and adds the `CONFIDENT_API_KEY` CI/CD variable for you.
+  </Step>
+</Steps>
+
+## Setup methods
+
+<CardGroup cols={2}>
+  <Card title="Setup merge request" icon="fa-light fa-code-merge">
+    Confident opens a merge request that adds the CI/CD component include and a `confident_eval.py` stub — no AI reads your code. You fill in `run()` and adjust the component inputs before merging.
+  </Card>
+  <Card title="Fully manual" icon="fa-light fa-pen">
+    Add the two files (and the CI/CD variable) yourself. Confident never opens a merge request for you — the connection only posts commit statuses and notes. Follow the steps below.
+  </Card>
+</CardGroup>
+
+## Set it up yourself
+
+If you'd rather Confident never open a merge request for you, add everything by hand. This is the most locked-down option; you also add the API key variable yourself.
+
+<Steps>
+  <Step title="Include the CI/CD component">
+    Add Confident's component to your **`.gitlab-ci.yml`**. Set `image` and `install_command` to match your app's runtime.
+
+    ```yaml title=".gitlab-ci.yml"
+    include:
+      - component: gitlab.com/confident-ai/eval-gate/eval-gate@v1
+        inputs:
+          base_url: "<your-region-api-base-url>"
+          dataset_alias: "<your-dataset-alias>"
+          dataset_version: "latest"
+          image: "python:3.12"                                # match your app's runtime
+          install_command: "pip install -r requirements.txt"  # match your project (poetry/uv/etc.)
+    ```
+
+    <Note>
+      `base_url` is region-specific: use `https://api.confident-ai.com` for US and `https://eu.api.confident-ai.com` for EU. Set `dataset_alias` (and optionally `dataset_version`) to the dataset you configured the gate against.
+    </Note>
+  </Step>
+
+  <Step title="Add the eval callback">
+    Create `confident_eval.py` at the repository root. `run(input)` receives one dataset input, calls your app, and returns its output — Confident runs it for every golden in your dataset and scores the results.
+
+    ```python title="confident_eval.py"
+    def run(input):
+        """Return your LLM app's output for a single dataset input."""
+        from my_app import agent  # import your application
+
+        return agent(input)  # return the output as a string
+    ```
+  </Step>
+
+  <Step title="Add the CI/CD variables">
+    Create a **project API key** in [Settings → API Keys](https://www.confident-ai.com/docs/settings/project/api-keys), then add it as a CI/CD variable named `CONFIDENT_API_KEY` (**Settings → CI/CD → Variables** in GitLab). **Mask** it, and leave **Protect variable unchecked** — protected variables are invisible to the merge-request pipelines where the gate runs. Add any runtime secrets your app needs (for example `OPENAI_API_KEY`) the same way.
+  </Step>
+</Steps>
+
+Once the component include and `confident_eval.py` are on your default branch, every future merge request runs the gate and posts the **Confident MR Eval Gate** commit status (and a note with the score comparison) against your target branch.
+
+<Note>
+  **Extra pipeline on merge requests.** If your project has no `workflow:rules`, GitLab may create both a branch pipeline and a merge-request pipeline for the same push — you'll see an extra pipeline, though the gate job itself isn't duplicated. Add [`workflow:rules`](https://docs.gitlab.com/ee/ci/yaml/workflow.html) to your `.gitlab-ci.yml` to run a single pipeline per change.
+</Note>
+
+## Troubleshooting
+
+Most misconfigurations fail loudly — the runner reports the reason on the **Confident MR Eval Gate** commit status and in the pipeline job logs. A few fail silently; those are called out below.
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Gate never runs on an MR (silent) | The component `include:` was removed, or the project's `workflow:rules` exclude merge-request pipelines | Keep the component include and allow `merge_request_event` pipelines |
+| Scores look meaningless — everything compared against "None" (silent) | `run()` returned `None` or a non-string value | Return your app's output **as a string** from `run()` |
+| `could not import confident_eval.run` | `confident_eval.py` isn't at the repo root, or the function isn't named `run` | Keep the file at the repository root and the function named `run` |
+| `app raised while producing outputs` | `run()` doesn't take a single `input` argument, or an app runtime secret is missing | Match the `run(input)` signature; add your app's secrets (e.g. `OPENAI_API_KEY`) as CI/CD variables |
+| `could not pull dataset` | `CONFIDENT_API_KEY` is missing/rotated/revoked, or the dataset alias, version, or `base_url` is wrong | Re-add the variable and verify the dataset alias, version, and region `base_url` |
+| `CONFIDENT_API_KEY` is empty in the job (silent) | The variable is **Protected**, so it's hidden from the merge-request pipeline | Edit the variable and **uncheck Protect variable** (keep Masked) |
+| The project doesn't appear in the picker | You're not a **Maintainer** on the project | Managing CI/CD variables requires Maintainer — ask an owner to grant it |
+| Errors on some or all rows | The dataset contains multi-turn goldens | v1 supports single-turn datasets — point the gate at a single-turn dataset |
