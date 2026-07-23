@@ -758,6 +758,9 @@ navigation:
               - page: PR Eval Gate
                 path: docs/pages/settings/project/integrations/pr-eval-gate.mdx
                 icon: fa-light fa-code-pull-request
+              - page: MR Eval Gate
+                path: docs/pages/settings/project/integrations/mr-eval-gate.mdx
+                icon: fa-light fa-code-merge
 
           - section: AI Connections
             path: docs/pages/settings/project/ai-connections.mdx
