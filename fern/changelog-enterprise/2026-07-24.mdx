@@ -1,0 +1,45 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.22
+
+Release v2.0.22 expands organization-level billing and cost-insights, adds invitation token flows for onboarding and public invite routes, and introduces AWS Marketplace license-manager integration. It also includes test-run cost and latency reporting, metric evaluation model support, and several deployment and packaging updates.
+
+### Highlights
+- Organization billing now includes cost-insights, cost breakdown, usage breakdown, and cost-by-project views.
+- Invitation links now use tokenized public routes and support token preview and acceptance flows.
+- Test runs now expose cost and latency graphs and per-run trace cost aggregation.
+- Helm and backend now support AWS Marketplace license-manager deployment and licensing configuration.
+
+### New Features
+- **Organization Cost Insights** — Added organization-level cost-insights, cost breakdown, usage breakdown, billed-cost, and cost-by-project endpoints and UI pages.
+- **Tokenized Invitations** — Added invitation tokens, public token preview and accept endpoints, and tokenized invite emails for org and project invitations.
+- **Metric Evaluation Model** — Added metric evaluation model support, including per-metric model resolution and frontend updates for metric-specific evals.
+- **Test-Run Cost And Latency** — Added test-run cost and latency routes, graphs, and per-run trace cost aggregation in test-run insights.
+- **AWS Marketplace Licensing** — Added AWS Marketplace license-manager integration, licensing mode configuration, and Helm support for marketplace deployment.
+
+### Improvements
+- **Usage Helpers By Project** — Updated cost-by-period and usage-count helpers to accept project IDs.
+- **Onboarding Invite Flow** — Added a team invite onboarding step with per-member role selectors and grouped invite sending.
+- **Test-Run Graph Layout** — Adjusted test-run performance and cost graph layout, tooltip syncing, and empty-state behavior.
+- **Helm Packaging And Images** — Updated Helm chart image handling, packaging scripts, and single-architecture image support.
+
+### Fixes
+- **Cost Breakdown Filtering** — Excluded unmetered AI-feature cost from organization cost breakdown and limited offline-eval cost to customer-keys only.
+- **Test-Case And Eval Fixes** — Fixed test-case result logging and several metric evaluation model issues, including provider defaults.
+- **Invitation UI Fixes** — Adjusted invite notice, invite email, and onboarding button layout and visibility behaviors.
+- **OpenTelemetry Build** — Fixed the OpenTelemetry build and added logging support.
+
+<Warning>
+**Breaking changes**
+
+- **Removed Old Sample Rate Fields** — Old sample rate fields were removed and default metric collection now defaults to 1. _Migration:_ Update any configs, payloads, or code paths that still reference the removed sample rate fields.
+- **Invite Flow Uses Tokenized Routes** — Invitation acceptance now relies on tokenized public routes and token columns in the invitation model. _Migration:_ Run the invitation token migration and ensure existing invitation emails and links are regenerated or backfilled as needed.
+- **License Mode Configuration** — Backend and chart configuration now require LICENSE_MODE and AWS Marketplace settings for marketplace deployments. _Migration:_ Set the new license mode and AWS Marketplace environment/config values before upgrading.
+- **Registry And Tag Separation** — Container image configuration now separates registry and tag values. _Migration:_ Update Helm values and deployment manifests to provide registry and tag separately.
+</Warning>
+
+### Upgrade Notes
+
+Apply the database migration that adds the invitation token column before enabling the new invite flow. If using AWS Marketplace licensing, configure LICENSE_MODE, the AWS Marketplace product settings, and the injected license secret/service account in Helm values. Update any deployments that reference the removed sample rate fields or the old combined registry/tag image setting.
