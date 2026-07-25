@@ -1,0 +1,31 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.1.0
+
+Release v2.1.0 adds standardized evaluation pings, model validation hooks, and support for flaky metrics with nullable thresholds. It also includes a backfill for legacy API keys in single-member orgs and a migration related to the new threshold behavior.
+
+### Highlights
+- Standardized evaluation pings
+- Added flaky metric and nullable threshold support
+- Added model validation hook
+- Backfilled ApiKey.userEmail for legacy single-member org keys
+
+### New Features
+- **Standardized Evaluation Pings** — Evaluation pings have been standardized.
+- **Model Validation Hook** — A model validation hook was added.
+- **Flaky Metric Support** — Support was added for flaky metrics and nullable thresholds.
+
+### Improvements
+- **Legacy ApiKey Backfill** — ApiKey.userEmail was backfilled for legacy keys in single-member organizations.
+
+<Warning>
+**Breaking changes**
+
+- **Threshold Migration** — A migration was added for flaky metric and nullable threshold support. _Migration:_ Apply the database migration associated with 38_add_flaky_and_nullable_threshold before upgrading.
+</Warning>
+
+### Upgrade Notes
+
+Run the database migration for 38_add_flaky_and_nullable_threshold during the upgrade. Legacy ApiKey.userEmail values are backfilled for single-member organizations, so no manual action is expected for that change.
