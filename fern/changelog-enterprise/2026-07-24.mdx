@@ -2,7 +2,7 @@
 tags: ["Enterprise", "Self-Hosting"]
 ---
 
-## v2.0.22
+## v2.1.0
 
 Release v2.0.22 expands organization-level billing and cost-insights, adds invitation token flows for onboarding and public invite routes, and introduces AWS Marketplace license-manager integration. It also includes test-run cost and latency reporting, metric evaluation model support, and several deployment and packaging updates.
 
@@ -11,6 +11,8 @@ Release v2.0.22 expands organization-level billing and cost-insights, adds invit
 - Invitation links now use tokenized public routes and support token preview and acceptance flows.
 - Test runs now expose cost and latency graphs and per-run trace cost aggregation.
 - Helm and backend now support AWS Marketplace license-manager deployment and licensing configuration.
+- Standardized evaluation pings, model validation
+- Added flaky metric and nullable threshold support
 
 ### New Features
 - **Organization Cost Insights** — Added organization-level cost-insights, cost breakdown, usage breakdown, billed-cost, and cost-by-project endpoints and UI pages.
@@ -18,6 +20,9 @@ Release v2.0.22 expands organization-level billing and cost-insights, adds invit
 - **Metric Evaluation Model** — Added metric evaluation model support, including per-metric model resolution and frontend updates for metric-specific evals.
 - **Test-Run Cost And Latency** — Added test-run cost and latency routes, graphs, and per-run trace cost aggregation in test-run insights.
 - **AWS Marketplace Licensing** — Added AWS Marketplace license-manager integration, licensing mode configuration, and Helm support for marketplace deployment.
+- **Standardized Evaluation Pings** — Evaluation pings have been standardized.
+- **Model Validation Hook** — A model validation hook was added.
+- **Flaky Metric Support** — Support was added for flaky metrics and nullable thresholds.
 
 ### Improvements
 - **Usage Helpers By Project** — Updated cost-by-period and usage-count helpers to accept project IDs.
