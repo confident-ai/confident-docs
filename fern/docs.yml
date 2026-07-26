@@ -999,7 +999,7 @@ navigation:
         icon: fa-light fa-server
         slug: self-hosting
       - changelog: ./changelog-client
-        title: Client SDKs
+        title: Admin SDKs
         icon: fa-light fa-code
         slug: confident-client
 
