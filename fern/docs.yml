@@ -457,6 +457,10 @@ navigation:
                   - section: Dataset Queue
                     contents:
                       - POST /v1/datasets/{alias}/queue
+                  - section: Dataset Goldens
+                    contents:
+                      - PUT /v1/datasets/{alias}/goldens/{goldenId}
+                      - DELETE /v1/datasets/{alias}/goldens/{goldenId}
               - section: Test Runs
                 contents:
                   - GET /v1/test-runs

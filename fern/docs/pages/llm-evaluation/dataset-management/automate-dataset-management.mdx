@@ -10,6 +10,7 @@ This section covers how to programmatically manage goldens in datasets using the
 - Push single and multi-turn goldens to datasets
 - Set `finalized=True` to make goldens available for evaluation, or `finalized=False` to queue for review
 - Include custom column values when pushing goldens
+- Update or delete an individual golden by its `id`
 - Delete datasets programmatically
 
 <Note>Only finalized goldens will be pulled for evaluation.</Note>
@@ -337,6 +338,125 @@ await dataset.pull({ alias: "YOUR-DATASET-ALIAS", version: "00.00.01" });
 <Note>
 When `version` is omitted, push and pull operate on the latest version. If the dataset has no versions yet, push leaves goldens unversioned and pull returns those unversioned goldens with `version: null`.
 </Note>
+
+## Update a Golden
+
+Update a single golden in place by its `id`. Pull the dataset first so each golden carries a stable `id`, edit the fields you want, then send the update.
+
+The golden's fields are replaced with the values you send. `tags` and custom columns are only changed when you include them.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+# Each pulled golden carries a stable id
+golden = dataset.goldens[0]
+golden.input = "How tall is Mt. Everest, in meters?"
+
+# alias is inherited from the pulled dataset; pass alias=... to override
+dataset.update_golden(golden=golden)
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+// Each pulled golden carries a stable id
+const golden = dataset.goldens[0];
+golden.input = "How tall is Mt. Everest, in meters?";
+
+// alias is inherited from the pulled dataset; pass alias to override
+await dataset.updateGolden({ golden });
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+For **single-turn** datasets:
+
+<EndpointRequestSnippet
+  endpoint="PUT /v1/datasets/{alias}/goldens/{goldenId}"
+  example="Single-Turn"
+/>
+
+For **multi-turn** datasets:
+
+<EndpointRequestSnippet
+  endpoint="PUT /v1/datasets/{alias}/goldens/{goldenId}"
+  example="Multi-Turn"
+/>
+
+</Tab>
+
+</Tabs>
+
+## Delete a Golden
+
+Remove a single golden from a dataset by its `id`. Only that golden is removed; the rest of the dataset is unchanged.
+
+<Tabs>
+
+<Tab title="Python" language="python">
+
+```python main.py
+from deepeval.dataset import EvaluationDataset
+
+dataset = EvaluationDataset()
+dataset.pull(alias="YOUR-DATASET-ALIAS")
+
+# alias is inherited from the pulled dataset; pass alias=... to override
+golden = dataset.goldens[0]
+dataset.delete_golden(golden=golden)
+
+# Or delete by id directly
+dataset.delete_golden(golden="GOLDEN-ID")
+```
+
+</Tab>
+
+<Tab title="Typescript" language="typescript">
+
+```ts index.ts
+import { EvaluationDataset } from "deepeval";
+
+const dataset = new EvaluationDataset();
+await dataset.pull({ alias: "YOUR-DATASET-ALIAS" });
+
+// alias is inherited from the pulled dataset; pass alias to override
+const golden = dataset.goldens[0];
+await dataset.deleteGolden({ golden });
+
+// Or delete by id directly
+await dataset.deleteGolden({ golden: "GOLDEN-ID" });
+```
+
+</Tab>
+
+<Tab title="curl" language="curl">
+
+<EndpointRequestSnippet endpoint="DELETE /v1/datasets/{alias}/goldens/{goldenId}" />
+
+</Tab>
+
+</Tabs>
+
+<Warning>
+  This action cannot be undone. The golden is permanently removed from the
+  dataset.
+</Warning>
 
 ## Delete Dataset
 
