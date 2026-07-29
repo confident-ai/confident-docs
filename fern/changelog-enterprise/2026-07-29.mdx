@@ -1,0 +1,49 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.1.1
+
+This release adds API key expiry and rotation support, new golden dataset/public endpoints, and several observability and discovery updates. It also includes security logging hardening and database migrations that operators should plan for.
+
+### Highlights
+- API keys now support expiry, rotation, grace periods, and status display.
+- Golden endpoints were split to support stable IDs and new public read/write operations.
+- Async test runs, discovery setup, and observatory onboarding received user-facing updates.
+- This release includes schema migrations for API keys and trace/full-IO related changes.
+
+### New Features
+- **API Key Expiry And Rotation** — API keys can now carry an expiration date, be rotated in place, and surface expiry and status information in settings tables and public v1 responses.
+- **Golden Endpoint Split** — Golden routes now use a stable dataset identifier and expose new public update, delete, read, and post endpoints.
+- **HubSpot CRM Sync** — Signups, organizations, plans, memberships, onboarding answers, seat counts, lifecycle stages, company domains, and Stripe customer IDs are now synced to HubSpot.
+- **Discovery Setup Guides** — Setup guides were added for tracing and test runs as part of the discovery revamp.
+- **Default Report Templates** — Default report templates were added.
+
+### Improvements
+- **Async Test Run Events** — SSE events for async test runs now show waiting test cases, and test case warnings and statuses were updated.
+- **Observability Onboarding** — Observatory onboarding and feature gating were improved.
+- **Governance Policy UI** — The add button was restored in governance policies.
+- **Marketing Materials Page** — A Marketing Materials page was added to the GTM dashboard.
+
+### Fixes
+- **Security Logging** — Credential bundles, raw axios errors, SAQ job kwargs, and model configuration details are no longer logged in sensitive failure paths.
+- **Api Key Cache Invalidation** — API key caches are now invalidated on public, client, and organization key updates, deletes, and rotations.
+- **Trace Full IO** — Trace and spans public endpoints now support fullIO handling.
+- **Platform Model Ping** — The platform model ping path was fixed.
+- **Classification Graphs** — Classification graphs were fixed, including thread classification graphs and chart updates.
+- **Online Metrics Parsing** — Online metrics now correctly parse tool call types.
+- **Educational Email Handling** — Educational emails are now allowed across signup, login, CLI auth, and invites.
+- **Pydantic Schema** — The pydantic schema was updated for a new content type.
+- **Security Provider Keys** — Provider key handling was fixed.
+
+<Warning>
+**Breaking changes**
+
+- **Api Key Schema Migration** — The API key model now includes expiresAt, shadowValue, and rotatesAt fields, and related status and rotation behavior changed. _Migration:_ Run the included database migrations before upgrading application components that read or write API keys.
+- **Trace And Span Endpoint Payloads** — Trace and span public endpoints now accept fullIO-related data handling changes. _Migration:_ Verify any clients or integrations that consume trace/span public endpoints against the updated payload shape.
+- **Golden Endpoint Contract** — Golden dataset and public endpoint coupling was removed in favor of new read and post routes. _Migration:_ Update any integrations calling golden endpoints to use the new stable dataset ID and public read/write endpoints.
+</Warning>
+
+### Upgrade Notes
+
+Apply the new API key migrations before deploying this release, and verify any automation that manages API keys, golden endpoints, or trace/span public endpoints against the updated contracts.
