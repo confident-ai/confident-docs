@@ -1,0 +1,44 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.1.2
+
+This release adds self-hosted signup disablement with admin seeding, expands audit logging and attribution, and introduces governance runtime controls for metric and annotation data. It also includes ClickHouse and audit-log fixes, plus several migration and deployment-related changes that require operator attention.
+
+### Highlights
+- Self-hosted signup can now be disabled and replaced with a seed-admin bootstrap flow.
+- Audit logs gain better organization/resource attribution and optional stdout mirroring on on-prem deployments.
+- Governance runtime controls now support metric data and annotations, including metric-level selection and persistence of extra query params.
+- New database migrations add model provider policy and governance control version fields.
+
+### New Features
+- **Disable Sign-Up Flow** — The backend and frontend now support disabling email/password signup via configuration and routing users to login when signup is disabled.
+- **Seed Admin Accounts** — A seed-admin script was added to pre-create bootstrap admin accounts for self-hosted deployments.
+- **Audit Log Stdout Mirroring** — On-prem deployments can now mirror audit events to stdout when the new audit log stdout setting is enabled.
+- **Governance Runtime Controls Expansion** — Governance runtime controls now support metric data, annotations, metric-level selection, median score aggregation, and extra query params on control versions.
+
+### Improvements
+- **ClickHouse Span Read Optimization** — The backend no longer performs wasted full-IO reads for offloaded span payloads in ClickHouse.
+- **Audit Log Attribution** — Audit log actor, organization, project, invitation, and token acceptance attribution were tightened when request parameters are missing or overridden.
+- **HubSpot PQL Sync** — Qualified lead flow now enters HubSpot at onboarding completion and syncs the PQL score explanation to HubSpot.
+- **Governance Editor Consistency** — The governance UI now exposes metric data and annotations in the runtime control editor and uses consistent data-model labeling.
+
+### Fixes
+- **Atomic Admin Seeding** — Admin seeding is now atomic to avoid partial user creation.
+- **Organization Fallback In Audit Logs** — Routes without an organizationId now fall back to the actor's organization for audit logging.
+- **Cost Display Corrections** — Cost display was fixed for multi-turn test runs with traces.
+- **Upgrade Callout UI** — The frontend callout component was upgraded.
+
+<Warning>
+**Breaking changes**
+
+- **Signup Disablement Configuration Renamed** — The signup disablement flag was renamed internally to CONFIDENT_DISABLE_SIGN_UP and is exposed through DISABLE_SIGN_UP and NEXT_PUBLIC_DISABLE_SIGN_UP in deployment config. _Migration:_ Update backend and frontend deployment configuration to set DISABLE_SIGN_UP and NEXT_PUBLIC_DISABLE_SIGN_UP, and use the Helm disableSignUp value if deploying via chart.
+- **Audit Log Stdout Configuration Renamed** — The audit log stdout flag was renamed internally to CONFIDENT_AUDIT_LOG_STDOUT and is exposed through AUDIT_LOG_STDOUT_ENABLED in deployment config. _Migration:_ Update backend and Helm configuration to set AUDIT_LOG_STDOUT_ENABLED if stdout mirroring is required.
+- **Governance Control Schema Expanded** — Governance control versions now include extra query params and metric-level configuration, and the runtime control write path validates aggregation against the selected data model. _Migration:_ Review governance control writes and snapshots to ensure metric-level and extra query param fields are populated where needed, then apply the new database migrations.
+- **Model Provider Policy Migration Added** — New model provider policy tables and related migrations were added. _Migration:_ Run the database migrations before upgrading the application.
+</Warning>
+
+### Upgrade Notes
+
+Apply the new database migrations before starting the upgraded release. If you use self-hosted signup disablement, configure DISABLE_SIGN_UP and NEXT_PUBLIC_DISABLE_SIGN_UP or the Helm disableSignUp value; if you use audit stdout mirroring, configure AUDIT_LOG_STDOUT_ENABLED or the Helm auditLogStdout value.
