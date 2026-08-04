@@ -1,0 +1,37 @@
+---
+tags: ["Enterprise", "Self-Hosting"]
+---
+
+## v2.0.21
+
+This release includes fixes for report templates, test case table errors, and cron firing behavior. It also adds DAG support to the metric model, introduces GA4 app instrumentation, and includes deployment-related changes for AWS Marketplace and secret variable naming.
+
+### Highlights
+- Added DAG support to the metric model.
+- Introduced GA4 instrumentation in the app and sign-up tracking on first onboarding view.
+- Fixed cron jobs firing every other time.
+- Renamed a secrets-related variable and added AWS Marketplace push setup.
+
+### New Features
+- **DAG Metric Model** — DAG support was added to the metric model.
+- **GA4 App Tracking** — GA4 was added to the app and sign_up is fired on the first onboarding view.
+
+### Improvements
+- **On-Prem Environment Gating** — On-prem environments are now gated.
+- **AWS Marketplace Push Setup** — CI was updated to set up AWS Marketplace push.
+- **Secrets Variable Rename** — A secrets-related variable was renamed.
+
+### Fixes
+- **Report Template Bug** — A bug in the report template was fixed.
+- **Test Cases Table Error** — The test cases table no longer shows a direct error.
+- **Cron Firing** — Cron jobs that were firing every other time were fixed.
+
+<Warning>
+**Breaking changes**
+
+- **Secrets Variable Rename** — A secrets-related variable was renamed. _Migration:_ Update any deployment or configuration references to the old secrets variable name.
+</Warning>
+
+### Upgrade Notes
+
+Update any deployment or configuration references to the renamed secrets variable before upgrading.
