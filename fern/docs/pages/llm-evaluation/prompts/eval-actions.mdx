@@ -1,0 +1,115 @@
+---
+subtitle: Automate evaluations on prompt commits, pull requests, and merges
+slug: llm-evaluation/prompt-management/eval-actions
+---
+
+## Overview
+
+Eval actions let you run evaluations automatically whenever specific events happen on your prompts. Instead of manually triggering evaluations each time you make a change, you can configure eval tasks that fire on commits, pull request creation, or merges.
+
+This is especially useful when combined with [branching and pull requests](/docs/llm-evaluation/prompt-management/branch-and-merge-prompts), as it gives you automated quality checks on prompt changes before they reach main.
+
+## Quality Checks Tab
+
+The **Quality Checks** tab on the Eval Actions page shows the results of all automated evaluation runs for the prompt. Each row displays the eval task name, trigger type, status, and a link to the full test run results.
+
+<Frame caption="Eval Actions — Quality Checks">
+  <img
+    data-image="prompts.evalActionsQualityChecks"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+## Create an Eval Task
+
+To set up an automated eval action, navigate to the **Triggers** tab on the Eval Actions page and click **Add Eval Task**.
+
+<Frame caption="Create an Eval Task">
+  <img
+    data-image="prompts.createEvalTask"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Each eval task requires:
+
+| Field | Description |
+| --- | --- |
+| **Name** | A descriptive name for the eval task. |
+| **Triggers** | Events that run the evaluation: **Commit**, **Pull Request**, **Merge**, or **Version**. |
+| **Dataset** | The dataset to evaluate against. Must have compatible goldens. |
+| **Metric Collection** | The metrics to score the prompt against. |
+
+### Triggers
+
+You can assign multiple triggers to a single eval task. Each trigger fires under different circumstances:
+
+- **Commit** — Runs every time a new commit is made to any branch (including main).
+- **Pull Request** — Runs once when a pull request is first opened. This is the recommended trigger for quality gates on PRs.
+- **Merge** — Runs after a pull request is merged into main.
+- **Version** — Runs when a commit is promoted to a version.
+
+<Frame caption="Eval task triggers">
+  <img
+    data-image="prompts.evalTaskTriggers"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+<Note>
+  A single eval task can have multiple triggers. For example, you might want a
+  task to run on both **Commit** and **Pull Request** events so you get
+  continuous feedback during development and a final check when the PR is
+  opened.
+</Note>
+
+### Dataset and Metric Requirements
+
+When selecting a dataset, ensure that the goldens (expected outputs) in the dataset are compatible with the metrics in your selected metric collection. If a dataset has no goldens, or its goldens don't match the required fields for the chosen metrics, the eval task will fail silently after triggering.
+
+A warning will appear in the eval task creator if the selected dataset is missing goldens or has a mismatch with the metric collection.
+
+<Warning>
+  If no eval task is configured with a **Pull Request** trigger, no automated
+  checks will run when a PR is created. A notice will appear in the PR creation
+  dialog reminding you to configure one.
+</Warning>
+
+## Eval Checks on Pull Requests
+
+When a pull request is opened and eval tasks with a **Pull Request** trigger exist, the evaluation runs automatically. Results appear in two places on the PR detail page:
+
+1. **Timeline** — Each eval run appears as a timeline entry with its status (passed, failed, or running) and a link to view the full test run.
+2. **Eval Checks section** — At the bottom of the General tab, the most recent eval check is displayed with a summary showing how many test cases passed or failed.
+
+<Frame caption="Eval checks on a pull request">
+  <img
+    data-image="prompts.prEvalChecks"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</Frame>
+
+Subsequent commits to the branch will trigger any **Commit**-type eval tasks, and those results will also appear in the PR timeline — giving you continuous visibility into prompt quality throughout the review process.
+
+## Enable or Disable Eval Tasks
+
+You can enable or disable individual eval tasks without deleting them. Disabled tasks will not fire on any trigger. Toggle the enabled state from the Triggers tab on the Eval Actions page.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Branch & Merge Prompts"
+    icon="code-branch"
+    href="/docs/llm-evaluation/prompt-management/branch-and-merge-prompts"
+  >
+    Learn how to use branches and pull requests for prompt development.
+  </Card>
+  <Card
+    title="Experiments"
+    icon="flask"
+    href="/docs/llm-evaluation/experiments"
+  >
+    Compare prompt versions side-by-side with statistical rigor.
+  </Card>
+</CardGroup>
